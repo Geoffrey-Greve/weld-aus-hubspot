@@ -1,0 +1,14 @@
+{
+  "label": "Events Feature Links",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Permanent feature links for the Events page (e.g. National Manufacturing Summit, Welding Excellence Awards). Each card only renders once it has a link, so 'coming soon' features stay hidden until a URL is set.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["events", "features", "links"]
+}

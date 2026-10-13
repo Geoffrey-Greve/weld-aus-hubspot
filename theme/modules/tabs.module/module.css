@@ -1,0 +1,110 @@
+/*
+ * tabs.module/module.css
+ * Accessible tabbed content panels with keyboard navigation.
+ * BEM prefix: wa-tabs.
+ */
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+
+.wa-tabs__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: 800;
+  margin: 0 0 var(--wa-space-8) 0;
+}
+
+/* ── Tab list ────────────────────────────────────────────────────────────── */
+
+.wa-tabs__tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--wa-space-8);
+  padding-bottom: 0;
+}
+
+/* ── Tab button ──────────────────────────────────────────────────────────── */
+
+.wa-tabs__tab {
+  padding: var(--wa-space-3) var(--wa-space-5);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-sm);
+  font-weight: 600;
+  color: var(--wa-color-text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  border-radius: var(--wa-radius-sm) var(--wa-radius-sm) 0 0;
+  min-height: var(--wa-touch-min);
+}
+
+.wa-tabs__tab[aria-selected="true"] {
+  color: var(--wa-color-primary);
+  border-bottom-color: var(--wa-color-primary);
+}
+
+.wa-tabs__tab:hover {
+  color: var(--wa-color-primary);
+}
+
+.wa-tabs__tab:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Panel ───────────────────────────────────────────────────────────────── */
+
+.wa-tabs__panel {
+  animation: wa-tabs-fadein 0.2s ease;
+}
+
+@keyframes wa-tabs-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Dark background overrides ───────────────────────────────────────────── */
+
+.wa-section--bg-primary .wa-tabs__tablist,
+.wa-section--bg-primary_dark .wa-tabs__tablist {
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+.wa-section--bg-primary .wa-tabs__tab,
+.wa-section--bg-primary_dark .wa-tabs__tab {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.wa-section--bg-primary .wa-tabs__tab[aria-selected="true"],
+.wa-section--bg-primary_dark .wa-tabs__tab[aria-selected="true"] {
+  color: var(--wa-color-accent);
+  border-bottom-color: var(--wa-color-accent);
+}
+
+.wa-section--bg-primary .wa-tabs__tab:hover,
+.wa-section--bg-primary_dark .wa-tabs__tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.wa-section--bg-primary .wa-tabs__tab:focus-visible,
+.wa-section--bg-primary_dark .wa-tabs__tab:focus-visible {
+  outline-color: var(--wa-color-accent);
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-tabs__panel {
+    animation: none;
+  }
+}

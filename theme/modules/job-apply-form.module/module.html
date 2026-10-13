@@ -1,0 +1,108 @@
+{#
+  job-apply-form.module/module.html
+  On-site application form for Job Board rows that apply by email (defect 68).
+
+  The employer's address is deliberately NOT passed into this module and must
+  never be rendered. The applicant submits a HubSpot form; a workflow reads the
+  job_slug hidden field, looks up the employer address server-side and forwards
+  the application. See workflows/job-board-apply-routing.md.
+
+  Runtime job context (set via {% module %} overrides on the job detail page):
+    module.job_title      - the advertised role title
+    module.job_reference  - the row's `ref` value, if any
+    module.job_slug       - the row slug, used by the routing workflow
+    module.employer_name  - the advertising company
+    module.fallback_url   - where to send applicants when no form is configured
+
+  Named module-tag overrides only land on module.* when matching fields exist
+  in fields.json - bare HubL variables are never created. As a belt-and-
+  suspenders fallback on HubDB dynamic pages, empty overrides also resolve
+  from dynamic_page_hubdb_row (same pattern as course-filter).
+
+  Fields (editor-configurable, shared across every job page):
+    module.form    - the application form. Blank => fallback CTA only.
+#}
+
+{# Form comes from the picker dropdown only - this module never takes a raw GUID. #}
+{% set _form_id = module.form.form_id | default('', true) | string | trim %}
+
+{# Prefer module-tag overrides (fields.json), then the HubDB dynamic page row. #}
+{% set _row = dynamic_page_hubdb_row %}
+{% set _job_title = module.job_title | default(_row.job_title, true) | default('', true) %}
+{% set _job_reference = module.job_reference | default(_row.ref, true) | default(_row.hs_id, true) | default('', true) %}
+{% set _job_slug = module.job_slug
+  | default(_row.hs_path, true)
+  | default(_row.path, true)
+  | default(_row.slug, true)
+  | default('', true)
+%}
+{% set _employer_name = module.employer_name | default(_row.company_name, true) | default('', true) %}
+{% set _fallback_url = module.fallback_url | default('', true) | trim %}
+{% if not _fallback_url %}
+  {% if _job_slug %}
+    {% set _fallback_url = '/contact-us?topic=job-board&ref=' ~ _job_slug %}
+  {% else %}
+    {% set _fallback_url = '/contact-us?topic=job-board' %}
+  {% endif %}
+{% endif %}
+
+<div class="wa-job-apply-form">
+  {% if _form_id %}
+    <h3 class="wa-job-apply-form__heading">{{ module.heading | default('Apply for this role', true) }}</h3>
+    {% if module.intro %}
+      <div class="wa-job-apply-form__intro">{{ module.intro }}</div>
+    {% endif %}
+
+    <div class="wa-job-apply-form__mount"></div>
+
+    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+    <script>
+    (function () {
+      var mount = document.currentScript.previousElementSibling.previousElementSibling;
+      var uid = 'wa-job-apply-' + Math.random().toString(36).slice(2, 9);
+      mount.id = uid;
+
+      var successHtml = {{ module.success_message | default('', true) | tojson }};
+      var jobContext = {
+        job_title: {{ (_job_title | striptags) | tojson }},
+        job_reference: {{ (_job_reference | striptags) | tojson }},
+        job_slug: {{ (_job_slug | striptags) | tojson }},
+        employer_name: {{ (_employer_name | striptags) | tojson }}
+      };
+
+      hbspt.forms.create({
+        region: 'ap1',
+        portalId: '441838610',
+        formId: '{{ _form_id }}',
+        target: '#' + uid,
+        onFormReady: function ($form) {
+          // Stamp the job context onto the form's hidden fields so the routing
+          // workflow can resolve the employer without the page ever knowing it.
+          var root = $form && $form.length ? $form[0] : $form;
+          if (!root || !root.querySelector) return;
+          Object.keys(jobContext).forEach(function (key) {
+            var input = root.querySelector('input[name="' + key + '"]');
+            if (!input) return;
+            input.value = jobContext[key];
+            // HubSpot forms read values through React-style change events.
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+        },
+        onFormSubmitted: function () {
+          var container = document.getElementById(uid);
+          if (container && successHtml) {
+            container.innerHTML = '<div class="wa-job-apply-form__success" role="alert">' + successHtml + '</div>';
+          }
+        }
+      });
+    }());
+    </script>
+  {% else %}
+    <h3 class="wa-job-apply-form__heading">{{ module.fallback_heading | default('Apply for this role', true) }}</h3>
+    {% if module.fallback_text %}
+      <div class="wa-job-apply-form__intro">{{ module.fallback_text }}</div>
+    {% endif %}
+    <a class="btn btn-primary" href="{{ _fallback_url }}">{{ module.fallback_cta_label | default('Apply via Weld Australia', true) }}</a>
+  {% endif %}
+</div>

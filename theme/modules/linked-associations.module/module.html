@@ -1,0 +1,212 @@
+{#
+  linked-associations.module/module.html
+
+  Read-only list of Company associations on the logged-in contact.
+
+  Data sources (in priority order):
+    1. window.__WELD_MEMBER__.associations (client-side, set by portal.html layout).
+       This array is richer and future-proof: if Ollie adds multiple associations
+       to the layout injection it will automatically appear here without a code change.
+    2. request_contact HubL properties (server-side fallback): associatedcompanyid,
+       associatedcompanyname, wa_company_role_label, wa_company_membership_tier.
+
+  Strategy:
+    HubL renders the server-side primary association inside a <noscript>-accessible
+    <ul> element with data attributes. JavaScript then replaces the list content
+    with data from window.__WELD_MEMBER__.associations if available, so the richer
+    client-side data wins when JS runs (handles multi-company contacts).
+
+  Tier badge colours:
+    Corporate Gold   → --wa-color-tier-gold   (#C9A227)
+    Corporate Silver → --wa-color-tier-silver (#A0A0A0)
+    Corporate Bronze → --wa-color-tier-bronze (#B27330)
+    All others       → --wa-color-text-muted
+
+  Role labels (from wa_company_role_label or association roleLabel):
+    Primary Admin / Employee / Apprentice / Reciprocal Member
+
+  Pro limitation note:
+    HubSpot Pro HubL only surfaces the primary associated company. Contacts
+    with multiple company associations see all of them here only if Ollie
+    extends the portal.html window.__WELD_MEMBER__ injection to include them
+    (Phase 2 enhancement - the frontend is already ready for it).
+#}
+
+{% set linked_assoc_editor_preview = is_in_editor or (is_in_previewer | default(false)) or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+{% set linked_assoc_has_member_context = request_contact.is_logged_in or linked_assoc_editor_preview %}
+
+{% if not module.members_only or linked_assoc_has_member_context %}
+
+{# ── Visibility classes ────────────────────────────────────────────────────── #}
+{%- set vis_classes = [] -%}
+{%- if 'mobile' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-mobile'] -%}{%- endif -%}
+{%- if 'tablet' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-tablet'] -%}{%- endif -%}
+{%- if 'desktop' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-desktop'] -%}{%- endif -%}
+
+{# ── Server-side primary association from HubL ─────────────────────────────── #}
+{%- set hs_company_id   = request_contact.associatedcompanyid   | default('', true) -%}
+{%- set hs_company_name = request_contact.associatedcompanyname | default('', true) -%}
+{%- set hs_role_label   = request_contact.wa_company_role_label | default('', true) -%}
+{%- set hs_tier         = request_contact.wa_company_membership_tier | default('', true) -%}
+{%- set has_association = hs_company_id != '' -%}
+
+{# ── Request change URL ───────────────────────────────────────────────────── #}
+{%- set change_href = module.request_change_link.url.href | default('/contact/', true) -%}
+{%- set change_new_tab = module.request_change_link.open_in_new_tab | default(false) -%}
+
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-linked-assoc{{ ' ' ~ vis_classes | join(' ') if vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div class="wa-linked-assoc__inner">
+
+      {# ── Heading ────────────────────────────────────────────────────────── #}
+      {% if module.heading %}
+      <h2 class="wa-linked-assoc__heading">{{ module.heading }}</h2>
+      {% endif %}
+
+      {# ── Associations list ──────────────────────────────────────────────── #}
+      {#
+        The list is pre-rendered server-side (HubL) and progressively enhanced
+        by JS which replaces the inner content with window.__WELD_MEMBER__.associations.
+        The data-server-rendered attribute signals to JS that SSR data is present.
+      #}
+      <ul
+        id="wa-linked-assoc-list"
+        class="wa-linked-assoc__list"
+        role="list"
+        {% if has_association %}data-server-rendered="true"{% endif %}
+      >
+        {% if has_association %}
+        {# Server-side primary company row #}
+        <li
+          class="wa-linked-assoc__item"
+          data-company-id="{{ hs_company_id | escape }}"
+        >
+          <div class="wa-linked-assoc__item-body">
+            <div class="wa-linked-assoc__company-name">{{ hs_company_name | escape }}</div>
+            {% if hs_role_label %}
+            <div class="wa-linked-assoc__role">{{ hs_role_label | escape }}</div>
+            {% endif %}
+            {% if hs_tier %}
+            <div class="wa-linked-assoc__tier wa-linked-assoc__tier--{{ hs_tier | lower | replace(' ', '-') }}">
+              {{ hs_tier | escape }}
+            </div>
+            {% endif %}
+          </div>
+        </li>
+        {% else %}
+        <li class="wa-linked-assoc__empty" id="wa-linked-assoc-empty">
+          {% if module.empty_state_message %}
+          {{ module.empty_state_message }}
+          {% else %}
+          No linked organisations found on your account.
+          {% endif %}
+        </li>
+        {% endif %}
+      </ul>
+
+      {# ── Request change link ────────────────────────────────────────────── #}
+      {% if module.request_change_label %}
+      <div class="wa-linked-assoc__footer">
+        <a
+          href="{{ change_href }}"
+          class="wa-linked-assoc__change-link"
+          {% if change_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >
+          <svg class="wa-linked-assoc__change-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+            <path d="M11.333 2.667A2 2 0 0 1 14 5.333L5.333 14H2.667v-2.667L11.333 2.667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ module.request_change_label }}
+        </a>
+        <p class="wa-linked-assoc__change-hint">
+          To add or remove a linked organisation, contact the Weld Australia membership team.
+        </p>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  var list = document.getElementById('wa-linked-assoc-list');
+  if (!list) return;
+
+  /* Read associations from window.__WELD_MEMBER__ (set by portal.html layout) */
+  var member = window.__WELD_MEMBER__;
+  if (!member || !Array.isArray(member.associations) || member.associations.length === 0) return;
+
+  var associations = member.associations;
+
+  /* Tier → CSS modifier + display label mapping */
+  var TIER_LABELS = {
+    'corporate_gold':   'Corporate Gold',
+    'corporate_silver': 'Corporate Silver',
+    'corporate_bronze': 'Corporate Bronze',
+    'individual':       'Individual',
+    'apprentice':       'Apprentice',
+    'reciprocal':       'Reciprocal',
+    'industry_supplier': 'Industry Supplier'
+  };
+
+  function tierModifier(tier) {
+    if (!tier) return '';
+    return tier.toLowerCase().replace(/\s+/g, '-');
+  }
+
+  function tierDisplay(tier) {
+    if (!tier) return '';
+    var key = tier.toLowerCase().replace(/\s+/g, '_');
+    return TIER_LABELS[key] || tier;
+  }
+
+  /* Build enhanced list items from window.__WELD_MEMBER__ data */
+  var html = associations.map(function (assoc) {
+    var companyId   = String(assoc.companyId || '');
+    var companyName = assoc.companyName || '';
+    var roleLabel   = assoc.roleLabel   || '';
+    var tier        = assoc.tier        || '';
+
+    var tierHtml = tier
+      ? '<div class="wa-linked-assoc__tier wa-linked-assoc__tier--' + tierModifier(tier) + '">' + tierDisplay(tier) + '</div>'
+      : '';
+
+    var roleHtml = roleLabel
+      ? '<div class="wa-linked-assoc__role">' + escHtml(roleLabel) + '</div>'
+      : '';
+
+    return (
+      '<li class="wa-linked-assoc__item" data-company-id="' + escHtml(companyId) + '">' +
+        '<div class="wa-linked-assoc__item-body">' +
+          '<div class="wa-linked-assoc__company-name">' + escHtml(companyName) + '</div>' +
+          roleHtml +
+          tierHtml +
+        '</div>' +
+      '</li>'
+    );
+  }).join('');
+
+  list.innerHTML = html || (
+    '<li class="wa-linked-assoc__empty">' +
+      'No linked organisations found on your account.' +
+    '</li>'
+  );
+
+  /* Minimal XSS escape for dynamic content */
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+}());
+</script>
+
+{% endif %}

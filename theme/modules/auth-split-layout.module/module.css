@@ -1,0 +1,167 @@
+/*
+ * auth-split-layout.module/module.css
+ * Brand panel component styles - rendered inside .auth-layout__brand.
+ * Full auth layout (grid, topbar) lives in theme/assets/css/auth.css.
+ * Tokens from theme/assets/css/tokens.css.
+ */
+
+/* ── Panel wrapper ───────────────────────────────────────────────────────── */
+
+.auth-brand {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(237, 18, 141, 0.20), transparent 34%),
+    radial-gradient(circle at 88% 14%, rgba(254, 207, 5, 0.18), transparent 28%),
+    linear-gradient(145deg, #0f1030 0%, #171a4a 54%, #062f5f 100%);
+  color: #ffffff;
+}
+
+/* ── Background image ────────────────────────────────────────────────────── */
+
+.auth-brand__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+/* Dark gradient overlay - ensures text legibility over any image */
+.auth-brand__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    145deg,
+    rgba(15, 16, 48, 0.88) 0%,
+    rgba(6, 47, 95, 0.74) 100%
+  );
+}
+
+/* ── Content layer ───────────────────────────────────────────────────────── */
+
+.auth-brand__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  padding: clamp(32px, 5vw, 64px);
+  gap: var(--wa-space-8);
+}
+
+/* ── Logo link ───────────────────────────────────────────────────────────── */
+
+.auth-brand__logo-link {
+  display: inline-block;
+  text-decoration: none;
+  flex-shrink: 0;
+  min-height: var(--wa-touch-min);
+  display: inline-flex;
+  align-items: center;
+}
+
+.auth-brand__logo-img {
+  display: block;
+  height: 42px;
+  width: auto;
+}
+
+/* ── Heading + body ──────────────────────────────────────────────────────── */
+
+.auth-brand__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--wa-space-4);
+  min-width: 0;
+}
+
+.auth-brand__heading {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(2rem, 4vw, 3.75rem);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: var(--wa-leading-tight);
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: -0.04em;
+}
+
+.auth-brand__body {
+  max-width: 620px;
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: var(--wa-leading-relaxed);
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.auth-brand__body p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Secondary action link ───────────────────────────────────────────────── */
+
+.auth-brand__secondary-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wa-space-2);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  width: fit-content;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  text-decoration: none;
+  opacity: 1;
+  min-height: var(--wa-touch-min);
+  transition:
+    background-color var(--wa-duration-fast) var(--wa-ease-default),
+    border-color var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.auth-brand__secondary-link:hover,
+.auth-brand__secondary-link:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.42);
+  text-decoration: none;
+}
+
+.auth-brand__secondary-link:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 3px;
+  border-radius: var(--wa-radius-sm);
+}
+
+.auth-brand__arrow {
+  flex-shrink: 0;
+  transition: transform var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.auth-brand__secondary-link:hover .auth-brand__arrow {
+  transform: translateX(3px);
+}
+
+/* ── Footer microcopy ────────────────────────────────────────────────────── */
+
+.auth-brand__microcopy {
+  font-size: var(--wa-text-xs);
+  line-height: var(--wa-leading-relaxed);
+  color: rgba(255, 255, 255, 0.64);
+  margin-top: auto;
+  padding-top: var(--wa-space-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.auth-brand__microcopy p:last-child {
+  margin-bottom: 0;
+}

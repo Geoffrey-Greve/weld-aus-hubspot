@@ -1,0 +1,14 @@
+{
+  "label": "Value Props (3-up)",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Three-column value proposition cards with icon, heading, body text, and optional CTA.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["content", "cards"]
+}

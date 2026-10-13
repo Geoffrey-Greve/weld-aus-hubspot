@@ -1,0 +1,14 @@
+{
+  "label": "Icon Grid",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Grid of icon + heading + body items. Replaces value-props-3up.module.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["icons", "features", "grid", "value-props"]
+}

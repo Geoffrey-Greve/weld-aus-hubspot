@@ -1,0 +1,14 @@
+{
+  "label": "Subscription Form",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Email signup card for events, or a full HubSpot subscription form. Always requires a form GUID — never renders a dead submit button.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["form", "subscription", "communications"]
+}

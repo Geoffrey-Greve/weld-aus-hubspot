@@ -1,0 +1,495 @@
+/* ============================================================
+   find-a-member - React island styles
+   Follows the --wa-* design token system from CLAUDE.md §5.3
+   Mobile-first; single-column on mobile, 3-column on desktop.
+   Tier badges use --wa-color-tier-gold/silver/bronze tokens.
+   ============================================================ */
+
+/* Screen-reader only utility */
+.wa-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Root wrapper ------------------------------------------------- */
+
+.wa-fam {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-6, 24px);
+}
+
+/* Section header ---------------------------------------------- */
+
+.wa-fam__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 12px);
+}
+
+.wa-fam__heading {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  margin: 0;
+}
+
+.wa-fam__intro {
+  color: var(--wa-color-text-muted, #6b7280);
+  max-width: 60ch;
+}
+
+.wa-fam__intro p:last-child {
+  margin-bottom: 0;
+}
+
+/* Toolbar ----------------------------------------------------- */
+
+.wa-fam__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4, 16px);
+}
+
+/* Search input */
+.wa-fam__search-wrap {
+  width: 100%;
+}
+
+.wa-fam__search {
+  width: 100%;
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-3, 12px);
+  border: 1.5px solid rgba(0, 0, 0, 0.2);
+  border-radius: var(--wa-radius-md, 8px);
+  font-size: 1rem;
+  background: var(--wa-color-surface, #fff);
+  box-sizing: border-box;
+}
+
+.wa-fam__search:focus {
+  outline: 2px solid var(--wa-color-primary, #003087);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+/* Filter chip groups */
+.wa-fam__filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 12px);
+}
+
+@media (min-width: 640px) {
+  .wa-fam__filters {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--wa-space-4, 16px);
+    align-items: flex-start;
+  }
+}
+
+/* Sort toggle */
+.wa-fam__sort {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.wa-fam__sort-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.wa-fam__sort-btn {
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-3, 12px);
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: var(--wa-radius-md, 8px);
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.wa-fam__sort-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.wa-fam__sort-btn--active {
+  background: var(--wa-color-primary, #003087);
+  border-color: var(--wa-color-primary, #003087);
+  color: var(--wa-color-on-primary, #fff);
+}
+
+.wa-fam__sort-btn--active:hover {
+  background: var(--wa-color-primary, #003087);
+}
+
+/* Result count ------------------------------------------------ */
+
+.wa-fam__count {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  margin: 0;
+  min-height: 1.25em;
+}
+
+/* Grid -------------------------------------------------------- */
+
+.wa-fam__grid {
+  display: grid;
+  /* minmax(0, 1fr) not 1fr - a bare 1fr floors the track at min-content, so a
+     long company name or email would widen the track past the viewport. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--wa-space-4, 16px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 640px) {
+  .wa-fam__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-fam__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wa-fam__grid-item {
+  display: flex;
+  min-width: 0;
+}
+
+/* Member card ------------------------------------------------- */
+
+.wa-fam__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 12px);
+  padding: var(--wa-space-4, 16px);
+  border-radius: var(--wa-radius-md, 8px);
+  background: var(--wa-color-surface, #fff);
+  box-shadow: var(--wa-shadow-card, 0 1px 4px rgba(0, 0, 0, 0.08));
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-top: 4px solid transparent;
+  width: 100%;
+  /* Fill the grid cell so every tile in a row is the same height regardless of
+     blurb length or number of CTAs (grid items already stretch). */
+  height: 100%;
+}
+
+/* Tier border accent (top) per §6.2 */
+.wa-fam__card--gold {
+  border-top-color: var(--wa-color-tier-gold, #c9a227);
+}
+
+.wa-fam__card--silver {
+  border-top-color: var(--wa-color-tier-silver, #a0a0a0);
+}
+
+.wa-fam__card--bronze {
+  border-top-color: var(--wa-color-tier-bronze, #b27330);
+}
+
+.wa-fam__card--reciprocal,
+.wa-fam__card--industry-supplier,
+.wa-fam__card--member,
+.wa-fam__card--premium {
+  border-top-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Logo container */
+.wa-fam__card-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--wa-radius-sm, 4px);
+  overflow: hidden;
+  background: var(--wa-color-surface-alt, #f9fafb);
+  flex-shrink: 0;
+}
+
+.wa-fam__logo-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.wa-fam__logo-initials {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--wa-color-text-muted, #6b7280);
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+/* Card body */
+.wa-fam__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-2, 8px);
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-fam__card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--wa-space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.wa-fam__company-name {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Tier badge */
+.wa-fam__tier-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border: 1.5px solid currentColor;
+}
+
+/* Gold: gold border + soft gold tint; #5c3d00 on #fdf8e8 → 9.5:1 (WCAG AA) */
+.wa-fam__tier-badge--gold {
+  color: #5c3d00;
+  background: #fdf8e8;
+}
+
+/* Silver: silver border + soft grey tint; #555 on #f5f5f5 → 6.2:1 (WCAG AA) */
+.wa-fam__tier-badge--silver {
+  color: #555;
+  background: #f5f5f5;
+  border-color: var(--wa-color-tier-silver, #a0a0a0);
+}
+
+/* Bronze: bronze border + soft bronze tint; #5c2d00 on #fdf3e8 → 9.8:1 (WCAG AA) */
+.wa-fam__tier-badge--bronze {
+  color: #5c2d00;
+  background: #fdf3e8;
+}
+
+.wa-fam__tier-badge--reciprocal,
+.wa-fam__tier-badge--industry-supplier,
+.wa-fam__tier-badge--member,
+.wa-fam__tier-badge--premium {
+  color: var(--wa-color-text-muted, #6b7280);
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.wa-fam__states {
+  font-size: 0.8125rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  margin: 0;
+}
+
+.wa-fam__blurb {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--wa-color-text, #111827);
+}
+
+.wa-fam__blurb p:first-child {
+  margin-top: 0;
+}
+
+.wa-fam__blurb p:last-child {
+  margin-bottom: 0;
+}
+
+/* Card CTAs */
+.wa-fam__card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-2, 8px);
+  margin-top: auto;
+}
+
+.wa-fam__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-4, 16px);
+  border-radius: var(--wa-radius-md, 8px);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1.5px solid var(--wa-color-primary, #003087);
+  color: var(--wa-color-primary, #003087);
+  background: transparent;
+  transition: background 0.15s, color 0.15s;
+}
+
+.wa-fam__cta:hover {
+  background: var(--wa-color-primary, #003087);
+  color: var(--wa-color-on-primary, #fff);
+}
+
+.wa-fam__email-link {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  /* `anywhere` rather than `break-all`: only breaks when the line actually
+     overflows, so short addresses stay intact instead of being chopped
+     mid-word. The min-width:0 on the grid item above is what makes this
+     reachable at all. */
+  overflow-wrap: anywhere;
+  min-height: var(--wa-touch-min, 44px);
+  display: inline-flex;
+  align-items: center;
+}
+
+.wa-fam__email-link:hover {
+  color: var(--wa-color-primary, #003087);
+}
+
+/* Empty state ------------------------------------------------- */
+
+.wa-fam__empty {
+  padding: var(--wa-space-12, 48px) var(--wa-space-4, 16px);
+  text-align: center;
+  color: var(--wa-color-text-muted, #6b7280);
+  border-radius: var(--wa-radius-lg, 16px);
+  background: var(--wa-color-surface-alt, #f9fafb);
+}
+
+.wa-fam__empty p {
+  margin: 0;
+}
+
+/* Filter component styles (wa-filter-group / wa-filter-chip) -- */
+
+.wa-filter-group fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wa-filter-group__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--wa-color-text, #111827);
+}
+
+.wa-filter-group__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-2, 8px);
+}
+
+.wa-filter-chip {
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-3, 12px);
+  border: 1.5px solid rgba(0, 0, 0, 0.2);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.wa-filter-chip:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.35);
+}
+
+.wa-filter-chip--active,
+.wa-filter-chip--active:hover,
+.wa-filter-chip--active:focus,
+.wa-filter-chip--active:focus-visible {
+  background-color: var(--wa-color-primary, #1c1e4c);
+  background-image: none;
+  border-color: var(--wa-color-primary, #1c1e4c);
+  color: var(--wa-color-on-primary, #fff);
+}
+
+/* Pagination component styles (wa-pagination / wa-pagination__btn) */
+
+.wa-pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-1, 4px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.wa-pagination__btn {
+  min-width: var(--wa-touch-min, 44px);
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-2, 8px);
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: var(--wa-radius-md, 8px);
+  background: #fff;
+  /* Explicit text colour so the number never inherits a light colour from a
+     global button rule and vanishes against the page. */
+  color: var(--wa-color-text, #1a1a1a);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  line-height: 1;
+  /* Kill the Android tap-flash that briefly washed the button/text out. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wa-pagination__btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--wa-color-text, #1a1a1a);
+}
+
+.wa-pagination__btn:focus-visible {
+  outline: 2px solid var(--wa-color-primary, #1c1e4c);
+  outline-offset: 2px;
+}
+
+.wa-pagination__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Active/current page - solid navy fill, white number. Both colours carry
+   literal fallbacks matching the real tokens (#1c1e4c / #fff) so the state is
+   always legible even if the CSS vars aren't in scope, and the colour holds
+   through :active / :focus (the Android "goes white" report). */
+.wa-pagination__btn--active,
+.wa-pagination__btn--active:hover,
+.wa-pagination__btn--active:active,
+.wa-pagination__btn--active:focus {
+  background: var(--wa-color-primary, #1c1e4c);
+  border-color: var(--wa-color-primary, #1c1e4c);
+  color: var(--wa-color-on-primary, #fff);
+}

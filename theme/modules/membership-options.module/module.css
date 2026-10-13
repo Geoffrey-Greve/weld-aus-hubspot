@@ -1,0 +1,468 @@
+/* ── Deep-link anchors ───────────────────────────────────────────────────────
+ * Zero-height targets for /membership#membership-<tab_key>. The site header is
+ * fixed (see header.module), so every anchor target needs scroll-margin-top or
+ * the browser parks the destination underneath it.
+ */
+.wa-membership-options__anchors {
+  height: 0;
+}
+
+.wa-membership-options__anchor {
+  display: block;
+  height: 0;
+}
+
+.wa-membership-options__anchor,
+.wa-membership-options,
+.wa-membership-options__card {
+  scroll-margin-top: calc(var(--wa-site-header-offset, 110px) + 24px);
+}
+
+.wa-membership-options__head {
+  max-width: 760px;
+  margin-bottom: var(--wa-space-10);
+}
+
+.wa-membership-options__heading {
+  margin: 0;
+  color: var(--wa-color-primary);
+  font-size: clamp(30px, 3vw, 40px);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.wa-membership-options__intro {
+  margin-top: var(--wa-space-3);
+  color: var(--wa-color-text-muted);
+  font-size: var(--wa-text-base);
+}
+
+.wa-membership-options__tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  border-bottom: 2px solid var(--wa-color-border);
+  scrollbar-width: none;
+}
+
+.wa-membership-options__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.wa-membership-options__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wa-space-2);
+  min-height: var(--wa-touch-min);
+  margin-bottom: -2px;
+  padding: 14px 24px;
+  color: var(--wa-color-text-muted);
+  font: inherit;
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  white-space: nowrap;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+.wa-membership-options__tab:hover,
+.wa-membership-options__tab:focus-visible,
+.wa-membership-options__tab.is-active {
+  color: var(--wa-color-primary);
+}
+
+.wa-membership-options__tab:focus-visible {
+  outline: 3px solid rgba(28, 30, 76, 0.18);
+  outline-offset: 3px;
+}
+
+.wa-membership-options__tab.is-active {
+  border-bottom-color: var(--wa-color-primary);
+}
+
+.wa-membership-options__tab img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.wa-membership-options__tab-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--wa-space-2);
+  color: var(--wa-color-success-text);
+  font-size: 10px;
+  border: 1px solid var(--wa-color-success-border);
+  border-radius: var(--wa-radius-full);
+  background: var(--wa-color-success-surface);
+}
+
+.wa-membership-options__panel {
+  padding-top: var(--wa-space-12);
+}
+
+.wa-membership-options__panel:not(.is-active) {
+  display: none;
+}
+
+.wa-membership-options__panel-head {
+  max-width: 760px;
+  margin-bottom: var(--wa-space-8);
+}
+
+.wa-membership-options__panel-head h3 {
+  margin: 0 0 var(--wa-space-3);
+  color: var(--wa-color-primary);
+  font-size: var(--wa-text-xl);
+  font-weight: var(--wa-weight-bold);
+  line-height: 1.2;
+}
+
+.wa-membership-options__panel-head .wa-richtext {
+  color: var(--wa-color-text-muted);
+  font-size: var(--wa-text-sm);
+  line-height: var(--wa-leading-relaxed);
+}
+
+.wa-membership-options__panel-layout {
+  display: grid;
+  gap: var(--wa-space-5);
+}
+
+.wa-membership-options__panel-layout--with-side {
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 0.8fr);
+}
+
+.wa-membership-options__card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--wa-space-5);
+}
+
+.wa-membership-options__panel-layout--with-side .wa-membership-options__card-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wa-membership-options__card {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: var(--wa-space-6);
+  border: 1px solid var(--wa-color-border);
+  border-top: 4px solid var(--wa-color-primary);
+  border-radius: var(--wa-radius-lg);
+  background: var(--wa-color-surface);
+  box-shadow: var(--wa-shadow-card);
+}
+
+.wa-membership-options__card--gold {
+  border-top-color: var(--wa-color-tier-gold);
+}
+
+.wa-membership-options__card--silver {
+  border-top-color: var(--wa-color-tier-silver);
+}
+
+.wa-membership-options__card--bronze {
+  border-top-color: var(--wa-color-tier-bronze);
+}
+
+.wa-membership-options__card--green {
+  border-top-color: var(--wa-color-success);
+}
+
+.wa-membership-options__card--blue {
+  border-top-color: var(--wa-color-secondary);
+}
+
+.wa-membership-options__card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--wa-space-4);
+  /* Reserve the logo's height even when a card has no logo (e.g. the blue
+     Reciprocal card) so card titles line up across a tab's cards. */
+  min-height: 64px;
+  margin-bottom: var(--wa-space-4);
+}
+
+.wa-membership-options__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  color: var(--wa-color-primary);
+  font-size: 12px;
+  font-weight: var(--wa-weight-semibold);
+  border: 1px solid currentColor;
+  border-radius: var(--wa-radius-full);
+  background: var(--wa-color-surface-2);
+}
+
+.wa-membership-options__card--gold .wa-membership-options__badge {
+  color: #5c3d00;
+  border-color: var(--wa-color-tier-gold);
+  background: var(--wa-color-tier-gold-bg);
+}
+
+.wa-membership-options__card--silver .wa-membership-options__badge {
+  color: #555;
+  border-color: var(--wa-color-tier-silver);
+  background: var(--wa-color-tier-silver-bg);
+}
+
+.wa-membership-options__card--bronze .wa-membership-options__badge {
+  color: #5c2d00;
+  border-color: var(--wa-color-tier-bronze);
+  background: var(--wa-color-tier-bronze-bg);
+}
+
+.wa-membership-options__card--green .wa-membership-options__badge {
+  color: var(--wa-color-success-text);
+  border-color: var(--wa-color-success-border);
+  background: var(--wa-color-success-surface);
+}
+
+.wa-membership-options__logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.wa-membership-options__card-title {
+  margin-bottom: var(--wa-space-4);
+}
+
+.wa-membership-options__card-title h4 {
+  margin: 0 0 var(--wa-space-1);
+  color: var(--wa-color-primary);
+  font-size: var(--wa-text-xl);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.wa-membership-options__card-title p,
+.wa-membership-options__description {
+  margin: 0;
+  color: var(--wa-color-text-muted);
+  font-size: var(--wa-text-sm);
+  line-height: 1.55;
+}
+
+.wa-membership-options__credit {
+  width: 100%;
+  margin-bottom: var(--wa-space-5);
+  padding: var(--wa-space-3) var(--wa-space-4);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-md);
+  background: var(--wa-color-surface-2);
+}
+
+.wa-membership-options__card--gold .wa-membership-options__credit {
+  border-color: var(--wa-color-tier-gold);
+  background: var(--wa-color-tier-gold-bg);
+}
+
+.wa-membership-options__card--silver .wa-membership-options__credit {
+  border-color: var(--wa-color-tier-silver);
+  background: var(--wa-color-tier-silver-bg);
+}
+
+.wa-membership-options__card--bronze .wa-membership-options__credit {
+  border-color: var(--wa-color-tier-bronze);
+  background: var(--wa-color-tier-bronze-bg);
+}
+
+.wa-membership-options__card--green .wa-membership-options__credit {
+  border-color: var(--wa-color-success-border);
+  background: var(--wa-color-success-surface);
+}
+
+.wa-membership-options__credit-label {
+  display: block;
+  margin-bottom: var(--wa-space-1);
+  color: var(--wa-color-text-muted);
+  font-size: 11px;
+  font-weight: var(--wa-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.wa-membership-options__credit strong {
+  display: block;
+  color: var(--wa-color-primary);
+  font-size: var(--wa-text-xl);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.15;
+}
+
+.wa-membership-options__credit span:not(.wa-membership-options__credit-label) {
+  display: block;
+  margin-top: 2px;
+  color: var(--wa-color-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.wa-membership-options__benefits {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0 0 var(--wa-space-5);
+  padding: 0;
+  list-style: none;
+}
+
+.wa-membership-options__benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--wa-color-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.wa-membership-options__check {
+  display: grid;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  margin-top: 1px;
+  place-items: center;
+  color: var(--wa-color-primary);
+  border-radius: 50%;
+  background: rgba(28, 30, 76, 0.08);
+}
+
+.wa-membership-options__check svg {
+  width: 10px;
+  height: 10px;
+}
+
+.wa-membership-options__card--gold .wa-membership-options__check {
+  color: #5c3d00;
+  background: var(--wa-color-tier-gold-bg);
+}
+
+.wa-membership-options__card--silver .wa-membership-options__check {
+  color: #444;
+  background: var(--wa-color-tier-silver-bg);
+}
+
+.wa-membership-options__card--bronze .wa-membership-options__check {
+  color: #5c2d00;
+  background: var(--wa-color-tier-bronze-bg);
+}
+
+.wa-membership-options__card--green .wa-membership-options__check {
+  color: var(--wa-color-success-text);
+  background: var(--wa-color-success-surface);
+}
+
+.wa-membership-options__cta {
+  width: 100%;
+  margin-top: auto;
+}
+
+.wa-membership-options__side {
+  align-self: stretch;
+  padding: var(--wa-space-7, 28px);
+  color: #fff;
+  border-radius: var(--wa-radius-lg);
+  background: var(--wa-color-primary);
+}
+
+.wa-membership-options__side h4 {
+  margin: 0 0 var(--wa-space-4);
+  color: #fff;
+  font-size: var(--wa-text-base);
+  font-weight: var(--wa-weight-bold);
+}
+
+.wa-membership-options__side ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wa-membership-options__side li {
+  display: flex;
+  gap: var(--wa-space-2);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: var(--wa-text-sm);
+  line-height: 1.5;
+}
+
+.wa-membership-options__side li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: var(--wa-color-accent);
+}
+
+.wa-membership-options__note {
+  display: flex;
+  gap: var(--wa-space-3);
+  margin-top: var(--wa-space-5);
+  padding: var(--wa-space-4) var(--wa-space-5);
+  color: var(--wa-color-text-muted);
+  font-size: var(--wa-text-sm);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-md);
+  background: var(--wa-color-surface-2);
+}
+
+.wa-membership-options__note p {
+  margin: 0;
+}
+
+@media (max-width: 1080px) {
+  .wa-membership-options__card-grid,
+  .wa-membership-options__panel-layout--with-side .wa-membership-options__card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wa-membership-options__panel-layout--with-side {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .wa-membership-options__card-grid,
+  .wa-membership-options__panel-layout--with-side .wa-membership-options__card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wa-membership-options__tab {
+    padding-inline: var(--wa-space-4);
+  }
+}
+
+/* ── Downgrade guard (QA ref 44) ──────────────────────────────────────────
+   A card below the member's own level keeps its price and benefits - the
+   comparison is the point of the page - and loses only its join link. The
+   note sits where the button did so the card's height does not jump. */
+.wa-membership-options__cta-note {
+  margin: 0;
+  min-height: var(--wa-touch-min, 44px);
+  display: flex;
+  align-items: center;
+  color: var(--wa-color-text-subtle, #6f757e);
+  font-size: var(--wa-text-sm, 0.875rem);
+  font-weight: 600;
+}
+
+.wa-membership-options__cta-note--current {
+  color: var(--wa-color-success, #1f8a4d);
+  font-weight: 800;
+}

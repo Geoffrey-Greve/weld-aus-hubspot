@@ -1,0 +1,14 @@
+{
+  "label": "Linked Associations",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Read-only display of Company associations on the logged-in contact. Reads the primary associated company from request_contact HubL properties (associatedcompanyid, associatedcompanyname, wa_company_role_label, wa_company_membership_tier). Also reads window.__WELD_MEMBER__.associations client-side for richer display. Shows a 'Request a change' link for admin-mediated updates. Place on profile.html (portal layout). Note: HubSpot Pro HubL surfaces only the primary company association; multi-company contacts are handled via window.__WELD_MEMBER__ enriched by the portal.html layout.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["portal", "members-only", "associations", "read-only"]
+}

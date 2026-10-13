@@ -1,0 +1,22 @@
+/*
+ * Course detail legacy DnD cleanup.
+ *
+ * HubSpot dynamic course pages can retain saved DnD output from older course
+ * detail layouts even after the template source is updated. This stylesheet is
+ * loaded globally but scoped to pages that contain the new dynamic course
+ * modules, so it does not hide shared modules on normal pages.
+ */
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-hero-video,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-stat-tiles,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #why,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #outcomes,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #syllabus,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #audience,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #trainer,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-team,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-testimonials,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-logo-strip,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #faq,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-cta-banner {
+  display: none !important;
+}

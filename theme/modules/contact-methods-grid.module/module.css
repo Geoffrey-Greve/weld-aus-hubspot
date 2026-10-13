@@ -1,0 +1,536 @@
+/*
+ * contact-methods-grid.module/module.css
+ * Three display styles: feature cards, directory list, and legacy grid.
+ */
+
+/* ── Shared heading ──────────────────────────────────────────────────────── */
+
+.wa-contact-cards__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl);
+  font-weight: 800;
+  color: inherit;
+  margin: 0 0 var(--wa-space-8) 0;
+  line-height: 1.2;
+}
+
+.wa-contact-cards__intro {
+  max-width: 620px;
+  margin: calc(var(--wa-space-8) * -0.55) 0 var(--wa-space-8);
+  color: var(--wa-color-text-muted);
+  font-size: var(--wa-text-base);
+  line-height: 1.65;
+}
+
+.wa-contact-cards__intro > *:first-child { margin-top: 0; }
+.wa-contact-cards__intro > *:last-child  { margin-bottom: 0; }
+
+.wa-section--bg-primary .wa-contact-cards__intro,
+.wa-section--bg-primary_dark .wa-contact-cards__intro {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   STYLE: feature - 3-col icon cards
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.wa-contact-cards__feature-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 640px) {
+  .wa-contact-cards__feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-contact-cards__feature-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.wa-contact-cards__feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4);
+  padding: var(--wa-space-6);
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  box-shadow: var(--wa-shadow-card);
+}
+
+.wa-section--bg-primary .wa-contact-cards__feature-card,
+.wa-section--bg-primary_dark .wa-contact-cards__feature-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.wa-contact-cards__icon-wrap {
+  width: 52px;
+  height: 52px;
+  background: rgba(28, 30, 76, 0.07);
+  border-radius: var(--wa-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wa-section--bg-primary .wa-contact-cards__icon-wrap,
+.wa-section--bg-primary_dark .wa-contact-cards__icon-wrap {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.wa-contact-cards__icon-glyph {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.wa-contact-cards__card-heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-lg);
+  font-weight: 700;
+  color: var(--wa-color-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.wa-section--bg-primary .wa-contact-cards__card-heading,
+.wa-section--bg-primary_dark .wa-contact-cards__card-heading {
+  color: #fff;
+}
+
+.wa-contact-cards__card-text {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+  line-height: 1.6;
+}
+
+.wa-section--bg-primary .wa-contact-cards__card-text,
+.wa-section--bg-primary_dark .wa-contact-cards__card-text {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wa-contact-cards__card-text > *:first-child { margin-top: 0; }
+.wa-contact-cards__card-text > *:last-child  { margin-bottom: 0; }
+
+.wa-contact-cards__card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wa-space-1);
+  min-height: var(--wa-touch-min, 44px);
+  font-size: var(--wa-text-sm);
+  font-weight: 600;
+  color: var(--wa-color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(28, 30, 76, 0.35);
+  transition: text-decoration-color 0.15s ease;
+}
+
+.wa-contact-cards__card-link:hover {
+  text-decoration-color: var(--wa-color-primary);
+}
+
+.wa-section--bg-primary .wa-contact-cards__card-link,
+.wa-section--bg-primary_dark .wa-contact-cards__card-link {
+  color: var(--wa-color-accent);
+  text-decoration-color: rgba(254, 207, 5, 0.45);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   STYLE: directory - numbered department list
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.wa-contact-cards__directory {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  overflow: hidden;
+}
+
+.wa-contact-cards__entry {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-4);
+  padding: var(--wa-space-4) var(--wa-space-6);
+  border-bottom: 1px solid var(--wa-color-border);
+  background: var(--wa-color-surface);
+}
+
+.wa-contact-cards__entry:last-child {
+  border-bottom: none;
+}
+
+.wa-contact-cards__entry-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--wa-color-primary);
+  color: #fff;
+  font-size: var(--wa-text-sm);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-contact-cards__entry-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--wa-space-2) var(--wa-space-6);
+  flex: 1;
+}
+
+.wa-contact-cards__entry-dept {
+  font-size: var(--wa-text-sm);
+  font-weight: 600;
+  color: var(--wa-color-text);
+  flex: 1 1 200px;
+}
+
+.wa-contact-cards__entry-phone {
+  font-size: var(--wa-text-sm);
+  font-weight: 500;
+  color: var(--wa-color-primary);
+  text-decoration: none;
+  min-height: var(--wa-touch-min, 44px);
+  display: inline-flex;
+  align-items: center;
+}
+
+.wa-contact-cards__entry-phone:hover {
+  text-decoration: underline;
+}
+
+/* QA ref 63: the department email reads and behaves exactly as the phone number
+   beside it. Same class shape so the .is-contact-page overrides below catch
+   both without being restated. */
+.wa-contact-cards__entry-email {
+  font-size: var(--wa-text-sm);
+  font-weight: 500;
+  color: var(--wa-color-primary);
+  text-decoration: none;
+  min-height: var(--wa-touch-min, 44px);
+  display: inline-flex;
+  align-items: center;
+  overflow-wrap: anywhere;
+}
+
+.wa-contact-cards__entry-email:hover {
+  text-decoration: underline;
+}
+
+.wa-contact-cards__entry-ext {
+  font-size: var(--wa-text-xs);
+  color: var(--wa-color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Dark bg overrides for directory ────────────────────────────────────── */
+
+.wa-section--bg-primary .wa-contact-cards__directory,
+.wa-section--bg-primary_dark .wa-contact-cards__directory {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.wa-section--bg-primary .wa-contact-cards__entry,
+.wa-section--bg-primary_dark .wa-contact-cards__entry {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.wa-section--bg-primary .wa-contact-cards__entry-dept,
+.wa-section--bg-primary_dark .wa-contact-cards__entry-dept {
+  color: #fff;
+}
+
+.wa-section--bg-primary .wa-contact-cards__entry-phone,
+.wa-section--bg-primary_dark .wa-contact-cards__entry-phone,
+.wa-section--bg-primary .wa-contact-cards__entry-email,
+.wa-section--bg-primary_dark .wa-contact-cards__entry-email {
+  color: var(--wa-color-accent);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   STYLE: legacy - original label/value/icon grid (backward compat)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.wa-contact-grid__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  gap: var(--wa-space-6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 640px) {
+  .wa-contact-grid__list { grid-template-columns: 1fr; }
+}
+
+.wa-contact-grid__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wa-space-4);
+  padding: var(--wa-space-5);
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-md);
+  box-shadow: var(--wa-shadow-card);
+}
+
+.wa-contact-grid__icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wa-color-surface-alt, #f3f4f6);
+  border-radius: var(--wa-radius-sm);
+}
+
+.wa-contact-grid__icon-img {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.wa-contact-grid__body { flex: 1 1 auto; min-width: 0; }
+
+.wa-contact-grid__label {
+  font-size: var(--wa-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wa-color-text-muted);
+  margin-bottom: var(--wa-space-1);
+}
+
+.wa-contact-grid__value {
+  font-size: var(--wa-text-base);
+  font-weight: 500;
+  color: var(--wa-color-text);
+  word-break: break-word;
+}
+
+.wa-contact-grid__value--link {
+  color: var(--wa-color-primary);
+  text-decoration: none;
+  min-height: var(--wa-touch-min, 44px);
+  display: inline-flex;
+  align-items: center;
+}
+
+.wa-contact-grid__value--link:hover { text-decoration: underline; }
+
+/* Contact page refinements: match the standalone Contact design */
+
+.is-contact-page .wa-contact-cards .wa-section-head {
+  max-width: 620px;
+  margin-bottom: var(--wa-space-10);
+}
+
+.is-contact-page .wa-contact-cards__heading {
+  color: var(--wa-color-primary);
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: var(--wa-space-3);
+}
+
+.is-contact-page .wa-contact-cards__intro {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: #3f4857;
+}
+
+.is-contact-page .wa-contact-cards__intro strong {
+  color: var(--wa-color-primary);
+  font-weight: 800;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__directory {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry {
+  min-height: 68px;
+  padding: 14px 18px;
+  gap: 14px;
+  border: 1px solid #d9dee8;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(15, 16, 48, 0.06);
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry:last-child {
+  border-bottom: 1px solid #d9dee8;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry-num {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--wa-color-primary);
+  color: var(--wa-color-accent);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry-num--icon {
+  background: #f3f5f8;
+  color: #637083;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry-dept {
+  flex: 0 1 auto;
+  color: var(--wa-color-primary);
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry-meta {
+  color: #647083;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry-phone,
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry-email {
+  min-height: 0;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 400;
+}
+
+/* An address linked inside the note keeps the note's colour but reads as a link. */
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry-ext .wa-contact-cards__entry-email {
+  text-decoration: underline;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry-ext {
+  color: inherit;
+  font-size: inherit;
+  white-space: normal;
+}
+
+.is-contact-page .wa-contact-cards--directory .wa-contact-cards__entry--no-number .wa-contact-cards__entry-ext {
+  color: #004b93;
+  font-weight: 700;
+}
+
+.wa-contact-cards__directory-cta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 16px 18px;
+  border: 1px solid rgba(254, 207, 5, 0.9);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.wa-contact-cards__directory-cta-icon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(254, 207, 5, 0.18);
+  color: #c96a00;
+  font-weight: 800;
+}
+
+.wa-contact-cards__directory-cta-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.wa-contact-cards__directory-cta-heading {
+  margin: 0 0 3px;
+  color: var(--wa-color-primary);
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.wa-contact-cards__directory-cta-body {
+  color: #3f4857;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.wa-contact-cards__directory-cta-body > *:first-child { margin-top: 0; }
+.wa-contact-cards__directory-cta-body > *:last-child  { margin-bottom: 0; }
+
+.wa-contact-cards__directory-cta-link {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: var(--wa-color-primary);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.wa-contact-cards__directory-cta-link:visited,
+.wa-contact-cards__directory-cta-link:hover,
+.wa-contact-cards__directory-cta-link:focus,
+.wa-contact-cards__directory-cta-link:focus-visible {
+  background: var(--wa-color-primary);
+  color: #fff;
+}
+
+@media (max-width: 820px) {
+  .is-contact-page .wa-contact-cards--directory .wa-contact-cards__directory {
+    grid-template-columns: 1fr;
+  }
+
+  .wa-contact-cards__directory-cta {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .wa-contact-cards__directory-cta-link {
+    width: 100%;
+    justify-content: center;
+  }
+}

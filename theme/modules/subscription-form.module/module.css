@@ -1,0 +1,399 @@
+/*
+ * subscription-form.module/module.css
+ * Styles for the subscription preferences form wrapper.
+ */
+
+.wa-subscription-form__inner {
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.wa-subscription-form__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl, 1.75rem);
+  font-weight: 700;
+  color: var(--wa-color-text);
+  margin-bottom: var(--wa-space-4, 1rem);
+}
+
+.wa-section.wa-bg--primary .wa-subscription-form__heading,
+.wa-section.wa-bg--primary_dark .wa-subscription-form__heading {
+  color: var(--wa-color-on-primary, #fff);
+}
+
+.wa-subscription-form__intro {
+  color: var(--wa-color-text-muted);
+  margin-bottom: var(--wa-space-8, 2rem);
+  line-height: 1.6;
+}
+
+.wa-section.wa-bg--primary .wa-subscription-form__intro,
+.wa-section.wa-bg--primary_dark .wa-subscription-form__intro {
+  color: var(--wa-color-on-primary, #fff);
+  opacity: 0.9;
+}
+
+.wa-subscription-form__form {
+  text-align: left;
+}
+
+.wa-subscription-form__fallback {
+  width: min(100%, 540px);
+  margin-inline: auto;
+}
+
+.wa-subscription-form__fallback-row {
+  display: grid;
+  gap: var(--wa-space-3, 0.75rem);
+}
+
+.wa-subscription-form__fallback-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0.78rem 1rem;
+  color: var(--wa-color-text, #071330);
+  background: var(--wa-color-surface, #fff);
+  border: 1px solid var(--wa-color-border-strong, #b8c0cc);
+  border-radius: var(--wa-radius-md, 9px);
+  font: inherit;
+  transition:
+    border-color var(--wa-duration-fast, 160ms) var(--wa-ease-default, ease),
+    box-shadow var(--wa-duration-fast, 160ms) var(--wa-ease-default, ease);
+}
+
+.wa-subscription-form__fallback-input::placeholder {
+  color: var(--wa-color-text-muted, #667085);
+}
+
+.wa-subscription-form__fallback-input:focus,
+.wa-subscription-form__fallback-input:focus-visible {
+  outline: none;
+  border-color: var(--wa-color-primary, #1c1e4c);
+  box-shadow: 0 0 0 3px rgba(28, 30, 76, 0.15);
+}
+
+.wa-subscription-form__fallback-button {
+  width: 100%;
+  min-height: 49px;
+  justify-content: center;
+  border-radius: var(--wa-radius-md, 9px);
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.wa-subscription-form__fallback-note {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: var(--wa-space-3, 0.75rem) 0 0;
+  color: var(--wa-color-text-muted, #667085);
+  font-size: var(--wa-text-sm, 0.875rem);
+  line-height: 1.5;
+}
+
+.wa-subscription-form__fallback-error,
+.wa-subscription-form__fallback-success {
+  margin: var(--wa-space-3, 0.75rem) 0 0;
+  font-size: var(--wa-text-sm, 0.875rem);
+  line-height: 1.5;
+}
+
+.wa-subscription-form__fallback-error {
+  color: var(--wa-color-danger, #b42318);
+}
+
+.wa-subscription-form__fallback-success {
+  color: var(--wa-color-success, #1f8a4d);
+  font-weight: 600;
+}
+
+.wa-subscription-form__fallback-input.is-invalid {
+  border-color: var(--wa-color-danger, #b42318);
+}
+
+.wa-subscription-form__fallback-note::before {
+  content: "✓";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+  color: currentColor;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+/* Events page subscribe block: same split CTA shell as cta-banner.module. */
+.wa-subscription-form--cta {
+  position: relative;
+  overflow: hidden;
+  color: var(--wa-color-on-primary, #fff);
+}
+
+.wa-subscription-form--cta::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--wa-color-magenta, #ed128d),
+    var(--wa-color-accent, #fecf05)
+  );
+}
+
+.wa-subscription-form--cta .container-wide {
+  position: relative;
+  z-index: 1;
+}
+
+.wa-subscription-form--cta .wa-cta-banner__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-6, 1.5rem);
+  align-items: flex-start;
+}
+
+.wa-subscription-form--cta .wa-cta-banner__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-6, 1.5rem);
+  width: 100%;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__inner {
+  max-width: none;
+  margin: 0;
+  text-align: left;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__text {
+  max-width: 560px;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__heading {
+  max-width: 560px;
+  margin: 0 0 14px;
+  color: var(--wa-color-on-primary, #fff);
+  font-family: var(--wa-font-heading);
+  font-size: clamp(32px, 3.1vw, 42px);
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: 0;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__intro {
+  max-width: 560px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.wa-subscription-form--cta .wa-subscription-form__intro > * {
+  margin: 0;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__actions {
+  width: min(100%, 430px);
+  flex: 0 1 430px;
+  justify-content: flex-end;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback,
+.wa-subscription-form--cta .wa-subscription-form__form {
+  width: 100%;
+  margin: 0;
+  padding: clamp(1.25rem, 2.5vw, 1.5rem);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-head {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+  margin-bottom: 1.1rem;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-icon {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  color: var(--wa-color-accent, #fecf05);
+  background: rgba(254, 207, 5, 0.14);
+  border: 1px solid rgba(254, 207, 5, 0.3);
+  border-radius: 12px;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-kicker,
+.wa-subscription-form--cta .wa-subscription-form__fallback-title {
+  display: block;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-kicker {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-title {
+  margin-top: 0.15rem;
+  color: var(--wa-color-on-primary, #fff);
+  font-family: var(--wa-font-heading);
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-row {
+  gap: 0.75rem;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-input {
+  color: var(--wa-color-text, #071330);
+  background: var(--wa-color-surface, #fff);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-input::placeholder {
+  color: var(--wa-color-text-muted, #667085);
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-input:focus,
+.wa-subscription-form--cta .wa-subscription-form__fallback-input:focus-visible {
+  border-color: var(--wa-color-accent, #fecf05);
+  box-shadow: 0 0 0 3px rgba(254, 207, 5, 0.18);
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-button {
+  color: var(--wa-color-on-accent, #050620);
+  box-shadow: none;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-button:hover,
+.wa-subscription-form--cta .wa-subscription-form__fallback-button:focus-visible {
+  color: var(--wa-color-on-accent, #050620);
+  background-color: #ffd91a;
+  border-color: #ffd91a;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-note {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.82rem;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-error {
+  color: #ffb4a8;
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-success {
+  color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-subscription-form--cta .wa-subscription-form__fallback-input.is-invalid {
+  border-color: #ffb4a8;
+  box-shadow: 0 0 0 3px rgba(255, 180, 168, 0.2);
+}
+
+@media (min-width: 768px) {
+  .wa-subscription-form--cta.wa-cta-banner--split .wa-cta-banner__inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    gap: 32px;
+  }
+
+  .wa-subscription-form--cta.wa-cta-banner--split .wa-cta-banner__content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .wa-subscription-form--cta .wa-subscription-form__heading {
+    font-size: 30px;
+    line-height: 1.2;
+  }
+
+  .wa-subscription-form--cta .wa-subscription-form__actions {
+    width: 100%;
+    max-width: 33rem;
+    justify-content: flex-start;
+  }
+
+  .wa-subscription-form--cta .wa-subscription-form__fallback,
+  .wa-subscription-form--cta .wa-subscription-form__form {
+    padding: 1.35rem;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .wa-subscription-form--cta .wa-subscription-form__fallback-head {
+    align-items: flex-start;
+  }
+}
+
+/* ── HubSpot form overrides within this module ─────────────────────────── */
+.wa-subscription-form__form .hs-form fieldset {
+  max-width: 100% !important;
+}
+
+.wa-subscription-form__form .hs-form .hs-submit .hs-button {
+  min-height: var(--wa-touch-min, 44px);
+  padding-inline: var(--wa-space-8, 2rem);
+  background-color: var(--wa-color-primary);
+  border-color: var(--wa-color-primary);
+  border-radius: var(--wa-radius-md, 8px);
+  font-family: var(--wa-font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.wa-subscription-form__form .hs-form .hs-submit .hs-button:hover,
+.wa-subscription-form__form .hs-form .hs-submit .hs-button:focus-visible {
+  background-color: var(--wa-color-primary-dark, color-mix(in srgb, var(--wa-color-primary) 80%, black));
+  border-color: var(--wa-color-primary-dark, color-mix(in srgb, var(--wa-color-primary) 80%, black));
+}
+
+.wa-subscription-form__form .hs-form-field label {
+  font-weight: 600;
+  color: var(--wa-color-text);
+  margin-bottom: var(--wa-space-1, 0.25rem);
+  display: block;
+}
+
+.wa-subscription-form__form .hs-form input[type="email"],
+.wa-subscription-form__form .hs-form input[type="text"],
+.wa-subscription-form__form .hs-form select {
+  width: 100%;
+  min-height: var(--wa-touch-min, 44px);
+  padding: var(--wa-space-2, 0.5rem) var(--wa-space-3, 0.75rem);
+  border: 1px solid var(--wa-color-border, #d1d5db);
+  border-radius: var(--wa-radius-sm, 4px);
+  font-family: var(--wa-font-body);
+  font-size: 1rem;
+  color: var(--wa-color-text);
+  background-color: var(--wa-color-surface);
+}
+
+.wa-subscription-form__form .hs-form input:focus-visible,
+.wa-subscription-form__form .hs-form select:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+}

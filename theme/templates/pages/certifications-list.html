@@ -1,0 +1,87 @@
+<!--
+  templateType: page
+  label: Member Portal - My Certifications
+  isAvailableForNewContent: true
+-->
+{#
+  certifications-list.html - Member portal certifications overview page.
+  URL: /portal/certifications/
+
+  ── HubSpot configuration required ──────────────────────────────────────────
+  • Assign this template to the page at /portal/certifications/
+  • Private Content audience: "Active Members" list
+    (individual_membership_status IN Active, Grace Period)
+  • The portal.html layout provides the secondary auth gate, window.__WELD_MEMBER__
+    injection, and the portal sub-nav.
+
+  ── Acceptance criteria ───────────────────────────────────────────────────────
+  • A test contact with as1796_cert_status renders an AS1796 cert card
+  • Cards are side-by-side on desktop, stacked on mobile
+  • "View progress" links to /portal/certifications/as1796/
+  • "Download certificate" only appears for active certs with a cert URL
+  • show_lapsed=false hides expired/lapsed certs
+  • Empty state renders when no certs exist (or all are filtered out)
+#}
+{% set page_title_exact = 'My Certifications - Weld Australia Member Portal' %}
+{% set page_description = 'View and manage your Weld Australia professional certifications.' %}
+{% extends "../layouts/portal.html" %}
+
+{% block extra_head %}
+{{ super() }}
+<meta name="robots" content="noindex, nofollow">
+<style>
+  body.is-certifications-page #my-certifications-hero.wa-hero {
+    min-height: clamp(460px, 42vw, 540px);
+    padding-block-start: calc(var(--wa-site-header-offset, 112px) + 96px);
+  }
+
+  body.is-certifications-page #my-certifications-hero .wa-hero__content {
+    max-width: 680px;
+  }
+
+  body.is-certifications-page .wa-certifications-section {
+    background: linear-gradient(180deg, #f5f7fb 0%, #ffffff 100%);
+    padding-block-start: clamp(48px, 6vw, 72px);
+  }
+
+  @media (max-width: 767px) {
+    body.is-certifications-page #my-certifications-hero.wa-hero {
+      min-height: auto;
+      padding-block-start: calc(var(--wa-site-header-offset, 112px) + 72px);
+      padding-block-end: 56px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body_class %} is-portal is-certifications-page{% endblock %}
+
+{% block portal_content %}
+
+  {% module "my_certifications_hero" path="../../modules/hero"
+    label="My certifications hero"
+    section_id="my-certifications-hero"
+    background="primary"
+    spacing="default"
+    height="compact"
+    alignment="left"
+    eyebrow="Member portal"
+    headline="My certifications"
+    subheadline="<p>View your Weld Australia certification records, progress, expiry dates, and available certificate downloads.</p>"
+    primary_cta={ "label_text": "View certifications", "link": { "url": { "type": "EXTERNAL", "href": "#certification-records" } }, "style": "gold" }
+    secondary_cta={ "label_text": "Explore pathways", "link": { "url": { "type": "EXTERNAL", "href": "/certification/" } }, "style": "white-outline" }
+    accent_bar=true
+  %}
+
+  {% module "certifications_list" path="../../modules/certifications-list"
+    section_id="certification-records"
+    heading=""
+    show_lapsed=true
+    empty_state_cta_label="Explore certification pathways"
+    empty_state_cta_link={ "url": { "type": "CONTENT", "href": "/certification/" } }
+    background="surface"
+    spacing="default"
+    members_only=true
+  %}
+
+{% endblock %}

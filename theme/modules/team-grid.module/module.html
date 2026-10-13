@@ -1,0 +1,271 @@
+{#
+  team-grid.module/module.html  (server-rendered)
+
+  People grid for team / board. Rendered entirely in HubL - no React island -
+  so it always displays without depending on a JS bundle loading.
+
+  Layout (matches the "Our team of welding experts" design):
+    • Header: overline + heading + intro on the left, highlight cards
+      (magenta left-border) on the right.
+    • People cards: square headshot, name, magenta role, outlined quals pill.
+
+  Data sources:
+    • module_fields → module.people[] repeater
+    • hubdb         → "team_and_board" table (is_active=true, display_order)
+
+  Category display (HubDB only):
+    • group_by_category = true → one titled sub-section per category, ordered by
+      the category_order[] repeater (then any extra categories present in data).
+    • otherwise → single flat grid, optionally narrowed by category_filter and
+      category_exclude (both accept a comma-separated list).
+
+  Profile links (HubDB only):
+    • team_and_board has dynamic pages enabled, so each row carries an hs_path.
+      Cards with a path link to profile_url_base ~ hs_path (default
+      /about/team/{person-name}); rows without one render as plain cards.
+
+  Fields: overline, section_heading, intro, highlights[], data_source,
+    people[], card_style, columns, category_filter, category_exclude,
+    group_by_category, category_order[], max_count, profile_url_base,
+    highlight_style, section_id, background, spacing, visibility, members_only
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{%- set _data_source = module.data_source | default('hubdb') -%}
+{%- set _bg    = module.background | default('surface') -%}
+{%- set _sp    = module.spacing    | default('default') -%}
+{%- set _cols  = module.columns    | default('4') -%}
+{%- set _dark  = _bg in ['primary', 'primary_dark'] -%}
+{%- set _vis   = module.visibility | default(['mobile','tablet','desktop']) -%}
+{%- set _group_raw = module.group_by_category | default(true) -%}
+{%- set _group_key = (_group_raw ~ '') | lower | trim -%}
+{%- set _group = _data_source == 'hubdb' and _group_key != 'false' and _group_key != '0' and _group_key != '' -%}
+{%- set _profile_base = module.profile_url_base | default('/about/team/') -%}
+{%- set _highlight_style = module.highlight_style | default('cards') -%}
+{%- set _request_path = request.path | default('', true) | lower | split('?') | first | split('#') | first -%}
+{%- set _section_id_key = module.section_id | default('', true) | lower | trim -%}
+{%- set _heading_key = module.section_heading | default('', true) | lower | trim -%}
+{%- set _is_about_page = _request_path == '/about' or _request_path == '/about/' -%}
+{%- set _is_about_team_preview = _is_about_page and (_section_id_key == 'our-team' or _heading_key == 'our team' or _heading_key == 'our team of welding experts') -%}
+
+{# The live About page uses a saved HubSpot DnD instance. Force that instance to
+   behave as a curated Board preview without needing a page-record rewrite. #}
+{%- if _is_about_team_preview -%}
+  {%- set _group = false -%}
+{%- endif -%}
+
+{%- set _classes = 'wa-team wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-' ~ _sp ~ ' wa-team--cols-' ~ _cols -%}
+{%- set _classes = _classes ~ ' wa-team--highlights-' ~ _highlight_style -%}
+{%- if _highlight_style == 'cards' and module.highlights and module.highlights | length > 3 -%}{%- set _classes = _classes ~ ' wa-team--feature-highlights' -%}{%- endif -%}
+{%- if _dark -%}{%- set _classes = _classes ~ ' wa-team--dark' -%}{%- endif -%}
+{%- if _is_about_team_preview -%}{%- set _classes = _classes ~ ' wa-team--board-preview' -%}{%- endif -%}
+{%- if 'mobile'  not in _vis -%}{%- set _classes = _classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _classes = _classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _classes = _classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{# ── Card markup, shared by the flat and grouped renderers ──────────────────
+   `profile_base` is passed in rather than read from the enclosing scope so the
+   macro works identically from both renderers. When person.path is empty the
+   card renders exactly as it always has - no link, no behaviour change.
+
+   A HubDB row with no page path is a data problem rather than a design choice, so
+   it leaves a comment in the source naming the row. Without it, a missing path is
+   invisible: the page looks fine and the card just isn't clickable. #}
+{% macro wa_team_card(person, profile_base) %}
+      {% if person.row_id and not person.path %}<!-- team-grid: HubDB row {{ person.row_id }} ({{ person.name }}) has no page path, so this card cannot link to a profile. Run `pnpm backfill:paths --table=team_and_board`. -->{% endif %}
+      <article class="wa-team__card{% if person.path %} wa-team__card--linked{% endif %}">
+        {% if person.path %}<a class="wa-team__card-link" href="{{ profile_base }}{{ person.path }}">{% endif %}
+        <div class="wa-team__photo-wrap">
+          {% if person.photo_url %}
+          <img src="{{ person.photo_url }}" alt="{{ person.photo_alt }}" class="wa-team__photo" loading="lazy" decoding="async">
+          {% else %}
+          <span class="wa-team__photo-fallback" aria-hidden="true">{{ person.name | truncate(1, true, '') | upper }}</span>
+          {% endif %}
+        </div>
+        <div class="wa-team__body">
+          <h3 class="wa-team__name">{{ person.name }}</h3>
+          {% if person.role %}<p class="wa-team__role">{{ person.role }}</p>{% endif %}
+          {% if person.quals %}<span class="wa-team__quals">{{ person.quals }}</span>{% endif %}
+        </div>
+        {% if person.path %}</a>{% endif %}
+      </article>
+{% endmacro %}
+
+{# ── Build the rows list from the chosen data source ──────────────────────── #}
+{%- set ns = namespace(rows=[]) -%}
+
+{% if _data_source == 'module_fields' %}
+  {% if module.people %}
+    {% for p in module.people %}
+      {% if p.name_text %}
+      {# No 'path': hand-entered people have no HubDB row, so no profile page. #}
+      {%- set ns.rows = ns.rows + [{
+        'name':  p.name_text,
+        'role':  p.role  | default(''),
+        'quals': p.quals | default(''),
+        'category': '',
+        'path': '',
+        'row_id': '',
+        'photo_url': p.photo.src | default(''),
+        'photo_alt': p.photo.alt | default(p.name_text)
+      }] -%}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% else %}
+  {# Normalise the filter and each row's category the same way so the filter works
+     with the current SELECT labels and with legacy choice keys alike. Both
+     category_filter and category_exclude accept a comma-separated list, so a grid
+     can show e.g. "board,executive" or show everyone except the board. #}
+  {%- set _cf_raw  = module.category_filter | default('any') -%}
+  {%- if _is_about_team_preview -%}{%- set _cf_raw = 'board' -%}{%- endif -%}
+  {%- set _cf_norm = _cf_raw | lower | replace(' ', '') | replace('&', '') -%}
+  {%- set _cf_list = _cf_norm | split(',') -%}
+  {# A specific category_filter means "show this category as one focused grid"
+     (for example, the public Our Board section). Force flat rendering so the
+     filtered section cannot accidentally render a redundant category subheading
+     or expand into every category. #}
+  {%- if _cf_raw and _cf_raw != 'any' -%}{%- set _group = false -%}{%- endif -%}
+  {%- set _cx_raw = module.category_exclude | default('') -%}
+  {%- if _is_about_team_preview -%}{%- set _cx_raw = '' -%}{%- endif -%}
+  {%- set _cx_norm = _cx_raw | lower | replace(' ', '') | replace('&', '') -%}
+  {%- set _cx_list = _cx_norm | split(',') -%}
+  {% set _hubdb_rows = hubdb_table_rows('team_and_board', 'is_active__eq=true&orderBy=display_order') %}
+  {% for row in _hubdb_rows %}
+    {%- set _cat = row.category.name | default('') -%}
+    {%- set _cat_key = _cat | lower | replace(' ', '') | replace('&', '') -%}
+    {# Exclusions apply even when grouping - a grid that opts a category out should
+       never have it reappear as a group heading. #}
+    {% if not _cx_norm or _cat_key not in _cx_list %}
+    {# When grouping, include every remaining row; otherwise apply the filter. #}
+    {% if _group or _cf_raw == 'any' or not _cf_raw or _cat_key in _cf_list %}
+      {% if _group or not module.max_count or module.max_count == 0 or ns.rows | length < module.max_count %}
+      {%- set ns.rows = ns.rows + [{
+        'name':  row.name | default(''),
+        'role':  row.role | default(''),
+        'quals': row.quals | default(''),
+        'category': _cat,
+        'path': row.hs_path | default(''),
+        'row_id': row.hs_id | default(''),
+        'photo_url': row.headshot.url | default(''),
+        'photo_alt': row.headshot.altText | default(row.name | default(''))
+      }] -%}
+      {% endif %}
+    {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<section
+  class="{{ _classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container-wide">
+
+    {# ── Header: intro (left) + highlight cards (right) ───────────────────── #}
+    {% if module.overline or module.section_heading or module.intro or module.highlights %}
+    <div class="wa-team__head">
+      <div class="wa-team__head-intro">
+        {% if module.overline %}
+        <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+          <span class="wa-overline__text">{{ module.overline }}</span>
+        </div>
+        {% endif %}
+        {% if module.section_heading %}<h2 class="wa-team__heading">{{ module.section_heading }}</h2>{% endif %}
+        {% if module.intro %}<div class="wa-team__intro wa-richtext">{{ module.intro }}</div>{% endif %}
+      </div>
+
+      {% if module.highlights %}
+      <ul class="wa-team__highlights" role="list">
+        {% for h in module.highlights %}
+        {% if h.title or h.description %}
+        <li class="wa-team__highlight">
+          {% if h.title %}<p class="wa-team__highlight-title">{{ h.title }}</p>{% endif %}
+          {% if h.description %}<p class="wa-team__highlight-desc">{{ h.description }}</p>{% endif %}
+        </li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# ── People cards ─────────────────────────────────────────────────────── #}
+    {% if ns.rows %}
+      {% if _group %}
+        {# Ordered category list: editor-defined order first, then any categories
+           present in the data but not listed, appended at the end. #}
+      {%- set ns_cats = namespace(order=[]) -%}
+      {% if module.category_order %}
+          {% for item in module.category_order %}
+            {% if item.category_name and item.category_name not in ns_cats.order %}
+              {%- set ns_cats.order = ns_cats.order + [item.category_name] -%}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {% for person in ns.rows %}
+          {% if person.category and person.category not in ns_cats.order %}
+            {%- set ns_cats.order = ns_cats.order + [person.category] -%}
+          {% endif %}
+        {% endfor %}
+
+        {% for cat in ns_cats.order %}
+          {%- set _cat_anchor = cat | lower | replace('&', 'and') | replace('/', '-') | replace(' ', '-') | replace('--', '-') -%}
+          {%- set ns_group = namespace(rows=[]) -%}
+          {% for person in ns.rows %}
+            {% if person.category == cat %}{%- set ns_group.rows = ns_group.rows + [person] -%}{% endif %}
+          {% endfor %}
+          {% if ns_group.rows %}
+          <div class="wa-team__group"{% if module.section_id and _cat_anchor %} id="{{ module.section_id }}-{{ _cat_anchor }}"{% endif %}>
+            <h3 class="wa-team__group-title">{{ cat }}</h3>
+            <div class="wa-team__grid">
+              {% for person in ns_group.rows %}{{ wa_team_card(person, _profile_base) }}{% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        {# Catch-all. Grouping keys off the category, so without this a row whose
+           Category was never filled in would silently disappear from the page
+           entirely - present in the data, invisible on the site. #}
+        {%- set ns_other = namespace(rows=[]) -%}
+        {% for person in ns.rows %}
+          {% if not person.category %}{%- set ns_other.rows = ns_other.rows + [person] -%}{% endif %}
+        {% endfor %}
+        {% if ns_other.rows %}
+        <div class="wa-team__group wa-team__group--ungrouped">
+          <h3 class="wa-team__group-title">{{ module.ungrouped_heading | default('Our team') }}</h3>
+          <div class="wa-team__grid">
+            {% for person in ns_other.rows %}{{ wa_team_card(person, _profile_base) }}{% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      {% else %}
+        <div class="wa-team__grid">
+          {% for person in ns.rows %}{{ wa_team_card(person, _profile_base) }}{% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    {%- set _view_all_label = module.view_all_label | default('', true) -%}
+    {%- set _view_all_href = '' -%}
+    {%- if module.view_all_link and module.view_all_link.url and module.view_all_link.url.href -%}
+      {%- set _view_all_href = module.view_all_link.url.href -%}
+    {%- endif -%}
+    {%- if _is_about_team_preview and not _view_all_label -%}{%- set _view_all_label = 'View all' -%}{%- endif -%}
+    {%- if _is_about_team_preview and not _view_all_href -%}{%- set _view_all_href = '/about/team' -%}{%- endif -%}
+
+    {% if _view_all_label and _view_all_href %}
+    <div class="wa-team__actions">
+      <a class="wa-btn wa-btn--primary wa-team__view-all" href="{{ _view_all_href }}">
+        <span>{{ _view_all_label }}</span>
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}{# end members_only gate #}

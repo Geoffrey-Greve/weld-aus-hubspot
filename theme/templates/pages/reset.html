@@ -1,0 +1,90 @@
+<!--
+  templateType: page
+  label: Member Password Reset
+  isAvailableForNewContent: true
+-->
+{#
+  reset.html - Member portal password reset
+  Suggested URL: /login/reset/
+
+  Legacy CMS reset URL. HubSpot's password reset request widget must run on the
+  Private Content system route, otherwise HubSpot can reject the submission with
+  CSRF_FAILURE. Keep this page as a friendly redirect for existing links.
+#}
+{% set page_title_exact = 'Reset your password - Weld Australia' %}
+{% set page_description = 'Reset your Weld Australia member portal password.' %}
+{% extends "../layouts/base.html" %}
+
+{%- set _member_dashboard_redirect = '/portal' -%}
+{%- set _raw_return = request.query_dict.redirect_url | default(request.query_dict.redirect, true) | default(_member_dashboard_redirect) -%}
+{%- if _raw_return and _raw_return[0:1] == '/' and _raw_return[0:2] != '//' -%}
+  {%- set _redirect = _raw_return -%}
+{%- else -%}
+  {%- set _redirect = _member_dashboard_redirect -%}
+{%- endif -%}
+{%- if _redirect == '/portal/' or _redirect == '/portal' or _redirect == '/membership/' or _redirect == '/membership' -%}
+  {%- set _redirect = _member_dashboard_redirect -%}
+{%- endif -%}
+{%- set _reset_url = '/_hcms/mem/reset/request?redirect_url=' ~ (_redirect|urlencode) -%}
+
+{% block extra_head %}
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="refresh" content="0; url={{ _reset_url }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/auth.css') }}">
+{% endblock %}
+
+{% block body_class %}is-auth-page{% endblock %}
+
+{% block body %}
+{% set _shared_hero_id = 'password-reset-hero' %}
+{% set _shared_hero_section_id = 'password-reset-hero' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'compact' %}
+{% set _shared_hero_spacing = 'spacious' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = 'none' %}
+{% set _shared_hero_eyebrow = 'Member portal' %}
+{% set _shared_hero_headline = 'Reset your password' %}
+{% set _shared_hero_subheadline = '<p>Enter your member email address and we’ll send a secure password reset link if your account is active.</p>' %}
+{% include "../partials/shared-hero.html" %}
+
+<section class="auth-page-section" aria-labelledby="password-reset-heading">
+  <div class="auth-page-shell">
+    <div class="auth-page-card">
+      <div class="auth-page-card__main">
+        <div class="auth-reset">
+          <p class="wa-overline auth-reset__eyebrow">
+            <span class="wa-overline__text">Password reset</span>
+          </p>
+          <h2 class="auth-reset__heading" id="password-reset-heading">Opening secure reset page</h2>
+          <div class="auth-reset__intro">
+            <p>We’re taking you to the secure password reset page.</p>
+          </div>
+          <div class="auth-reset__action">
+            <a class="btn btn-primary auth-reset__button" href="{{ _reset_url }}">Continue to password reset</a>
+          </div>
+        </div>
+      </div>
+
+      <aside class="auth-page-card__aside auth-reset__aside" aria-label="Password reset help">
+        <div class="auth-support">
+          <p class="auth-support__label">Need help?</p>
+          <h2>Having trouble signing in?</h2>
+          <div class="auth-support__body">
+            <p>If an account exists for that email address, you’ll receive a password reset link shortly.</p>
+          </div>
+          <div class="auth-support__actions">
+            <a class="btn btn-secondary" href="/login/?redirect={{ _redirect|urlencode }}">Back to sign in</a>
+            <a class="auth-support__text-link" href="/contact-us">Contact us</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script>
+  window.location.replace({{ _reset_url|tojson }});
+</script>
+{% endblock %}

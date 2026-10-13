@@ -1,0 +1,1037 @@
+/*
+ * Weld Australia - Base Component Styles
+ * Buttons and form fields. All components respect --wa-touch-min (44px).
+ * Load order: tokens.css → reset.css → base.css → utilities.css → components.css
+ */
+
+/* ── Button - Base ───────────────────────────────────────────────────────── */
+
+/*
+ * Dynamic course detail cleanup
+ * HubSpot can retain saved DnD output for removed course-detail areas on HubDB
+ * dynamic pages. Scope this to pages that contain the new course dynamic module.
+ */
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-hero-video,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-stat-tiles,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #why,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #outcomes,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #syllabus,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #audience,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #trainer,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-team,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-testimonials,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-logo-strip,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) #faq,
+main:has(#hs_cos_wrapper_course_dynamic_proof_points) .wa-cta-banner {
+  display: none !important;
+}
+
+/* Portal auth fallback shown only when a portal page is reached without an
+   active HubSpot Private Content session. It does not expose member data. */
+.portal-auth-gate {
+  max-width: 680px;
+  margin-inline: auto;
+  padding: clamp(2rem, 5vw, 4rem);
+  text-align: center;
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-xl);
+  box-shadow: var(--wa-shadow-lg);
+}
+
+.portal-auth-gate__eyebrow {
+  margin: 0 0 var(--wa-space-3);
+  color: var(--wa-color-secondary);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.portal-auth-gate__heading {
+  margin: 0;
+  color: var(--wa-color-primary-dark);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: var(--wa-leading-tight);
+  letter-spacing: -0.04em;
+}
+
+.portal-auth-gate__body {
+  max-width: 520px;
+  margin: var(--wa-space-5) auto 0;
+  color: var(--wa-color-text-muted);
+  font-size: var(--wa-text-md);
+  line-height: var(--wa-leading-relaxed);
+}
+
+.portal-auth-gate__body a {
+  color: var(--wa-color-secondary);
+  font-weight: var(--wa-weight-semibold);
+}
+
+/* Portal page header + empty state (used by /portal/team/ and future portal pages) */
+.wa-portal-page-head {
+  max-width: 720px;
+  margin: 0 0 var(--wa-space-6);
+}
+
+.wa-portal-page-head__title {
+  margin: var(--wa-space-2) 0 0;
+  color: var(--wa-color-primary-dark);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  line-height: var(--wa-leading-tight);
+  letter-spacing: -0.03em;
+}
+
+.wa-portal-page-head__intro {
+  margin: var(--wa-space-3) 0 0;
+  color: var(--wa-color-text-muted);
+  font-size: var(--wa-text-md);
+  line-height: var(--wa-leading-relaxed);
+}
+
+.wa-portal-empty {
+  max-width: 680px;
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  text-align: center;
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-xl);
+}
+
+.wa-portal-empty h2 {
+  margin: 0 0 var(--wa-space-3);
+  color: var(--wa-color-primary-dark);
+}
+
+.wa-portal-empty a {
+  color: var(--wa-color-secondary);
+  font-weight: var(--wa-weight-semibold);
+}
+
+/*
+ * Canonical button base. `.wa-btn` (the React-island convention) is aliased
+ * here rather than re-declared further down the file - a second base block
+ * used to exist under "wa-btn aliases" and silently overrode any fix made
+ * here. Keep this the only place the base is defined.
+ *
+ * Labels MUST be allowed to wrap. This rule previously carried
+ * `white-space: nowrap`, which meant any CTA whose label was wider than the
+ * viewport ran straight off the right edge on mobile (QA 240/237) - or, inside
+ * an `overflow: hidden` container, inflated the grid track and clipped its own
+ * card (QA 224).
+ */
+.btn, .wa-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wa-space-2);
+  min-height: var(--wa-touch-min);
+  max-width: 100%;
+  /* padding-block drops 12px -> 8px to pay for the taller line box below:
+     16px x 1.25 + 16px padding + 4px border = 40px, so `min-height: 44px` still
+     wins and a single-line button renders at exactly 44px, unchanged. Leaving
+     padding at 12px would have grown every button in the theme to 48px. */
+  padding: var(--wa-space-2) var(--wa-space-6);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-base);
+  font-weight: var(--wa-weight-semibold);
+  /* 1.25 (not 1) so a wrapped two-line label doesn't collide with itself. */
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: break-word;
+  text-decoration: none;
+  border-radius: var(--wa-radius-md);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--wa-duration-fast) var(--wa-ease-default),
+    color var(--wa-duration-fast) var(--wa-ease-default),
+    border-color var(--wa-duration-fast) var(--wa-ease-default),
+    box-shadow var(--wa-duration-fast) var(--wa-ease-default);
+  user-select: none;
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--wa-color-primary);
+  outline-offset: 3px;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn svg,
+.wa-btn svg,
+.wa-btn__arrow {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Button - Sizes ──────────────────────────────────────────────────────── */
+
+.btn-sm {
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-2) var(--wa-space-4);
+  font-size: var(--wa-text-sm);
+}
+
+.btn-lg {
+  /* 54px is what this rendered at before the base line-height went to 1.25
+     (18px x 1 + 32px padding + 4px border). Pinning it as a min-height and
+     dropping padding-block to 12px keeps a single-line .btn-lg pixel-identical
+     while letting a wrapped label breathe. */
+  min-height: 54px;
+  padding: var(--wa-space-3) var(--wa-space-8);
+  font-size: var(--wa-text-md);
+}
+
+/* ── Button - Primary ────────────────────────────────────────────────────── */
+
+.btn-primary,
+.btn-primary:link,
+.btn-primary:visited {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  border-color: var(--wa-color-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background-color: var(--wa-color-primary-dark);
+  border-color: var(--wa-color-primary-dark);
+  color: var(--wa-color-on-primary);
+  text-decoration: none;
+}
+
+.btn-primary:active {
+  background-color: var(--wa-color-primary-dark);
+}
+
+/* ── Button - Secondary ──────────────────────────────────────────────────── */
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--wa-color-primary);
+  border-color: var(--wa-color-primary);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  text-decoration: none;
+}
+
+.btn-secondary:active {
+  background-color: var(--wa-color-primary-dark);
+  border-color: var(--wa-color-primary-dark);
+  color: var(--wa-color-on-primary);
+}
+
+/* ── Button - Ghost ──────────────────────────────────────────────────────── */
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--wa-color-text);
+  border-color: transparent;
+}
+
+.btn-ghost:hover,
+.btn-ghost:focus-visible {
+  background-color: var(--wa-color-surface-2);
+  color: var(--wa-color-text);
+  text-decoration: none;
+}
+
+.btn-ghost:active {
+  background-color: var(--wa-color-surface-3);
+}
+
+/* ── Button - Accent (CTA / member discount highlight) ───────────────────── */
+
+.btn-accent {
+  background-color: var(--wa-color-accent);
+  color: var(--wa-color-on-accent);
+  border-color: var(--wa-color-accent);
+}
+
+.btn-accent:hover,
+.btn-accent:focus-visible {
+  background-color: var(--wa-color-accent-dark);
+  border-color: var(--wa-color-accent-dark);
+  color: var(--wa-color-on-accent);
+  text-decoration: none;
+}
+
+/* ── Button - Outline on dark (translucent white) ────────────────────────── */
+/* For use on primary / primary-dark / image backgrounds (hero, CTA band). */
+
+.btn-outline {
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.btn-outline:hover,
+.btn-outline:focus-visible {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* ── Button - Danger ─────────────────────────────────────────────────────── */
+
+.btn-danger {
+  background-color: var(--wa-color-danger);
+  color: #ffffff;
+  border-color: var(--wa-color-danger);
+}
+
+.btn-danger:hover,
+.btn-danger:focus-visible {
+  background-color: #8a1b15;
+  border-color: #8a1b15;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* ── Field - Wrapper ─────────────────────────────────────────────────────── */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-1);
+}
+
+/* ── Field - Label ───────────────────────────────────────────────────────── */
+
+.field-label {
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  color: var(--wa-color-text);
+  line-height: var(--wa-leading-snug);
+}
+
+.field-label-optional::after {
+  content: ' (optional)';
+  font-weight: var(--wa-weight-normal);
+  color: var(--wa-color-text-muted);
+}
+
+/* ── Field - Input / Select / Textarea ───────────────────────────────────── */
+
+.field-input {
+  width: 100%;
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-3) var(--wa-space-4);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text);
+  background-color: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border-strong);
+  border-radius: var(--wa-radius-md);
+  transition: border-color var(--wa-duration-fast) var(--wa-ease-default),
+              box-shadow var(--wa-duration-fast) var(--wa-ease-default);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.field-input::placeholder {
+  color: var(--wa-color-text-subtle);
+}
+
+.field-input:hover {
+  border-color: var(--wa-color-primary-light);
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--wa-color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 47, 95, 0.15);
+}
+
+.field-input:disabled {
+  background-color: var(--wa-color-surface-2);
+  color: var(--wa-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Select arrow */
+select.field-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b6770' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--wa-space-3) center;
+  padding-right: var(--wa-space-10);
+}
+
+/* ── Field - Error state ─────────────────────────────────────────────────── */
+
+.field-input[aria-invalid='true'],
+.field--error .field-input {
+  border-color: var(--wa-color-danger);
+}
+
+.field-input[aria-invalid='true']:focus,
+.field--error .field-input:focus {
+  box-shadow: 0 0 0 3px var(--wa-color-danger-surface);
+}
+
+.field-error {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-danger);
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-1);
+}
+
+.field-error::before {
+  content: '!';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--wa-radius-full);
+  background-color: var(--wa-color-danger);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: var(--wa-weight-bold);
+  flex-shrink: 0;
+}
+
+/* ── Field - Hint ────────────────────────────────────────────────────────── */
+
+.field-hint {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+  line-height: var(--wa-leading-snug);
+}
+
+/* ── Checkbox / Radio ────────────────────────────────────────────────────── */
+
+.field-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wa-space-3);
+  cursor: pointer;
+  min-height: var(--wa-touch-min);
+  align-items: center;
+}
+
+.field-check input[type='checkbox'],
+.field-check input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--wa-color-primary);
+  cursor: pointer;
+}
+
+/* ── Badge ───────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--wa-space-2);
+  font-size: var(--wa-text-xs);
+  font-weight: var(--wa-weight-semibold);
+  border-radius: var(--wa-radius-full);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.badge-gold {
+  background-color: var(--wa-color-tier-gold-bg);
+  /* #5c3d00 on #fdf6e3 → 9.5:1 - satisfies WCAG AA small text (4.5:1) */
+  color: #5c3d00;
+  border: 1px solid var(--wa-color-tier-gold);
+}
+
+.badge-silver {
+  background-color: var(--wa-color-tier-silver-bg);
+  /* #555 on #f5f5f5 → 6.2:1 */
+  color: #555;
+  border: 1px solid var(--wa-color-tier-silver);
+}
+
+.badge-bronze {
+  background-color: var(--wa-color-tier-bronze-bg);
+  /* #5c2d00 on #faf0e6 → 9.8:1 */
+  color: #5c2d00;
+  border: 1px solid var(--wa-color-tier-bronze);
+}
+
+.badge-success {
+  background-color: var(--wa-color-success-surface);
+  color: var(--wa-color-success-text); /* WCAG 1.4.3 - AA small text */
+  border: 1px solid var(--wa-color-success-border);
+}
+
+.badge-warning {
+  background-color: var(--wa-color-warning-surface);
+  /* #7a4a00 on #fef4e5 → 6.9:1 */
+  color: #7a4a00;
+  border: 1px solid var(--wa-color-warning-border);
+}
+
+.badge-danger {
+  background-color: var(--wa-color-danger-surface);
+  color: var(--wa-color-danger);
+  border: 1px solid var(--wa-color-danger-border);
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.card {
+  background-color: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  box-shadow: var(--wa-shadow-card);
+  overflow: hidden;
+}
+
+.card-body {
+  padding: var(--wa-space-6);
+}
+
+/* ── Alert / Notification banner ─────────────────────────────────────────── */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wa-space-3);
+  padding: var(--wa-space-4) var(--wa-space-4);
+  border-radius: var(--wa-radius-md);
+  border-left: 4px solid currentColor;
+  font-size: var(--wa-text-sm);
+}
+
+.alert-info    { background-color: var(--wa-color-info-surface);    color: var(--wa-color-info-text);    border-color: var(--wa-color-info); }
+.alert-success { background-color: var(--wa-color-success-surface); color: var(--wa-color-success-text); border-color: var(--wa-color-success); }
+.alert-warning { background-color: var(--wa-color-warning-surface); color: var(--wa-color-warning); border-color: var(--wa-color-warning); }
+.alert-danger  { background-color: var(--wa-color-danger-surface);  color: var(--wa-color-danger);  border-color: var(--wa-color-danger); }
+
+/* ── wa-btn aliases ──────────────────────────────────────────────────────── */
+/*
+ * React islands use a wa- prefixed button convention. These aliases mirror
+ * the .btn rules above so that islands receive brand-consistent buttons
+ * from the globally-loaded theme stylesheet - without duplicating definitions
+ * in each module's extracted CSS bundle.
+ *
+ * The base declaration that used to sit here has been folded into the single
+ * `.btn, .wa-btn` block above. It was a byte-for-byte duplicate that won on
+ * source order, so any edit made to the base above appeared to do nothing.
+ * Do not reintroduce it - add `.wa-btn` to the selector up there instead.
+ */
+
+.btn:focus-visible, .wa-btn:focus-visible {
+  outline: 3px solid var(--wa-color-primary);
+  outline-offset: 3px;
+}
+
+.btn:disabled, .btn[aria-disabled='true'],
+.wa-btn:disabled, .wa-btn[aria-disabled='true'],
+.wa-btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-sm, .wa-btn--sm {
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-2) var(--wa-space-4);
+  font-size: var(--wa-text-sm);
+}
+
+.btn-lg, .wa-btn--lg {
+  /* Keep in step with the .btn-lg block above - see the note there. */
+  min-height: 54px;
+  padding: var(--wa-space-3) var(--wa-space-8);
+  font-size: var(--wa-text-md);
+}
+
+.btn-primary,
+.btn-primary:link,
+.btn-primary:visited,
+.wa-btn--primary,
+.wa-btn--primary:link,
+.wa-btn--primary:visited {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  border-color: var(--wa-color-primary);
+}
+
+.btn-primary:hover, .btn-primary:focus-visible,
+.wa-btn--primary:hover, .wa-btn--primary:focus-visible {
+  background-color: var(--wa-color-primary-dark);
+  border-color: var(--wa-color-primary-dark);
+  color: var(--wa-color-on-primary);
+  text-decoration: none;
+}
+
+.btn-secondary, .wa-btn--secondary {
+  background-color: transparent;
+  color: var(--wa-color-primary);
+  border-color: var(--wa-color-primary);
+}
+
+.btn-secondary:hover, .btn-secondary:focus-visible,
+.wa-btn--secondary:hover, .wa-btn--secondary:focus-visible {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  text-decoration: none;
+}
+
+.btn-ghost, .wa-btn--ghost {
+  background-color: transparent;
+  color: var(--wa-color-text);
+  border-color: transparent;
+}
+
+.btn-ghost:hover, .btn-ghost:focus-visible,
+.wa-btn--ghost:hover, .wa-btn--ghost:focus-visible {
+  background-color: var(--wa-color-surface-2);
+  color: var(--wa-color-text);
+  text-decoration: none;
+}
+
+.btn-danger, .wa-btn--danger {
+  background-color: var(--wa-color-danger);
+  color: #ffffff;
+  border-color: var(--wa-color-danger);
+}
+
+.wa-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-1);
+}
+
+.wa-field label {
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  color: var(--wa-color-text);
+}
+
+.wa-field input,
+.wa-field select,
+.wa-field textarea {
+  width: 100%;
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-3) var(--wa-space-4);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text);
+  background-color: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border-strong);
+  border-radius: var(--wa-radius-md);
+  transition: border-color var(--wa-duration-fast), box-shadow var(--wa-duration-fast);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.wa-field input:focus,
+.wa-field select:focus,
+.wa-field textarea:focus {
+  outline: none;
+  border-color: var(--wa-color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 47, 95, 0.15);
+}
+
+.wa-field__hint {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Section system - shared vertical rhythm + background variants                */
+/*                                                                              */
+/* Section modules emit one of two historical conventions for their wrapper:    */
+/*   • .wa-section--<bg>        + .wa-section--<spacing>                         */
+/*   • .wa-section--bg-<bg>     + .wa-section--spacing-<spacing>                 */
+/* and the choice values use underscores (surface_alt, primary_dark) while some */
+/* module CSS was written with hyphens. This block defines every combination    */
+/* once, from tokens, so any module renders with correct padding + background   */
+/* regardless of which convention it emits. Idempotent with module-local rules. */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.wa-section { position: relative; }
+
+/* ── Vertical spacing ─────────────────────────────────────────────────────── */
+.wa-section--compact,  .wa-section--spacing-compact  { padding-block: var(--wa-space-8); }
+.wa-section--default,  .wa-section--spacing-default  { padding-block: var(--wa-space-24); }
+.wa-section--spacious, .wa-section--spacing-spacious { padding-block: var(--wa-space-24); }
+
+/* ── Portal page-head rhythm ──────────────────────────────────────────────── */
+/* The member-portal section pages render their heading as the first .wa-section
+   (default spacing = 96px top). That leaves the sub-nav→heading gap 32px larger
+   than the public hero module (64px). Override just the top padding on
+   these header sections so the menu→heading rhythm is uniform site-wide. Scoped
+   to the bespoke per-page classes - never the global .wa-section--default, which
+   drives vertical rhythm for every content section across the site. */
+.wa-my-courses-section,
+.wa-my-events-section,
+.wa-my-invoices-section,
+.wa-certifications-section,
+.wa-cert-guidance-section {
+  padding-block-start: var(--wa-space-16); /* 64px - matches public hero top */
+}
+
+/* ── Backgrounds (both conventions + both spellings) ──────────────────────── */
+.wa-section--surface,
+.wa-section--bg-surface {
+  background-color: var(--wa-color-surface);
+  color: var(--wa-color-text);
+}
+
+.wa-section--surface_alt, .wa-section--surface-alt,
+.wa-section--bg-surface_alt, .wa-section--bg-surface-alt {
+  background-color: var(--wa-color-surface-2);
+  color: var(--wa-color-text);
+}
+
+.wa-section--primary,
+.wa-section--bg-primary {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+}
+
+.wa-section--primary_dark, .wa-section--primary-dark,
+.wa-section--bg-primary_dark, .wa-section--bg-primary-dark {
+  background-color: var(--wa-color-primary-dark);
+  color: var(--wa-color-on-primary);
+}
+
+.wa-section--transparent,
+.wa-section--bg-transparent {
+  background-color: transparent;
+}
+
+/* ── Button - Design-canonical variant aliases ───────────────────────────── */
+/* Maps the Btn primitive names from wa-core.jsx to existing .btn-* classes.  */
+
+.btn-gold,
+.wa-btn--gold {
+  background-color: var(--wa-color-accent);
+  color: var(--wa-color-on-accent);
+  border-color: var(--wa-color-accent);
+}
+.btn-gold:hover, .btn-gold:focus-visible,
+.wa-btn--gold:hover, .wa-btn--gold:focus-visible {
+  background-color: var(--wa-color-accent-dark);
+  border-color: var(--wa-color-accent-dark);
+  color: var(--wa-color-on-accent);
+  text-decoration: none;
+}
+
+.btn-navy,
+.wa-btn--navy {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  border-color: var(--wa-color-primary);
+}
+.btn-navy:hover, .btn-navy:focus-visible,
+.wa-btn--navy:hover, .wa-btn--navy:focus-visible {
+  background-color: var(--wa-color-primary-dark);
+  border-color: var(--wa-color-primary-dark);
+  color: var(--wa-color-on-primary);
+  text-decoration: none;
+}
+
+.btn-navy-outline,
+.wa-btn--navy-outline {
+  background-color: transparent;
+  color: var(--wa-color-primary);
+  border-color: var(--wa-color-primary);
+}
+.btn-navy-outline:hover, .btn-navy-outline:focus-visible,
+.wa-btn--navy-outline:hover, .wa-btn--navy-outline:focus-visible {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  text-decoration: none;
+}
+
+.btn-white-outline,
+.btn-white-outline:link,
+.btn-white-outline:visited,
+.wa-btn--white-outline,
+.wa-btn--white-outline:link,
+.wa-btn--white-outline:visited {
+  background-color: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.btn-white-outline:hover, .btn-white-outline:focus-visible,
+.wa-btn--white-outline:hover, .wa-btn--white-outline:focus-visible {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.btn-green,
+.wa-btn--green {
+  background-color: var(--wa-color-success);
+  color: #ffffff;
+  border-color: var(--wa-color-success);
+}
+.btn-green:hover, .btn-green:focus-visible,
+.wa-btn--green:hover, .wa-btn--green:focus-visible {
+  background-color: #176e3c;
+  border-color: #176e3c;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.btn-blue,
+.wa-btn--blue {
+  background-color: var(--wa-color-secondary);
+  color: #ffffff;
+  border-color: var(--wa-color-secondary);
+}
+.btn-blue:hover, .btn-blue:focus-visible,
+.wa-btn--blue:hover, .wa-btn--blue:focus-visible {
+  background-color: var(--wa-color-secondary-dark);
+  border-color: var(--wa-color-secondary-dark);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* ── Overline - section eyebrow component ────────────────────────────────── */
+/* Magenta horizontal rule + uppercase label. Dark variant for navy sections. */
+
+.wa-overline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.wa-overline::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: var(--wa-color-accent-magenta);
+}
+
+.wa-overline__text {
+  font-size: var(--wa-text-xs); /* 12px - WCAG 1.4.4 (was 11px) */
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wa-color-magenta-text); /* WCAG 1.4.3 - AA on light surfaces */
+}
+
+.wa-overline--light::before {
+  background: rgba(254, 207, 5, 0.85);
+}
+
+.wa-overline--light .wa-overline__text {
+  color: rgba(255, 255, 255, 0.85); /* AA on dark/navy sections */
+}
+
+/* ── Section head block ──────────────────────────────────────────────────── */
+
+.wa-section-head {
+  margin-bottom: var(--wa-space-12);
+}
+
+.wa-section-head--center {
+  text-align: center;
+}
+
+.wa-section-head--center p {
+  margin-inline: auto;
+  max-width: 680px;
+}
+
+/* ── Portal sub-nav (portal-nav.html partial) ────────────────────────────────
+ * Secondary navigation for the member portal, included by portal.html.
+ * Lives here (global, always bundled into critical.css) rather than in the
+ * header module so it is styled on every portal page regardless of whether
+ * the header module is present. The sticky offset reads
+ * --wa-site-header-offset (set by the header module), falling back to static
+ * 110px / 72px values when that module is absent.
+ */
+
+.wa-portal-nav {
+  background-color: var(--wa-color-surface-2);
+  border-bottom: 1px solid var(--wa-color-border);
+  position: sticky;
+  top: var(--wa-site-header-offset, 110px);
+  z-index: calc(var(--wa-z-sticky) - 1);
+}
+
+.wa-portal-nav .container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.wa-portal-nav .container::-webkit-scrollbar {
+  display: none;
+}
+
+.wa-portal-nav__list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: var(--wa-space-1);
+  white-space: nowrap;
+}
+
+.wa-portal-nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-3) var(--wa-space-4);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-medium);
+  color: var(--wa-color-text-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color var(--wa-duration-fast), border-bottom-color var(--wa-duration-fast);
+}
+
+.wa-portal-nav__link:hover,
+.wa-portal-nav__link:focus-visible {
+  color: var(--wa-color-primary);
+  border-bottom-color: var(--wa-color-primary);
+}
+
+.wa-portal-nav__link:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: -2px;
+}
+
+.wa-portal-nav__link.is-active,
+.wa-portal-nav__link[aria-current="page"] {
+  color: var(--wa-color-primary);
+  border-bottom-color: var(--wa-color-primary);
+  font-weight: var(--wa-weight-semibold);
+}
+
+.wa-portal-nav__item--logout {
+  margin-left: auto;
+}
+
+.wa-portal-nav__link--logout {
+  color: var(--wa-color-danger);
+}
+
+.wa-portal-nav__link--logout:hover,
+.wa-portal-nav__link--logout:focus-visible {
+  color: var(--wa-color-danger);
+  border-bottom-color: var(--wa-color-danger);
+}
+
+@media (max-width: 1023px) {
+  .wa-portal-nav {
+    top: var(--wa-site-header-offset, 72px);
+  }
+
+  .wa-portal-nav .container {
+    padding-inline: var(--wa-space-4);
+  }
+
+  .wa-portal-nav__list {
+    gap: var(--wa-space-2);
+    padding-block: var(--wa-space-2);
+  }
+
+  .wa-portal-nav__item--logout {
+    margin-left: 0;
+  }
+
+  .wa-portal-nav__link {
+    background: var(--wa-color-surface);
+    border: 1px solid var(--wa-color-border);
+    border-radius: 999px;
+    min-height: 38px;
+    padding: 8px 14px;
+  }
+
+  .wa-portal-nav__link:hover,
+  .wa-portal-nav__link:focus-visible,
+  .wa-portal-nav__link.is-active,
+  .wa-portal-nav__link[aria-current="page"] {
+    background: var(--wa-color-primary);
+    border-color: var(--wa-color-primary);
+    color: #fff;
+  }
+
+  .wa-portal-nav__link--logout {
+    background: rgba(179, 38, 30, 0.08);
+    border-color: rgba(179, 38, 30, 0.22);
+  }
+
+  .wa-portal-nav__link--logout:hover,
+  .wa-portal-nav__link--logout:focus-visible {
+    background: var(--wa-color-danger);
+    border-color: var(--wa-color-danger);
+    color: #fff;
+  }
+}
+
+@media (max-width: 480px) {
+  .wa-portal-nav .container {
+    padding-inline: var(--wa-space-3);
+  }
+
+  .wa-portal-nav__link {
+    font-size: 12px;
+    min-height: 36px;
+    padding: 7px 12px;
+  }
+}
+
+/* ── Hero - light text on dark backgrounds ───────────────────────────────── */
+/* Client feedback 2026-07-23: on the dark hero banner at the top of pages
+   (e.g. course.html, course-sales.html) the breadcrumb links inherited the
+   global navy link colour (--wa-color-primary #1c1e4c) and rendered as dark
+   navy-on-deep-navy - effectively unreadable. Supporting copy also used a
+   translucent grey (opacity .9). Force white / very-light tones across every
+   dark hero context: solid primary, deep-navy, or a background image.
+   Lives in components.css (bundled into critical.css) so it is guaranteed to
+   load on the static course heroes, which do not pull in hero.module.css. */
+
+.wa-hero--bg-primary .wa-hero__breadcrumb-link,
+.wa-hero--bg-primary_dark .wa-hero__breadcrumb-link,
+.wa-hero--has-image .wa-hero__breadcrumb-link {
+  color: #ffffff;
+}
+
+.wa-hero--bg-primary .wa-hero__breadcrumb-link:hover,
+.wa-hero--bg-primary_dark .wa-hero__breadcrumb-link:hover,
+.wa-hero--has-image .wa-hero__breadcrumb-link:hover {
+  color: #ffffff;
+  opacity: 0.82;
+}
+
+.wa-hero--bg-primary .wa-hero__breadcrumb-current,
+.wa-hero--bg-primary_dark .wa-hero__breadcrumb-current,
+.wa-hero--has-image .wa-hero__breadcrumb-current,
+.wa-hero--bg-primary .wa-hero__breadcrumb-sep,
+.wa-hero--bg-primary_dark .wa-hero__breadcrumb-sep,
+.wa-hero--has-image .wa-hero__breadcrumb-sep {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Sub-headline / supporting copy on dark heroes is lightened at the source in
+   hero.module/module.css (the static course heroes have no sub-headline, so no
+   override is needed here). */
+
+/* Eyebrow / overline label inside a dark hero - brighten to near-white. */
+.wa-hero .wa-overline--light .wa-overline__text {
+  color: rgba(255, 255, 255, 0.95);
+}

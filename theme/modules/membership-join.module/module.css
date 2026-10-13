@@ -1,0 +1,336 @@
+.wa-membership-join__hero {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+.wa-membership-join__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.75fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.wa-membership-join__copy > h2 {
+  margin: 0 0 1rem;
+  color: var(--wa-color-primary-dark, #0f1030);
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.wa-membership-join__intro {
+  max-width: 46rem;
+  color: var(--wa-color-text-muted, #5b6478);
+  font-size: var(--wa-text-lg, 1.125rem);
+}
+
+.wa-membership-join__steps {
+  display: grid;
+  gap: 1rem;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wa-membership-join__steps li {
+  display: grid;
+  grid-template-columns: 2.75rem 1fr;
+  gap: 0.85rem 1rem;
+  align-items: start;
+  padding: 1.15rem;
+  border: 1px solid rgba(15, 16, 48, 0.1);
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.wa-membership-join__steps span {
+  grid-row: 1 / span 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--wa-color-primary, #1c1e4c);
+  font-weight: 800;
+}
+
+.wa-membership-join__steps strong,
+.wa-membership-join__steps small {
+  display: block;
+}
+
+.wa-membership-join__steps strong {
+  grid-column: 2;
+  min-width: 0;
+  color: var(--wa-color-primary-dark, #0f1030);
+}
+
+.wa-membership-join__steps small {
+  grid-column: 2;
+  min-width: 0;
+  margin-top: 0.25rem;
+  color: var(--wa-color-text-muted, #5b6478);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.wa-membership-join__card {
+  position: sticky;
+  top: calc(var(--wa-site-header-offset, 110px) + 1.25rem);
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  border: 1px solid rgba(15, 16, 48, 0.1);
+  border-radius: 1.35rem;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(15, 16, 48, 0.12);
+}
+
+.wa-membership-join__category {
+  display: inline-flex;
+  margin: 0 0 1rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  color: var(--wa-color-primary-dark, #0f1030);
+  background: rgba(254, 207, 5, 0.28);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wa-membership-join__card h2 {
+  margin: 0;
+  color: var(--wa-color-primary-dark, #0f1030);
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  letter-spacing: -0.04em;
+}
+
+.wa-membership-join__price-block {
+  margin: 1rem 0 0;
+}
+
+.wa-membership-join__price-label {
+  display: block;
+  margin: 0 0 0.25rem;
+  color: var(--wa-color-text-muted, #5b6478);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wa-membership-join__price {
+  margin: 0;
+  color: var(--wa-color-secondary, #ed128d);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.wa-membership-join__price-sub {
+  margin: 0.25rem 0 0;
+  color: var(--wa-color-text-muted, #5b6478);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.wa-membership-join__description {
+  margin: 1rem 0 1.5rem;
+  color: var(--wa-color-text-muted, #5b6478);
+  line-height: 1.6;
+}
+
+.wa-membership-join__notice {
+  margin: 0 0 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(237, 18, 141, 0.18);
+  border-radius: 0.9rem;
+  color: var(--wa-color-text, #20263a);
+  background: rgba(237, 18, 141, 0.06);
+  font-size: 0.95rem;
+}
+
+.wa-membership-join__notice p {
+  margin: 0;
+}
+
+.wa-membership-join__cta {
+  width: 100%;
+  justify-content: center;
+}
+
+.wa-membership-join__application {
+  margin-top: clamp(2rem, 4vw, 3rem);
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border: 1px solid rgba(15, 16, 48, 0.1);
+  border-radius: 1.15rem;
+  background: #fff;
+}
+
+.wa-membership-join__application-heading {
+  margin: 0 0 1rem;
+  color: var(--wa-color-primary-dark, #0f1030);
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  letter-spacing: -0.03em;
+}
+
+.wa-membership-join__form-mount {
+  max-width: 40rem;
+}
+
+.wa-membership-join__form-mount [hidden] {
+  display: none !important;
+}
+
+/*
+ * Theme-owned application form (issue 251). New HubSpot editor embeds render
+ * in a cross-origin iframe, so we mirror contact-form: native markup + Forms API.
+ */
+.wa-membership-join__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.wa-mj-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 479px) {
+  .wa-mj-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wa-mj-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.wa-mj-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid rgba(15, 16, 48, 0.1);
+  border-radius: var(--wa-radius-lg, 12px);
+  background: rgba(28, 30, 76, 0.035);
+}
+
+.wa-mj-fieldset__legend {
+  padding: 0 0.35rem;
+  color: var(--wa-color-primary-dark, #0f1030);
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.wa-mj-fieldset .wa-mj-row {
+  align-items: end;
+}
+
+@media (min-width: 480px) {
+  .wa-mj-fieldset .wa-mj-row .wa-mj-label {
+    min-height: 3.1em;
+  }
+}
+
+.wa-mj-label {
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--wa-color-text, #20263a);
+}
+
+.wa-mj-required {
+  color: var(--wa-color-danger, #b42318);
+  margin-left: 2px;
+}
+
+.wa-mj-input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0.7rem 0.9rem;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.3;
+  color: var(--wa-color-text, #20263a);
+  background: var(--wa-color-surface, #fff);
+  border: 1.5px solid var(--wa-color-border, #dde0e5);
+  border-radius: var(--wa-radius-md, 8px);
+  outline: none;
+  transition: border-color 160ms ease;
+}
+
+.wa-mj-input:focus,
+.wa-mj-input:focus-visible {
+  border-color: var(--wa-color-primary, #1c1e4c);
+  outline: 3px solid rgba(28, 30, 76, 0.28);
+  outline-offset: 2px;
+}
+
+.wa-mj-input.is-invalid {
+  border-color: var(--wa-color-danger, #b42318);
+}
+
+.wa-mj-error {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--wa-color-danger, #b42318);
+}
+
+.wa-membership-join__form-submit {
+  width: 100%;
+  min-height: var(--wa-touch-min, 44px);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.wa-membership-join__form-submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.wa-membership-join__success {
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(31, 138, 77, 0.28);
+  border-radius: 0.9rem;
+  color: var(--wa-color-text, #20263a);
+  background: rgba(31, 138, 77, 0.08);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.wa-membership-join__success p {
+  margin: 0;
+}
+
+.wa-membership-join__back {
+  display: inline-flex;
+  margin-top: 1rem;
+  color: var(--wa-color-primary, #1c1e4c);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.wa-membership-join__back:hover,
+.wa-membership-join__back:focus-visible {
+  color: var(--wa-color-secondary, #ed128d);
+}
+
+@media (max-width: 900px) {
+  .wa-membership-join__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wa-membership-join__card {
+    position: static;
+  }
+}

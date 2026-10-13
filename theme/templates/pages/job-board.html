@@ -1,0 +1,130 @@
+<!--
+  templateType: page
+  label: Job Board
+  isAvailableForNewContent: true
+-->
+{#
+  job-board.html - Weld Australia Jobs Board + dynamic job detail router
+  URL: /job-board and /job-board/{slug}
+
+  Safe data behaviour:
+  - Hero and listing modules read published rows from the HubDB `jobs` table only.
+  - Does not write to CRM, HubDB, forms, deals, contacts, or workflows.
+  - When configured as the Jobs HubDB dynamic parent, child routes render
+    the selected job row via the shared job-detail partials.
+#}
+{% set _job_row = dynamic_page_hubdb_row %}
+{% set _job_inactive = _job_row and not _job_row.is_active %}
+{% set _job_visible = _job_row and _job_row.is_active %}
+
+{# Title and description are resolved here, above the extends. layouts/base.html
+   includes partials/_head.html, which emits the document's ONLY <title> and meta
+   description; an assignment made after the extends lands too late for it, and
+   job-detail-head.html renders from inside extra_head, which is later still. The
+   detail branch mirrors the title job-detail-head.html used to emit. #}
+{% if _job_inactive %}
+  {% set page_title = 'Job no longer listed' %}
+  {% set page_description = 'This job opportunity is no longer listed on the Weld Australia Jobs Board.' %}
+{% elif _job_visible %}
+  {% set _job_seo_title = _job_row.job_title | default('Welding opportunity', true) %}
+  {% set _job_seo_company = _job_row.company_name | default('Weld Australia member employer', true) %}
+  {% set page_title_exact = _job_seo_title ~ ' at ' ~ _job_seo_company ~ ' | Weld Australia Jobs Board' %}
+  {% set _job_seo_excerpt = _job_row.excerpt | default('', true) %}
+  {% if not _job_seo_excerpt and _job_row.job_description %}
+    {% set _job_seo_excerpt = _job_row.job_description | striptags | truncate(190) %}
+  {% endif %}
+  {% if not _job_seo_excerpt %}
+    {% set _job_seo_excerpt = 'Explore this welding, fabrication or manufacturing opportunity advertised through the Weld Australia Jobs Board.' %}
+  {% endif %}
+  {% set page_description = _job_seo_excerpt | striptags | truncate(160) %}
+{% else %}
+  {% set page_title_exact = 'Welding Jobs Australia | Fabrication & Manufacturing Careers | Weld Australia' %}
+  {% set page_description = "Explore welding, fabrication and manufacturing jobs across Australia. Find industry career opportunities or advertise vacancies through Weld Australia's dedicated Jobs Board." %}
+{% endif %}
+
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+{% if _job_visible %}
+{% include "../partials/job-detail-head.html" %}
+{% elif _job_inactive %}
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/job-board.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/job-detail.css') }}">
+{% else %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/job-board.css') }}">
+{% endif %}
+{% endblock %}
+
+{% block body_class %}{% if _job_visible %} is-job-detail-page{% elif _job_inactive %} is-job-detail-page is-job-detail-inactive-page{% endif %}{% endblock %}
+
+{% block body %}
+{% if _job_visible %}
+{% include "../partials/job-detail-body.html" %}
+{% elif _job_inactive %}
+{% include "../partials/job-detail-inactive.html" %}
+{% else %}
+{# Instance key is deliberately "job_board_hero_v2" (not "job_board_hero").
+   The retired job-board-hero saved body used lead_text / body_text /
+   primary_cta_label / primary_cta_link and stats.label_text; hero.module reads
+   subheadline + nested primary_cta groups + stats.stat_label. Re-keying avoids
+   overlaying that incompatible schema. The four stat tiles are live counts off
+   the jobs HubDB table - hero.module resolves them from `dynamic_value` and
+   only runs the query when one is set. #}
+{% module "job_board_hero_v2" path="../../modules/hero"
+  label="Job Board Hero"
+  background="primary"
+  height="large"
+  spacing="default"
+  alignment="left"
+  accent_bar=true
+  media_type="none"
+  eyebrow="Welding jobs Australia"
+  headline="Welding & Fabrication Jobs Board"
+  subheadline="<p>Connect with career opportunities across Australia's welding, fabrication and manufacturing industries through Weld Australia's dedicated industry Jobs Board.</p><p>Designed specifically for the sector, the Jobs Board helps employers connect with skilled professionals, while supporting welders, engineers, inspectors, supervisors, apprentices and industry specialists to discover new opportunities across a wide range of industries and projects.</p>"
+  primary_cta={"label_text": "Browse open roles", "link": {"url": {"href": "#job-board-open-roles", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "gold"}
+  secondary_cta={"label_text": "Advertise a vacancy", "link": {"url": {"href": "#job-board-connect", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "white-outline"}
+  show_stats=true
+  stats_placement="side"
+  stats=[
+    {"value": "", "stat_label": "Jobs listed", "dynamic_value": "open_roles_count"},
+    {"value": "", "stat_label": "States represented", "dynamic_value": "states_count"},
+    {"value": "", "stat_label": "Employers hiring", "dynamic_value": "employers_count"},
+    {"value": "", "stat_label": "Job categories", "dynamic_value": "categories_count"}
+  ]
+%}
+
+{% module "job_board_open_positions" path="../../modules/job-board-open-positions"
+  label="Open positions"
+%}
+
+{% module "job_board_cta" path="../../modules/job-board-cta"
+  label="Get connected"
+  section_id="job-board-connect"
+  eyebrow="Get connected"
+  heading="Whether you're hiring or job hunting"
+  cards=[
+    {
+      "icon_style": "employer",
+      "kicker": "For employers",
+      "title": "Advertise a role",
+      "body_text": "Reach skilled welders, fabricators, engineers and inspectors through a jobs board built specifically for Australia's welding and fabrication industry.",
+      "primary_label": "Advertise a vacancy",
+      "primary_link": {"url": {"href": "/contact-us?topic=advertise-a-job#enquiry", "type": "EXTERNAL"}},
+      "secondary_label": "Talk to our team",
+      "secondary_link": {"url": {"href": "/contact-us?topic=job-board#enquiry", "type": "EXTERNAL"}}
+    },
+    {
+      "icon_style": "seeker",
+      "kicker": "For job seekers",
+      "title": "Find the right next step",
+      "body_text": "Use the filters above to explore open jobs by role family, location, employment type and arrangement. For help with career pathways, contact the Weld Australia team.",
+      "primary_label": "Browse roles",
+      "primary_link": {"url": {"href": "#job-board-open-roles", "type": "EXTERNAL"}},
+      "secondary_label": "Contact us",
+      "secondary_link": {"url": {"href": "/contact-us?topic=job-board#enquiry", "type": "EXTERNAL"}}
+    }
+  ]
+%}
+{% endif %}
+{% endblock %}

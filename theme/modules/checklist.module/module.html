@@ -1,0 +1,87 @@
+{%- set _bg = module.background | default('surface') -%}
+{%- set _sp = module.spacing | default('default') -%}
+{%- set _vis = module.visibility | default(['mobile','tablet','desktop']) -%}
+{%- set _dark = _bg in ['primary', 'primary_dark'] -%}
+{%- set _layout = module.layout | default('list') -%}
+{%- set _cols = module.columns | default('2') -%}
+{%- set _tick = module.tick_color | default('navy') -%}
+
+{%- set _section_classes = 'wa-checklist wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-' ~ _sp -%}
+{# add wa-hide-mobile/tablet/desktop for missing vis items #}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section class="{{ _section_classes }}" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container">
+    {% if module.overline or module.heading or module.intro %}
+    <div class="wa-section-head">
+      {% if module.overline %}
+      <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}"><span class="wa-overline__text">{{ module.overline }}</span></div>
+      {% endif %}
+      {% if module.heading %}<h2 class="wa-checklist__heading">{{ module.heading }}</h2>{% endif %}
+      {% if module.intro %}<div class="wa-checklist__intro wa-richtext">{{ module.intro }}</div>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if module.items %}
+    {% if _layout == 'cards' %}
+    {% if module.section_id == 'benefits' %}
+    <div class="wa-checklist__benefit-groups">
+      {% set _benefit_groups = [
+        {"label": "For welders", "key": "for welders", "modifier": "welders"},
+        {"label": "For employers", "key": "for employers", "modifier": "employers"}
+      ] %}
+      {% for group in _benefit_groups %}
+      <article class="wa-checklist__benefit-panel wa-checklist__benefit-panel--{{ group.modifier }}" aria-labelledby="wa-checklist-benefits-{{ group.modifier }}">
+        <div class="wa-checklist__benefit-panel-head">
+          <span class="wa-checklist__benefit-kicker">Certification benefits</span>
+          <h3 class="wa-checklist__benefit-title" id="wa-checklist-benefits-{{ group.modifier }}">{{ group.label }}</h3>
+        </div>
+        <ul class="wa-checklist__benefit-list" role="list">
+          {% for item in module.items %}
+          {% if item.category_label | lower == group.key %}
+          <li class="wa-checklist__benefit-item">
+            <svg class="wa-checklist__tick wa-checklist__tick--{{ _tick }}" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+              <polyline points="8 12 11 15 16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>{{ item.text }}</span>
+          </li>
+          {% endif %}
+          {% endfor %}
+        </ul>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="wa-checklist__cards wa-checklist__cards--{{ _cols }}col">
+      {% for item in module.items %}
+      <div class="wa-checklist__card">
+        {% if item.category_label %}<span class="wa-checklist__card-label">{{ item.category_label }}</span>{% endif %}
+        <div class="wa-checklist__check-row">
+          <svg class="wa-checklist__tick wa-checklist__tick--{{ _tick }}" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+            <polyline points="8 12 11 15 16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>{{ item.text }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% else %}
+    <ul class="wa-checklist__list wa-checklist__list--{{ _cols }}col" role="list">
+      {% for item in module.items %}
+      <li class="wa-checklist__item">
+        <svg class="wa-checklist__tick wa-checklist__tick--{{ _tick }}" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+          <polyline points="8 12 11 15 16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ item.text }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endif %}
+  </div>
+</section>
+{% endif %}

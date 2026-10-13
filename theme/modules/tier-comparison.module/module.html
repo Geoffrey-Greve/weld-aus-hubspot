@@ -1,0 +1,197 @@
+{#
+  tier-comparison.module/module.html
+  Membership tier comparison. Two views, CSS-only responsive:
+    Desktop (≥1024px): Full comparison table with tier columns and feature rows.
+    Mobile (<1024px):  Per-tier stacked cards, each listing all features.
+
+  tier_values is a JSON array of strings matching tier order, e.g. ["✓","✓","Limited","✗"]
+  Parsed via HubL fromjson filter.
+
+  Fields:
+    module.section_id    - optional anchor id
+    module.background    - background variant
+    module.spacing       - vertical spacing variant
+    module.members_only  - gating flag
+    module.section_heading - heading
+    module.tiers         - repeater group (tier_name, tier_label_color, price_intro, price,
+                            price_period, summary, cta_label, cta_link, is_featured)
+    module.feature_rows  - repeater group (feature_label, feature_help, tier_values JSON)
+#}
+
+{#- QA ref 44: the downgrade guard, shared with membership-options through
+    _membership-rank.html. A Gold or Silver member is not offered a join link on a
+    lower ranked tier, and their own tier says so; the tier keeps its price and
+    features, because the comparison is the point. A tier is ranked on the gold /
+    silver / bronze keyword in its name, and anything else (an apprentice or
+    individual table) is never restricted. -#}
+{% include "../../templates/partials/_membership-rank.html" %}
+{%- set _tc_member_rank = wa_membership_rank.rank -%}
+{%- set _tc_tier_label = wa_membership_rank.tier_label | default('your', true) -%}
+{% macro tc_cta(tier, cls) -%}
+  {%- set _name = tier.tier_name | default('', true) | lower -%}
+  {%- set _rank = 3 if 'gold' in _name else (2 if 'silver' in _name else (1 if 'bronze' in _name else 0)) -%}
+  {%- if _tc_member_rank > 0 and _rank > 0 and _rank == _tc_member_rank -%}
+  <p class="wa-tier-comparison__cta-note wa-tier-comparison__cta-note--current">Your current membership</p>
+  {%- elif _tc_member_rank > 0 and _rank > 0 and _rank < _tc_member_rank -%}
+  <p class="wa-tier-comparison__cta-note">Included in your {{ _tc_tier_label }} membership</p>
+  {%- elif tier.cta_label and tier.cta_link -%}
+  <a
+    href="{{ tier.cta_link.url.href }}"
+    class="{{ cls }}"
+    {% if tier.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+  >{{ tier.cta_label }}</a>
+  {%- endif -%}
+{%- endmacro %}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section
+  class="wa-tier-comparison wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-tier-comparison__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    {# ── DESKTOP TABLE ──────────────────────────────────────────────────────
+       Hidden on mobile via CSS. Full comparison grid. #}
+    <div class="wa-tier-comparison__table-wrap">
+      <table class="wa-tier-comparison__table">
+        <thead>
+          <tr>
+            {# Empty first cell (feature label column header) #}
+            <th class="wa-tier-comparison__th wa-tier-comparison__th--feature" scope="col">
+              <span class="wa-sr-only">Feature</span>
+            </th>
+            {% for tier in module.tiers %}
+            <th
+              class="wa-tier-comparison__th wa-tier-comparison__th--tier{% if tier.is_featured %} wa-tier-comparison__th--featured{% endif %} wa-tier-comparison__th--{{ tier.tier_label_color }}"
+              scope="col"
+            >
+              <div class="wa-tier-comparison__tier-header">
+                <span class="wa-tier-comparison__tier-name">{{ tier.tier_name }}</span>
+                {% if tier.price %}
+                <div class="wa-tier-comparison__tier-price">
+                  {% if tier.price_intro %}<span class="wa-tier-comparison__price-intro">{{ tier.price_intro }}</span>{% endif %}
+                  <strong class="wa-tier-comparison__price">{{ tier.price }}</strong>
+                  {% if tier.price_period %}<span class="wa-tier-comparison__price-period">{{ tier.price_period }}</span>{% endif %}
+                </div>
+                {% endif %}
+                {% if tier.summary %}
+                <p class="wa-tier-comparison__tier-summary">{{ tier.summary }}</p>
+                {% endif %}
+                {{ tc_cta(tier, 'wa-tier-comparison__cta') }}
+              </div>
+            </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in module.feature_rows %}
+          {% set parsed_values = row.tier_values | fromjson %}
+          <tr class="wa-tier-comparison__row{% if loop.index is even %} wa-tier-comparison__row--alt{% endif %}">
+            <td class="wa-tier-comparison__td wa-tier-comparison__td--feature">
+              {{ row.feature_label }}
+              {% if row.feature_help %}
+              <button
+                class="wa-tier-comparison__tooltip-trigger"
+                type="button"
+                aria-label="More info: {{ row.feature_label }}"
+                title="{{ row.feature_help }}"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2Zm1 12H9v-2h2v2Zm0-4H9V6h2v4Z"/>
+                </svg>
+              </button>
+              {% endif %}
+            </td>
+            {% for tier in module.tiers %}
+            <td
+              class="wa-tier-comparison__td wa-tier-comparison__td--value{% if tier.is_featured %} wa-tier-comparison__td--featured{% endif %}"
+              data-tier-index="{{ loop.index0 }}"
+            >
+              {% if parsed_values and parsed_values[loop.index0] is defined %}
+                {% set cell_val = parsed_values[loop.index0] %}
+                {% if cell_val == '✓' %}
+                  <span class="wa-tier-comparison__cell-check" aria-label="Included">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <path d="M4 10l4 4 8-8" stroke="var(--wa-color-success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                {% elif cell_val == '✗' %}
+                  <span class="wa-tier-comparison__cell-cross" aria-label="Not included">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <path d="M5 5l10 10M15 5L5 15" stroke="var(--wa-color-text-muted)" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </span>
+                {% else %}
+                  <span class="wa-tier-comparison__cell-text">{{ cell_val }}</span>
+                {% endif %}
+              {% else %}
+                <span class="wa-tier-comparison__cell-cross" aria-label="Not included">-</span>
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# ── MOBILE CARDS ───────────────────────────────────────────────────────
+       Shown only on mobile (<1024px). Each tier becomes a standalone card
+       with all features listed inside it. #}
+    <div class="wa-tier-comparison__mobile-cards">
+      {% for tier in module.tiers %}
+      {# Capture tier index before entering inner loop - HubL nested loop safe pattern #}
+      {% set current_tier_idx = loop.index0 %}
+      <div class="wa-tier-comparison__mobile-card wa-tier-comparison__mobile-card--{{ tier.tier_label_color }}{% if tier.is_featured %} wa-tier-comparison__mobile-card--featured{% endif %}">
+
+        <div class="wa-tier-comparison__mobile-card-header">
+          <h3 class="wa-tier-comparison__mobile-tier-name">{{ tier.tier_name }}</h3>
+          {% if tier.price %}
+          <div class="wa-tier-comparison__mobile-price">
+            {% if tier.price_intro %}<span class="wa-tier-comparison__price-intro">{{ tier.price_intro }}</span>{% endif %}
+            <strong class="wa-tier-comparison__price">{{ tier.price }}</strong>
+            {% if tier.price_period %}<span class="wa-tier-comparison__price-period">{{ tier.price_period }}</span>{% endif %}
+          </div>
+          {% endif %}
+          {% if tier.summary %}
+          <p class="wa-tier-comparison__mobile-summary">{{ tier.summary }}</p>
+          {% endif %}
+        </div>
+
+        {# Feature list for this tier #}
+        <ul class="wa-tier-comparison__mobile-features">
+          {% for row in module.feature_rows %}
+          {% set parsed_values = row.tier_values | fromjson %}
+          <li class="wa-tier-comparison__mobile-feature">
+            <span class="wa-tier-comparison__mobile-feature-label">{{ row.feature_label }}</span>
+            <span class="wa-tier-comparison__mobile-feature-value">
+              {% if parsed_values and parsed_values[current_tier_idx] is defined %}
+                {% set cv = parsed_values[current_tier_idx] %}
+                {% if cv == '✓' %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-label="Included">
+                  <path d="M4 10l4 4 8-8" stroke="var(--wa-color-success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                {% elif cv == '✗' %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-label="Not included">
+                  <path d="M5 5l10 10M15 5L5 15" stroke="var(--wa-color-text-muted)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                {% else %}{{ cv }}{% endif %}
+              {% else %}-{% endif %}
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        {{ tc_cta(tier, 'wa-tier-comparison__mobile-cta') }}
+
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endif %}

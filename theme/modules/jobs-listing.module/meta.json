@@ -1,0 +1,14 @@
+{
+  "label": "Jobs Listing",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "React island: job board driven by the HubDB jobs table. Supports state, type, and keyword filters. Featured jobs are pinned to the top.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["jobs", "react-island", "hubdb", "listing", "interactive"]
+}

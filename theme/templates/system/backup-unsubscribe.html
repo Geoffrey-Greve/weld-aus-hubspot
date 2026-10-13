@@ -1,0 +1,374 @@
+<!--
+  templateType: email_backup_unsubscribe_page
+  label: Unknown Contact Subscription Preferences
+  isAvailableForNewContent: true
+-->
+{#
+  backup-unsubscribe.html - Unknown Contact Subscription Preferences Page
+  Assign in: HubSpot Settings → Website → Pages → System pages → Unknown contact subscription preferences
+
+  HubSpot renders this page when a recipient clicks an unsubscribe or
+  "Manage preferences" link but HubSpot cannot resolve them to a contact in the
+  CRM - typically because the email was forwarded, the link was opened from a
+  different address, the tracking token expired, or the contact was deleted.
+
+  Because there is no known contact, HubSpot cannot show per-type subscription
+  checkboxes here. The `email_simple_subscription` module instead asks the
+  visitor to type their email address and opts that address out. This is the
+  legally required fallback path for CAN-SPAM / Australian Spam Act compliance -
+  do not remove the module.
+
+  Sibling templates (keep the copy and styling of all three in sync):
+    - email-subscriptions.html              → Subscription Preferences Page
+    - email-subscriptions-confirmation.html → Subscription Update Confirmation Page
+    - backup-unsubscribe.html               → this page
+
+  Fixed layout - no dnd_area.
+#}
+{% set page_title = "Email Preferences" %}
+{% set page_description = "Unsubscribe from Weld Australia emails. Enter your email address and we'll update your communication preferences." %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body_class %}page-email-subscriptions page-backup-unsubscribe{% endblock %}
+
+{% block body %}
+<section class="subs-page" aria-labelledby="subs-heading">
+
+  {# ── Hero band ──────────────────────────────────────────────────────────── #}
+  {% set _shared_hero_id = 'unknown-contact-preferences-hero' %}
+  {% set _shared_hero_section_id = 'subs' %}
+  {% set _shared_hero_background = 'primary' %}
+  {% set _shared_hero_height = 'compact' %}
+  {% set _shared_hero_spacing = 'spacious' %}
+  {% set _shared_hero_alignment = 'left' %}
+  {% set _shared_hero_accent_bar = true %}
+  {% set _shared_hero_media_type = 'none' %}
+  {% set _shared_hero_eyebrow = 'Email preferences' %}
+  {% set _shared_hero_headline = 'Manage your email preferences' %}
+  {% set _shared_hero_subheadline = "<p>We couldn't match your link to a subscription record, so we need your email address to continue. Enter it below and we'll update your preferences straight away.</p>" %}
+  {% include "../partials/shared-hero.html" %}
+
+  {% if false %}
+  {# Legacy hero markup replaced by shared-hero in Batch 4. #}
+  <div class="subs-page__hero">
+    <div class="container container-narrow">
+      <h1 id="subs-heading" class="subs-page__heading">
+        Manage your email preferences
+      </h1>
+      <p class="subs-page__lead">
+        We couldn't match your link to a subscription record, so we need your
+        email address to continue. Enter it below and we'll update your
+        preferences straight away.
+      </p>
+    </div>
+  </div>
+
+  {# ── Backup unsubscribe module ───────────────────────────────────────────── #}
+  {#
+    `email_simple_subscription` is HubSpot's built-in module for this template
+    type. It renders the email-address field and the opt-out control, and is the
+    only module permitted on an email_backup_unsubscribe_page. Do not remove or
+    replace it - it is the compliance fallback when a contact cannot be
+    identified from the email link.
+  #}
+  {% endif %}
+
+  <div class="subs-page__form-wrap">
+    <div class="container container-narrow">
+
+      <div class="subs-page__intro-card">
+        <p class="subs-page__subscription-types-label">
+          Why am I seeing this page?
+        </p>
+        <ul class="subs-page__categories-preview" aria-label="Reasons this page is shown">
+          <li>
+            <strong>The email was forwarded</strong> - the preferences link only works for the address it was originally sent to
+          </li>
+          <li>
+            <strong>The link has expired</strong> - preference links time out after a period for your security
+          </li>
+          <li>
+            <strong>You're using a different address</strong> - the address you're browsing with doesn't match the one we emailed
+          </li>
+        </ul>
+      </div>
+
+      {# HubSpot requires the built-in email_simple_subscription module on this templateType. #}
+      {% module "backup_unsubscribe"
+        path="@hubspot/email_simple_subscription"
+        label="Unknown contact subscription preferences"
+      %}
+
+    </div>
+  </div>
+
+  {# ── Unsubscribe clarification ─────────────────────────────────────────── #}
+  <div class="subs-page__footer-note">
+    <div class="container container-narrow">
+      <p>
+        <strong>Note:</strong> Unsubscribing from marketing communications does not
+        affect transactional emails - you will always receive emails that are
+        necessary to deliver services you've purchased (e.g. course confirmations,
+        certificates, and invoices).
+      </p>
+      <p>
+        If you're a Weld Australia member, you can manage each subscription type
+        individually. Log in to your <a href="/portal/">member portal</a> and visit
+        <a href="/portal/profile/">My Profile</a>.
+      </p>
+      <p>
+        Questions about your data? Contact us at
+        <a href="mailto:office@weldaustralia.com.au">office@weldaustralia.com.au</a>.
+      </p>
+    </div>
+  </div>
+
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── Unknown Contact Subscription Preferences Styles ─────────────────────── */
+  /* Mirrors email-subscriptions.html so all three subscription system pages
+     read as one surface. Keep the shared rules in sync across those files. */
+
+  .subs-page {
+    background-color: var(--wa-color-surface);
+    min-height: 60vh;
+  }
+
+  /* Hero band */
+  .subs-page__hero {
+    background-color: var(--wa-color-primary-dark);
+    color: var(--wa-color-text-inverse);
+    padding: var(--wa-space-16) var(--wa-space-4) var(--wa-space-12);
+  }
+
+  .subs-page__heading {
+    font-family: var(--wa-font-heading);
+    font-size: clamp(var(--wa-text-2xl), 4vw, var(--wa-text-3xl));
+    font-weight: var(--wa-weight-bold);
+    color: var(--wa-color-text-inverse);
+    margin: 0 0 var(--wa-space-4);
+    line-height: var(--wa-leading-tight);
+  }
+
+  .subs-page__lead {
+    font-size: var(--wa-text-md);
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 56ch;
+    line-height: var(--wa-leading-relaxed);
+    margin: 0;
+  }
+
+  /* Form wrapper */
+  .subs-page__form-wrap {
+    padding: var(--wa-space-12) var(--wa-space-4);
+  }
+
+  /* Intro card */
+  .subs-page__intro-card {
+    background-color: var(--wa-color-surface-2);
+    border: 1px solid var(--wa-color-border);
+    border-radius: var(--wa-radius-lg);
+    padding: var(--wa-space-6) var(--wa-space-8);
+    margin-bottom: var(--wa-space-8);
+  }
+
+  .subs-page__subscription-types-label {
+    font-size: var(--wa-text-sm);
+    font-weight: var(--wa-weight-semibold);
+    color: var(--wa-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 var(--wa-space-4);
+  }
+
+  .subs-page__categories-preview {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-3);
+  }
+
+  .subs-page__categories-preview li {
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-text-muted);
+    line-height: var(--wa-leading-normal);
+    padding-left: var(--wa-space-5);
+    position: relative;
+  }
+
+  .subs-page__categories-preview li::before {
+    content: "•";
+    position: absolute;
+    left: var(--wa-space-2);
+    color: var(--wa-color-accent);
+    font-weight: var(--wa-weight-bold);
+  }
+
+  .subs-page__categories-preview strong {
+    color: var(--wa-color-text);
+    font-weight: var(--wa-weight-semibold);
+  }
+
+  /*
+   * Style HubSpot's built-in email_simple_subscription module to match the
+   * theme. Unlike the preferences page it renders an email input plus a single
+   * opt-out checkbox, so both need theming here.
+   */
+  .subs-page__form-wrap .hs-form-field {
+    margin-bottom: var(--wa-space-5);
+  }
+
+  .subs-page__form-wrap .hs-form-field > label {
+    display: block;
+    font-size: var(--wa-text-sm);
+    font-weight: var(--wa-weight-semibold);
+    color: var(--wa-color-text);
+    margin-bottom: var(--wa-space-2);
+  }
+
+  .subs-page__form-wrap input[type="email"],
+  .subs-page__form-wrap input[type="text"] {
+    width: 100%;
+    min-height: var(--wa-touch-min);
+    padding: var(--wa-space-3) var(--wa-space-4);
+    font-family: var(--wa-font-body);
+    font-size: var(--wa-text-base);
+    color: var(--wa-color-text);
+    background-color: var(--wa-color-surface);
+    border: 1px solid var(--wa-color-border);
+    border-radius: var(--wa-radius-md);
+  }
+
+  .subs-page__form-wrap input[type="email"]:focus-visible,
+  .subs-page__form-wrap input[type="text"]:focus-visible {
+    outline: 3px solid var(--wa-color-primary);
+    outline-offset: 2px;
+    border-color: var(--wa-color-primary);
+  }
+
+  .hs-subscription-types-list {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-3);
+  }
+
+  .hs-subscription-type-item {
+    border: 1px solid var(--wa-color-border);
+    border-radius: var(--wa-radius-md);
+    background-color: var(--wa-color-surface);
+    padding: var(--wa-space-4) var(--wa-space-5);
+    transition: border-color var(--wa-duration-fast) var(--wa-ease-default);
+  }
+
+  .hs-subscription-type-item:has(input:checked) {
+    border-color: var(--wa-color-primary);
+    background-color: var(--wa-color-surface-2);
+  }
+
+  .hs-subscription-type-item label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wa-space-3);
+    cursor: pointer;
+    font-size: var(--wa-text-base);
+    font-weight: var(--wa-weight-medium);
+    color: var(--wa-color-text);
+    line-height: var(--wa-leading-normal);
+  }
+
+  .subs-page__form-wrap input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    margin-top: 1px;
+    accent-color: var(--wa-color-primary);
+    cursor: pointer;
+    border-radius: var(--wa-radius-sm);
+  }
+
+  .hs-subscription-type-description {
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-text-muted);
+    margin: var(--wa-space-1) 0 0;
+    line-height: var(--wa-leading-relaxed);
+  }
+
+  /* Validation messaging - more likely to fire here than on the known-contact
+     page, because the visitor types their address by hand. */
+  .subs-page__form-wrap .hs-error-msg,
+  .subs-page__form-wrap .hs-error-msgs label {
+    display: block;
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-danger);
+    margin-top: var(--wa-space-2);
+  }
+
+  /* Save button override - align to primary button style */
+  .hs-button.primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--wa-touch-min);
+    padding: var(--wa-space-3) var(--wa-space-6);
+    font-family: var(--wa-font-body);
+    font-size: var(--wa-text-base);
+    font-weight: var(--wa-weight-semibold);
+    background-color: var(--wa-color-primary);
+    color: var(--wa-color-on-primary);
+    border: 2px solid var(--wa-color-primary);
+    border-radius: var(--wa-radius-md);
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: var(--wa-space-6);
+    transition:
+      background-color var(--wa-duration-fast) var(--wa-ease-default),
+      border-color var(--wa-duration-fast) var(--wa-ease-default);
+  }
+
+  .hs-button.primary:hover {
+    background-color: var(--wa-color-primary-dark);
+    border-color: var(--wa-color-primary-dark);
+  }
+
+  .hs-button.primary:focus-visible {
+    outline: 3px solid var(--wa-color-primary);
+    outline-offset: 3px;
+  }
+
+  /* Footer note */
+  .subs-page__footer-note {
+    background-color: var(--wa-color-surface-2);
+    border-top: 1px solid var(--wa-color-border);
+    padding: var(--wa-space-12) var(--wa-space-4);
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-text-muted);
+    line-height: var(--wa-leading-relaxed);
+  }
+
+  .subs-page__footer-note p {
+    margin: 0 0 var(--wa-space-3);
+  }
+
+  .subs-page__footer-note p:last-child {
+    margin-bottom: 0;
+  }
+
+  .subs-page__footer-note a {
+    color: var(--wa-color-primary);
+    text-decoration: underline;
+  }
+
+  .subs-page__footer-note a:hover {
+    color: var(--wa-color-primary-dark);
+  }
+</style>
+{% endblock %}

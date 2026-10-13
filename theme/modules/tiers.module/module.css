@@ -1,0 +1,307 @@
+/*
+ * tiers.module/module.css
+ * Membership band matching the supplied standalone design.
+ */
+
+.wa-tiers {
+  position: relative;
+  overflow: hidden;
+}
+
+.wa-tiers::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--wa-color-magenta, #ed128d), var(--wa-color-accent, #fecf05));
+}
+
+.wa-tiers .container {
+  position: relative;
+  z-index: 1;
+}
+
+.wa-tiers__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.wa-tiers__content {
+  max-width: 420px;
+}
+
+.wa-tiers__heading {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #fff;
+  margin: 0 0 16px;
+}
+
+.wa-section--bg-surface .wa-tiers__heading {
+  color: var(--wa-color-primary, #1c1e4c);
+}
+
+.wa-tiers__intro {
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.85;
+  margin: 0 0 32px;
+  max-width: 380px;
+}
+
+.wa-tiers__intro,
+.wa-tiers__intro p {
+  font-size: 15px;
+}
+
+.wa-tiers__intro > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-section--bg-surface .wa-tiers__intro {
+  color: var(--wa-color-text-muted);
+}
+
+.wa-tiers__cta {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.wa-tiers__cta .btn {
+  min-height: 50px;
+  padding-inline: 26px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  gap: 8px;
+}
+
+.wa-tiers__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.wa-tiers__card {
+  min-width: 0;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+}
+
+.wa-tiers__card--gold {
+  border-color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-tiers__card--silver {
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+.wa-tiers__card--bronze {
+  border-color: rgba(201, 126, 16, 0.82);
+}
+
+.wa-tiers__card--navy,
+.wa-tiers__card--magenta,
+.wa-tiers__card--green {
+  border-color: rgba(26, 92, 158, 0.82);
+}
+
+.wa-section--bg-surface .wa-tiers__card {
+  background: var(--wa-color-surface, #fff);
+  border-color: var(--wa-color-border, rgba(28, 30, 76, 0.12));
+  box-shadow: var(--wa-shadow-card, 0 2px 12px rgba(0, 0, 0, 0.06));
+}
+
+.wa-tiers__badge-img {
+  width: 48px;
+  height: 48px;
+  display: block;
+  object-fit: contain;
+}
+
+.wa-tiers__badge {
+  display: none;
+}
+
+.wa-tiers__name {
+  font-family: var(--wa-font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+  margin: 0;
+}
+
+.wa-section--bg-surface .wa-tiers__name {
+  color: var(--wa-color-primary, #1c1e4c);
+}
+
+.wa-tiers__price-block {
+  display: block;
+}
+
+.wa-tiers__price {
+  display: inline;
+  font-family: var(--wa-font-heading);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.wa-tiers__price-sub {
+  display: inline;
+  font-size: inherit;
+  color: inherit;
+  margin-left: 0;
+}
+
+.wa-section--bg-surface .wa-tiers__price,
+.wa-section--bg-surface .wa-tiers__price-sub {
+  color: var(--wa-color-text-muted);
+}
+
+.wa-tiers__desc {
+  flex: 1;
+  font-size: 11px;
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.wa-section--bg-surface .wa-tiers__desc {
+  color: var(--wa-color-text-muted);
+}
+
+.wa-tiers .wa-tiers__learn-more,
+.wa-tiers .wa-tiers__learn-more:link,
+.wa-tiers .wa-tiers__learn-more:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 34px;
+  margin-top: auto;
+  padding: 0 14px;
+  color: rgba(255, 255, 255, 0.62) !important;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.wa-tiers .wa-tiers__learn-more:hover,
+.wa-tiers .wa-tiers__learn-more:focus-visible {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.42);
+  text-decoration: none;
+}
+
+.wa-tiers .wa-tiers__learn-more--gold,
+.wa-tiers .wa-tiers__learn-more--gold:link,
+.wa-tiers .wa-tiers__learn-more--gold:visited {
+  color: var(--wa-color-on-accent, #1c1e4c) !important;
+  background: var(--wa-color-accent, #fecf05);
+  border-color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-tiers .wa-tiers__learn-more--gold:hover,
+.wa-tiers .wa-tiers__learn-more--gold:focus-visible {
+  color: var(--wa-color-on-accent, #1c1e4c) !important;
+  background: var(--wa-color-accent-dark, #e6b900);
+  border-color: var(--wa-color-accent-dark, #e6b900);
+}
+
+.wa-tiers .wa-tiers__learn-more--navy,
+.wa-tiers .wa-tiers__learn-more--navy:link,
+.wa-tiers .wa-tiers__learn-more--navy:visited {
+  color: var(--wa-color-on-primary, #fff) !important;
+  background: var(--wa-color-primary, #1c1e4c);
+  border-color: var(--wa-color-primary, #1c1e4c);
+}
+
+.wa-tiers .wa-tiers__learn-more--white,
+.wa-tiers .wa-tiers__learn-more--white:link,
+.wa-tiers .wa-tiers__learn-more--white:visited {
+  color: var(--wa-color-primary, #1c1e4c) !important;
+  background: #fff;
+  border-color: #fff;
+}
+
+.wa-section--bg-surface .wa-tiers .wa-tiers__learn-more,
+.wa-section--bg-surface .wa-tiers .wa-tiers__learn-more:link,
+.wa-section--bg-surface .wa-tiers .wa-tiers__learn-more:visited {
+  color: var(--wa-color-primary, #1c1e4c) !important;
+  border-color: rgba(28, 30, 76, 0.2);
+}
+
+.wa-section--bg-surface .wa-tiers .wa-tiers__learn-more--gold,
+.wa-section--bg-surface .wa-tiers .wa-tiers__learn-more--gold:link,
+.wa-section--bg-surface .wa-tiers .wa-tiers__learn-more--gold:visited {
+  color: var(--wa-color-on-accent, #1c1e4c) !important;
+  border-color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-section--bg-surface .wa-tiers .wa-tiers__learn-more--navy,
+.wa-section--bg-surface .wa-tiers .wa-tiers__learn-more--navy:link,
+.wa-section--bg-surface .wa-tiers .wa-tiers__learn-more--navy:visited {
+  color: #fff !important;
+  border-color: var(--wa-color-primary, #1c1e4c);
+}
+
+@media (min-width: 640px) {
+  .wa-tiers__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .wa-tiers__layout {
+    gap: 48px;
+  }
+
+  .wa-tiers__intro,
+  .wa-tiers__intro p {
+    font-size: 15px;
+  }
+
+  .wa-tiers__card {
+    padding: 22px 18px;
+  }
+
+  .wa-tiers__badge-img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .wa-tiers__name {
+    font-size: 17px;
+  }
+
+  .wa-tiers__price {
+    font-size: 13px;
+  }
+
+  .wa-tiers__desc {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-tiers__layout {
+    grid-template-columns: 380px minmax(0, 1fr);
+    gap: 72px;
+  }
+}

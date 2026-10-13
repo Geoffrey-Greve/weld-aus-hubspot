@@ -1,0 +1,948 @@
+{#
+  member-command-centre.module/module.html
+
+  Member dashboard command centre.
+
+  Safety model:
+    - Member profile values are read from the logged-in Contact and associated
+      Company CRM records via HubL read functions.
+    - Courses, events and resources are read from existing public HubDB tables.
+    - Financials reads associated HubSpot Invoices first, then Deal-level invoice
+      PDF fields (same strategy as my-invoices.module).
+    - No HubSpot CRM contacts/deals/properties/workflows are written.
+
+  Build note:
+    The script tag below is updated by scripts/build.ts after `corepack pnpm build`.
+#}
+
+{% import "../../templates/partials/_member-tier.html" as wa_tier %}
+{% import "../../templates/partials/_member-pricing.html" as wa_price %}
+
+{% set mcc_editor_preview = is_in_editor or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+{% set mcc_editor_preview_email = module.editor_preview_contact_email | default(request.query_dict.portal_preview_email, true) | string | lower | trim %}
+
+{% if request_contact.is_logged_in or mcc_editor_preview %}
+
+{% set course_rows = hubdb_table_rows('courses', 'status__neq=Cancelled&orderBy=start_date&limit=250') %}
+{% set event_rows = hubdb_table_rows('events', 'orderBy=event_date&limit=250') %}
+{% set resource_rows = hubdb_table_rows('resources', 'is_active__eq=true&orderBy=-published_date&limit=8') %}
+{% set today_key = local_dt | datetimeformat('%Y%m%d') %}
+
+{% set contact_email_candidates = [
+  request_contact.email | default('', true) | string | lower | trim,
+  request_contact.hs_content_membership_email | default('', true) | string | lower | trim,
+  request_contact.member_email | default('', true) | string | lower | trim,
+  contact.email | default('', true) | string | lower | trim,
+  contact.hs_content_membership_email | default('', true) | string | lower | trim,
+  contact.member_email | default('', true) | string | lower | trim
+] %}
+{% set contact_email_ns = namespace(value='') %}
+{% for email_candidate in contact_email_candidates %}
+  {% set normalized_email = email_candidate | default('', true) | string | lower | trim %}
+  {% if not contact_email_ns.value and normalized_email and normalized_email != '[object object]' and normalized_email != '[object Object]' and '@' in normalized_email %}
+    {% set contact_email_ns.value = normalized_email %}
+  {% endif %}
+{% endfor %}
+{% set contact_email = contact_email_ns.value %}
+{% if mcc_editor_preview and mcc_editor_preview_email %}
+  {% set contact_email = mcc_editor_preview_email %}
+{% endif %}
+
+{% set contact_company_id_raw = request_contact.associatedcompanyid | default('', true) | string | trim %}
+{% if not contact_company_id_raw or contact_company_id_raw == '[object Object]' or contact_company_id_raw == '[object object]' %}
+  {% set contact_company_id_raw = contact.associatedcompanyid | default('', true) | string | trim %}
+{% endif %}
+{% set contact_company_id = contact_company_id_raw | int | default(0) %}
+
+{% set contact_first_name = request_contact.firstname | default('', true) | string | trim %}
+{% if not contact_first_name or contact_first_name == '[object Object]' or contact_first_name == '[object object]' %}
+  {% set contact_first_name = contact.firstname | default('', true) | string | trim %}
+{% endif %}
+
+{% set contact_last_name = request_contact.lastname | default('', true) | string | trim %}
+{% if not contact_last_name or contact_last_name == '[object Object]' or contact_last_name == '[object object]' %}
+  {% set contact_last_name = contact.lastname | default('', true) | string | trim %}
+{% endif %}
+
+{% set contact_membership_expiry_value = request_contact.individual_membership_expiry_date_2 | default('', true) %}
+{% if not contact_membership_expiry_value %}
+  {% set contact_membership_expiry_value = contact.individual_membership_expiry_date_2 | default('', true) %}
+{% endif %}
+
+{% set contact_id_candidates = [
+  request_contact.id | default('', true) | string | trim,
+  request_contact.hs_object_id | default('', true) | string | trim,
+  request_contact.vid | default('', true) | string | trim,
+  contact.id | default('', true) | string | trim,
+  contact.hs_object_id | default('', true) | string | trim,
+  contact.vid | default('', true) | string | trim
+] %}
+
+{% set contact_profile_ns = namespace(record={}, props={}, record_id='', seen=[]) %}
+{% for contact_candidate in contact_id_candidates %}
+  {% set contact_candidate_id = contact_candidate | string | trim %}
+  {% if contact_candidate_id and contact_candidate_id != '[object Object]' and contact_candidate_id != '[object object]' and contact_candidate_id not in contact_profile_ns.seen and not contact_profile_ns.record_id %}
+    {% set contact_profile_ns.seen = contact_profile_ns.seen + [contact_candidate_id] %}
+    {#
+      Hydrate the logged-in Contact directly for individual memberships.
+      The lightweight private-content contact object does not always expose
+      custom CRM properties, so this keeps the dashboard CRM-first without
+      writing to CRM or relying on manually maintained HubDB member rows.
+    #}
+    {% set candidate_contact = crm_object('contact', contact_candidate_id, 'firstname,lastname,email,company,associatedcompanyid,associatedcompanyname,state,individual_membership_status,individual_membership_type_2,individual_membership_expiry_date_2,cams__member_type,cams__join_date,cams_person_id,cams__imem_person_id,is_corporate_admin,wa_company_role_label,wa_company_membership_tier,hs_object_id') %}
+    {% if candidate_contact %}
+      {% set candidate_contact_props = candidate_contact.properties | default({}, true) %}
+      {% set candidate_contact_status = candidate_contact.individual_membership_status | default(candidate_contact_props.individual_membership_status, true) | default('', true) %}
+      {% set candidate_contact_tier = candidate_contact.individual_membership_type_2 | default(candidate_contact_props.individual_membership_type_2, true) | default('', true) %}
+      {% set candidate_contact_expiry = candidate_contact.individual_membership_expiry_date_2 | default(candidate_contact_props.individual_membership_expiry_date_2, true) | default('', true) %}
+      {% set candidate_contact_member_id = candidate_contact.cams_person_id | default(candidate_contact_props.cams_person_id, true) | default(candidate_contact.cams__imem_person_id, true) | default(candidate_contact_props.cams__imem_person_id, true) | default('', true) %}
+      {% set candidate_contact_email = candidate_contact.email | default(candidate_contact_props.email, true) | default('', true) %}
+      {% if candidate_contact_status or candidate_contact_tier or candidate_contact_expiry or candidate_contact_member_id or candidate_contact_email %}
+        {% set contact_profile_ns.record = candidate_contact %}
+        {% set contact_profile_ns.props = candidate_contact_props %}
+        {% set contact_profile_ns.record_id = contact_candidate_id %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+{% set contact_record = contact_profile_ns.record %}
+{% set contact_props = contact_profile_ns.props %}
+
+{% set hydrated_contact_email = contact_record.email | default(contact_props.email, true) | default('', true) | string | lower | trim %}
+{% if hydrated_contact_email and hydrated_contact_email != '[object object]' and hydrated_contact_email != '[object Object]' and '@' in hydrated_contact_email %}
+  {% set contact_email = hydrated_contact_email %}
+{% endif %}
+
+{#
+  Refuel QA accounts use plus-address profile codes backed by an isolated
+  HubDB table. This lets the team test portal states without creating fake
+  membership Deals or touching real member records and workflows.
+#}
+{% set qa_persona_rows = hubdb_table_rows('portal_test_profiles', 'is_active__eq=true&limit=50') %}
+{% set qa_persona_ns = namespace(row=none) %}
+{% for qa_row in qa_persona_rows %}
+  {% set qa_profile_code = qa_row.profile_code | default('', true) | string | lower | trim %}
+  {% if not qa_persona_ns.row and qa_profile_code and ('+' ~ qa_profile_code ~ '@') in contact_email %}
+    {% set qa_persona_ns.row = qa_row %}
+  {% endif %}
+{% endfor %}
+{% set qa_persona = qa_persona_ns.row %}
+
+{% set hydrated_contact_company_id_raw = contact_record.associatedcompanyid | default(contact_props.associatedcompanyid, true) | default('', true) | string | trim %}
+{% if not contact_company_id and hydrated_contact_company_id_raw and hydrated_contact_company_id_raw != '[object Object]' and hydrated_contact_company_id_raw != '[object object]' %}
+  {% set contact_company_id = hydrated_contact_company_id_raw | int | default(0) %}
+{% endif %}
+
+{% set hydrated_contact_first_name = contact_record.firstname | default(contact_props.firstname, true) | default('', true) | string | trim %}
+{% if hydrated_contact_first_name and hydrated_contact_first_name != '[object Object]' and hydrated_contact_first_name != '[object object]' %}
+  {% set contact_first_name = hydrated_contact_first_name %}
+{% endif %}
+
+{% set hydrated_contact_last_name = contact_record.lastname | default(contact_props.lastname, true) | default('', true) | string | trim %}
+{% if hydrated_contact_last_name and hydrated_contact_last_name != '[object Object]' and hydrated_contact_last_name != '[object object]' %}
+  {% set contact_last_name = hydrated_contact_last_name %}
+{% endif %}
+
+{% set hydrated_contact_expiry = contact_record.individual_membership_expiry_date_2 | default(contact_props.individual_membership_expiry_date_2, true) | default('', true) %}
+{% if hydrated_contact_expiry %}
+  {% set contact_membership_expiry_value = hydrated_contact_expiry %}
+{% endif %}
+
+{#
+  Financials data strategy (mirrors my-invoices.module — defect 219):
+    1. Associated HubSpot Invoices (Contact → Invoice typeId 178)
+    2. Deal-level invoice PDF fields (Contact → Deal typeId 4) as fallback
+  The private-content contact token can expose different id fields depending on
+  context, so we try every safe candidate until HubSpot returns rows.
+#}
+{% set invoice_properties = 'hs_object_id,hs_number,hs_title,hs_invoice_date,hs_due_date,hs_invoice_status,hs_payment_status,hs_amount_billed,hs_balance_due,hs_invoice_link,hs_pdf_download_link,hs_currency' %}
+{% set finance_lookup_ns = namespace(invoice_rows=[], deal_rows=[], contact_record_id='', seen=[]) %}
+{% for contact_candidate in contact_id_candidates %}
+  {% set contact_candidate_id = contact_candidate | string | trim %}
+  {% if contact_candidate_id and contact_candidate_id != '[object Object]' and contact_candidate_id != '[object object]' and contact_candidate_id not in finance_lookup_ns.seen and (finance_lookup_ns.invoice_rows|length == 0 or finance_lookup_ns.deal_rows|length == 0) %}
+    {% set finance_lookup_ns.seen = finance_lookup_ns.seen + [contact_candidate_id] %}
+    {% if finance_lookup_ns.invoice_rows|length == 0 %}
+      {% set raw_candidate_invoices = crm_associations(contact_candidate_id, 'HUBSPOT_DEFINED', 178, 'limit=50&order=-hs_invoice_date', invoice_properties, false) %}
+      {% set candidate_invoices = raw_candidate_invoices.results | default([], true) %}
+      {% if candidate_invoices|length > 0 %}
+        {% set finance_lookup_ns.invoice_rows = candidate_invoices %}
+        {% set finance_lookup_ns.contact_record_id = contact_candidate_id %}
+      {% endif %}
+    {% endif %}
+    {% if finance_lookup_ns.deal_rows|length == 0 %}
+      {% set raw_candidate_deals = crm_associations(contact_candidate_id, 'HUBSPOT_DEFINED', 4, 'limit=50', 'amount,dealname,closedate,createdate,dealtype,xero_invoice_pdf_url,invoice_pdf_url,hs_object_id', false) %}
+      {% set candidate_deals = raw_candidate_deals.results | default([], true) %}
+      {% if candidate_deals|length == 0 %}
+        {% set queried_deals = crm_objects('deal', 'associations.contact=' ~ contact_candidate_id ~ '&limit=50') %}
+        {% set candidate_deals = queried_deals.results | default([], true) %}
+      {% endif %}
+      {% if candidate_deals|length > 0 %}
+        {% set finance_lookup_ns.deal_rows = candidate_deals %}
+        {% if not finance_lookup_ns.contact_record_id %}
+          {% set finance_lookup_ns.contact_record_id = contact_candidate_id %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% set finance_ns = namespace(rows=[], seen_pdf_urls=[]) %}
+{% if finance_lookup_ns.invoice_rows|length > 0 %}
+  {% for invoice in finance_lookup_ns.invoice_rows %}
+    {% set invoice_properties_map = invoice.properties | default({}, true) %}
+    {% set invoice_id = invoice.hs_object_id | default(invoice_properties_map.hs_object_id, true) | default(invoice.id, true) | default(invoice.toObjectId, true) | default(invoice.to_object_id, true) | string | trim %}
+    {% set invoice_date = invoice.hs_invoice_date | default(invoice_properties_map.hs_invoice_date, true) %}
+    {% if not invoice_date %}
+      {% set invoice_date = invoice.createdate | default(invoice_properties_map.createdate, true) %}
+    {% endif %}
+    {% set invoice_status_raw = invoice.hs_payment_status | default(invoice_properties_map.hs_payment_status, true) | default(invoice.hs_invoice_status, true) | default(invoice_properties_map.hs_invoice_status, true) | default('Invoice available', true) | string | trim %}
+    {% set invoice_status = invoice_status_raw | replace('_', ' ') | capitalize %}
+    {% set invoice_amount_raw = invoice.hs_amount_billed | default(invoice_properties_map.hs_amount_billed, true) %}
+    {% if not invoice_amount_raw %}
+      {% set invoice_amount_raw = invoice.hs_balance_due | default(invoice_properties_map.hs_balance_due, true) %}
+    {% endif %}
+    {% set invoice_amount = invoice_amount_raw | float | default(0) %}
+    {% set invoice_number = invoice.hs_number | default(invoice_properties_map.hs_number, true) | default('', true) | string | trim %}
+    {% set invoice_title = invoice.hs_title | default(invoice_properties_map.hs_title, true) | default('', true) | string | trim %}
+    {% set invoice_name = invoice_title if invoice_title else ('Invoice #' ~ invoice_number if invoice_number else 'HubSpot invoice #' ~ invoice_id) %}
+    {% set invoice_pdf_url = invoice.hs_pdf_download_link | default(invoice_properties_map.hs_pdf_download_link, true) | default('', true) | string | trim %}
+    {#
+      Issue 34 / membership renew: keep hs_invoice_link as pay_url (same as
+      my-invoices). Invoice-billing members renew by paying this page; do not
+      collapse it into pdf_url.
+    #}
+    {% set invoice_pay_url = invoice.hs_invoice_link | default(invoice_properties_map.hs_invoice_link, true) | default('', true) | string | trim %}
+    {% set invoice_balance_due = invoice.hs_balance_due | default(invoice_properties_map.hs_balance_due, true) | float | default(0) %}
+    {% set invoice_status_lower = invoice_status_raw | lower %}
+    {% if invoice_balance_due > 0 %}
+      {% if 'overdue' in invoice_status_lower %}
+        {% set invoice_status = 'Overdue' %}
+      {% else %}
+        {% set invoice_status = 'Due' %}
+      {% endif %}
+    {% endif %}
+    {% if invoice_id %}
+      {% set finance_data = {
+        'id': 'invoice-' ~ invoice_id,
+        'name': invoice_name,
+        'type': 'Invoice',
+        'amount': invoice_amount if invoice_amount > 0 else null,
+        'status': invoice_status,
+        'date': invoice_date,
+        'pdf_url': invoice_pdf_url,
+        'pay_url': invoice_pay_url,
+        'balance_due': invoice_balance_due if invoice_balance_due > 0 else null,
+        'source': 'HubSpot invoice'
+      } %}
+      {% set finance_ns.rows = finance_ns.rows + [finance_data] %}
+      {% if invoice_pdf_url %}
+        {% set finance_ns.seen_pdf_urls = finance_ns.seen_pdf_urls + [invoice_pdf_url] %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% if finance_lookup_ns.deal_rows|length > 0 %}
+  {% for deal in finance_lookup_ns.deal_rows %}
+    {% set deal_record_id = deal.hs_object_id | default(deal.id, true) | default(deal.toObjectId, true) | default(deal.to_object_id, true) | string | trim %}
+    {% set deal_properties = deal.properties | default({}, true) %}
+    {% set deal_has_finance_fields = deal.amount | default('', true) or deal_properties.amount | default('', true) or deal.dealname | default('', true) or deal_properties.dealname | default('', true) or deal.invoice_pdf_url | default('', true) or deal_properties.invoice_pdf_url | default('', true) or deal.xero_invoice_pdf_url | default('', true) or deal_properties.xero_invoice_pdf_url | default('', true) %}
+    {% if deal_record_id and deal_record_id != '[object Object]' and deal_record_id != '[object object]' and not deal_has_finance_fields %}
+      {#
+        Some crm_associations responses only include the associated object id.
+        Hydrate the Deal directly so the Financials card can read amount/name.
+      #}
+      {% set hydrated_deal = crm_object('deal', deal_record_id, 'amount,dealname,closedate,createdate,dealtype,xero_invoice_pdf_url,invoice_pdf_url,hs_object_id') %}
+      {% if hydrated_deal %}
+        {% set deal = hydrated_deal %}
+        {% set deal_properties = deal.properties | default({}, true) %}
+      {% endif %}
+    {% endif %}
+    {% set deal_amount_raw = deal.amount | default('', true) %}
+    {% if not deal_amount_raw %}
+      {% set deal_amount_raw = deal_properties.amount | default('', true) %}
+    {% endif %}
+    {% set deal_amount = deal_amount_raw | float | default(0) %}
+    {% set deal_name = deal.dealname | default(deal_properties.dealname, true) | default('Payment record', true) %}
+    {% set deal_pdf_url = deal.xero_invoice_pdf_url | default(deal_properties.xero_invoice_pdf_url, true) %}
+    {% if not deal_pdf_url %}
+      {% set deal_pdf_url = deal.invoice_pdf_url | default(deal_properties.invoice_pdf_url, true) %}
+    {% endif %}
+    {% set deal_pdf_url = deal_pdf_url | default('', true) | string | trim %}
+    {#
+      Match my-invoices: only surface Deal rows that carry a downloadable PDF,
+      and skip PDFs already listed from a HubSpot Invoice association.
+    #}
+    {% if deal_pdf_url and deal_pdf_url not in finance_ns.seen_pdf_urls %}
+      {% set deal_date = deal.closedate | default(deal_properties.closedate, true) %}
+      {% if not deal_date %}
+        {% set deal_date = deal.createdate | default(deal_properties.createdate, true) %}
+      {% endif %}
+      {% set finance_data = {
+        'id': deal.hs_object_id | default(deal_properties.hs_object_id, true) | default(deal.id, true) | string,
+        'name': deal_name,
+        'type': deal.dealtype | default(deal_properties.dealtype, true) | default('Payment', true),
+        'amount': deal_amount if deal_amount > 0 else null,
+        'status': 'Receipt available',
+        'date': deal_date,
+        'pdf_url': deal_pdf_url,
+        'pay_url': '',
+        'balance_due': null,
+        'source': 'Invoice PDF'
+      } %}
+      {% set finance_ns.rows = finance_ns.rows + [finance_data] %}
+      {% set finance_ns.seen_pdf_urls = finance_ns.seen_pdf_urls + [deal_pdf_url] %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{# First HubSpot invoice with a balance + pay link drives renew CTAs in the React island. #}
+{% set outstanding_ns = namespace(
+  number='',
+  name='',
+  amount=0,
+  status='Paid',
+  date=null,
+  pdf_url='',
+  pay_url='',
+  balance_due=0
+) %}
+{% for item in finance_ns.rows %}
+  {% set item_balance = item.balance_due | float | default(0) %}
+  {% set item_pay_url = item.pay_url | default('', true) | string | trim %}
+  {% if item_balance > 0 and item_pay_url and not outstanding_ns.pay_url %}
+    {% set outstanding_ns.number = item.name | default('', true) | string | trim %}
+    {% set outstanding_ns.name = item.name | default('', true) | string | trim %}
+    {% set outstanding_ns.amount = item.amount | float | default(item_balance) %}
+    {% set item_status_lower = item.status | default('', true) | string | lower %}
+    {% if 'overdue' in item_status_lower %}
+      {% set outstanding_ns.status = 'Overdue' %}
+    {% else %}
+      {% set outstanding_ns.status = 'Due' %}
+    {% endif %}
+    {% set outstanding_ns.date = item.date | default(null, true) %}
+    {% set outstanding_ns.pdf_url = item.pdf_url | default('', true) | string | trim %}
+    {% set outstanding_ns.pay_url = item_pay_url %}
+    {% set outstanding_ns.balance_due = item_balance %}
+  {% endif %}
+{% endfor %}
+
+{% set profile_ns = namespace(rows=[]) %}
+{% if qa_persona %}
+  {% set qa_status_key = qa_persona.status_key | default('never_member', true) | string | lower | trim %}
+  {% set qa_member_type = qa_persona.member_type | default('QA member', true) | string | trim %}
+  {% set qa_profile_code = qa_persona.profile_code | default('portal-qa', true) | string | lower | trim %}
+  {% set qa_member_id_name = contact_first_name | default('tester', true) | string | upper | replace(' ', '-') %}
+  {% set qa_member_id_code = qa_profile_code | upper | replace('PORTAL-QA-', '') %}
+  {% set qa_linked_seats = qa_persona.linked_seats | int | default(0) %}
+  {% set qa_is_primary_admin = qa_persona.is_primary_admin == true %}
+  {% set qa_banner_title = '' %}
+  {% set qa_banner_body = '' %}
+  {% set qa_banner_cta_label = '' %}
+  {% set qa_banner_cta_url = '' %}
+  {% set qa_banner_type = 'none' %}
+  {% if qa_status_key == 'lapsed' %}
+    {% set qa_banner_type = 'invoice' %}
+    {% set qa_banner_title = 'This QA membership is lapsed' %}
+    {% set qa_banner_body = '<p>This test profile verifies the expired-member experience, including restricted benefits and renewal prompts.</p>' %}
+    {% set qa_banner_cta_label = 'Renew membership' %}
+    {% set qa_banner_cta_url = '/membership/join/' %}
+  {% elif qa_status_key == 'never_member' %}
+    {% set qa_banner_type = 'cert' %}
+    {% set qa_banner_title = 'This QA profile has no applicable membership' %}
+    {% set qa_banner_body = '<p>This test profile verifies the portal experience where the membership type is Not Applicable.</p>' %}
+    {% set qa_banner_cta_label = 'View membership options' %}
+    {% set qa_banner_cta_url = '/membership' %}
+  {% endif %}
+  {% set profile_ns.rows = profile_ns.rows + [{
+    'profile_key': 'qa-' ~ qa_profile_code,
+    'first_name': contact_first_name | default('QA tester', true),
+    'last_name': contact_last_name,
+    'initials': '',
+    'role_title': qa_persona.role_label | default('QA test member', true),
+    'company_name': qa_persona.company_name | default('Refuel Creative QA', true),
+    'member_tier': qa_member_type,
+    'pricing_member_tier': qa_member_type if qa_status_key != 'never_member' else '',
+    'is_pricing_member': qa_status_key != 'never_member' and qa_persona.membership_status | default('Active', true) != 'Lapsed',
+    'membership_status': qa_persona.membership_status | default('Active', true),
+    'is_linked_member': qa_status_key != 'never_member',
+    'is_primary_admin': qa_is_primary_admin,
+    'member_since': 2026,
+    'member_id': 'QA-' ~ qa_member_id_name ~ '-' ~ qa_member_id_code,
+    'renewal_date': qa_persona.renewal_date | default(null, true),
+    'linked_seats': qa_linked_seats,
+    'linked_individual_label': qa_member_type ~ ' QA persona',
+    'state': qa_persona.state | default('SA', true),
+    'state_raw': qa_persona.state | default('SA', true),
+    'accent': qa_persona.accent | default('member', true),
+    'banner_type': qa_banner_type,
+    'banner_title': qa_banner_title,
+    'banner_body': qa_banner_body,
+    'banner_cta_label': qa_banner_cta_label,
+    'banner_cta_url': qa_banner_cta_url,
+    'certification_name': '',
+    'certification_meta': '',
+    'cert_progress_percent': 0,
+    'cert_steps_json': '[]',
+    'next_step_body': '',
+    'next_step_cta_label': '',
+    'next_step_cta_url': '',
+    'invoice_number': '',
+    'invoice_amount': 0,
+    'invoice_status': 'Paid',
+    'invoice_date': null,
+    'invoice_pdf_url': '',
+    'invoice_pay_url': '',
+    'invoice_balance_due': null,
+    'financial_items': [],
+    'team_linked_employees': qa_linked_seats if qa_is_primary_admin else 0,
+    'team_active_members': qa_linked_seats if qa_is_primary_admin else 0,
+    'training_vouchers_used': 0,
+    'training_vouchers_total': 4 if qa_is_primary_admin else 0,
+    'summit_tickets_used': 0,
+    'summit_tickets_total': 2 if qa_is_primary_admin else 0
+  }] %}
+{% endif %}
+{% set company_record = {} %}
+{% set company_props = {} %}
+{% if contact_company_id %}
+  {% set company_record = crm_object('company', contact_company_id, 'name,city,state,country,address,numberofemployees,num_associated_contacts,corporate_membership_status,corporate_membership_level_2,corporate_membership_expiry_date_2,industry_supplier_membership_status,industry_supplier_membership_level_2,industry_supplier_membership_expiry_date,membership_number,cams__join_date,cams__member_type,cams__cams_id,cams__imem_organisation_number,vouchers_total,vouchers_used,summit_tickets_total,summit_tickets_used,createdate,hs_object_id') %}
+  {% if company_record %}
+    {% set company_props = company_record.properties | default({}, true) %}
+  {% endif %}
+{% endif %}
+
+{% set contact_status_raw = contact_record.individual_membership_status | default(contact_props.individual_membership_status, true) | default(request_contact.individual_membership_status, true) | default(contact.individual_membership_status, true) | default('', true) | string | trim %}
+{% set contact_tier_value = contact_record.individual_membership_type_2 | default(contact_props.individual_membership_type_2, true) | default(request_contact.individual_membership_type_2, true) | default(contact.individual_membership_type_2, true) | default('', true) | string | trim %}
+{% set contact_member_type_value = contact_record.cams__member_type | default(contact_props.cams__member_type, true) | default(request_contact.cams__member_type, true) | default(contact.cams__member_type, true) | default('', true) | string | trim %}
+{% set contact_member_since_value = contact_record.cams__join_date | default(contact_props.cams__join_date, true) | default(request_contact.cams__join_date, true) | default(contact.cams__join_date, true) | default('', true) %}
+{% set contact_member_id_value = contact_record.cams_person_id | default(contact_props.cams_person_id, true) | default(request_contact.cams_person_id, true) | default(contact.cams_person_id, true) | default('', true) %}
+{% if not contact_member_id_value %}
+  {% set contact_member_id_value = contact_record.cams__imem_person_id | default(contact_props.cams__imem_person_id, true) | default(request_contact.cams__imem_person_id, true) | default(contact.cams__imem_person_id, true) | default('', true) %}
+{% endif %}
+
+{% set crm_company_name = company_record.name | default(company_props.name, true) | default('', true) | string | trim %}
+{% if not crm_company_name %}
+  {% set crm_company_name = request_contact.associatedcompanyname | default(contact.associatedcompanyname, true) | default('', true) | string | trim %}
+{% endif %}
+{% if not crm_company_name or crm_company_name == '[object Object]' or crm_company_name == '[object object]' %}
+  {% set crm_company_name = contact_record.associatedcompanyname | default(contact_props.associatedcompanyname, true) | default('', true) | string | trim %}
+{% endif %}
+{% if not crm_company_name or crm_company_name == '[object Object]' or crm_company_name == '[object object]' %}
+  {% set crm_company_name = contact_record.company | default(contact_props.company, true) | default('', true) | string | trim %}
+{% endif %}
+
+{% set company_status_value = company_record.corporate_membership_status | default(company_props.corporate_membership_status, true) | default('', true) | string | trim %}
+{% if not company_status_value %}
+  {% set company_status_value = company_record.industry_supplier_membership_status | default(company_props.industry_supplier_membership_status, true) | default('', true) | string | trim %}
+{% endif %}
+
+{% set company_tier_value = company_record.corporate_membership_level_2 | default(company_props.corporate_membership_level_2, true) | default('', true) | string | trim %}
+{% if not company_tier_value %}
+  {% set company_tier_value = company_record.industry_supplier_membership_level_2 | default(company_props.industry_supplier_membership_level_2, true) | default('', true) | string | trim %}
+{% endif %}
+
+{% set company_member_type_value = company_record.cams__member_type | default(company_props.cams__member_type, true) | default('', true) | string | trim %}
+
+{% set company_expiry_value = company_record.corporate_membership_expiry_date_2 | default(company_props.corporate_membership_expiry_date_2, true) | default('', true) %}
+{% if not company_expiry_value %}
+  {% set company_expiry_value = company_record.industry_supplier_membership_expiry_date | default(company_props.industry_supplier_membership_expiry_date, true) | default('', true) %}
+{% endif %}
+
+{% set company_member_since_value = company_record.cams__join_date | default(company_props.cams__join_date, true) | default('', true) %}
+{% if not company_member_since_value %}
+  {% set company_member_since_value = company_record.createdate | default(company_props.createdate, true) | default('', true) %}
+{% endif %}
+
+{% set company_member_id_value = company_record.membership_number | default(company_props.membership_number, true) | default('', true) | string | trim %}
+{% if not company_member_id_value %}
+  {% set company_member_id_value = company_record.cams__imem_organisation_number | default(company_props.cams__imem_organisation_number, true) | default('', true) | string | trim %}
+{% endif %}
+{% if not company_member_id_value %}
+  {% set company_member_id_value = company_record.cams__cams_id | default(company_props.cams__cams_id, true) | default('', true) | string | trim %}
+{% endif %}
+
+{% set company_associated_contacts_value = company_record.num_associated_contacts | default(company_props.num_associated_contacts, true) | default('', true) | string | trim %}
+{% if company_associated_contacts_value %}
+  {% set company_seats_value = company_associated_contacts_value %}
+{% else %}
+  {% set company_seats_value = company_record.numberofemployees | default(company_props.numberofemployees, true) | default(null, true) %}
+{% endif %}
+
+{# Prefer a contact's individual membership when it exists. Treat CRM sentinels
+   ("Not Applicable", …) as empty so corporate employees fall back to the
+   company Gold/Silver/Bronze tier - same rule as checkout (defect 126). #}
+{% set contact_tier_value = wa_tier.scrub(contact_tier_value) | trim %}
+{% set contact_status_raw = wa_tier.scrub(contact_status_raw) | trim %}
+{% set tier_name = contact_tier_value | default(company_tier_value, true) | default('', true) | string | trim %}
+{% if not tier_name %}
+  {% set tier_name = 'Member' %}
+{% endif %}
+
+{% set role_title_value = contact_member_type_value | default(company_member_type_value, true) | default('', true) | string | trim %}
+{% if not role_title_value %}
+  {% if contact_tier_value %}
+    {% set role_title_value = contact_tier_value ~ ' member' %}
+  {% elif company_tier_value %}
+    {% set role_title_value = tier_name ~ ' corporate member' %}
+  {% else %}
+    {% set role_title_value = tier_name ~ ' member' %}
+  {% endif %}
+{% endif %}
+
+{% set status_value = contact_status_raw | default(company_status_value, true) | default('', true) | string | trim %}
+{% set status_key = status_value | lower | replace(' ', '_') %}
+{% if status_key in ['current', 'active'] %}
+  {% set membership_status = 'Active' %}
+{% elif status_key in ['pending', 'grace', 'grace_period'] %}
+  {% set membership_status = 'Grace period' %}
+{% elif status_key in ['lapsed', 'expired', 'inactive', 'cancelled', 'canceled'] %}
+  {% set membership_status = 'Lapsed' %}
+{% elif company_expiry_value or contact_membership_expiry_value or company_tier_value or contact_tier_value %}
+  {% set membership_status = 'Active' %}
+{% else %}
+  {% set membership_status = 'Grace period' %}
+{% endif %}
+
+{% set has_crm_membership = company_status_value or company_tier_value or company_expiry_value or company_member_id_value or contact_status_raw or contact_tier_value or contact_membership_expiry_value or contact_member_since_value or contact_member_id_value %}
+
+{# Defect 213 - portal vs course-page price mismatch.
+
+   `tier_name` above is a DISPLAY label: it falls back to the literal "Member" so
+   the hero always reads sensibly. That label must never reach pricing.
+   normaliseMemberPriceTier('Member') matches the "member" substring and resolves
+   to the `individual` tier, so the portal priced off price_individual, while
+   /courses/ - which sends '' when nothing resolves - priced off price_member.
+   Two different HubDB columns for the same visitor.
+
+   Resolve a separate pricing tier that stays EMPTY unless a real tier was found,
+   scrub the company sentinel (course-filter.module scrubs it; this module did
+   not), and gate on membership status the same way course-filter.module does via
+   _visitor_is_member. #}
+{% set company_tier_for_pricing = wa_tier.scrub(company_tier_value) | trim %}
+{% set pricing_is_member = has_crm_membership and membership_status != 'Lapsed' %}
+{% if pricing_is_member %}
+  {# Prefer Corporate Gold/Silver/Bronze over a weaker individual membership so
+     the portal and checkout quote the same rate for corporate employees who
+     also hold an individual seat (defect 126). #}
+  {% set company_tier_key_for_pricing = company_tier_for_pricing | lower %}
+  {% if company_tier_for_pricing and ('gold' in company_tier_key_for_pricing or 'silver' in company_tier_key_for_pricing or 'bronze' in company_tier_key_for_pricing) %}
+    {% set pricing_member_tier = company_tier_for_pricing %}
+  {% else %}
+    {% set pricing_member_tier = contact_tier_value | default(company_tier_for_pricing, true) | default('', true) | string | trim %}
+  {% endif %}
+{% else %}
+  {% set pricing_member_tier = '' %}
+{% endif %}
+{% set display_first_name = contact_first_name | default('', true) %}
+{% set display_last_name = contact_last_name | default('', true) %}
+{% if not display_first_name %}
+  {% set display_first_name = crm_company_name | default('Member', true) %}
+  {% set display_last_name = '' %}
+{% endif %}
+{% set company_name = crm_company_name | default(contact_record.company, true) | default(contact_props.company, true) | default(request_contact.company, true) | default(contact.company, true) | default('', true) | string | trim %}
+
+{% set member_since_value = contact_member_since_value | default(company_member_since_value, true) | default(null, true) %}
+{% set renewal_date_value = contact_membership_expiry_value | default(company_expiry_value, true) | default(null, true) %}
+{% set member_id_value = contact_member_id_value | default(company_member_id_value, true) | default('', true) %}
+{% set member_id_display_value = member_id_value | string | trim %}
+{% set linked_seats_value = company_seats_value | default(null, true) %}
+{% set primary_admin_role_label = request_contact.wa_company_role_label | default(contact_record.wa_company_role_label, true) | default(contact_props.wa_company_role_label, true) | default('', true) | string | lower | trim %}
+{% set primary_admin_flag = request_contact.is_corporate_admin | default(contact_record.is_corporate_admin, true) | default(contact_props.is_corporate_admin, true) | default(false, true) | string | lower | trim %}
+{% set primary_admin_ns = namespace(value=false, seen=[]) %}
+{% if primary_admin_role_label in ['primary admin', 'admin'] or primary_admin_flag in ['true', '1', 'yes'] %}
+  {% set primary_admin_ns.value = true %}
+{% endif %}
+{% if request_contact.is_logged_in and not primary_admin_ns.value %}
+  {% for contact_candidate in contact_id_candidates %}
+    {% set contact_candidate_id = contact_candidate | string | trim %}
+    {% if contact_candidate_id and contact_candidate_id != '[object Object]' and contact_candidate_id != '[object object]' and contact_candidate_id not in primary_admin_ns.seen and not primary_admin_ns.value %}
+      {% set primary_admin_ns.seen = primary_admin_ns.seen + [contact_candidate_id] %}
+      {#
+        The "Admin" corporate role is stored as a custom Contact → Company
+        association label in HubSpot: USER_DEFINED / typeId 7. The generic
+        CONTACT_TO_COMPANY association call does not always expose label names
+        in private-content renders, so check the typed association directly.
+      #}
+      {% set typed_primary_admin_assocs_raw = crm_associations(contact_candidate_id, 'USER_DEFINED', 7, 'limit=50', 'name,hs_object_id', false) %}
+      {% set typed_primary_admin_assocs = typed_primary_admin_assocs_raw.results if typed_primary_admin_assocs_raw.results else typed_primary_admin_assocs_raw %}
+      {% if typed_primary_admin_assocs|length > 0 %}
+        {% set primary_admin_ns.value = true %}
+      {% endif %}
+      {% set primary_admin_company_assocs_raw = crm_associations(contact_candidate_id, 'CONTACT_TO_COMPANY', 50) %}
+      {% set primary_admin_company_assocs = primary_admin_company_assocs_raw.results if primary_admin_company_assocs_raw.results else primary_admin_company_assocs_raw %}
+      {% for primary_admin_company in primary_admin_company_assocs %}
+        {% set primary_admin_labels = primary_admin_company.association_labels | default(primary_admin_company.labels | default([], true), true) %}
+        {% for primary_admin_label in primary_admin_labels %}
+          {% if primary_admin_label | string | lower | trim in ['primary admin', 'admin'] %}
+            {% set primary_admin_ns.value = true %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+{% set crm_is_primary_admin = primary_admin_ns.value %}
+{% set company_vouchers_total = company_record.vouchers_total | default(company_props.vouchers_total, true) | int | default(0) %}
+{% set company_vouchers_used = company_record.vouchers_used | default(company_props.vouchers_used, true) | int | default(0) %}
+{% set company_summit_tickets_total = company_record.summit_tickets_total | default(company_props.summit_tickets_total, true) | int | default(0) %}
+{% set company_summit_tickets_used = company_record.summit_tickets_used | default(company_props.summit_tickets_used, true) | int | default(0) %}
+
+{% set state_options = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'NT', 'ACT', 'National'] %}
+{% set crm_state_raw = company_record.state | default(company_props.state, true) | default(contact_record.state, true) | default(contact_props.state, true) | default(request_contact.state, true) | default(contact.state, true) | default('', true) | string | trim %}
+{% set crm_state_key = crm_state_raw | lower %}
+{% if crm_state_raw in state_options %}
+  {% set state_name = crm_state_raw %}
+{% elif crm_state_key in ['new south wales', 'nsw'] %}
+  {% set state_name = 'NSW' %}
+{% elif crm_state_key in ['victoria', 'vic'] %}
+  {% set state_name = 'VIC' %}
+{% elif crm_state_key in ['queensland', 'qld'] %}
+  {% set state_name = 'QLD' %}
+{% elif crm_state_key in ['western australia', 'wa'] %}
+  {% set state_name = 'WA' %}
+{% elif crm_state_key in ['south australia', 'sa'] %}
+  {% set state_name = 'SA' %}
+{% elif crm_state_key in ['tasmania', 'tas'] %}
+  {% set state_name = 'TAS' %}
+{% elif crm_state_key in ['northern territory', 'nt'] %}
+  {% set state_name = 'NT' %}
+{% elif crm_state_key in ['australian capital territory', 'act'] %}
+  {% set state_name = 'ACT' %}
+{% else %}
+  {% set state_name = 'National' %}
+{% endif %}
+
+{% set tier_key = tier_name | lower %}
+{% if 'gold' in tier_key %}
+  {% set profile_accent = 'gold' %}
+{% elif 'silver' in tier_key %}
+  {% set profile_accent = 'silver' %}
+{% elif 'bronze' in tier_key %}
+  {% set profile_accent = 'bronze' %}
+{% else %}
+  {% set profile_accent = 'member' %}
+{% endif %}
+
+{% if profile_ns.rows | length == 0 and has_crm_membership %}
+  {% set profile_ns.rows = profile_ns.rows + [{
+    'profile_key': 'crm-' ~ (contact_company_id if contact_company_id else contact_profile_ns.record_id | default(request_contact.vid | default('current'), true)),
+    'first_name': display_first_name,
+    'last_name': display_last_name,
+    'initials': '',
+    'role_title': role_title_value,
+    'company_name': company_name,
+    'member_tier': tier_name,
+    'pricing_member_tier': pricing_member_tier,
+    'is_pricing_member': pricing_is_member,
+    'membership_status': membership_status,
+    'is_linked_member': true,
+    'is_primary_admin': crm_is_primary_admin,
+    'member_since': member_since_value,
+    'member_id': member_id_display_value,
+    'renewal_date': renewal_date_value | default(null, true),
+    'linked_seats': linked_seats_value,
+    'linked_individual_label': '',
+    'state': state_name,
+    'state_raw': crm_state_raw,
+    'accent': profile_accent,
+    'banner_type': 'none',
+    'banner_title': '',
+    'banner_body': '',
+    'banner_cta_label': '',
+    'banner_cta_url': '',
+    'certification_name': '',
+    'certification_meta': '',
+    'cert_progress_percent': 0,
+    'cert_steps_json': '[]',
+    'next_step_body': '',
+    'next_step_cta_label': '',
+    'next_step_cta_url': '',
+    'invoice_number': outstanding_ns.number,
+    'invoice_amount': outstanding_ns.amount,
+    'invoice_status': outstanding_ns.status if outstanding_ns.pay_url else 'Paid',
+    'invoice_date': outstanding_ns.date,
+    'invoice_pdf_url': outstanding_ns.pdf_url,
+    'invoice_pay_url': outstanding_ns.pay_url,
+    'invoice_balance_due': outstanding_ns.balance_due if outstanding_ns.balance_due > 0 else null,
+    'financial_items': finance_ns.rows,
+    'team_linked_employees': (linked_seats_value | int | default(0)) if crm_is_primary_admin else 0,
+    'team_active_members': (linked_seats_value | int | default(0)) if crm_is_primary_admin else 0,
+    'training_vouchers_used': company_vouchers_used if crm_is_primary_admin else 0,
+    'training_vouchers_total': company_vouchers_total if crm_is_primary_admin else 0,
+    'summit_tickets_used': company_summit_tickets_used if crm_is_primary_admin else 0,
+    'summit_tickets_total': company_summit_tickets_total if crm_is_primary_admin else 0
+  }] %}
+{% endif %}
+
+{% if profile_ns.rows | length == 0 %}
+  {% set fallback_first_name = contact_first_name | default('', true) %}
+  {% if not fallback_first_name and contact_email %}
+    {% set fallback_first_name = contact_email %}
+  {% elif not fallback_first_name %}
+    {% set fallback_first_name = 'Member' %}
+  {% endif %}
+  {% set fallback_company = request_contact.associatedcompanyname | default('', true) | string | trim %}
+  {% if not fallback_company or fallback_company == '[object Object]' or fallback_company == '[object object]' %}
+    {% set fallback_company = contact.associatedcompanyname | default('', true) | string | trim %}
+  {% endif %}
+  {% if not fallback_company or fallback_company == '[object Object]' or fallback_company == '[object object]' %}
+    {% set fallback_company = contact_record.associatedcompanyname | default(contact_props.associatedcompanyname, true) | default(contact_record.company, true) | default(contact_props.company, true) | default('', true) | string | trim %}
+  {% endif %}
+  {% if not fallback_company or fallback_company == '[object Object]' or fallback_company == '[object object]' %}
+    {% set fallback_company = '' %}
+  {% endif %}
+  {% set profile_ns.rows = profile_ns.rows + [{
+    'profile_key': 'contact-' ~ request_contact.vid | default('current'),
+    'first_name': fallback_first_name,
+    'last_name': contact_last_name,
+    'initials': '',
+    'role_title': 'Membership details pending',
+    'company_name': fallback_company,
+    'member_tier': 'Support needed',
+    'pricing_member_tier': '',
+    'is_pricing_member': false,
+    'membership_status': 'Grace period',
+    'is_linked_member': false,
+    'is_primary_admin': crm_is_primary_admin,
+    'member_since': 0,
+    'member_id': '',
+    'renewal_date': contact_membership_expiry_value | default(null, true),
+    'linked_seats': 0,
+    'linked_individual_label': '',
+    'state': 'National',
+    'accent': 'gold',
+    'banner_type': 'cert',
+    'banner_title': 'We need to connect your membership details',
+    'banner_body': '<p>You are signed in, but we could not find your Weld Australia membership details for this login yet. Please contact support and we will help connect your account.</p>',
+    'banner_cta_label': 'Contact support',
+    'banner_cta_url': '/contact',
+    'certification_name': '',
+    'certification_meta': '',
+    'cert_progress_percent': 0,
+    'cert_steps_json': '[]',
+    'next_step_body': '',
+    'next_step_cta_label': '',
+    'next_step_cta_url': '',
+    'invoice_number': outstanding_ns.number,
+    'invoice_amount': outstanding_ns.amount,
+    'invoice_status': outstanding_ns.status if outstanding_ns.pay_url else 'Paid',
+    'invoice_date': outstanding_ns.date,
+    'invoice_pdf_url': outstanding_ns.pdf_url,
+    'invoice_pay_url': outstanding_ns.pay_url,
+    'invoice_balance_due': outstanding_ns.balance_due if outstanding_ns.balance_due > 0 else null,
+    'financial_items': finance_ns.rows,
+    'team_linked_employees': (linked_seats_value | int | default(0)) if crm_is_primary_admin else 0,
+    'team_active_members': (linked_seats_value | int | default(0)) if crm_is_primary_admin else 0,
+    'training_vouchers_used': company_vouchers_used if crm_is_primary_admin else 0,
+    'training_vouchers_total': company_vouchers_total if crm_is_primary_admin else 0,
+    'summit_tickets_used': company_summit_tickets_used if crm_is_primary_admin else 0,
+    'summit_tickets_total': company_summit_tickets_total if crm_is_primary_admin else 0
+  }] %}
+{% endif %}
+
+{% set course_ns = namespace(rows=[]) %}
+{% for row in course_rows %}
+  {% set course_start_key = row.start_date | datetimeformat('%Y%m%d') if row.start_date else '' %}
+  {% set city_name = row.city.name | default('') %}
+  {# The row's own `state` column wins: it exists so Weld Aus can schedule a
+     session anywhere and have it reach the right members without a code change
+     (set it on the row, or run `pnpm backfill:course-state`).
+
+     The city map below is the fallback for rows seeded before the column
+     existed and for anything left blank. It is keyed off the courses.city
+     SELECT (hubdb/courses.json): a city missing from both resolves to
+     "National", which hides a regional course from the member's own state
+     filter. Lower-cased keys so a row saved as "mackay" resolves the same as
+     "Mackay". #}
+  {% set city_states = {
+    'sydney': 'NSW', 'newcastle': 'NSW', 'wollongong': 'NSW',
+    'melbourne': 'VIC', 'geelong': 'VIC',
+    'brisbane': 'QLD', 'mackay': 'QLD', 'maryborough': 'QLD',
+    'gladstone': 'QLD', 'townsville': 'QLD',
+    'perth': 'WA',
+    'adelaide': 'SA',
+    'canberra': 'ACT',
+    'darwin': 'NT',
+    'hobart': 'TAS'
+  } %}
+  {% set row_state = row.state.name | default('') | trim %}
+  {% set city_state_key = city_name | lower | trim %}
+  {% set state_name = row_state if row_state else city_states[city_state_key] | default('National', true) %}
+
+  {% set course_detail_url = '/courses/' %}
+  {% if row.course_slug %}
+    {% set course_detail_url = '/courses/' ~ row.course_slug %}
+  {% endif %}
+
+  {#
+    This dashboard tile is a discovery surface, not the checkout CTA. Course
+    cards should send members to the public course detail page first; the detail
+    page owns the session selection and checkout handoff.
+  #}
+  {% set course_url = course_detail_url %}
+
+  {% set price_individual = row.price_individual | float | default(0) %}
+  {% set price_bronze = row.price_bronze_aud_ex_gst | float | default(0) %}
+  {% set price_silver = row.price_silver_aud_ex_gst | float | default(0) %}
+  {% set price_gold = row.price_gold_aud_ex_gst | float | default(0) %}
+  {% set price_student = row.price_student_aud_ex_gst | float | default(0) %}
+  {% set price_member = wa_price.member_price(row, '') | trim | float %}
+  {% set price_non_member = wa_price.non_member_price(row) | trim | float %}
+
+  {% if not course_start_key or course_start_key >= today_key %}
+    {% set course_ns.rows = course_ns.rows + [{
+      'id': row.hs_id | default(row.course_id | default(loop.index)),
+      'name': row.course_name | default('Course'),
+      'city': city_name | default('Online'),
+      'state': state_name,
+      'start_date': row.start_date | default(null),
+      'end_date': row.end_date | default(null),
+      'price_member': price_member,
+      'price_individual': price_individual,
+      'price_student': price_student,
+      'price_bronze': price_bronze,
+      'price_silver': price_silver,
+      'price_gold': price_gold,
+      'price_non_member': price_non_member,
+      'status': row.status.name | default('Available'),
+      'url': course_url | default('/courses'),
+      'category': row.category.name | default('Training'),
+      'delivery_mode': row.delivery_mode.name | default('')
+    }] %}
+  {% endif %}
+{% endfor %}
+
+{% set event_ns = namespace(rows=[]) %}
+{% for row in event_rows %}
+  {% set event_start_key = row.event_date | datetimeformat('%Y%m%d') if row.event_date else '' %}
+  {% if not event_start_key or event_start_key >= today_key %}
+    {% set event_detail_path = row.hs_path | default(row.path, true) | default(row.slug, true) | default('', true) | trim %}
+    {% set event_detail_url = '/events/' ~ event_detail_path if event_detail_path else '/events' %}
+    {% set event_ns.rows = event_ns.rows + [{
+      'id': row.hs_id | default(loop.index),
+      'name': row.event_name | default('Event'),
+      'type': row.event_type.name | default('Event'),
+      'state': row.event_state.name | default('National'),
+      'location': row.event_location | default(row.city | default('Online')),
+      'date': row.event_date | default(null),
+      'end_date': row.event_end_date | default(null),
+      'url': event_detail_url,
+      'members_only': row.is_members_only | default(false)
+    }] %}
+  {% endif %}
+{% endfor %}
+
+{% set resource_ns = namespace(rows=[]) %}
+{% for row in resource_rows %}
+  {% set resource_ns.rows = resource_ns.rows + [{
+    'id': row.hs_id | default(loop.index),
+    'title': row.title | default('Resource'),
+    'category': row.category.name | default(''),
+    'file_type': row.file_type.name | default(''),
+    'file_url': row.file_url | default('/resources/' ~ row.slug),
+    'required_tier': row.min_tier.name | default(row.required_tier.name | default('public')),
+    'member_label': row.member_label | default('Open')
+  }] %}
+{% endfor %}
+
+{% set is_member_portal_shell = request.path == '/portal/' or request.path == '/portal' %}
+{% set profile_url_value = '#portal-profile' if is_member_portal_shell else module.profile_url | default('/portal/profile/') %}
+{% set team_url_value = '#portal-team' if is_member_portal_shell else module.team_url | default('/portal#portal-team') %}
+{% set support_url_value = '/contact-us' if is_member_portal_shell else module.support_url | default('/contact-us') %}
+
+{% set props = {
+  'profiles': profile_ns.rows,
+  'courses': course_ns.rows,
+  'events': event_ns.rows,
+  'resources': resource_ns.rows,
+  'labels': {
+    'trainingUrl': module.training_url | default('/courses'),
+    'profileUrl': profile_url_value,
+    'membershipUrl': module.membership_url | default('/membership'),
+    'resourcesUrl': module.resources_url | default('/resources'),
+    'teamUrl': team_url_value,
+    'supportPhone': module.support_phone | default('1300 660 660'),
+    'supportUrl': support_url_value
+  },
+  'settings': {
+    'layoutVariant': module.layout_variant | default('two_column'),
+    'cardStyle': module.card_style | default('elevated'),
+    'density': module.dashboard_density | default('comfortable'),
+    'heroStyle': module.hero_style | default('standard'),
+    'showPreviewBar': module.show_preview_bar | default(false),
+    'showProfileSelector': module.show_profile_selector | default(false),
+    'showHeaderActions': module.show_header_actions | default(true),
+    'showAlertBanner': module.show_alert_banner | default(true),
+    'showDataNote': module.show_data_note | default(false),
+    'tiles': {
+      'certification': module.show_certification_tile | default(true),
+      'coursesEvents': module.show_courses_events_tile | default(true),
+      'membership': module.show_membership_tile | default(true),
+      'financials': module.show_financials_tile | default(true),
+      'team': module.show_team_tile | default(true),
+      'resources': module.show_resources_tile | default(true)
+    }
+  }
+} %}
+
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-member-command-centre-section"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  {% if mcc_editor_preview and not request_contact.is_logged_in %}
+    <div style="max-width: 1120px; margin: 0 auto 18px; padding: 12px 14px; border: 1px solid #d8deea; border-radius: 12px; background: #ffffff; color: #171947; font: 13px/1.45 system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+      <strong>Editor preview:</strong> showing a sample member dashboard so the layout can be edited. The live page still requires member login permission.
+    </div>
+  {% endif %}
+  <div
+    data-wa-module="member-command-centre"
+    data-props="{{ props | tojson | escape }}"
+  ></div>
+</section>
+
+{# Script tag injected by pnpm build - do not edit this line manually. #}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/js/assets/member-command-centre.standalone.css') }}">
+<script type="module" src="{{ get_asset_url('../../assets/js/member-command-centre.standalone.js') }}"></script>
+
+{% else %}
+
+{% set member_login_redirect = module.profile_url | default('/portal', true) %}
+{% set member_login_url = '/_hcms/mem/login?redirect_url=' ~ member_login_redirect|urlencode %}
+
+{# The server-rendered auth gate below uses .wa-mcc-auth-gate* rules, which live
+   in the module's standalone CSS bundle. Load it here (stable name) so the gate
+   is styled when the JS redirect can't run - JS disabled, framed, or blocked. #}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/js/assets/member-command-centre.standalone.css') }}">
+
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-member-command-centre-section"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  {% if not is_in_editor %}
+  <script>
+    (function () {
+      if (window.self !== window.top) return;
+      window.location.replace('{{ member_login_url|escapejs }}');
+    })();
+  </script>
+  {% endif %}
+  <div class="container">
+    <div class="wa-mcc-auth-gate" role="status" aria-live="polite">
+      <p class="wa-mcc-auth-gate__eyebrow">Member dashboard</p>
+      <h1 class="wa-mcc-auth-gate__heading">Sign in to view your dashboard</h1>
+      <p class="wa-mcc-auth-gate__body">
+        Please sign in with your Weld Australia member account to view your dashboard, benefits, invoices and training recommendations.
+      </p>
+      <div class="wa-mcc-auth-gate__actions">
+        <a class="wa-mcc-auth-gate__button wa-mcc-auth-gate__button--primary" href="{{ member_login_url }}">Member login</a>
+        <a class="wa-mcc-auth-gate__button wa-mcc-auth-gate__button--secondary" href="/_hcms/mem/register?redirect_url={{ member_login_redirect|urlencode }}">Create account</a>
+      </div>
+      <p class="wa-mcc-auth-gate__help">
+        Need help? <a href="/contact">Contact Weld Australia</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+{% endif %}

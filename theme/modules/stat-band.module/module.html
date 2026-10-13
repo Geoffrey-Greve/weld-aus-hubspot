@@ -1,0 +1,102 @@
+{#
+  stat-band.module/module.html
+  Band of statistics/numbers with optional overline, heading and CTA.
+  Replaces stat-tiles.module for the updated design system.
+
+  Fields:
+    module.section_id    - optional anchor id
+    module.background    - background variant (default: primary / Navy)
+    module.spacing       - vertical spacing variant
+    module.visibility    - device show/hide
+    module.members_only  - gating flag
+    module.overline      - optional overline text
+    module.heading       - optional section heading
+    module.stats         - repeater group (value, label, accent_color)
+    module.cta_label     - optional CTA button label
+    module.cta_link      - optional CTA button link
+#}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{% set _member_status = request_contact.individual_membership_status | default('') %}
+{% set _is_active_member = _member_status in ['Current'] %}
+{% if not module.members_only or _is_active_member %}
+
+{# ── Derived flags ──────────────────────────────────────────────────────────── #}
+{%- set _bg   = module.background | default('primary') -%}
+{%- set _sp   = module.spacing    | default('default') -%}
+{%- set _has_bg_img = module.background_image and module.background_image.src -%}
+{%- set _overlay = module.background_overlay | default(82) -%}
+{%- set _dark = _bg in ['primary', 'primary_dark'] or _has_bg_img -%}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{%- set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) -%}
+{%- set _vis_classes = '' -%}
+{%- if 'mobile'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-mobile'  -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-tablet'  -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+<section
+  class="wa-stat-band wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}{% if _has_bg_img %} wa-stat-band--media{% endif %}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  {% if _has_bg_img %}style="--_overlay: {{ _overlay }}%;"{% endif %}
+>
+  {% if _has_bg_img %}
+  <img
+    src="{{ module.background_image.src }}"
+    alt=""
+    class="wa-stat-band__bg-img"
+    aria-hidden="true"
+    loading="lazy"
+    decoding="async"
+    {% if module.background_image.width  %}width="{{ module.background_image.width }}"{% endif %}
+    {% if module.background_image.height %}height="{{ module.background_image.height }}"{% endif %}
+  >
+  <div class="wa-stat-band__overlay" aria-hidden="true"></div>
+  {% endif %}
+
+  <div class="container">
+
+    {# ── Section head ──────────────────────────────────────────────────────── #}
+    {% if module.overline or module.heading %}
+    <div class="wa-section-head">
+      {% if module.overline %}
+      <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+        <span class="wa-overline__text">{{ module.overline }}</span>
+      </div>
+      {% endif %}
+      {% if module.heading %}
+      <h2 class="wa-stat-band__heading">{{ module.heading }}</h2>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# ── Stats grid ────────────────────────────────────────────────────────── #}
+    {% if module.stats %}
+    <div class="wa-stat-band__grid" role="list">
+      {% for stat in module.stats %}
+      <div class="wa-stat-band__stat" role="listitem">
+        <span class="wa-stat-band__value wa-stat-band__value--{{ stat.accent_color | default('gold') }}">{{ stat.value_text }}</span>
+        <span class="wa-stat-band__label">{{ stat.label_text }}</span>
+        {% if stat.sublabel %}
+        <span class="wa-stat-band__sublabel">{{ stat.sublabel }}</span>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ── CTA ───────────────────────────────────────────────────────────────── #}
+    {% if module.cta_label and module.cta_link and module.cta_link.url and module.cta_link.url.href %}
+    <div class="wa-stat-band__cta">
+      <a
+        href="{{ module.cta_link.url.href }}"
+        class="btn btn-{% if _dark %}gold{% else %}primary{% endif %}"
+        {% if module.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >{{ module.cta_label }}</a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}{# end members_only gate #}

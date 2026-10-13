@@ -1,0 +1,84 @@
+<!--
+  templateType: none
+-->
+{#
+  _member-pricing.html
+
+  One HubL implementation of member price resolution, mirroring
+  src/shared/utils/memberPricing.ts (normaliseMemberPriceTier / priceForTier /
+  resolveMemberPrice). Keep the two in step - src/shared/utils/memberPricing.test.ts
+  documents the expected tier -> column mapping.
+
+  Why this exists (defect 213): the tier -> column chain was copy-pasted into
+  featured-courses, courses-upcoming-sessions, pricing-table and (with no tier logic
+  at all) training-course-cards. The copies drifted - some truncated with |int, some
+  omitted the reciprocal/honorary tiers, one showed "(member)" to anonymous
+  visitors - so the same course quoted different numbers on different pages.
+
+  Column names: the React islands receive short keys (price_gold, price_silver, …)
+  because HubL renames them when it serialises props. The LIVE HubDB columns are
+  price_gold_aud_ex_gst / price_silver_aud_ex_gst / price_bronze_aud_ex_gst /
+  price_student_aud_ex_gst. These macros read HubDB rows, so they try the live names
+  first and fall back to the short names for callers that already renamed.
+
+  TWO TABLES, TWO SHAPES (QA ref 73, events-engine migration 0044). `courses` names an
+  absolute column per tier; `events` names the public price once (`non_member_price`,
+  `member_price`) and states each tier as a PERCENTAGE off it (`gold_discount_`,
+  `silver_discount_`, `bronze_discount_`). Both are legitimate price lists and Weld key
+  one of each, so these macros read both: the column families do not collide
+  (price_non_member vs non_member_price, price_member vs member_price), so a courses
+  row resolves exactly as it did before and an events row now resolves at all. Until
+  0044 nothing on either side read the events columns, so every event was priced from
+  `pricing_rules` in the Worker and from `ticket_types_json` on the page.
+
+  A percentage outside (0, 100) is IGNORED, never honoured: 0 is "nobody entered one",
+  which is the state of most rows, and 100 or more gives a seat away. Same rule as
+  `tierDiscountPrice` in memberPricing.ts and `applyLevelDiscount` in the Worker.
+
+  Usage:
+    {% import "../../templates/partials/_member-pricing.html" as wa_price %}
+    {% set _tier_key = wa_price.member_tier_key(tier)|trim %}
+    {% set _member   = wa_price.member_price(row, tier)|trim|float %}
+    {% set _public   = wa_price.non_member_price(row)|trim|float %}
+
+  Always |trim the result - HubL macros emit the surrounding whitespace otherwise.
+
+  Callers gate on membership themselves: these macros answer "what would this tier
+  pay", not "is this visitor a member". Pass '' as the tier for a visitor who is not
+  entitled to a member rate.
+
+  Each macro is deliberately SELF-CONTAINED - no macro calls another. HubL's macro
+  support is a restricted Jinja2 (see the note in course-taxonomy.html about
+  zero-arg calls being rejected), and a cross-macro call inside an imported
+  namespace is exactly the sort of thing that only fails server-side on upload. The
+  small duplication below is the price of that safety.
+#}
+
+{# Normalise any raw tier string to one of: gold | silver | bronze | student |
+   individual | member. Mirrors normaliseMemberPriceTier(). An empty/unknown tier
+   resolves to `member` (the generic price_member column), NOT to `individual` -
+   that distinction is the portal-vs-course-page mismatch in defect 213.
+   Accepts raw labels ("Corporate Gold") and snake_case keys ("corporate_gold").
+
+   A label containing the bare word "member" and none of the other keywords - "Member",
+   "Corporate Member" - resolves to `member`, NOT `individual`. The individual branch
+   used to catch it, while the Worker's own canonicaliser (toCanonicalMemberLevel in
+   events-engine membership.ts) has always given it its own level. So those labels were
+   priced from price_individual on the page and price_member at reserve: where both
+   columns are set and differ, that is a refused booking or a silent undercharge. The
+   branch ORDER matters and matches the Worker's exactly - 'individual' is tested
+   before the fallthrough, so "Individual Member" is unaffected. #}
+{% macro member_tier_key(raw) %}{% set _k = raw|default('', true)|string|lower|trim|replace('_', ' ')|replace('-', ' ') %}{% if not _k %}member{% elif 'gold' in _k %}gold{% elif 'silver' in _k %}silver{% elif 'bronze' in _k %}bronze{% elif 'apprentice' in _k or 'student' in _k %}student{% elif 'individual' in _k or 'reciprocal' in _k or 'associate' in _k or 'honorary' in _k or 'honourary' in _k or 'industry supplier' in _k %}individual{% else %}member{% endif %}{% endmacro %}
+
+{# The exact per-tier price for a HubDB course row, or 0 when that tier has no price
+   set. Mirrors priceForTier(). #}
+{% macro tier_price(row, tier) %}{% set _k = tier|default('', true)|string|lower|trim|replace('_', ' ')|replace('-', ' ') %}{% if _k and 'gold' in _k %}{{ row.price_gold_aud_ex_gst|default(row.price_gold, true)|default(0, true)|float }}{% elif _k and 'silver' in _k %}{{ row.price_silver_aud_ex_gst|default(row.price_silver, true)|default(0, true)|float }}{% elif _k and 'bronze' in _k %}{{ row.price_bronze_aud_ex_gst|default(row.price_bronze, true)|default(0, true)|float }}{% elif _k and ('apprentice' in _k or 'student' in _k) %}{{ row.price_student_aud_ex_gst|default(row.price_student, true)|default(0, true)|float }}{% elif _k and ('individual' in _k or 'reciprocal' in _k or 'associate' in _k or 'honorary' in _k or 'honourary' in _k or 'industry supplier' in _k) %}{{ row.price_individual|default(0, true)|float }}{% else %}{{ row.price_member|default(row.member_price, true)|default(0, true)|float }}{% endif %}{% endmacro %}
+
+{# The price this tier actually pays: the exact tier price when set, otherwise the
+   same fallback chain the React util uses - price_member, then price_individual,
+   then price_non_member. Mirrors resolveMemberPrice(). #}
+{% macro member_price(row, tier) %}{% set _k = tier|default('', true)|string|lower|trim|replace('_', ' ')|replace('-', ' ') %}{% set _public = row.price_non_member|default(row.non_member_price, true)|default(0, true)|float %}{% if _k and 'gold' in _k %}{% set _exact = row.price_gold_aud_ex_gst|default(row.price_gold, true)|default(0, true)|float %}{% set _pct = row.gold_discount_|default(row.discount_gold, true)|default(0, true)|float %}{% elif _k and 'silver' in _k %}{% set _exact = row.price_silver_aud_ex_gst|default(row.price_silver, true)|default(0, true)|float %}{% set _pct = row.silver_discount_|default(row.discount_silver, true)|default(0, true)|float %}{% elif _k and 'bronze' in _k %}{% set _exact = row.price_bronze_aud_ex_gst|default(row.price_bronze, true)|default(0, true)|float %}{% set _pct = row.bronze_discount_|default(row.discount_bronze, true)|default(0, true)|float %}{% elif _k and ('apprentice' in _k or 'student' in _k) %}{% set _exact = row.price_student_aud_ex_gst|default(row.price_student, true)|default(0, true)|float %}{% set _pct = row.student_discount_|default(row.discount_student, true)|default(0, true)|float %}{% elif _k and ('individual' in _k or 'reciprocal' in _k or 'associate' in _k or 'honorary' in _k or 'honourary' in _k or 'industry supplier' in _k) %}{% set _exact = row.price_individual|default(0, true)|float %}{% set _pct = row.individual_discount_|default(row.discount_individual, true)|default(0, true)|float %}{% else %}{% set _exact = row.price_member|default(row.member_price, true)|default(0, true)|float %}{% set _pct = row.member_discount_|default(row.discount_member, true)|default(0, true)|float %}{% endif %}{% if _exact > 0 %}{{ _exact }}{% elif _pct > 0 and _pct < 100 and _public > 0 %}{{ ((_public * (100 - _pct) / 100) * 100)|round / 100 }}{% elif row.price_member|default(row.member_price, true)|default(0, true)|float > 0 %}{{ row.price_member|default(row.member_price, true)|float }}{% elif row.price_individual|default(0, true)|float > 0 %}{{ row.price_individual|float }}{% else %}{{ _public }}{% endif %}{% endmacro %}
+
+{# The public price. Kept here so callers read both sides from one place. Reads the
+   `events` column name too, for the reason in the header note. #}
+{% macro non_member_price(row) %}{{ row.price_non_member|default(row.non_member_price, true)|default(0, true)|float }}{% endmacro %}

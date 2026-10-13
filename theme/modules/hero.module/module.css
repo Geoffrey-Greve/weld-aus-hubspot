@@ -1,0 +1,768 @@
+/*
+ * hero.module/module.css
+ * Full-width hero: headline, sub-headline, optional right-side image/video, CTA pair.
+ *
+ * Scoped to .wa-hero. Mobile-first (min-width overrides).
+ * Tokens from theme/assets/css/tokens.css (:root --wa-* variables).
+ * WCAG 2.5.5: CTAs min 44×44px via --wa-touch-min.
+ * Side media: inline image/video column, never a full-bleed background.
+ */
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+
+.wa-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  /* Explicit min-height prevents CLS across height variants */
+  min-height: var(--_hero-min-h, 320px);
+  box-sizing: border-box;
+}
+
+.wa-hero--bg-primary,
+.wa-hero--bg-primary_dark {
+  background:
+    linear-gradient(90deg, rgba(15, 16, 48, 0.98) 0%, rgba(28, 30, 76, 0.92) 52%, rgba(28, 30, 76, 0.78) 100%),
+    radial-gradient(circle at 86% 18%, rgba(254, 207, 5, 0.16), transparent 28%),
+    radial-gradient(circle at 76% 76%, rgba(237, 18, 141, 0.18), transparent 30%),
+    var(--wa-color-primary);
+}
+
+/* ── Inner layout ─────────────────────────────────────────────────────────── */
+
+.wa-hero__inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--wa-space-10);
+  align-items: center;
+}
+
+.wa-hero__content,
+.wa-hero__media {
+  min-width: 0;
+}
+
+.wa-hero__content {
+  max-width: 620px;
+}
+
+/* ── Overline spacing in hero context ────────────────────────────────────── */
+
+.wa-hero .wa-overline {
+  margin-bottom: var(--wa-space-4);
+}
+
+/* ── Text alignment ───────────────────────────────────────────────────────── */
+
+.wa-hero--align-center:not(.wa-hero--has-media) .wa-hero__content {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.wa-hero--align-center:not(.wa-hero--has-media) .wa-hero__ctas {
+  justify-content: center;
+}
+
+/* ── Headline ─────────────────────────────────────────────────────────────── */
+
+.wa-hero__headline {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.08;
+  margin: 0 0 18px 0;
+  color: inherit;
+  max-width: 620px;
+}
+
+/* ── Sub-headline ─────────────────────────────────────────────────────────── */
+
+.wa-hero__subheadline {
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-base);
+  line-height: 1.7;
+  margin: 0 0 var(--wa-space-8) 0;
+  color: inherit;
+  opacity: 0.9;
+  max-width: 560px;
+}
+
+.wa-hero--bg-primary .wa-hero__subheadline,
+.wa-hero--bg-primary_dark .wa-hero__subheadline {
+  /* Client feedback 2026-07-23: the supporting copy was rgba(255,255,255,0.48)
+     - grey and hard to read on the dark hero. Lifted to a very-light tone that
+     stays a touch softer than the bright <strong> lead line below. */
+  color: rgba(255, 255, 255, 0.82);
+  opacity: 1;
+  max-width: 520px;
+}
+
+.wa-hero--bg-primary .wa-hero__subheadline strong,
+.wa-hero--bg-primary_dark .wa-hero__subheadline strong {
+  display: block;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 19px;
+  font-weight: var(--wa-weight-semibold);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.wa-hero__subheadline > *:last-child {
+  margin-bottom: 0;
+}
+
+/*
+ * Links inside the sub-headline rich text on a dark hero (QA 236).
+ *
+ * base.css sets `a { color: var(--wa-color-primary) }` directly on the anchor,
+ * so the light colour set on the .wa-hero__subheadline container above never
+ * inherits down - the anchor's own colour wins. On the navy hero gradient that
+ * rendered the Welding Fumes hotline number as navy-on-navy. `:visited` has to
+ * be listed explicitly or it reverts to near-black after the first tap.
+ * The underline carries the affordance so this doesn't rely on colour alone.
+ */
+.wa-hero--bg-primary .wa-hero__subheadline a,
+.wa-hero--bg-primary_dark .wa-hero__subheadline a,
+.wa-hero--bg-primary .wa-hero__subheadline a:visited,
+.wa-hero--bg-primary_dark .wa-hero__subheadline a:visited {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.wa-hero--bg-primary .wa-hero__subheadline a:hover,
+.wa-hero--bg-primary_dark .wa-hero__subheadline a:hover,
+.wa-hero--bg-primary .wa-hero__subheadline a:focus-visible,
+.wa-hero--bg-primary_dark .wa-hero__subheadline a:focus-visible {
+  color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-hero__extra {
+  display: grid;
+  gap: var(--wa-space-4);
+  margin: calc(var(--wa-space-8) * -0.35) 0 var(--wa-space-8);
+}
+
+.wa-hero__subheadline + .wa-hero__extra {
+  margin-top: calc(var(--wa-space-4) * -1);
+}
+
+.wa-hero__extra:empty {
+  display: none;
+}
+
+.wa-hero__badges,
+.wa-hero__tag-list,
+.wa-hero__meta-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--wa-space-2);
+  margin: 0;
+  padding: 0;
+}
+
+.wa-hero__badge,
+.wa-hero__tag,
+.wa-hero__meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: var(--wa-weight-semibold, 600);
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.wa-hero__tag:hover,
+.wa-hero__tag:focus-visible {
+  border-color: rgba(254, 207, 5, 0.6);
+  background: rgba(254, 207, 5, 0.14);
+  color: #fff;
+}
+
+.wa-hero__badge--accent,
+.wa-hero__tag--accent {
+  border-color: rgba(254, 207, 5, 0.32);
+  background: rgba(254, 207, 5, 0.16);
+  color: #fff;
+}
+
+.wa-hero__tag,
+.wa-hero__tag:link,
+.wa-hero__tag:visited,
+.wa-hero__tag:hover,
+.wa-hero__tag:focus-visible,
+.wa-hero__tag--accent,
+.wa-hero__tag--accent:link,
+.wa-hero__tag--accent:visited,
+.wa-hero__tag--accent:hover,
+.wa-hero__tag--accent:focus-visible {
+  color: #fff;
+}
+
+.wa-hero__badge--muted,
+.wa-hero__meta-pill {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.wa-hero__meta-line {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: var(--wa-text-sm, 0.875rem);
+}
+
+/* ── Breadcrumb ───────────────────────────────────────────────────────────── */
+
+.wa-hero__breadcrumb {
+  margin-block-end: clamp(1.25rem, 2vw, 1.85rem);
+}
+
+.wa-hero__breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--wa-space-2);
+  margin: 0 0 var(--wa-space-2);
+  padding: 0;
+  list-style: none;
+  font-family: var(--wa-font-body);
+  font-size: 0.875rem;
+}
+
+.wa-hero__breadcrumb li {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* WCAG 2.5.5: breadcrumb links keep the 44px minimum touch target */
+.wa-hero__breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--wa-touch-min);
+  color: var(--wa-color-text-muted);
+  text-underline-offset: 3px;
+}
+
+.wa-hero__breadcrumb [aria-current="page"] {
+  font-weight: var(--wa-weight-semibold);
+}
+
+.wa-hero--bg-primary .wa-hero__breadcrumb a,
+.wa-hero--bg-primary_dark .wa-hero__breadcrumb a {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.wa-hero--bg-primary .wa-hero__breadcrumb a:hover,
+.wa-hero--bg-primary_dark .wa-hero__breadcrumb a:hover {
+  color: #fff;
+}
+
+.wa-hero--bg-primary .wa-hero__breadcrumb [aria-current="page"],
+.wa-hero--bg-primary_dark .wa-hero__breadcrumb [aria-current="page"] {
+  color: #fff;
+}
+
+/* ── CTAs ─────────────────────────────────────────────────────────────────── */
+
+.wa-hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-3);
+  align-items: center;
+}
+
+.wa-hero__cta {
+  min-height: 50px;
+  min-width: var(--wa-touch-min);
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wa-space-2);
+  padding-block: 8px;
+  padding-inline: 28px;
+  /* No `white-space: nowrap` - it out-specified the .btn base and would stop
+     a long hero CTA label wrapping on a narrow viewport. */
+}
+
+/* ── Stat tiles ───────────────────────────────────────────────────────────── */
+
+.wa-hero__search {
+  width: 100%;
+  max-width: 720px;
+  margin-top: var(--wa-space-8);
+}
+
+.wa-hero__ctas + .wa-hero__search {
+  margin-top: var(--wa-space-6);
+}
+
+.wa-hero__search-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  min-height: 54px;
+  overflow: hidden;
+  border-radius: var(--wa-radius-lg);
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.18);
+}
+
+.wa-hero__search-icon {
+  position: absolute;
+  top: 50%;
+  left: var(--wa-space-4);
+  z-index: 1;
+  color: var(--wa-color-text-muted, #5b6770);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.wa-hero__search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  min-height: var(--wa-touch-min);
+  border: 0;
+  padding: 0 var(--wa-space-4) 0 calc(var(--wa-space-4) + 28px);
+  background: transparent;
+  color: var(--wa-color-text);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-base);
+  outline: 0;
+}
+
+.wa-hero__search-input::placeholder {
+  color: var(--wa-color-text-muted, #5b6770);
+}
+
+.wa-hero__search-input:focus-visible {
+  outline: 2px solid var(--wa-color-accent, #fecf05);
+  outline-offset: -3px;
+}
+
+.wa-hero__search-submit {
+  flex: 0 0 auto;
+  min-height: var(--wa-touch-min);
+  border-radius: 0 var(--wa-radius-lg) var(--wa-radius-lg) 0;
+  padding-inline: var(--wa-space-6);
+  white-space: nowrap;
+}
+
+.wa-hero__stats {
+  display: grid;
+  margin: 0;
+  padding: 0;
+}
+
+.wa-hero__stat,
+.wa-hero__stat-value,
+.wa-hero__stat-label {
+  margin: 0;
+}
+
+.wa-hero__stat-value {
+  display: block;
+  color: var(--wa-color-accent, #fecf05);
+  font-family: var(--wa-font-heading);
+  font-weight: var(--wa-weight-black, 900);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.wa-hero__stat-label {
+  display: block;
+  font-family: var(--wa-font-body);
+  color: var(--wa-color-text-muted);
+  line-height: 1.4;
+}
+
+.wa-hero--bg-primary .wa-hero__stat-label,
+.wa-hero--bg-primary_dark .wa-hero__stat-label {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Below the copy: a compact row of numbers. Flex rather than grid so any
+   number of tiles (1-6) wraps sensibly instead of leaving empty columns. */
+.wa-hero__stats--below {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.1rem, 3vw, 2.25rem);
+  margin-top: var(--wa-space-8);
+  max-width: 680px;
+}
+
+.wa-hero__stats--below .wa-hero__stat-value {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.wa-hero__stats--below .wa-hero__stat-label {
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+}
+
+/* Right-hand column: bordered cards */
+.wa-hero__stats--side {
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-3);
+}
+
+.wa-hero__stats--side .wa-hero__stat {
+  padding: 24px 20px;
+  border: 1px solid var(--wa-color-surface-3, #edf0f4);
+  border-radius: var(--wa-radius-md);
+  background: var(--wa-color-surface-alt, #f5f5f5);
+}
+
+.wa-hero--bg-primary .wa-hero__stats--side .wa-hero__stat,
+.wa-hero--bg-primary_dark .wa-hero__stats--side .wa-hero__stat {
+  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.wa-hero__stats--side .wa-hero__stat-value {
+  font-size: 34px;
+  margin-bottom: var(--wa-space-2);
+}
+
+.wa-hero__stats--side .wa-hero__stat:nth-child(even) .wa-hero__stat-value {
+  color: var(--wa-color-magenta, #ed128d);
+}
+
+.wa-hero__stats--side .wa-hero__stat-label {
+  font-size: 12px;
+}
+
+/* § 5.4 rule 1: single column on mobile, widening with the viewport */
+@media (min-width: 521px) {
+  .wa-hero__stats--below {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .wa-hero__stats--side { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ── Side media (image / video) ───────────────────────────────────────────── */
+
+.wa-hero__media {
+  width: 100%;
+}
+
+.wa-hero__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--wa-radius-lg);
+  object-fit: cover;
+  box-shadow: var(--wa-shadow-lg);
+  aspect-ratio: 4 / 3;
+}
+
+/* Right-hand column holding rich text instead of an image or video. Shares the
+   bordered-card treatment used by the side stat tiles so the two read as one
+   family; colour is inherited from the section so dark backgrounds just work. */
+.wa-hero__media-text {
+  padding: var(--wa-space-8) var(--wa-space-6);
+  border: 1px solid var(--wa-color-surface-3, #edf0f4);
+  border-radius: var(--wa-radius-lg);
+  background: var(--wa-color-surface-alt, #f5f5f5);
+}
+
+.wa-hero--bg-primary .wa-hero__media-text,
+.wa-hero--bg-primary_dark .wa-hero__media-text {
+  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.wa-hero__media-text > :first-child { margin-top: 0; }
+.wa-hero__media-text > :last-child  { margin-bottom: 0; }
+
+.wa-hero__media-text:has(.wa-error-403__panel),
+.wa-hero__media-text:has(.wa-error-404__panel),
+.wa-hero__media-text:has(.wa-error-500__panel),
+.wa-hero__media-text:has(.wa-job-detail-apply-card),
+.wa-hero__media-text:has(.wa-team-profile__photo-wrap) {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.wa-hero__media-text:has(.wa-team-profile__photo-wrap) {
+  display: flex;
+  justify-content: center;
+}
+
+.wa-hero__media-text h2,
+.wa-hero__media-text h3,
+.wa-hero__media-text h4 {
+  margin-bottom: var(--wa-space-3);
+  font-family: var(--wa-font-heading);
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.wa-hero__media-text p,
+.wa-hero__media-text ul,
+.wa-hero__media-text ol {
+  margin-bottom: var(--wa-space-4);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.wa-hero__media-text ul,
+.wa-hero__media-text ol {
+  padding-left: var(--wa-space-5);
+}
+
+.wa-hero__media-text li + li {
+  margin-top: var(--wa-space-2);
+}
+
+.wa-hero__media-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--wa-radius-lg);
+  overflow: hidden;
+  background: #000;
+  box-shadow: var(--wa-shadow-lg);
+}
+
+.wa-hero__media-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Video: hide the embed on small screens; show the "Watch video" link instead */
+.wa-hero--has-video .wa-hero__media {
+  display: none;
+}
+
+/* Click-to-play poster facade (shown before the embed loads) */
+.wa-hero__video-facade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  background: #000;
+  display: block;
+  overflow: hidden;
+}
+
+.wa-hero__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease, filter 0.3s ease;
+}
+
+.wa-hero__poster-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--wa-color-primary, #002f5f);
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  transition: transform 0.25s ease, background 0.25s ease;
+  /* Optical centering of the play triangle */
+  padding-left: 4px;
+}
+
+.wa-hero__video-facade:hover .wa-hero__poster,
+.wa-hero__video-facade:focus-visible .wa-hero__poster {
+  transform: scale(1.04);
+  filter: brightness(0.92);
+}
+
+.wa-hero__video-facade:hover .wa-hero__poster-play,
+.wa-hero__video-facade:focus-visible .wa-hero__poster-play {
+  transform: translate(-50%, -50%) scale(1.08);
+  background: var(--wa-color-accent, #fecf05);
+  color: var(--wa-color-primary, #002f5f);
+}
+
+.wa-hero__video-facade:focus-visible {
+  outline: 3px solid var(--wa-color-accent, #fecf05);
+  outline-offset: 2px;
+}
+
+/* Tablet/mobile fallback: "Watch our video" link (shown when an embed is set) */
+.wa-hero__video-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: var(--wa-space-6);
+  min-height: var(--wa-touch-min);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-sm);
+  /* Client feedback 2026-07-23: lightened from 0.62 (grey, hard to read) so the
+     "Watch our video" link reads clearly on the dark hero. */
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+}
+
+.wa-hero:not(.wa-hero--bg-primary):not(.wa-hero--bg-primary_dark) .wa-hero__video-link {
+  color: var(--wa-color-text-muted);
+}
+
+.wa-hero__video-play {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wa-color-accent);
+  background: rgba(254, 207, 5, 0.12);
+  border: 1.5px solid rgba(254, 207, 5, 0.4);
+}
+
+.wa-hero__video-link:hover { color: #fff; }
+
+/* ── Brand accent bar (flame gradient) ────────────────────────────────────── */
+
+.wa-hero--accent-bar { padding-bottom: calc(var(--wa-space-16) + 4px); }
+
+.wa-hero__accent-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  z-index: 3;
+  background: var(--wa-gradient-flame);
+}
+
+/* ── Height variants ──────────────────────────────────────────────────────── */
+
+.wa-hero--h-banner   { --_hero-min-h: 160px; }
+.wa-hero--h-compact  { --_hero-min-h: 280px; }
+.wa-hero--h-medium   { --_hero-min-h: 420px; }
+.wa-hero--h-large    { --_hero-min-h: 560px; }
+.wa-hero--h-tall     { --_hero-min-h: 600px; }
+.wa-hero--h-full     { --_hero-min-h: 100svh; }
+
+/* ── Vertical spacing ─────────────────────────────────────────────────────── */
+
+.wa-hero--sp-compact  { padding-block: var(--wa-space-8);  }
+.wa-hero--sp-default  { padding-block: var(--wa-space-16); }
+.wa-hero--sp-spacious { padding-block: var(--wa-space-24); }
+
+/* ── Background colour variants ───────────────────────────────────────────── */
+
+.wa-hero--bg-surface {
+  background-color: var(--wa-color-surface);
+  color: var(--wa-color-text);
+}
+
+.wa-hero--bg-surface_alt {
+  background-color: var(--wa-color-surface-alt, #f5f5f5);
+  color: var(--wa-color-text);
+}
+
+.wa-hero--bg-primary {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+}
+
+.wa-hero--bg-primary_dark {
+  background-color: var(--wa-color-primary-dark, #0b2a4a);
+  color: var(--wa-color-on-primary);
+}
+
+.wa-hero--bg-transparent {
+  background-color: transparent;
+  color: var(--wa-color-text);
+}
+
+/* ── Visibility helpers ───────────────────────────────────────────────────── */
+
+/* Mobile-only (<768px) hide */
+@media (max-width: 767px) {
+  .wa-hero__search-wrap {
+    flex-direction: column;
+    border-radius: var(--wa-radius-lg);
+  }
+
+  .wa-hero__search-submit {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .wa-hidden-mobile { display: none !important; }
+}
+
+/* Tablet hide (768-1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .wa-hidden-tablet { display: none !important; }
+}
+
+/* Desktop hide (≥1024px) */
+@media (min-width: 1024px) {
+  .wa-hidden-desktop { display: none !important; }
+}
+
+/* ── Responsive headline sizing ───────────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  .wa-hero__headline {
+    font-size: clamp(2.5rem, 5vw, 2.875rem);
+  }
+
+  .wa-hero__content {
+    max-width: 760px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-hero__headline {
+    font-size: 46px;
+  }
+
+  .wa-hero--h-banner   { --_hero-min-h: 200px; }
+  .wa-hero--h-compact  { --_hero-min-h: 320px; }
+  .wa-hero--h-medium   { --_hero-min-h: 480px; }
+  .wa-hero--h-large    { --_hero-min-h: 640px; }
+  .wa-hero--h-tall     { --_hero-min-h: 620px; }
+
+  /* Split layout: copy + media side by side */
+  .wa-hero--has-media .wa-hero__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+    gap: var(--wa-space-20);
+  }
+
+  .wa-hero--has-media .wa-hero__content { max-width: 620px; }
+
+  .wa-hero--has-video .wa-hero__media { display: block; }
+  .wa-hero--has-video .wa-hero__video-link { display: none; }
+}

@@ -1,0 +1,208 @@
+<!--
+  templateType: page
+  label: Certification - ISO 3834
+  isAvailableForNewContent: true
+-->
+﻿{#
+  certification-iso3834.html - Weld Australia ISO 3834 Company Certification Page
+  URL: /certification/iso-3834/
+  Template type: drag-and-drop page
+
+  Sections (§ 3.10 variant - ISO 3834 company certification focus):
+    1. Hero - ISO 3834 focus
+    2. What is ISO 3834 - two-column rich text with image
+    3. Why get ISO 3834 certified - three-up benefits for companies
+    4. ISO 3834 levels - cert-pathway-cards showing Part 2 / Part 3 / Part 4
+    5. Certification process - Apply / Audit / Certified / Maintain four-step
+    6. Accreditation logos - ISO body recognition
+    7. Find certified companies promo - CTA to Find a Member filtered to certified
+    8. FAQ accordion - ISO 3834 specific
+    9. Final CTA - Request a quote / enquire
+
+  Modules used:
+    hero, two-col-text-image, value-props-3up, cert-pathway-cards,
+    step-process, logo-strip, cta-banner, faq-accordion, cta-banner
+#}
+{% set page_title_exact = page_meta.html_title | default('ISO 3834 Company Certification - Weld Australia') %}
+{% set page_description = page_meta.meta_description | default('Weld Australia administers ISO 3834 certification for welding manufacturers. ISO 3834 demonstrates your organisation\'s commitment to welding quality and compliance.') %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 1  HERO COMPACT - ISO 3834 entry point
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero - ISO 3834"
+          background="primary_dark"
+          height="compact"
+          spacing="default"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+          eyebrow="Certification"
+          headline="ISO 3834 Company Certification"
+          subheadline="<p>Demonstrate your organisation's commitment to welding quality with internationally recognised ISO 3834 certification.</p>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 2  WHAT IS ISO 3834 - Two-column explainer
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/two-col-text-image"
+          label="What is ISO 3834?"
+          heading="What is ISO 3834?"
+          body_text="<p>ISO 3834 is the international standard for quality requirements for fusion welding of metallic materials. It defines the minimum quality requirements that a manufacturer must meet when welding metallic materials - whether welding is carried out permanently or on a temporary basis.</p><p>Weld Australia is an accredited certification body for ISO 3834, authorised to assess and certify Australian organisations against the standard.</p>"
+          image_position="right"
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 3  WHY GET ISO 3834 - Three-up company benefits
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/value-props-3up"
+          label="Why get ISO 3834 certified"
+          section_heading="Why ISO 3834 matters for your business"
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 4  ISO 3834 LEVELS - Part 2 / Part 3 / Part 4 pathway cards
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cert-pathway-cards"
+          label="ISO 3834 certification levels"
+          section_heading="Choose the right certification level"
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 5  CERTIFICATION PROCESS - Apply / Audit / Certified / Maintain
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/step-process"
+          label="ISO 3834 certification process"
+          section_heading="The ISO 3834 certification process"
+          step_count=4
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 6  ACCREDITATION LOGOS - ISO body recognition
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/logo-strip"
+          label="Accreditation bodies"
+          section_heading="Recognised by international accreditation bodies"
+          source="manual"
+          background="surface"
+          spacing="compact"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 7  FIND CERTIFIED COMPANIES - Directory CTA
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Find ISO 3834 certified companies"
+          headline="Find ISO 3834 certified welding organisations"
+          body_text="<p>Search our member directory for companies that hold ISO 3834 certification.</p>"
+          cta_label="Find a member"
+          cta_link={"url": {"href": "/find-a-member/", "type": "EXTERNAL"}}
+          background="primary"
+          spacing="default"
+          align="split"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 8  FAQ - ISO 3834 specific questions
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/faq-accordion"
+          label="ISO 3834 FAQ"
+          section_heading="Frequently asked questions"
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 9  FINAL CTA - Request a quote / enquire
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA - ISO 3834 enquiry"
+          headline="Ready to pursue ISO 3834 certification?"
+          body_text="<p>Contact our certification team to begin your assessment and receive a quote for your organisation.</p>"
+          cta_label="Request a quote"
+          cta_link={"url": {"href": "/contact-us?topic=certification#enquiry", "type": "EXTERNAL"}}
+          secondary_cta_label="All certification pathways"
+          secondary_cta_link={"url": {"href": "/certification/", "type": "EXTERNAL"}}
+          background="primary"
+          spacing="default"
+          align="split"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

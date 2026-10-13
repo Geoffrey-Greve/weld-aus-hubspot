@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Weld Australia">
+  <defs>
+    <linearGradient id="wa-flame" x1="18" y1="100" x2="210" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ed2290"/>
+      <stop offset="0.07" stop-color="#ed2288"/>
+      <stop offset="0.13" stop-color="#ed2272"/>
+      <stop offset="0.21" stop-color="#ed2350"/>
+      <stop offset="0.26" stop-color="#ee2439"/>
+      <stop offset="0.44" stop-color="#eb4031"/>
+      <stop offset="0.74" stop-color="#e87924"/>
+      <stop offset="0.82" stop-color="#ed901a"/>
+      <stop offset="0.93" stop-color="#fed401"/>
+      <stop offset="1" stop-color="#fed401"/>
+    </linearGradient>
+  </defs>
+  <!-- Brand mark cropped from logo wordmark; translated into a square canvas -->
+  <g transform="translate(-8.5,-8.5) scale(0.965)">
+    <path
+      fill="url(#wa-flame)"
+      d="M27.1,104.97l1.08-.42,32.56-12.77,8.18,20.52.14.36-16.29,56.66c-8.55-21.45-17.11-42.9-25.67-64.34M84.28,83.06l20.7,51.6-4.31,14.95c-13.35,5.23-26.7,10.49-40.05,15.73l23.65-82.28ZM90.97,79.89l33.69-13.22,18.35,45.75-16.28,56.64-35.76-89.16ZM167.91,49.76l40.62-15.92-33.75,118.45-40.71,15.99,33.83-118.52ZM162.24,44.77l-15.89,56.19-17.33-43.23-49.78,19.52-6.86,23.86-7.26-18.27-47.18,18.56,30.26,76.07,58.86-23.15,2.15-9.2,13.9,34.68c19.08-7.5,38.16-15,57.23-22.51L218.78,22.59l-56.54,22.17Z"
+    />
+  </g>
+</svg>

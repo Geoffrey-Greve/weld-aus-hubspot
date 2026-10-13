@@ -1,0 +1,90 @@
+[
+  {
+    "name": "show_breadcrumbs",
+    "label": "Show breadcrumbs",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "breadcrumb_home_label",
+    "label": "Breadcrumb home label",
+    "type": "text",
+    "default": "Home"
+  },
+  {
+    "name": "breadcrumb_blog_label",
+    "label": "Breadcrumb blog label",
+    "type": "text",
+    "default": "News & Publications"
+  },
+  {
+    "name": "breadcrumb_blog_url",
+    "label": "Breadcrumb blog URL",
+    "type": "text",
+    "default": "/news/"
+  },
+  {
+    "name": "breadcrumb_current_label",
+    "label": "Current page breadcrumb label",
+    "type": "text",
+    "default": "Article"
+  },
+  {
+    "name": "show_eyebrow",
+    "label": "Show eyebrow",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "eyebrow_text",
+    "label": "Eyebrow text",
+    "type": "text",
+    "default": "Welding industry news Australia"
+  },
+  {
+    "name": "show_tag",
+    "label": "Show topic tag",
+    "type": "boolean",
+    "default": true,
+    "help_text": "Uses the first HubSpot blog tag/topic assigned to the post. If no post tag exists, the fallback tag below can be shown."
+  },
+  {
+    "name": "show_fallback_tag",
+    "label": "Show fallback tag if post has no tag",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "fallback_tag_label",
+    "label": "Fallback tag label",
+    "type": "text",
+    "default": "Industry News"
+  },
+  {
+    "name": "fallback_tag_slug",
+    "label": "Fallback tag slug / colour style",
+    "type": "text",
+    "default": "industry-news",
+    "help_text": "Also controls the tag colour style. Examples: industry-news, technical, standards, technology, training, advocacy, member-news."
+  },
+  {
+    "name": "fallback_tag_url",
+    "label": "Fallback tag URL",
+    "type": "text",
+    "default": "/news/tag/industry-news/"
+  },
+  {
+    "name": "summary_override",
+    "label": "Hero summary override",
+    "type": "text",
+    "default": "",
+    "help_text": "Optional. Leave blank to use the blog post meta description / summary."
+  },
+  {
+    "name": "background_image",
+    "label": "Article hero image override",
+    "type": "image",
+    "responsive": false,
+    "help_text": "Optional image used only in this article hero. Leave blank to use the blog post Featured image. To change the thumbnail shown on the News page and homepage, update Settings > Featured image on the blog post."
+  }
+]

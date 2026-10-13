@@ -1,0 +1,14 @@
+{
+  "label": "Timeline",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Vertical timeline with alternating left/right layout on desktop. Single column on mobile.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["content", "timeline", "history"]
+}

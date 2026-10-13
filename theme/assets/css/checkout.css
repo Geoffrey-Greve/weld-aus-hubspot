@@ -1,0 +1,149 @@
+/*
+ * Checkout page frame.
+ *
+ * The checkout template uses the normal Weld Australia global header/footer
+ * from base.html. These rules only style the checkout-specific progress band
+ * and page canvas that sit between them.
+ */
+
+body.is-checkout {
+  color: var(--wa-color-text, #1a1a1a);
+  background: #f7f8fb;
+}
+
+body.is-checkout #main-content {
+  min-height: 72vh;
+  background: #f7f8fb;
+  overflow: clip;
+}
+
+.checkout-progress-band {
+  position: sticky;
+  top: var(--wa-site-header-offset, 0);
+  z-index: calc(var(--wa-z-sticky, 200) - 1);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid rgba(28, 30, 76, 0.1);
+  box-shadow: 0 18px 42px rgba(15, 16, 48, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.checkout-progress-band__inner {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.42fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--wa-space-3, 12px) clamp(20px, 4vw, 48px);
+  min-height: 118px;
+  padding-block: var(--wa-space-5, 20px);
+}
+
+.checkout-progress-band__copy {
+  min-width: 0;
+}
+
+.checkout-progress-band__eyebrow {
+  margin: 0 0 var(--wa-space-1, 4px);
+  color: var(--wa-color-magenta, #ed128d);
+  font-size: var(--wa-text-xs, 0.75rem);
+  font-weight: var(--wa-weight-bold, 700);
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.checkout-progress-band__title {
+  margin: 0;
+  color: var(--wa-color-primary-dark, #0f1030);
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  letter-spacing: -0.035em;
+  line-height: var(--wa-leading-tight, 1.25);
+}
+
+.checkout-progress-band__steps {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  min-width: 0;
+}
+
+.checkout-progress-band__secure {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--wa-space-2, 8px);
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  margin: 0;
+  padding: var(--wa-space-2, 8px) var(--wa-space-3, 12px);
+  color: var(--wa-color-primary, #1c1e4c);
+  font-size: var(--wa-text-sm, 0.875rem);
+  font-weight: var(--wa-weight-semibold, 600);
+  white-space: nowrap;
+  background: rgba(31, 138, 77, 0.08);
+  border: 1px solid rgba(31, 138, 77, 0.22);
+  border-radius: var(--wa-radius-full, 9999px);
+}
+
+.checkout-progress-band__secure-icon {
+  color: var(--wa-color-success, #1f8a4d);
+  flex: 0 0 auto;
+}
+
+.checkout-page-shell {
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(40px, 7vw, 88px) clamp(64px, 8vw, 112px);
+  background: #f7f8fb;
+}
+
+@media (max-width: 1023px) {
+  .checkout-progress-band__inner {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+    gap: var(--wa-space-4, 16px);
+    min-height: 0;
+    padding-block: var(--wa-space-4, 16px);
+  }
+
+  .checkout-progress-band__copy {
+    text-align: center;
+  }
+
+  .checkout-progress-band__steps,
+  .checkout-progress-band__secure {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .checkout-progress-band__secure {
+    justify-self: center;
+  }
+}
+
+@media (max-width: 640px) {
+  body.is-checkout #main-content {
+    background: #f7f8fb;
+  }
+
+  .checkout-progress-band {
+    position: relative;
+    top: auto;
+  }
+
+  .checkout-progress-band__inner {
+    padding-block: var(--wa-space-4, 16px) var(--wa-space-5, 20px);
+  }
+
+  .checkout-progress-band__title {
+    font-size: 1.35rem;
+  }
+
+  .checkout-progress-band__secure {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .checkout-page-shell {
+    padding-block: var(--wa-space-8, 32px) var(--wa-space-12, 48px);
+  }
+
+}

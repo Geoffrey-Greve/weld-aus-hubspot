@@ -1,0 +1,530 @@
+<!--
+  templateType: "page"
+  isAvailableForNewContent: true
+-->
+{#
+  membership.html - Weld Australia Membership Page
+  Intended URL: /membership
+  Public page - no HubSpot private-content gate.
+  Modules: hero → membership-intro → membership-value-grid → membership-options →
+           compare-table → membership-testimonials-grid → membership-directory-cta →
+           faq-accordion → cta-banner
+#}
+{% set page_title_exact = 'Welding Association Membership Australia | Weld Australia' %}
+{% set page_description = 'Join Australia\'s peak welding industry body. Access training, certification, technical support, networking and advocacy through Weld Australia membership.' %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body_class %}is-membership-page{% endblock %}
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ── § 1  HERO ────────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero"
+          background="primary"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="image"
+          background_image={"src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/Imported_Blog_Media/reciprocal-membership.jpg", "alt": "reciprocal-membership", "width": 980, "height": 653}
+          eyebrow="Australia's peak welding body"
+          headline="Welding association membership Australia"
+          subheadline="<p>Connect to the heart of Australia's welding industry - access technical expertise, training, certification, insights, and a powerful advocacy voice, from day one.</p>"
+          primary_cta={"label_text": "View membership options", "link": {"url": {"href": "#membership-options", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "Download prospectus", "link": {"url": {"href": "https://weldaustralia.com.au/wp-content/uploads/2025/10/Weld-Australia-Membership-Prospectus-2025-FINAL.pdf", "type": "EXTERNAL"}, "open_in_new_tab": true}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 2  BENEFITS INTRO ──────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/membership-intro"
+          label="Lifting capability, quality and safety"
+          section_id="benefits"
+          background="surface"
+          eyebrow="Benefits of welding association membership"
+          heading="Lifting capability, quality and safety - together"
+          body_text="<p>Weld Australia membership connects you to the heart of the welding industry. As the nation’s peak welding association, we provide members with access to technical expertise, training, certification, industry insights, and a powerful advocacy voice.</p><p>Our membership structure is built for how industry really works. We’ve mapped benefits to real needs, so every member - regardless of size or specialisation - unlocks practical value from day one.</p><p>Through events, forums and working groups, you’ll find a community that shares knowledge generously and collaborates to solve real-world challenges. As your collective voice, we advocate with governments, standards bodies and major procurers to strengthen local content, lift performance, and build a resilient, sovereign manufacturing base.</p>"
+          primary_cta={"label_text": "Explore membership options", "link": {"url": {"href": "#membership-options", "type": "EXTERNAL"}}}
+          secondary_cta={"label_text": "Membership prospectus", "link": {"url": {"href": "https://weldaustralia.com.au/wp-content/uploads/2025/10/Weld-Australia-Membership-Prospectus-2025-FINAL.pdf", "type": "EXTERNAL"}, "open_in_new_tab": true}}
+          video_url="https://youtu.be/_90zsT7p1vM"
+          video_label="Watch: why members join"
+          highlights=[
+            {"heading": "IIW representative", "body_text": "Australia’s voice in the global welding community", "accent_color": "gold"},
+            {"heading": "Globally recognised", "body_text": "Internationally accepted qualifications and certifications", "accent_color": "magenta"},
+            {"heading": "Industry connections", "body_text": "Bridging industry, education and government", "accent_color": "gold"},
+            {"heading": "Largest IWE team", "body_text": "Expert engineering support across every industry", "accent_color": "magenta"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 3  PRACTICAL VALUE GRID ───────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/membership-value-grid"
+          label="Practical value from day one"
+          section_id="why-join"
+          background="surface_alt"
+          eyebrow="Why join Weld Australia?"
+          heading="Practical value from day one"
+          cards=[
+            {"heading": "Stay competitive", "body_text": "Access expert guidance on Australian and international standards to meet compliance requirements and deliver high-quality work every time.", "icon_style": "shield", "accent_color": "navy"},
+            {"heading": "Build capability", "body_text": "Discounted training, certification, and engineering services to upskill your workforce and strengthen your business.", "icon_style": "book", "accent_color": "green"},
+            {"heading": "Reduce risk and rework", "body_text": "Leverage best-practice resources and technical support to improve efficiency, minimise errors, and protect your bottom line.", "icon_style": "risk", "accent_color": "gold"},
+            {"heading": "Grow your network", "body_text": "Connect with industry leaders, peers, and potential clients through events, forums, and working groups across Australia.", "icon_style": "network", "accent_color": "blue"},
+            {"heading": "Win more work", "body_text": "Enhance your credibility with recognised industry affiliation - helping you secure contracts and build trust with clients.", "icon_style": "growth", "accent_color": "magenta"},
+            {"heading": "Influence the industry", "body_text": "Be part of a collective voice advocating for stronger standards, local content, and a sustainable future for Australian manufacturing.", "icon_style": "star", "accent_color": "bronze"},
+            {"heading": "Access real value", "body_text": "Member-only discounts, supplier offers, credit vouchers, and practical tools that deliver immediate, measurable ROI.", "icon_style": "value", "accent_color": "green"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 4  MEMBERSHIP OPTIONS ─────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/membership-options"
+          label="Membership options"
+          section_id="membership-options"
+          background="surface"
+          eyebrow="Welding membership options"
+          heading="Find the membership that's right for you"
+          intro="<p>Whether you’re a fabricator, inspector, engineer, educator, apprentice, student, or supplier - we have a membership package built for your operating reality.</p>"
+          tabs=[
+            {
+              "tab_key": "corporate",
+              "tab_label": "Corporate",
+              "heading": "Corporate welding membership packages",
+              "body_text": "<p>Designed for fabricators, contractors, asset owners and primes delivering Australia’s most critical projects. Gain technical leadership, a powerful advocacy voice, substantial discounts, and trusted connections across the national supply chain.</p>",
+              "cards": [
+                {
+                  "title": "Gold",
+                  "subtitle": "Premier corporate membership",
+                  "badge_text": "Gold member",
+                  "tier_color": "gold",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$20,000",
+                  "credit_sub": "AUD per year",
+                  "benefits": [
+                    {"benefit_text": "1 seat per industry group - shape standards and policy"},
+                    {"benefit_text": "Personal advocacy and half-day strategy session with C-suite"},
+                    {"benefit_text": "10 Welding Excellence Awards tickets"},
+                    {"benefit_text": "15% off engineering services and company certification"},
+                    {"benefit_text": "20 MEM learning resource licences and 5 simulator days"},
+                    {"benefit_text": "Gold status listing and unlimited associate memberships"},
+                    {"benefit_text": "Feature opportunities across Weld Connect, Australian Welding and social media"}
+                  ],
+                  "cta_label": "Apply now",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                },
+                {
+                  "title": "Silver",
+                  "subtitle": "Full corporate membership",
+                  "badge_text": "Silver member",
+                  "tier_color": "silver",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$8,500",
+                  "credit_sub": "AUD per year",
+                  "benefits": [
+                    {"benefit_text": "Access to industry group outcomes"},
+                    {"benefit_text": "Roundtable invitation and 2 annual C-suite lunches"},
+                    {"benefit_text": "4 Welding Excellence Awards tickets"},
+                    {"benefit_text": "12% off engineering services and company certification"},
+                    {"benefit_text": "10 MEM learning resource licences and 2 simulator days"},
+                    {"benefit_text": "Silver status listing and unlimited associate memberships"},
+                    {"benefit_text": "Submit content to publications and weekly wrap"}
+                  ],
+                  "cta_label": "Apply now",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                },
+                {
+                  "title": "Bronze",
+                  "subtitle": "Entry-level corporate membership",
+                  "badge_text": "Bronze member",
+                  "tier_color": "bronze",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$3,000",
+                  "credit_sub": "AUD per year",
+                  "benefits": [
+                    {"benefit_text": "Roundtable invitation and campfire session access"},
+                    {"benefit_text": "2 Welding Excellence Awards tickets"},
+                    {"benefit_text": "8% off engineering services and company certification"},
+                    {"benefit_text": "5 MEM learning resource licences"},
+                    {"benefit_text": "Bronze status listing and member rates on services"},
+                    {"benefit_text": "Unlimited associate memberships and publications access"},
+                    {"benefit_text": "2 jobs board adverts and supplier discount ecosystem"}
+                  ],
+                  "cta_label": "Apply now",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                }
+              ],
+              "note": "<p>Credit vouchers are valid for one year and can be used towards engineering services and training. Contact Weld Australia for the full corporate prospectus.</p>"
+            },
+            {
+              "tab_key": "supplier",
+              "tab_label": "Industry supplier",
+              "heading": "Industry supplier membership packages",
+              "body_text": "<p>If your business supplies equipment, consumables, software or services to Australia’s welding and fabrication sector, this membership gives you trusted, permissioned access to a national audience of fabricators, contractors, inspectors, educators, asset owners and OEMs.</p>",
+              "cards": [
+                {
+                  "title": "Gold",
+                  "subtitle": "Maximum brand exposure",
+                  "badge_text": "Gold supplier",
+                  "tier_color": "gold",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$20,000",
+                  "credit_sub": "AUD per year",
+                  "benefits": [
+                    {"benefit_text": "Company showcase event per year"},
+                    {"benefit_text": "Priority rights for Industry Drinks Nights sponsorship"},
+                    {"benefit_text": "Gold sponsor recognition at Welding Excellence Awards"},
+                    {"benefit_text": "Newsletter, magazine, social and dedicated EDM opportunities"},
+                    {"benefit_text": "Personal advocacy and C-suite strategy session"}
+                  ],
+                  "cta_label": "Apply now",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                },
+                {
+                  "title": "Silver",
+                  "subtitle": "Targeted reach and recognition",
+                  "badge_text": "Silver supplier",
+                  "tier_color": "silver",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$15,000",
+                  "credit_sub": "AUD per year",
+                  "benefits": [
+                    {"benefit_text": "Company showcase webinar per year"},
+                    {"benefit_text": "Silver sponsor recognition at Welding Excellence Awards"},
+                    {"benefit_text": "Newsletter, magazine and social media exposure"},
+                    {"benefit_text": "Roundtable invitation and C-suite lunch access"},
+                    {"benefit_text": "10 MEM licences and 2 simulator days"}
+                  ],
+                  "cta_label": "Apply now",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                },
+                {
+                  "title": "Bronze",
+                  "subtitle": "Market presence and access",
+                  "badge_text": "Bronze supplier",
+                  "tier_color": "bronze",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$10,000",
+                  "credit_sub": "AUD per year",
+                  "benefits": [
+                    {"benefit_text": "Company showcase webinar per year"},
+                    {"benefit_text": "Bronze sponsor recognition at Welding Excellence Awards"},
+                    {"benefit_text": "Newsletter, magazine and social media exposure"},
+                    {"benefit_text": "Preferred supplier status and directory listing"},
+                    {"benefit_text": "5 MEM licences and technical resources access"}
+                  ],
+                  "cta_label": "Apply now",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                }
+              ]
+            },
+            {
+              "tab_key": "individual",
+              "tab_label": "Individual and reciprocal",
+              "heading": "Individual welding membership",
+              "body_text": "<p>Built for welders, inspectors, supervisors, engineers, and educators. Individual Membership gives you the skills, recognition and community to progress your career - a practical way to stay current with standards and be part of Australia’s largest welding network.</p>",
+              "cards": [
+                {
+                  "title": "Individual",
+                  "subtitle": "Welders, inspectors, engineers and educators",
+                  "badge_text": "Individual member",
+                  "tier_color": "navy",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$199",
+                  "credit_sub": "AUD per year",
+                  "benefits": [
+                    {"benefit_text": "Member rates on training, certification and exams"},
+                    {"benefit_text": "CPD pathways and structured upskilling"},
+                    {"benefit_text": "Timely guidance on Australian Standards"},
+                    {"benefit_text": "Free technical guidance notes"},
+                    {"benefit_text": "Industry supplier discounts"},
+                    {"benefit_text": "Weld Connect and Australian Welding Journal"},
+                    {"benefit_text": "Access to jobs board and free member events"}
+                  ],
+                  "cta_label": "Join now",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                },
+                {
+                  "title": "Reciprocal",
+                  "subtitle": "Partner associations and their members",
+                  "badge_text": "Reciprocal member",
+                  "tier_color": "blue",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$0",
+                  "credit_sub": "Free",
+                  "benefits": [
+                    {"benefit_text": "All individual member benefits included"},
+                    {"benefit_text": "Access to Weld Australia’s national network"},
+                    {"benefit_text": "Shared knowledge base and technical resources"},
+                    {"benefit_text": "Cross-association advocacy and policy voice"},
+                    {"benefit_text": "Enhanced credibility with stakeholders"}
+                  ],
+                  "cta_label": "Contact us",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                }
+              ],
+              "side_panel": {
+                "heading": "Who should join?",
+                "items": [
+                  {"item_text": "Welders and welding operators"},
+                  {"item_text": "Welding inspectors and supervisors"},
+                  {"item_text": "Welding engineers"},
+                  {"item_text": "Trainers and educators"},
+                  {"item_text": "NDT practitioners"}
+                ]
+              }
+            },
+            {
+              "tab_key": "free",
+              "tab_label": "Student & Apprentice",
+              "tab_badge": "Free",
+              "heading": "Free student, apprentice and TAFE membership",
+              "body_text": "<p>Weld Australia is committed to growing the next generation of Australia’s welding industry. We offer free membership to currently enrolled students, apprentices, and Australian TAFE institutions.</p>",
+              "cards": [
+                {
+                  "title": "Student and Apprentice membership",
+                  "subtitle": "For eligible students and apprentices at Australian RTOs",
+                  "badge_text": "Free - student and apprentice",
+                  "tier_color": "green",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$0",
+                  "credit_sub": "Free",
+                  "description": "Free for students and apprentices currently enrolled in a welding-related vocational training course at an Australian registered public provider.",
+                  "benefits": [
+                    {"benefit_text": "Member pricing on events, training and seminars"},
+                    {"benefit_text": "Invitations to free member-only events"},
+                    {"benefit_text": "Industry insights, magazine and newsletter"},
+                    {"benefit_text": "Supplier discounts and technical guidance notes"},
+                    {"benefit_text": "Be part of the collective - have your voice heard"}
+                  ],
+                  "cta_label": "Join for free",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                },
+                {
+                  "title": "TAFE and Government RTO membership",
+                  "subtitle": "For public providers supporting welding education",
+                  "badge_text": "Free - TAFE and training providers",
+                  "tier_color": "blue",
+                  "credit_label": "Membership fee",
+                  "credit_value": "$0",
+                  "credit_sub": "Free",
+                  "description": "A free membership pathway for eligible public training providers helping grow Australia’s welding workforce.",
+                  "benefits": [
+                    {"benefit_text": "Training and industry updates"},
+                    {"benefit_text": "Connection to Weld Australia’s education network"},
+                    {"benefit_text": "Access to relevant member events"},
+                    {"benefit_text": "Support for welding workforce development"}
+                  ],
+                  "cta_label": "Contact us",
+                  "cta_link": {"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+                }
+              ]
+            }
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 5  CORPORATE COMPARISON ───────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/compare-table"
+          label="Corporate membership comparison"
+          background="surface_alt"
+          overline="Compare tiers"
+          heading="Compare all corporate membership benefits"
+          tier_columns=[
+            {"label_text": "Gold", "accent_color": "gold", "is_highlighted": true},
+            {"label_text": "Silver", "accent_color": "silver", "is_highlighted": false},
+            {"label_text": "Bronze", "accent_color": "bronze", "is_highlighted": false}
+          ]
+          row_groups=[
+            {
+              "group_label": "Membership",
+              "rows": [
+                {"feature_label": "Associate memberships", "values": [{"text": "Unlimited"}, {"text": "Unlimited"}, {"text": "Unlimited"}]},
+                {"feature_label": "Credit voucher", "values": [{"text": "$3,000"}, {"text": "$2,000"}, {"text": "$750"}]},
+                {"feature_label": "Website directory listing", "values": [{"text": "Gold status"}, {"text": "Silver status"}, {"text": "Bronze status"}]}
+              ]
+            },
+            {
+              "group_label": "Advocacy",
+              "rows": [
+                {"feature_label": "Personal advocacy seat", "values": [{"included": true}, {"included": false}, {"included": false}]},
+                {"feature_label": "C-suite strategy session", "values": [{"text": "Half day"}, {"included": false}, {"included": false}]},
+                {"feature_label": "Roundtable invitation", "values": [{"included": true}, {"included": true}, {"included": true}]}
+              ]
+            },
+            {
+              "group_label": "Training & Support",
+              "rows": [
+                {"feature_label": "MEM learning licences", "values": [{"text": "20 ×"}, {"text": "10 ×"}, {"text": "5 ×"}]},
+                {"feature_label": "Welding simulator days", "values": [{"text": "5 ×"}, {"text": "2 ×"}, {"included": false}]},
+                {"feature_label": "Engineering services", "values": [{"text": "15% off"}, {"text": "12% off"}, {"text": "8% off"}]},
+                {"feature_label": "Business consultation", "values": [{"text": "4 × / yr"}, {"text": "2 × / yr"}, {"text": "1 × / yr"}]}
+              ]
+            },
+            {
+              "group_label": "Events",
+              "rows": [
+                {"feature_label": "Tickets per category", "values": [{"text": "10 ×"}, {"text": "4 ×"}, {"text": "2 ×"}]},
+                {"feature_label": "National Manufacturing Summit", "values": [{"text": "1 × ticket"}, {"text": "20% off"}, {"text": "10% off"}]}
+              ]
+            }
+          ]
+          collapsible=true
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 6  TESTIMONIALS ───────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/membership-testimonials-grid"
+          label="Member testimonials"
+          section_id="member-testimonials"
+          eyebrow="Member testimonials"
+          heading="What our members say"
+          testimonials=[
+            {"quote": "<p>As a Gold member, the training vouchers alone pay for membership many times over. The advocacy work on local content policy is a genuine bonus - we’ve seen real change.</p>", "name_text": "Michael Tran", "role": "CEO", "company": "ACME Welding Pty Ltd", "tier": "gold", "photo": {"src": "https://staging-441838610.weldaustralia.com/hs-fs/hubfs/placeholders/Images%20for%20webpage/Women%20in%20weld%2012.png?width=96&height=96&name=Women%20in%20weld%2012.png", "alt": "Michael Tran"}},
+            {"quote": "<p>Weld Australia’s training programs have been instrumental in upskilling our workforce. The quality and relevance of the courses is unmatched anywhere in the industry.</p>", "name_text": "James Okafor", "role": "Operations Manager", "company": "Pacific Steel Fabricators", "tier": "silver", "photo": {"src": "https://staging-441838610.weldaustralia.com/hs-fs/hubfs/placeholders/Stocked%20Images/iStock-595329266.jpg?width=96&height=96&name=iStock-595329266.jpg", "alt": "James Okafor"}},
+            {"quote": "<p>The IIW Inspector qualification opened doors globally. Weld Australia made the pathway clear and the support throughout the certification process was exceptional.</p>", "name_text": "Sarah Chen", "role": "Senior Welding Inspector", "company": "BHP Engineering", "tier": "individual", "photo": {"src": "https://staging-441838610.weldaustralia.com/hs-fs/hubfs/placeholders/Stocked%20Images/iStock-927902644%20(1)%20copy.jpg?width=96&height=96&name=iStock-927902644%20(1)%20copy.jpg", "alt": "Sarah Chen"}}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 7  MEMBER DIRECTORY CTA ───────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/membership-directory-cta"
+          label="Find a member CTA"
+          section_id="directory"
+          background="surface_alt"
+          eyebrow="Member directory"
+          heading="Find a Weld Australia member near you"
+          body_text="<p>Search our national directory of member companies - from Gold-tier fabricators and primes to specialist suppliers, training providers, and engineers.</p>"
+          cta_label="Browse member directory"
+          cta_link={"url": {"href": "/find-a-member/", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 8  FAQ - About page layout/module, membership questions ───────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/faq-accordion"
+          label="Membership FAQs"
+          section_id="faq"
+          background="surface"
+          overline="FAQs"
+          section_heading="Frequently asked questions"
+          emit_jsonld=true
+          items=[
+            {"title": "How do I join Weld Australia?", "body_text": "<p>You can apply for membership online via the Become a Member button on this page. Select the membership type that best suits your role or organisation, complete the application form, and our team will be in touch within 2 business days to confirm your membership and discuss your package.</p>", "is_open_default": true},
+            {"title": "What are the benefits of welding membership in Australia?", "body_text": "<p>Weld Australia membership delivers tangible value: discounted training, certification and engineering services; technical guidance on Australian and international standards; access to supplier discounts; industry publications including Australian Welding and Weld Connect; invitations to member events; a strong collective advocacy voice; and a national professional network.</p>"},
+            {"title": "Who can become a member of Weld Australia?", "body_text": "<p>Membership is open to any individual or organisation involved in or connected to the welding and fabrication industry in Australia. This includes welders, inspectors, supervisors, engineers, educators, fabricators, contractors, asset owners, OEMs, training providers, and industry suppliers.</p>"},
+            {"title": "What is the difference between Corporate Gold, Silver and Bronze?", "body_text": "<p>The three tiers are differentiated by the size of credit voucher, the depth of advocacy access, event tickets, training discounts, MEM learning licences, simulator days, publication opportunities and directory visibility. All three tiers include associate memberships for employees and access to relevant member resources.</p>"},
+            {"title": "How do credit vouchers work?", "body_text": "<p>Corporate membership credit vouchers are flexible credits your company can spend with Weld Australia on engineering services and training. They are valid for 12 months from the date of issue and cannot be accumulated across membership years. Gold members receive $3,000, Silver $2,000, and Bronze $750 per year.</p>"},
+            {"title": "Is student and apprentice membership really free?", "body_text": "<p>Yes. Student and Apprentice Membership is free for currently enrolled students and apprentices completing a welding-related vocational training course at an Australian Registered Training Organisation public provider.</p>"},
+            {"title": "Can my employees access member benefits?", "body_text": "<p>Yes. Corporate membership extends relevant member benefits and communications to nominated employees through associate memberships.</p>"},
+            {"title": "Where can I find Weld Australia members?", "body_text": "<p>You can browse the Weld Australia member directory via the Find a Member page. The directory is powered by the members HubDB table and can be filtered by tier and state.</p>"}
+          ]
+          contact_cta_label="Contact us"
+          contact_cta_link={"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 9  FINAL CTA ──────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA"
+          background="primary"
+          align="split"
+          headline="Ready to build a stronger future for Australian welding?"
+          body_text="<p>Join us, and let’s build a stronger future for Australian welding - together.</p>"
+          cta_label="Become a member"
+          cta_link={"url": {"href": "#membership-options", "type": "EXTERNAL"}}
+          secondary_cta_label="Download prospectus"
+          secondary_cta_link={"url": {"href": "https://weldaustralia.com.au/wp-content/uploads/2025/10/Weld-Australia-Membership-Prospectus-2025-FINAL.pdf", "type": "EXTERNAL"}, "open_in_new_tab": true}
+          tertiary_cta_label="Contact us"
+          tertiary_cta_link={"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+
+{#
+  The published /membership page has saved DnD body sections in HubSpot, so
+  adding a new default DnD section above does not affect the existing page.
+  This static editable module renders through the template for the current page.
+#}
+{% module "membership_year_in_review" path="../../modules/split-feature"
+  label="Year in Review download"
+  section_id="year-in-review"
+  background="surface_alt"
+  spacing="default"
+  media_type="image"
+  media_side="right"
+  overline="Year in Review"
+  heading="See what Weld Australia delivered in 2025"
+  body_text="<p>Explore Weld Australia's 2025 Year in Review - a snapshot of the advocacy, projects, events, training, certification and industry partnerships delivered for Australia's welding community.</p><p>The report highlights member outcomes, national initiatives and the momentum carrying into 2026.</p>"
+  image={"src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/resources/weld-australia-2025-year-in-review-cover.png", "alt": "Weld Australia 2025 Year in Review cover", "width": 992, "height": 1403}
+  buttons=[
+    {"label_text": "Download Year in Review", "url": {"url": {"href": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/resources/weld-australia-2025-year-in-review.pdf", "type": "EXTERNAL"}}, "style": "gold", "open_in_new_tab": true},
+    {"label_text": "View membership options", "url": {"url": {"href": "#membership-options", "type": "EXTERNAL"}}, "style": "navy-outline"}
+  ]
+%}
+
+<script>
+  (function () {
+    var yearInReview = document.getElementById('year-in-review');
+    var testimonials = document.getElementById('member-testimonials');
+    var target = testimonials && (testimonials.closest('.dnd-section') || testimonials);
+
+    if (yearInReview && target && target.parentNode) {
+      target.parentNode.insertBefore(yearInReview, target.nextSibling);
+    }
+  })();
+</script>
+{% endblock %}

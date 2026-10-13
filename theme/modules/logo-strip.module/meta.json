@@ -1,0 +1,14 @@
+{
+  "label": "Logo Strip",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Displays a horizontal row of logos. Source can be manually configured or pulled automatically from HubDB Gold-tier members.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["logos", "members", "social-proof"]
+}

@@ -1,0 +1,81 @@
+{#
+  auth-split-layout.module/module.html
+  Renders the brand/value-proposition panel on Login and Reset pages.
+  Placed in .auth-layout__brand (left column) - see login.html and reset.html.
+
+  CSS: theme/assets/css/auth.css (loaded via extra_head on auth page templates)
+
+  Fields:
+    brand_panel_heading  - large heading in the brand panel
+    brand_panel_body     - richtext body paragraph(s)
+    brand_panel_image    - optional background image (overlay auto-applied)
+    secondary_link_label - label for the secondary action link
+    secondary_link       - href for the secondary link
+    footer_microcopy     - SSO disclaimer at the base of the panel
+                           Per CLAUDE.md § 9.2: must NOT promise unified login in Phase 1.
+#}
+
+<div class="auth-brand">
+
+  {# ── Optional background image + dark overlay ─────────────────────────── #}
+  {% if module.brand_panel_image and module.brand_panel_image.src %}
+  <img
+    src="{{ module.brand_panel_image.src }}"
+    alt="{{ module.brand_panel_image.alt | default('') }}"
+    class="auth-brand__bg-img"
+    aria-hidden="true"
+    loading="eager"
+    decoding="async"
+    {% if module.brand_panel_image.width %}width="{{ module.brand_panel_image.width }}"{% endif %}
+    {% if module.brand_panel_image.height %}height="{{ module.brand_panel_image.height }}"{% endif %}
+  >
+  {% endif %}
+  <div class="auth-brand__overlay" aria-hidden="true"></div>
+
+  <div class="auth-brand__content">
+
+    {# ── Logo - links back to public site ─────────────────────────────── #}
+    <a href="/" class="auth-brand__logo-link" aria-label="Weld Australia - back to home page">
+      <img
+        src="{{ get_asset_url('../../assets/img/logo-light.svg') }}"
+        alt="Weld Australia"
+        class="auth-brand__logo-img"
+        height="48"
+        loading="eager"
+        decoding="async"
+      >
+    </a>
+
+    {# ── Heading + body ───────────────────────────────────────────────── #}
+    <div class="auth-brand__text">
+      {% if module.brand_panel_heading %}
+      <p class="auth-brand__heading">{{ module.brand_panel_heading }}</p>
+      {% endif %}
+
+      {% if module.brand_panel_body %}
+      <div class="auth-brand__body">{{ module.brand_panel_body }}</div>
+      {% endif %}
+    </div>
+
+    {# ── Secondary action link (e.g. "Become a member") ───────────────── #}
+    {% if module.secondary_link_label %}
+    <a
+      href="{{ module.secondary_link.url.href | default('/membership/') }}"
+      class="auth-brand__secondary-link"
+      {% if module.secondary_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >
+      {{ module.secondary_link_label }}
+      <svg class="auth-brand__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    {% endif %}
+
+    {# ── Footer microcopy - SSO Phase 1 disclaimer ────────────────────── #}
+    {% if module.footer_microcopy %}
+    <div class="auth-brand__microcopy">{{ module.footer_microcopy }}</div>
+    {% endif %}
+
+  </div>
+
+</div>

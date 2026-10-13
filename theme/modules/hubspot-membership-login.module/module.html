@@ -1,0 +1,117 @@
+{#
+  hubspot-membership-login.module/module.html
+  Custom-styled wrapper around HubSpot's native membership login widget.
+
+  Important: do not hand-code the membership login form. HubSpot's native
+  member_login widget injects the csrf_token, hubspotutk and hidden redirect
+  fields required by the private-content auth service.
+#}
+
+{%- set _error_code  = request.query_dict.loginReason | default('') -%}
+{%- set _member_dashboard_redirect = '/portal' -%}
+{%- set _raw_return  = request.query_dict.return | default(request.query_dict.redirect, true) | default('') -%}
+{%- if _raw_return and _raw_return[0:1] == '/' and _raw_return[0:2] != '//' -%}
+  {%- set _redirect = _raw_return -%}
+{%- else -%}
+  {%- set _redirect = module.post_login_redirect.url.href | default(_member_dashboard_redirect) -%}
+{%- endif -%}
+{%- if _redirect == '/portal/' or _redirect == '/portal' or _redirect == '/membership/' or _redirect == '/membership' -%}
+  {%- set _redirect = _member_dashboard_redirect -%}
+{%- endif -%}
+
+<div class="auth-login">
+
+  {% if module.eyebrow %}
+  <p class="wa-overline auth-login__eyebrow">
+    <span class="wa-overline__text">{{ module.eyebrow }}</span>
+  </p>
+  {% endif %}
+
+  {% if module.heading %}
+  <h2 class="auth-login__heading" id="member-login-heading">{{ module.heading }}</h2>
+  {% endif %}
+
+  {% if _error_code %}
+  <div class="alert alert-danger auth-login__error" role="alert" aria-live="polite">
+    {% if _error_code == 'wrongPassword' or _error_code == 'wrongCredentials' %}
+      Incorrect email or password. Please try again.
+    {% elif _error_code == 'noMembership' %}
+      No member account was found for that email address.
+      <a href="/membership/">Become a member</a> to get access.
+    {% elif _error_code == 'expired' or _error_code == 'membershipExpired' %}
+      Your membership has lapsed. Please <a href="/membership/">renew your membership</a> to restore portal access.
+    {% else %}
+      Sign in failed. Please check your details and try again.
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="auth-login__native" data-auth-redirect="{{ _redirect | escape_attr }}">
+    {% member_login "member_login_native" %}
+  </div>
+
+  <script>
+    (function () {
+      var root = document.currentScript && document.currentScript.previousElementSibling;
+      if (!root) return;
+
+      var redirect = root.getAttribute('data-auth-redirect') || '/portal';
+      var loginForm = root.querySelector('form[action^="/_hcms/mem/login"]');
+
+      if (loginForm) {
+        var redirectInputs = loginForm.querySelectorAll('input[name="redirect_url"]');
+        redirectInputs.forEach(function (input) {
+          input.value = redirect;
+        });
+
+        try {
+          var actionUrl = new URL(loginForm.getAttribute('action'), window.location.origin);
+          actionUrl.searchParams.set('redirect_url', redirect);
+          loginForm.setAttribute('action', actionUrl.pathname + actionUrl.search);
+        } catch (e) {
+          loginForm.setAttribute('action', '/_hcms/mem/login?redirect_url=' + encodeURIComponent(redirect));
+        }
+      }
+
+      var passwordlessForm = root.querySelector('form[action^="/_hcms/mem/login/passwordless-auth/request"]');
+      if (passwordlessForm) {
+        var passwordlessRedirect = passwordlessForm.querySelector('input[name="redirect_url"]');
+        if (passwordlessRedirect) passwordlessRedirect.value = redirect;
+      }
+
+      var resetLink = root.querySelector('#hs_login_reset');
+      if (resetLink) {
+        resetLink.setAttribute('href', '/_hcms/mem/reset/request?redirect_url=' + encodeURIComponent(redirect));
+      }
+
+      var registerLink = root.querySelector('#hs-login-self-registration-link a');
+      if (registerLink) {
+        registerLink.setAttribute('href', '/signup/');
+      }
+
+      // Issues 211/212: replace HubSpot's raw "…do not match all tracking
+      // cookies…" error (confusing wording; usually clears on retry) with
+      // friendly copy. The widget injects errors after submit, so observe too.
+      var FRIENDLY_LOGIN_ERROR = 'Something went wrong signing you in. Please try again.';
+      function remapLoginErrors() {
+        var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+        var node;
+        var matches = [];
+        while ((node = walker.nextNode())) {
+          if (/tracking cookies|do not match all/i.test(node.nodeValue || '')) {
+            matches.push(node);
+          }
+        }
+        matches.forEach(function (textNode) {
+          textNode.nodeValue = FRIENDLY_LOGIN_ERROR;
+        });
+      }
+      remapLoginErrors();
+      try {
+        var errorObserver = new MutationObserver(remapLoginErrors);
+        errorObserver.observe(root, { childList: true, subtree: true, characterData: true });
+      } catch (e) {}
+    })();
+  </script>
+
+</div>

@@ -1,0 +1,14 @@
+{
+  "label": "Featured Courses",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Pure HubL: renders 1-8 course cards from HubDB Table 1 (courses). Three selection modes: next upcoming, manually picked, or filtered by category. No interactive filtering - use course-filter for that.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["courses", "hubdb", "cards", "static"]
+}

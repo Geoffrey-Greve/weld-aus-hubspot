@@ -1,0 +1,95 @@
+<!--
+  templateType: page
+  label: Jobs
+  isAvailableForNewContent: true
+-->
+﻿{#
+  jobs.html - Job Board
+  URL: /jobs/
+  § 3.16 of docs/01-sitemap.md
+
+  Sections:
+    1. Hero              - title, intro, "Post a job" CTA for members
+    2. Jobs listing      - jobs-listing React island (filter: State / Type / Category)
+    3. Post a job promo  - conditional CTA for non-members
+
+  Modules used: hero, jobs-listing, cta-banner-conditional
+#}
+{% set page_title_exact = page_meta.html_title | default('Welding Job Board - Weld Australia') %}
+{% set page_description = page_meta.meta_description | default('Browse welding industry job vacancies across Australia. Find full-time, part-time, contract and apprenticeship opportunities posted by Weld Australia members.') %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 1  HERO - with "Post a job" CTA for members
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero - Job Board"
+          eyebrow="Welding jobs Australia"
+          headline="Welding Job Board"
+          subheadline="<p>Browse welding industry vacancies across Australia - full-time, part-time, contract and apprenticeship opportunities posted by our member network.</p>"
+          background="primary"
+          spacing="default"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 2  JOBS LISTING - React island
+          Featured jobs pinned at top; remainder sorted by newest date_posted.
+          Filter chips: State / Type.
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/jobs-listing"
+          label="Jobs listing"
+          section_heading="Current vacancies"
+          intro="<p>Looking for your next welding role? Browse open positions below. Featured listings are pinned at the top.</p>"
+          default_state_filter="any"
+          default_type_filter="any"
+          page_size=10
+          post_a_job_label="Post a job (members only)"
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 3  POST A JOB PROMO - conditional, non-members only
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner-conditional"
+          label="Post a job promo"
+          visitor_state="non_members"
+          headline="Recruiting? Post a job to our member network"
+          body_text="<p>Weld Australia members can list vacancies on our job board, reaching Australia's largest professional welding community. Become a member to post your first role.</p>"
+          cta_label="Explore membership"
+          secondary_cta_label="Contact us"
+          background="primary"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

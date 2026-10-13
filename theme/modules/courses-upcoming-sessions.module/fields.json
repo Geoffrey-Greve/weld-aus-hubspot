@@ -1,0 +1,85 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "upcoming-training"
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Upcoming training"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Courses with upcoming sessions"
+  },
+  {
+    "name": "view_all_label",
+    "label": "View all label",
+    "type": "text",
+    "default": "View all courses"
+  },
+  {
+    "name": "view_all_link",
+    "label": "View all link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": "#all-courses"
+      },
+      "open_in_new_tab": false,
+      "no_follow": false
+    }
+  },
+  {
+    "name": "max_count",
+    "label": "Maximum cards",
+    "type": "number",
+    "default": 3,
+    "min": 1,
+    "max": 12,
+    "help_text": "Number of upcoming course cards to show. The module reads from the courses HubDB table, excludes Cancelled/past sessions, sorts by start date soonest first, dedupes by course_slug, then displays the first N distinct courses."
+  },
+  {
+    "name": "empty_heading",
+    "label": "Empty heading",
+    "type": "text",
+    "default": "Upcoming sessions are being confirmed."
+  },
+  {
+    "name": "empty_body",
+    "label": "Empty body",
+    "type": "richtext",
+    "default": "<p>Please check back soon or contact the training team to discuss course availability.</p>"
+  },
+  {
+    "name": "empty_cta_label",
+    "label": "Empty CTA label",
+    "type": "text",
+    "default": "Contact training"
+  },
+  {
+    "name": "empty_cta_link",
+    "label": "Empty CTA link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": "/contact-us/"
+      },
+      "open_in_new_tab": false,
+      "no_follow": false
+    }
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

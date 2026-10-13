@@ -1,0 +1,14 @@
+{
+  "label": "Tier Card",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "A single membership tier card with price, benefits list (included/excluded checkmarks), and CTA buttons. Place inside a tabs.module or use standalone.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["membership", "tier", "pricing", "card"]
+}

@@ -1,0 +1,195 @@
+/*
+ * timeline.module/module.css
+ * Vertical timeline. Mobile: single-column.
+ * Desktop (≥1024px): alternating left/right with a centre spine.
+ */
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+
+.wa-timeline__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-12);
+  text-align: center;
+}
+
+.wa-section--primary .wa-timeline__heading,
+.wa-section--primary-dark .wa-timeline__heading {
+  color: var(--wa-color-on-primary);
+}
+
+/* ── Track (the spine container) ────────────────────────────────────────── */
+
+.wa-timeline__track {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-10);
+}
+
+/* Vertical spine line on desktop */
+@media (min-width: 1024px) {
+  .wa-timeline__track::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background-color: var(--wa-color-border);
+  }
+}
+
+/* ── Item ────────────────────────────────────────────────────────────────── */
+
+.wa-timeline__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4);
+}
+
+@media (min-width: 1024px) {
+  .wa-timeline__item {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  /* Left items: card on left, node on right */
+  .wa-timeline__item--left {
+    flex-direction: row;
+  }
+
+  /* Right items: node on left, card on right */
+  .wa-timeline__item--right {
+    flex-direction: row-reverse;
+  }
+}
+
+/* ── Node (year badge + spine dot) ──────────────────────────────────────── */
+
+.wa-timeline__node {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--wa-space-3);
+  flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+  .wa-timeline__node {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: var(--wa-space-2);
+    justify-content: center;
+    z-index: 1;
+  }
+}
+
+/* ── Year badge ──────────────────────────────────────────────────────────── */
+
+.wa-timeline__year-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-bold);
+  padding: var(--wa-space-1) var(--wa-space-3);
+  border-radius: var(--wa-radius-md);
+  white-space: nowrap;
+  min-height: 28px;
+  line-height: 1;
+}
+
+@media (min-width: 1024px) {
+  /* On desktop the badge sits above the spine; use a circle for the dot */
+  .wa-timeline__year-badge {
+    border-radius: var(--wa-radius-lg);
+    padding: var(--wa-space-2) var(--wa-space-4);
+  }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.wa-timeline__card {
+  background-color: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  padding: var(--wa-space-6);
+  box-shadow: var(--wa-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3);
+}
+
+@media (min-width: 1024px) {
+  .wa-timeline__item--left .wa-timeline__card {
+    width: calc(50% - var(--wa-space-12));
+    margin-right: auto;
+  }
+
+  .wa-timeline__item--right .wa-timeline__card {
+    width: calc(50% - var(--wa-space-12));
+    margin-left: auto;
+  }
+}
+
+.wa-section--primary .wa-timeline__card,
+.wa-section--primary-dark .wa-timeline__card {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Card image ──────────────────────────────────────────────────────────── */
+
+.wa-timeline__image-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--wa-radius-md);
+  background-color: var(--wa-color-surface-2);
+}
+
+.wa-timeline__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Card text ───────────────────────────────────────────────────────────── */
+
+.wa-timeline__card-heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.wa-section--primary .wa-timeline__card-heading,
+.wa-section--primary-dark .wa-timeline__card-heading {
+  color: var(--wa-color-on-primary);
+}
+
+.wa-timeline__card-body {
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text-muted);
+  line-height: 1.6;
+}
+
+.wa-timeline__card-body > *:first-child { margin-top: 0; }
+.wa-timeline__card-body > *:last-child  { margin-bottom: 0; }
+
+.wa-section--primary .wa-timeline__card-body,
+.wa-section--primary-dark .wa-timeline__card-body {
+  color: rgba(255, 255, 255, 0.8);
+}

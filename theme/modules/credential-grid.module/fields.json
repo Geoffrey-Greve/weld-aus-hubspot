@@ -1,0 +1,254 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White/Light"
+      ],
+      [
+        "surface_alt",
+        "Alt grey"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext"
+  },
+  {
+    "name": "source",
+    "label": "Credential source",
+    "type": "choice",
+    "choices": [
+      [
+        "manual",
+        "Manual module items"
+      ],
+      [
+        "hubdb_courses_certifications",
+        "HubDB courses certification rows"
+      ],
+      [
+        "hubdb_certification_pathways",
+        "HubDB certification pathways"
+      ]
+    ],
+    "default": "manual",
+    "help_text": "HubDB mode reads public individual certification pathways from HubDB and falls back to manual groups if no rows are found."
+  },
+  {
+    "name": "pathways_table",
+    "label": "Certification pathways HubDB table",
+    "type": "text",
+    "default": "certification_pathways",
+    "visibility": {
+      "controlling_field_path": "source",
+      "operator": "EQUAL",
+      "controlling_value_regex": "hubdb_certification_pathways"
+    }
+  },
+  {
+    "name": "pathways_audience",
+    "label": "Certification pathways audience",
+    "type": "choice",
+    "choices": [
+      [
+        "individual",
+        "Individual"
+      ],
+      [
+        "company",
+        "Company"
+      ],
+      [
+        "all",
+        "All"
+      ]
+    ],
+    "default": "individual",
+    "visibility": {
+      "controlling_field_path": "source",
+      "operator": "EQUAL",
+      "controlling_value_regex": "hubdb_certification_pathways"
+    }
+  },
+  {
+    "name": "courses_table",
+    "label": "Courses HubDB table",
+    "type": "text",
+    "default": "courses",
+    "visibility": {
+      "controlling_field_path": "source",
+      "operator": "EQUAL",
+      "controlling_value_regex": "hubdb_courses_certifications"
+    }
+  },
+  {
+    "name": "certification_slugs",
+    "label": "Certification course slugs",
+    "type": "text",
+    "default": "iwe,iwt,iws,iwi-s,iwi-b,as1796-cert-10,as1796-cert-11,as1796-cert-1-9,as2214,iso9606,welding-supervisor",
+    "help_text": "Comma-separated course_slug values to show from HubDB.",
+    "visibility": {
+      "controlling_field_path": "source",
+      "operator": "EQUAL",
+      "controlling_value_regex": "hubdb_courses_certifications"
+    }
+  },
+  {
+    "name": "groups",
+    "label": "Credential groups",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 10,
+      "default": 1
+    },
+    "children": [
+      {
+        "name": "group_label",
+        "label": "Group heading",
+        "type": "text"
+      },
+      {
+        "name": "items",
+        "label": "Credentials",
+        "type": "group",
+        "occurrence": {
+          "min": 1,
+          "max": 30,
+          "default": 1
+        },
+        "children": [
+          {
+            "name": "code",
+            "label": "Code badge (e.g. AS1796-10)",
+            "type": "text"
+          },
+          {
+            "name": "title",
+            "label": "Title",
+            "type": "text"
+          },
+          {
+            "name": "description",
+            "label": "Description",
+            "type": "text"
+          },
+          {
+            "name": "link_url",
+            "label": "Link URL",
+            "type": "link",
+            "help_text": "Optional. If left empty, common Weld Australia credential codes link to their matching course pages automatically."
+          },
+          {
+            "name": "accent_color",
+            "label": "Accent colour",
+            "type": "choice",
+            "choices": [
+              [
+                "gold",
+                "Gold"
+              ],
+              [
+                "navy",
+                "Navy"
+              ],
+              [
+                "magenta",
+                "Magenta"
+              ],
+              [
+                "green",
+                "Green"
+              ]
+            ],
+            "default": "navy"
+          }
+        ]
+      }
+    ]
+  }
+]

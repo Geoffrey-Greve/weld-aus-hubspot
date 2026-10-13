@@ -1,0 +1,52 @@
+<!--
+  templateType: page
+  label: Subscribe to Weld Australia updates
+  isAvailableForNewContent: true
+-->
+{#
+  subscribe.html - standalone public subscription page.
+  Suggested URL: /subscribe/
+
+  A public (non-gated) page that hosts the existing subscription-form module so
+  visitors can opt in to Weld Australia communications - Advocacy, Training,
+  Membership, Events and the newsletter - from one place.
+
+  ── HubSpot configuration required ──────────────────────────────────────────
+  • Assign this template to a page at /subscribe/.
+  • Select a HubSpot form from the "Subscription form" dropdown on the
+    subscription module below, in the page editor. If left blank, the module
+    renders the heading/intro plus an editor-only setup notice.
+
+  ── Layout ───────────────────────────────────────────────────────────────────
+  Public page - extends base.html (global header/footer, no portal sub-nav).
+#}
+{% set page_title_exact = 'Subscribe to updates - Weld Australia' %}
+{% set page_description = 'Subscribe to Weld Australia communications - advocacy, training, membership and events updates, plus the newsletter.' %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body_class %}is-subscribe-page{% endblock %}
+
+{% block body %}
+{% module "subscribe_hero" path="../../modules/hero"
+  label="Subscribe page hero"
+  background="primary"
+  height="compact"
+  alignment="left"
+  accent_bar=true
+  media_type="none"
+  eyebrow="Stay connected"
+  headline="Subscribe to Weld Australia updates"
+  subheadline="<p>Choose the updates that matter to you - advocacy, training, membership, events and our newsletter - and we'll keep you in the loop.</p>"
+%}
+
+{% module "subscribe_form" path="../../modules/subscription-form"
+  label="Subscription form"
+  heading="Manage your subscriptions"
+  section_id="subscribe"
+  intro="<p>Select the communications you'd like to receive from Weld Australia. You can update your preferences at any time.</p>"
+  subscription_options=["advocacy", "training", "membership", "events", "newsletter"]
+  background="surface"
+  spacing="spacious"
+%}
+{% endblock %}

@@ -1,0 +1,9 @@
+/*
+ * Weld Australia - Poppins local font stack
+ *
+ * @font-face declarations live in theme/templates/partials/_fonts.html and use
+ * HubL get_asset_url(). Do NOT re-add relative ../fonts/ urls here or into
+ * critical.css - those 404 when the stylesheet is served from HubSpot's CDN.
+ *
+ * Font files: theme/assets/fonts/Poppins-*.ttf
+ */

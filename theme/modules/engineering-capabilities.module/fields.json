@@ -1,0 +1,42 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "What we can help with"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Welding engineering capabilities"
+  },
+  {
+    "name": "intro_text",
+    "label": "Intro text",
+    "type": "richtext"
+  },
+  {
+    "name": "items",
+    "label": "Capability items",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 30,
+      "default": 8
+    },
+    "children": [
+      {
+        "name": "text",
+        "label": "Capability",
+        "type": "text"
+      }
+    ]
+  }
+]

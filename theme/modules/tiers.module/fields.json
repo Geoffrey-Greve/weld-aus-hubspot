@@ -1,0 +1,215 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "primary_dark",
+        "Deep navy"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "surface",
+        "Light"
+      ]
+    ],
+    "default": "primary_dark"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "overline",
+    "label": "Overline text (optional)",
+    "type": "text"
+  },
+  {
+    "name": "heading",
+    "label": "Section heading (optional)",
+    "type": "text"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text (optional)",
+    "type": "richtext"
+  },
+  {
+    "name": "tiers",
+    "label": "Membership tiers",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 8,
+      "default": 4
+    },
+    "children": [
+      {
+        "name": "badge_text",
+        "label": "Badge text",
+        "type": "text",
+        "help_text": "e.g. \"Gold Member\""
+      },
+      {
+        "name": "badge_color",
+        "label": "Badge colour",
+        "type": "choice",
+        "choices": [
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "silver",
+            "Silver"
+          ],
+          [
+            "bronze",
+            "Bronze"
+          ],
+          [
+            "magenta",
+            "Magenta"
+          ],
+          [
+            "navy",
+            "Navy"
+          ],
+          [
+            "green",
+            "Green"
+          ]
+        ],
+        "default": "gold"
+      },
+      {
+        "name": "badge_image",
+        "label": "Badge image",
+        "type": "image",
+        "help_text": "Optional membership badge image shown at the top of the tier card. If empty, the theme uses the matching default badge asset."
+      },
+      {
+        "name": "name_text",
+        "label": "Tier name",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "price",
+        "label": "Price",
+        "type": "text",
+        "help_text": "e.g. \"$1,500\""
+      },
+      {
+        "name": "price_sub",
+        "label": "Price sub-label",
+        "type": "text",
+        "help_text": "e.g. \"per year + GST\""
+      },
+      {
+        "name": "description",
+        "label": "Short description",
+        "type": "text"
+      },
+      {
+        "name": "link",
+        "label": "Learn more link",
+        "type": "link"
+      },
+      {
+        "name": "button_label",
+        "label": "Button label",
+        "type": "text",
+        "default": "Learn more"
+      },
+      {
+        "name": "button_style",
+        "label": "Button style",
+        "type": "choice",
+        "choices": [
+          [
+            "outline",
+            "Outline"
+          ],
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "navy",
+            "Navy"
+          ],
+          [
+            "white",
+            "White"
+          ]
+        ],
+        "default": "outline"
+      }
+    ]
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA button label (optional)",
+    "type": "text"
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA button link",
+    "type": "link"
+  }
+]

@@ -1,0 +1,178 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface light"
+      ],
+      [
+        "surface_alt",
+        "Alt grey"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "primary"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  },
+  {
+    "name": "overline",
+    "label": "Overline text (optional)",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "label": "Section heading (optional)",
+    "type": "text"
+  },
+  {
+    "name": "background_image",
+    "label": "Background image (optional)",
+    "type": "image",
+    "help_text": "Shown behind the stats with a dark overlay. When set, the stat tiles render as translucent glass cards. Leave blank for a solid background."
+  },
+  {
+    "name": "background_overlay",
+    "label": "Background image overlay opacity",
+    "type": "number",
+    "default": 82,
+    "min": 0,
+    "max": 100,
+    "suffix": "%",
+    "help_text": "Darkness of the navy overlay over the background image. Higher = darker / more readable text."
+  },
+  {
+    "name": "stats",
+    "label": "Stats",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 8,
+      "default": 4
+    },
+    "children": [
+      {
+        "name": "value_text",
+        "label": "Value",
+        "type": "text",
+        "required": true,
+        "help_text": "e.g. \"10,000+\"",
+        "default": ""
+      },
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text",
+        "required": true,
+        "help_text": "e.g. \"Members Australia-wide\"",
+        "default": ""
+      },
+      {
+        "name": "sublabel",
+        "label": "Sub-label / description (optional)",
+        "type": "text",
+        "help_text": "Small muted line beneath the label, e.g. \"Individuals and organisations across Australia\".",
+        "default": ""
+      },
+      {
+        "name": "accent_color",
+        "label": "Accent colour",
+        "type": "choice",
+        "choices": [
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "magenta",
+            "Magenta"
+          ],
+          [
+            "navy",
+            "Navy"
+          ]
+        ],
+        "default": "gold"
+      }
+    ]
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA button label (optional)",
+    "type": "text"
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA button link",
+    "type": "link"
+  }
+]

@@ -1,0 +1,208 @@
+/*
+ * document-list.module/module.css
+ * Styles for the HubDB-driven document/resource list.
+ * Mobile-first: single-column stacked items below 640px, then inline layout.
+ * WCAG 2.5.5: CTA buttons meet 44×44px min touch target.
+ */
+
+.wa-document-list__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl, 1.75rem);
+  font-weight: 700;
+  color: var(--wa-color-text);
+  margin-bottom: var(--wa-space-8, 2rem);
+}
+
+/* ── List reset ────────────────────────────────────────────────────────── */
+.wa-document-list__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 0.75rem);
+}
+
+/* ── Individual item ───────────────────────────────────────────────────── */
+.wa-document-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-4, 1rem);
+  padding: var(--wa-space-4, 1rem);
+  background-color: var(--wa-color-surface, #fff);
+  border: 1px solid var(--wa-color-border, #e5e7eb);
+  border-radius: var(--wa-radius-md, 8px);
+  box-shadow: var(--wa-shadow-card, 0 1px 3px rgba(0,0,0,.06));
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  flex-wrap: wrap;
+}
+
+.wa-document-list__item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--wa-color-primary);
+}
+
+.wa-document-list__item--locked {
+  opacity: 0.8;
+  background-color: var(--wa-color-surface-alt, #f9fafb);
+}
+
+/* ── Icon ──────────────────────────────────────────────────────────────── */
+.wa-document-list__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: color-mix(in srgb, var(--wa-color-primary) 10%, transparent);
+  border-radius: var(--wa-radius-sm, 4px);
+  color: var(--wa-color-primary);
+}
+
+/* ── Content (title + description) ────────────────────────────────────── */
+.wa-document-list__content {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-1, 0.25rem);
+  min-width: 0;
+}
+
+.wa-document-list__title {
+  font-weight: 600;
+  color: var(--wa-color-text);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.wa-document-list__desc {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted);
+  line-height: 1.5;
+}
+
+.wa-document-list__date {
+  font-size: 0.8125rem;
+  /* Do not stack opacity on text-muted — 0.75 dropped contrast below AA. */
+  color: var(--wa-color-text-muted);
+}
+
+/* ── Badges ────────────────────────────────────────────────────────────── */
+.wa-document-list__badges {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-2, 0.5rem);
+  flex-shrink: 0;
+}
+
+.wa-document-list__type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--wa-radius-sm, 4px);
+  font-size: var(--wa-text-xs); /* 12px - WCAG 1.4.4 */
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background-color: var(--wa-color-surface-alt, #f3f4f6);
+  color: var(--wa-color-text-muted);
+}
+
+.wa-document-list__type-badge--pdf {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.wa-document-list__type-badge--video {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.wa-document-list__type-badge--doc {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.wa-document-list__tier-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--wa-radius-sm, 4px);
+  font-size: var(--wa-text-xs); /* 12px - WCAG 1.4.4 */
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background-color: color-mix(in srgb, var(--wa-color-tier-gold, #C9A227) 15%, transparent);
+  color: color-mix(in srgb, var(--wa-color-tier-gold, #C9A227) 80%, #333);
+  white-space: nowrap;
+}
+
+.wa-document-list__tier-badge--gold {
+  background-color: color-mix(in srgb, var(--wa-color-tier-gold, #C9A227) 15%, transparent);
+  color: color-mix(in srgb, var(--wa-color-tier-gold, #C9A227) 80%, #333);
+}
+
+.wa-document-list__tier-badge--silver {
+  background-color: color-mix(in srgb, var(--wa-color-tier-silver, #A0A0A0) 15%, transparent);
+  color: color-mix(in srgb, var(--wa-color-tier-silver, #A0A0A0) 80%, #333);
+}
+
+.wa-document-list__tier-badge--bronze {
+  background-color: color-mix(in srgb, var(--wa-color-tier-bronze, #B27330) 15%, transparent);
+  color: color-mix(in srgb, var(--wa-color-tier-bronze, #B27330) 80%, #333);
+}
+
+.wa-document-list__tier-badge--member {
+  background-color: color-mix(in srgb, var(--wa-color-primary) 12%, transparent);
+  color: var(--wa-color-primary);
+}
+
+/* ── Action (CTA button) ───────────────────────────────────────────────── */
+.wa-document-list__action {
+  flex-shrink: 0;
+}
+
+.wa-document-list__cta {
+  min-height: var(--wa-touch-min, 44px);
+  min-width: 44px;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wa-space-2, 0.5rem);
+  /* No `white-space: nowrap` - it out-specified the .btn base and would stop a
+     long CTA label wrapping on a narrow viewport. */
+}
+
+.wa-document-list__lock-icon {
+  flex-shrink: 0;
+}
+
+/* ── Empty state ───────────────────────────────────────────────────────── */
+.wa-document-list__empty {
+  color: var(--wa-color-text-muted);
+  text-align: center;
+  padding: var(--wa-space-16, 4rem) 0;
+  font-size: 1rem;
+}
+
+/* ── Mobile: wrap badges below content ────────────────────────────────── */
+@media (max-width: 639px) {
+  .wa-document-list__item {
+    flex-wrap: wrap;
+  }
+
+  .wa-document-list__badges {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .wa-document-list__action {
+    order: 4;
+    flex-basis: 100%;
+  }
+
+  .wa-document-list__cta {
+    width: 100%;
+    justify-content: center;
+  }
+}

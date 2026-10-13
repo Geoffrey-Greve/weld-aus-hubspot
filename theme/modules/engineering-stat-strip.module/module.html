@@ -1,0 +1,15 @@
+<section class="wa-engineering-stat-strip" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container wa-engineering-stat-strip__grid">
+    {% for stat in module.stats %}
+      <div class="wa-engineering-stat-strip__item">
+        {% if stat.value_text %}
+          <strong>{{ stat.value_text }}</strong>
+        {% endif %}
+        <span>{{ stat.label_text }}</span>
+        {% if stat.sublabel %}
+          <small>{{ stat.sublabel }}</small>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</section>

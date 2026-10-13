@@ -1,0 +1,14 @@
+{
+  "label": "Feature Banner",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Navy rounded-corner banner with copy + CTAs on one side and image or badge on the other. Replaces feature-section.module.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["banner", "feature", "cta", "navy"]
+}

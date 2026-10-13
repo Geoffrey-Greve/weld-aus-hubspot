@@ -1,0 +1,205 @@
+<!--
+  templateType: none
+-->
+{#
+  _resource-member-resolve.html
+
+  Shared, read-only membership resolver for Resources listing/detail access.
+  Mirrors the company-aware course/checkout approach so corporate Gold/Silver/
+  Bronze members are treated as members even when their individual contact tier
+  is blank or weaker.
+
+  Sets `resource_member` namespace:
+    logged_in, email, status_raw, tier, is_active, tier_rank
+#}
+{% import "./_member-tier.html" as wa_tier %}
+
+{% set resource_member = namespace(
+  logged_in=request_contact.is_logged_in | default(false),
+  email='',
+  contact_id='',
+  status_raw=request_contact.individual_membership_status | default(contact.individual_membership_status, true) | default('', true) | string | trim,
+  tier_raw=request_contact.individual_membership_type_2 | default(contact.individual_membership_type_2, true) | default('', true) | string | trim,
+  company_id=(request_contact.associatedcompanyid | default(contact.associatedcompanyid, true) | default(0, true) | int),
+  company_tier=request_contact.wa_company_membership_tier | default(contact.wa_company_membership_tier, true) | default('', true) | string | trim,
+  company_status=request_contact.wa_company_membership_status | default(contact.wa_company_membership_status, true) | default('', true) | string | trim,
+  member_id=request_contact.cams_person_id | default(request_contact.cams__imem_person_id, true) | default('', true) | string | trim,
+  directory_tier='',
+  directory_active=false,
+  is_active=false,
+  tier='',
+  tier_rank=0
+) %}
+
+{% set resource_member_contact_properties = 'email,associatedcompanyid,individual_membership_status,individual_membership_type_2,wa_company_membership_tier,cams_person_id,cams__imem_person_id,hs_object_id' %}
+{% set resource_member_contact = namespace(tier='', status='', company_id=0, email='', member_id='', found=false, seen=[]) %}
+
+{% if resource_member.logged_in %}
+  {% set resource_member_contact_id_candidates = [
+    request_contact.id | default('', true) | string | trim,
+    request_contact.hs_object_id | default('', true) | string | trim,
+    request_contact.vid | default('', true) | string | trim,
+    contact.id | default('', true) | string | trim,
+    contact.hs_object_id | default('', true) | string | trim,
+    contact.vid | default('', true) | string | trim
+  ] %}
+
+  {% for resource_member_contact_candidate in resource_member_contact_id_candidates %}
+    {% set resource_member_candidate_id = resource_member_contact_candidate | string | trim %}
+    {% if resource_member_candidate_id and resource_member_candidate_id != '[object Object]' and resource_member_candidate_id != '[object object]' and resource_member_candidate_id not in resource_member_contact.seen and not resource_member_contact.found %}
+      {% set resource_member_contact.seen = resource_member_contact.seen + [resource_member_candidate_id] %}
+      {% set resource_member_record = crm_object('contact', resource_member_candidate_id, resource_member_contact_properties) %}
+      {% if resource_member_record %}
+        {% set resource_member_props = resource_member_record.properties | default({}, true) %}
+        {% set resource_member_candidate_tier = resource_member_record.individual_membership_type_2 | default(resource_member_props.individual_membership_type_2, true) | default('', true) | string | trim %}
+        {% set resource_member_candidate_status = resource_member_record.individual_membership_status | default(resource_member_props.individual_membership_status, true) | default('', true) | string | trim %}
+        {% set resource_member_candidate_company_id = resource_member_record.associatedcompanyid | default(resource_member_props.associatedcompanyid, true) | default(0, true) | int %}
+        {% set resource_member_candidate_email = resource_member_record.email | default(resource_member_props.email, true) | default('', true) | string | lower | trim %}
+        {% set resource_member_candidate_company_tier = resource_member_record.wa_company_membership_tier | default(resource_member_props.wa_company_membership_tier, true) | default('', true) | string | trim %}
+        {% set resource_member_candidate_member_id = resource_member_record.cams_person_id | default(resource_member_props.cams_person_id, true) | default(resource_member_record.cams__imem_person_id, true) | default(resource_member_props.cams__imem_person_id, true) | default('', true) | string | trim %}
+        {% if resource_member_candidate_tier or resource_member_candidate_status or resource_member_candidate_company_id or resource_member_candidate_email or resource_member_candidate_company_tier or resource_member_candidate_member_id %}
+          {% set resource_member_contact.tier = resource_member_candidate_tier %}
+          {% set resource_member_contact.status = resource_member_candidate_status %}
+          {% set resource_member_contact.company_id = resource_member_candidate_company_id %}
+          {% set resource_member_contact.email = resource_member_candidate_email %}
+          {% set resource_member_contact.member_id = resource_member_candidate_member_id %}
+          {% set resource_member.contact_id = resource_member_candidate_id %}
+          {% if resource_member_candidate_company_tier %}
+            {% set resource_member.company_tier = resource_member_candidate_company_tier %}
+          {% endif %}
+          {% set resource_member_contact.found = true %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {% if not resource_member_contact.found %}
+    {% set resource_member_email_lookup = request_contact.email | default(request_contact.hs_content_membership_email, true) | default(request_contact.member_email, true) | default(contact.email, true) | default(contact.hs_content_membership_email, true) | default(contact.member_email, true) | default('', true) | string | lower | trim %}
+    {% if resource_member_email_lookup and '@' in resource_member_email_lookup %}
+      {% set resource_member_query = crm_objects('contact', 'email=' ~ resource_member_email_lookup ~ '&limit=1', resource_member_contact_properties) %}
+      {% set resource_member_matches = resource_member_query.results if resource_member_query.results else resource_member_query %}
+      {% for resource_member_match in resource_member_matches %}
+        {% if resource_member_match and not resource_member_contact.found %}
+          {% set resource_member_match_props = resource_member_match.properties | default({}, true) %}
+          {% set resource_member_contact.tier = resource_member_match.individual_membership_type_2 | default(resource_member_match_props.individual_membership_type_2, true) | default('', true) | string | trim %}
+          {% set resource_member_contact.status = resource_member_match.individual_membership_status | default(resource_member_match_props.individual_membership_status, true) | default('', true) | string | trim %}
+          {% set resource_member_contact.company_id = resource_member_match.associatedcompanyid | default(resource_member_match_props.associatedcompanyid, true) | default(0, true) | int %}
+          {% set resource_member_contact.email = resource_member_match.email | default(resource_member_match_props.email, true) | default('', true) | string | lower | trim %}
+          {% set resource_member_contact.member_id = resource_member_match.cams_person_id | default(resource_member_match_props.cams_person_id, true) | default(resource_member_match.cams__imem_person_id, true) | default(resource_member_match_props.cams__imem_person_id, true) | default('', true) | string | trim %}
+          {% set resource_member.contact_id = resource_member_match.hs_object_id | default(resource_member_match_props.hs_object_id, true) | default('', true) | string | trim %}
+          {% set resource_member_match_company_tier = resource_member_match.wa_company_membership_tier | default(resource_member_match_props.wa_company_membership_tier, true) | default('', true) | string | trim %}
+          {% if resource_member_match_company_tier %}
+            {% set resource_member.company_tier = resource_member_match_company_tier %}
+          {% endif %}
+          {% set resource_member_contact.found = true %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% if resource_member_contact.tier %}
+  {% set resource_member.tier_raw = resource_member_contact.tier %}
+{% endif %}
+{% if resource_member_contact.status %}
+  {% set resource_member.status_raw = resource_member_contact.status %}
+{% endif %}
+{% if resource_member_contact.company_id %}
+  {% set resource_member.company_id = resource_member_contact.company_id %}
+{% endif %}
+{% if resource_member_contact.email %}
+  {% set resource_member.email = resource_member_contact.email %}
+{% endif %}
+{% if resource_member_contact.member_id %}
+  {% set resource_member.member_id = resource_member_contact.member_id %}
+{% endif %}
+
+{% if not resource_member.email %}
+  {% set resource_member.email = request_contact.email | default(request_contact.hs_content_membership_email, true) | default(request_contact.member_email, true) | default(contact.email, true) | default(contact.hs_content_membership_email, true) | default(contact.member_email, true) | default('', true) | string | lower | trim %}
+{% endif %}
+
+{% if resource_member.logged_in and resource_member.company_id %}
+  {% set resource_member_company = crm_object('company', resource_member.company_id, 'corporate_membership_status,corporate_membership_level_2,industry_supplier_membership_status,industry_supplier_membership_level_2') %}
+  {% if resource_member_company %}
+    {% set resource_member_company_props = resource_member_company.properties | default({}, true) %}
+    {% set resource_member_company_tier = resource_member_company.corporate_membership_level_2 | default(resource_member_company_props.corporate_membership_level_2, true) | default(resource_member_company.industry_supplier_membership_level_2, true) | default(resource_member_company_props.industry_supplier_membership_level_2, true) | default('', true) | string | trim %}
+    {% set resource_member_company_status = resource_member_company.corporate_membership_status | default(resource_member_company_props.corporate_membership_status, true) | default(resource_member_company.industry_supplier_membership_status, true) | default(resource_member_company_props.industry_supplier_membership_status, true) | default('', true) | string | trim %}
+    {% if resource_member_company_tier %}
+      {% set resource_member.company_tier = resource_member_company_tier %}
+    {% endif %}
+    {% if resource_member_company_status %}
+      {% set resource_member.company_status = resource_member_company_status %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% set resource_member.company_tier = wa_tier.scrub(resource_member.company_tier) | trim %}
+{% set resource_member.company_status = wa_tier.scrub(resource_member.company_status) | trim %}
+{% set resource_member.status_raw = wa_tier.scrub(resource_member.status_raw) | trim %}
+{% set resource_member.tier_raw = wa_tier.prefer_pricing_tier(resource_member.tier_raw, resource_member.company_tier) | trim %}
+{% set resource_member.tier_raw = wa_tier.scrub(resource_member.tier_raw) | trim %}
+
+{% set resource_member_contact_status_is_real = wa_tier.is_real_tier(resource_member.status_raw) | trim %}
+{% if resource_member.company_status and not resource_member_contact_status_is_real %}
+  {% set resource_member.status_raw = resource_member.company_status %}
+{% endif %}
+
+{% if resource_member.logged_in and resource_member.email %}
+  {% for resource_member_row in hubdb_table_rows('members', 'orderBy=company_name&limit=1000') %}
+    {% set resource_member_row_email = resource_member_row.contact_email | default('', true) | string | lower | trim %}
+    {% if not resource_member.directory_active and resource_member_row_email and resource_member_row_email == resource_member.email %}
+      {% set resource_member_row_active = resource_member_row.is_active | default(false, true) | string | lower | trim %}
+      {% set resource_member.directory_active = resource_member_row_active in ['true', '1', 'yes'] %}
+      {% if resource_member.directory_active %}
+        {% set resource_member.directory_tier = resource_member_row.member_tier.name | default(resource_member_row.member_tier.label, true) | default(resource_member_row.member_tier, true) | default('', true) | string | trim %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% if not resource_member.tier_raw and resource_member.directory_tier %}
+  {% set resource_member.tier_raw = resource_member.directory_tier %}
+{% endif %}
+
+{% set resource_member_status_key = resource_member.status_raw | lower | replace(' ', '_') | replace('-', '_') %}
+{% set resource_member_status_is_active = resource_member_status_key in ['current', 'active', 'grace', 'grace_period', 'honorary', 'honourary'] or 'current' in resource_member_status_key or 'active' in resource_member_status_key or 'grace' in resource_member_status_key or 'honorary' in resource_member_status_key or 'honourary' in resource_member_status_key %}
+{% set resource_member_status_is_inactive = resource_member_status_key in ['lapsed', 'expired', 'inactive', 'cancelled', 'canceled'] %}
+{% set resource_member_tier_is_member = wa_tier.is_real_tier(resource_member.tier_raw) | trim %}
+{% set resource_member.is_active = resource_member.logged_in and not resource_member_status_is_inactive and (resource_member_status_is_active or resource_member.directory_active or resource_member_tier_is_member or resource_member.member_id) %}
+
+{% set qa_persona_email = resource_member.email %}
+{% include "./_qa-persona-resolve.html" %}
+{% if resource_member.logged_in and qa_persona.found %}
+  {% if qa_persona.entitled %}
+    {% set resource_member.is_active = true %}
+    {% set resource_member.tier_raw = qa_persona.pricing_tier %}
+    {% if qa_persona.membership_status %}
+      {% set resource_member.status_raw = qa_persona.membership_status %}
+    {% endif %}
+  {% else %}
+    {% set resource_member.is_active = false %}
+    {% set resource_member.tier_raw = '' %}
+  {% endif %}
+{% endif %}
+
+{% if resource_member.is_active %}
+  {% set resource_member.tier = resource_member.tier_raw | default('Member', true) | string | trim %}
+  {% if not resource_member.tier %}
+    {% set resource_member.tier = 'Member' %}
+  {% endif %}
+{% else %}
+  {% set resource_member.tier = '' %}
+{% endif %}
+
+{% set resource_member_tier_key = resource_member.tier | lower | replace(' ', '_') | replace('-', '_') %}
+{% if resource_member.is_active and 'gold' in resource_member_tier_key %}
+  {% set resource_member.tier_rank = 4 %}
+{% elif resource_member.is_active and 'silver' in resource_member_tier_key %}
+  {% set resource_member.tier_rank = 3 %}
+{% elif resource_member.is_active and 'bronze' in resource_member_tier_key %}
+  {% set resource_member.tier_rank = 2 %}
+{% elif resource_member.is_active %}
+  {% set resource_member.tier_rank = 1 %}
+{% else %}
+  {% set resource_member.tier_rank = 0 %}
+{% endif %}

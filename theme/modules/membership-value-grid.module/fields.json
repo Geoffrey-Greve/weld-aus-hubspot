@@ -1,0 +1,106 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "why-join"
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      ["surface", "White"],
+      ["surface_alt", "Light grey"]
+    ],
+    "default": "surface_alt"
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Why join Weld Australia?"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Practical value from day one"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext"
+  },
+  {
+    "name": "cards",
+    "label": "Cards",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 12,
+      "default": 7
+    },
+    "children": [
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "body_text",
+        "label": "Body text",
+        "type": "text"
+      },
+      {
+        "name": "icon_style",
+        "label": "Icon style",
+        "type": "choice",
+        "choices": [
+          ["shield", "Shield"],
+          ["book", "Book"],
+          ["risk", "Risk"],
+          ["network", "Network"],
+          ["growth", "Growth"],
+          ["star", "Star"],
+          ["value", "Value"]
+        ],
+        "default": "shield"
+      },
+      {
+        "name": "accent_color",
+        "label": "Accent colour",
+        "type": "choice",
+        "choices": [
+          ["navy", "Navy"],
+          ["green", "Green"],
+          ["gold", "Gold"],
+          ["blue", "Blue"],
+          ["magenta", "Magenta"],
+          ["bronze", "Bronze"]
+        ],
+        "default": "navy"
+      }
+    ]
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

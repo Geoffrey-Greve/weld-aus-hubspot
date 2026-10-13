@@ -1,0 +1,331 @@
+{%- set _bg = module.background|default('surface') -%}
+{%- set _vis = module.visibility|default(['mobile','tablet','desktop']) -%}
+{%- set _section_classes = 'wa-membership-options wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-spacious' -%}
+{%- if 'mobile' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{#
+  ── Downgrade guard (QA ref 44) ─────────────────────────────────────────────
+  A Corporate or Industry Supplier member may stay where they are or move up,
+  never down. The cards are editor content with no per-card visibility rule, so
+  a smart-content attempt could only remove a card from the Default view as
+  well - which is why this is here and not in HubSpot.
+
+  Who the visitor is comes from _membership-rank.html, shared with
+  tier-comparison on /membership/corporate: the company tier through the shared
+  ladder, a Refuel QA persona over it, and a lapsed status resetting it. See
+  there for why each is needed. The first guard read the company tier alone.
+
+  FAILS OPEN, deliberately. Only a tier we positively recognise as gold or
+  silver restricts anything; a blank, unknown or individual tier leaves every
+  card exactly as the editor wrote it. Of the two ways to be wrong, one shows a
+  member a plan they cannot take, and the other hides the plan a prospect came
+  to buy.
+
+  Nothing is hidden either way: a lower card still renders with its price and
+  benefits, because the comparison is the point of the page. It just stops
+  offering a join link, and the member's own level says so.
+#}
+{% include "../../templates/partials/_membership-rank.html" %}
+{%- set _mo_member_rank = wa_membership_rank.rank -%}
+{%- set _mo_tier_label = wa_membership_rank.tier_label | default('your', true) -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section class="{{ _section_classes }}" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container">
+    {% if module.tabs %}
+    {#
+      Deep-link anchors - one always-visible, zero-height target per tab, so
+      /membership#membership-<tab_key> resolves to a real element. The browser
+      scrolls to it natively before module.js runs; the script then activates the
+      matching tab. Without these, tab-level hashes had no DOM target at all and
+      depended entirely on the JS fallback firing at the right moment.
+
+      `individual` and `reciprocal` are skipped on purpose: those ids already
+      belong to cards further down (see the _card_anchor special case) and ids
+      must stay unique.
+    #}
+    {%- set _reserved_anchor_keys = ['individual', 'reciprocal'] -%}
+    <div class="wa-membership-options__anchors" aria-hidden="true">
+      {%- for tab in module.tabs -%}
+      {%- set _key = tab.tab_key|default('tab-' ~ loop.index)|lower|replace(' ', '-') -%}
+      {%- if _key not in _reserved_anchor_keys -%}
+      <span class="wa-membership-options__anchor" id="membership-{{ _key }}" data-membership-anchor="{{ _key }}"></span>
+      {%- endif -%}
+      {%- endfor -%}
+    </div>
+    {% endif %}
+
+    <div class="wa-membership-options__head">
+      {% if module.eyebrow %}
+      <div class="wa-overline">
+        <span class="wa-overline__text">{{ module.eyebrow }}</span>
+      </div>
+      {% endif %}
+      {% if module.heading %}
+      <h2 class="wa-membership-options__heading">{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+      <div class="wa-membership-options__intro wa-richtext">{{ module.intro }}</div>
+      {% endif %}
+    </div>
+
+    {% if module.tabs %}
+    <div class="wa-membership-options__tabs" role="tablist" aria-label="Membership options">
+      {% for tab in module.tabs %}
+      {%- set _key = tab.tab_key|default('tab-' ~ loop.index)|lower|replace(' ', '-') -%}
+      <button
+        class="wa-membership-options__tab{% if loop.first %} is-active{% endif %}"
+        type="button"
+        role="tab"
+        id="wa-membership-tab-{{ name }}-{{ _key }}"
+        aria-selected="{% if loop.first %}true{% else %}false{% endif %}"
+        aria-controls="wa-membership-panel-{{ name }}-{{ _key }}"
+        data-membership-tab="{{ _key }}"
+      >
+        {% if tab.tab_icon and tab.tab_icon.src %}
+        <img src="{{ tab.tab_icon.src }}" alt="" loading="lazy" decoding="async">
+        {% endif %}
+        <span>{{ tab.tab_label|default(tab.heading)|default('Membership') }}</span>
+        {% if tab.tab_badge %}<span class="wa-membership-options__tab-badge">{{ tab.tab_badge }}</span>{% endif %}
+      </button>
+      {% endfor %}
+    </div>
+
+    {% for tab in module.tabs %}
+    {%- set _key = tab.tab_key|default('tab-' ~ loop.index)|lower|replace(' ', '-') -%}
+    <div
+      class="wa-membership-options__panel{% if loop.first %} is-active{% endif %}"
+      id="wa-membership-panel-{{ name }}-{{ _key }}"
+      role="tabpanel"
+      aria-labelledby="wa-membership-tab-{{ name }}-{{ _key }}"
+      data-membership-panel="{{ _key }}"
+      {% if not loop.first %}hidden{% endif %}
+    >
+      <div class="wa-membership-options__panel-head">
+        {% if tab.heading %}<h3>{{ tab.heading }}</h3>{% endif %}
+        {% if tab.body_text %}<div class="wa-richtext">{{ tab.body_text }}</div>{% endif %}
+      </div>
+
+      <div class="wa-membership-options__panel-layout{% if tab.side_panel.heading or tab.side_panel.items %} wa-membership-options__panel-layout--with-side{% endif %}">
+        {% if tab.cards %}
+        <div class="wa-membership-options__card-grid">
+          {% for card in tab.cards %}
+          {%- set _color = card.tier_color|default('navy') -%}
+          {%- set _tab_context = (tab.tab_key|default(tab.tab_label|default(tab.heading|default(''))))|lower -%}
+          {%- set _card_title = card.title|default('membership') -%}
+          {%- set _card_title_key = _card_title|lower -%}
+          {%- set _card_slug = _card_title_key|replace(' ', '-') -%}
+          {%- set _card_anchor = _key ~ '-' ~ _card_slug -%}
+          {%- if _card_slug == 'individual' -%}
+            {%- set _card_anchor = 'individual' -%}
+          {%- elif _card_slug == 'reciprocal' -%}
+            {%- set _card_anchor = 'reciprocal' -%}
+          {%- endif -%}
+          {%- set _display_credit_label = card.credit_label|default('', true) -%}
+          {%- set _display_credit_value = card.credit_value|default('', true) -%}
+          {%- set _display_credit_sub = card.credit_sub|default('', true) -%}
+          {%- if 'supplier' in _tab_context and 'gold' in _card_title_key -%}
+            {%- set _display_credit_label = 'Membership fee' -%}
+            {%- set _display_credit_value = '$20,000' -%}
+            {%- set _display_credit_sub = 'AUD per year' -%}
+          {%- elif 'supplier' in _tab_context and 'silver' in _card_title_key -%}
+            {%- set _display_credit_label = 'Membership fee' -%}
+            {%- set _display_credit_value = '$15,000' -%}
+            {%- set _display_credit_sub = 'AUD per year' -%}
+          {%- elif 'supplier' in _tab_context and 'bronze' in _card_title_key -%}
+            {%- set _display_credit_label = 'Membership fee' -%}
+            {%- set _display_credit_value = '$10,000' -%}
+            {%- set _display_credit_sub = 'AUD per year' -%}
+          {%- elif 'corporate' in _tab_context and 'gold' in _card_title_key -%}
+            {%- set _display_credit_label = 'Membership fee' -%}
+            {%- set _display_credit_value = '$20,000' -%}
+            {%- set _display_credit_sub = 'AUD per year' -%}
+          {%- elif 'corporate' in _tab_context and 'silver' in _card_title_key -%}
+            {%- set _display_credit_label = 'Membership fee' -%}
+            {%- set _display_credit_value = '$8,500' -%}
+            {%- set _display_credit_sub = 'AUD per year' -%}
+          {%- elif 'corporate' in _tab_context and 'bronze' in _card_title_key -%}
+            {%- set _display_credit_label = 'Membership fee' -%}
+            {%- set _display_credit_value = '$3,000' -%}
+            {%- set _display_credit_sub = 'AUD per year' -%}
+          {%- elif 'retired' in _card_title_key -%}
+            {%- set _display_credit_label = 'Membership fee' -%}
+            {%- set _display_credit_value = '$72.73' -%}
+            {%- set _display_credit_sub = 'New membership / $63.64 renewal, ex GST' -%}
+          {%- elif 'reciprocal' in _card_title_key or 'honorary' in _card_title_key or 'industry group' in _card_title_key or 'student' in _card_title_key or 'apprentice' in _card_title_key or 'tafe' in _card_title_key or 'rto' in _card_title_key -%}
+            {%- set _display_credit_label = 'Membership fee' -%}
+            {%- set _display_credit_value = '$0' -%}
+            {%- set _display_credit_sub = 'Free' -%}
+          {%- elif 'individual' in _card_title_key -%}
+            {%- set _display_credit_label = 'Membership fee' -%}
+            {%- set _display_credit_value = '$199' -%}
+            {%- set _display_credit_sub = 'AUD per year' -%}
+          {%- endif -%}
+          {%- set _join_slug = '' -%}
+          {%- if 'student' in _card_title_key or 'apprentice' in _card_title_key -%}
+            {%- set _join_slug = 'student-apprentice' -%}
+          {%- elif 'individual' in _card_title_key -%}
+            {%- set _join_slug = 'individual' -%}
+          {%- elif 'reciprocal' in _card_title_key -%}
+            {%- set _join_slug = 'reciprocal' -%}
+          {%- elif 'tafe' in _card_title_key or 'rto' in _card_title_key -%}
+            {%- set _join_slug = 'tafe-rto' -%}
+          {%- elif 'gold' in _card_title_key and 'supplier' in _tab_context -%}
+            {%- set _join_slug = 'supplier-gold' -%}
+          {%- elif 'silver' in _card_title_key and 'supplier' in _tab_context -%}
+            {%- set _join_slug = 'supplier-silver' -%}
+          {%- elif 'bronze' in _card_title_key and 'supplier' in _tab_context -%}
+            {%- set _join_slug = 'supplier-bronze' -%}
+          {%- elif 'gold' in _card_title_key -%}
+            {%- set _join_slug = 'corporate-gold' -%}
+          {%- elif 'silver' in _card_title_key -%}
+            {%- set _join_slug = 'corporate-silver' -%}
+          {%- elif 'bronze' in _card_title_key -%}
+            {%- set _join_slug = 'corporate-bronze' -%}
+          {%- endif -%}
+          {#- QA ref 36: a membership fee is ex GST, like every other price on the
+              site; the payment step adds the tax. A paid fee whose wording does
+              not already say so gets "ex GST" appended to its sub-line, which also
+              rides the join link below, so /membership/join/ says it too. A $0 or
+              non-numeric figure ("By agreement") is left alone. -#}
+          {%- set _mo_fee_amount = _display_credit_value|string|replace('$', '')|replace(',', '')|trim|float -%}
+          {%- if _mo_fee_amount > 0 and 'gst' not in (_display_credit_label ~ ' ' ~ _display_credit_value ~ ' ' ~ _display_credit_sub)|lower -%}
+            {%- set _display_credit_sub = (_display_credit_sub ~ ', ex GST') if _display_credit_sub else 'ex GST' -%}
+          {%- endif -%}
+          {#- Where this card sits on the same ladder. Only the three ranked
+              levels take part; everything else (individual, student, reciprocal,
+              TAFE/RTO) is a different kind of membership, not a step down. -#}
+          {%- set _mo_card_rank = 0 -%}
+          {%- if _join_slug in ['corporate-gold', 'supplier-gold'] -%}
+            {%- set _mo_card_rank = 3 -%}
+          {%- elif _join_slug in ['corporate-silver', 'supplier-silver'] -%}
+            {%- set _mo_card_rank = 2 -%}
+          {%- elif _join_slug in ['corporate-bronze', 'supplier-bronze'] -%}
+            {%- set _mo_card_rank = 1 -%}
+          {%- endif -%}
+          {%- set _mo_is_current = _mo_member_rank > 0 and _mo_card_rank == _mo_member_rank -%}
+          {%- set _mo_is_downgrade = _mo_member_rank > 0 and _mo_card_rank > 0 and _mo_card_rank < _mo_member_rank -%}
+          {%- set _card_href = card.cta_link.url.href|default('', true) -%}
+          {%- if not _card_href or '/contact-us' in _card_href -%}
+            {%- if _join_slug -%}
+              {%- set _card_href = '/membership/join/?tier=' ~ _join_slug -%}
+            {%- else -%}
+              {%- set _card_href = '/membership/join/' -%}
+            {%- endif -%}
+            {%- if _display_credit_label -%}
+              {%- set _card_href = _card_href ~ '&price_label=' ~ (_display_credit_label|urlencode) -%}
+            {%- endif -%}
+            {%- if _display_credit_value -%}
+              {%- set _card_href = _card_href ~ '&price_value=' ~ (_display_credit_value|urlencode) -%}
+            {%- endif -%}
+            {%- if _display_credit_sub -%}
+              {%- set _card_href = _card_href ~ '&price_sub=' ~ (_display_credit_sub|urlencode) -%}
+            {%- endif -%}
+          {%- endif -%}
+          {%- if _color == 'silver' -%}
+            {%- set _default_logo = get_asset_url('../../assets/img/member-logo-silver.png') -%}
+          {%- elif _color == 'bronze' -%}
+            {%- set _default_logo = get_asset_url('../../assets/img/member-logo-bronze.png') -%}
+          {%- elif _color == 'gold' -%}
+            {%- set _default_logo = get_asset_url('../../assets/img/member-logo-gold.png') -%}
+          {%- else -%}
+            {%- set _default_logo = get_asset_url('../../assets/img/member-logo-individual.png') -%}
+          {%- endif -%}
+          <article
+            class="wa-membership-options__card wa-membership-options__card--{{ _color }}"
+            id="membership-{{ _card_anchor }}"
+            data-membership-card="{{ _card_slug }}"
+            data-membership-card-tab="{{ _key }}"
+            {% if _mo_is_current %}data-membership-card-state="current"{% elif _mo_is_downgrade %}data-membership-card-state="below-current"{% endif %}
+          >
+            <div class="wa-membership-options__card-top">
+              {% if card.badge_text %}<span class="wa-membership-options__badge">{{ card.badge_text }}</span>{% endif %}
+              {% if card.logo.src or _color in ['gold', 'silver', 'bronze', 'navy'] %}
+              <img
+                class="wa-membership-options__logo"
+                src="{{ card.logo.src|default(_default_logo) }}"
+                alt="{{ card.logo.alt|default(card.title ~ ' member badge') }}"
+                loading="lazy"
+                decoding="async"
+              >
+              {% endif %}
+            </div>
+
+            {% if card.title or card.subtitle %}
+            <div class="wa-membership-options__card-title">
+              {% if card.title %}<h4>{{ card.title }}</h4>{% endif %}
+              {% if card.subtitle %}<p>{{ card.subtitle }}</p>{% endif %}
+            </div>
+            {% endif %}
+
+            {% if _display_credit_label or _display_credit_value or _display_credit_sub %}
+            <div class="wa-membership-options__credit">
+              {% if _display_credit_label %}<span class="wa-membership-options__credit-label">{{ _display_credit_label }}</span>{% endif %}
+              {% if _display_credit_value %}<strong>{{ _display_credit_value }}</strong>{% endif %}
+              {% if _display_credit_sub %}<span>{{ _display_credit_sub }}</span>{% endif %}
+            </div>
+            {% endif %}
+            {% if card.description %}
+            <p class="wa-membership-options__description">{{ card.description }}</p>
+            {% endif %}
+
+            {% if card.benefits %}
+            <ul class="wa-membership-options__benefits" role="list">
+              {% for benefit in card.benefits %}
+              {% if benefit.benefit_text %}
+              <li>
+                <span class="wa-membership-options__check" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+                <span>{{ benefit.benefit_text }}</span>
+              </li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if _mo_is_current %}
+            <p class="wa-membership-options__cta-note wa-membership-options__cta-note--current">
+              Your current membership
+            </p>
+            {% elif _mo_is_downgrade %}
+            <p class="wa-membership-options__cta-note">
+              Included in your {{ _mo_tier_label }} membership
+            </p>
+            {% elif card.cta_label %}
+            <a
+              class="btn {% if _color == 'gold' or _color == 'green' %}btn-gold{% elif _color == 'navy' or _color == 'blue' %}btn-primary{% else %}btn-navy-outline{% endif %} wa-membership-options__cta"
+              href="{{ _card_href }}"
+              {% if card.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ card.cta_label }}</a>
+            {% endif %}
+          </article>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if tab.side_panel.heading or tab.side_panel.items %}
+        <aside class="wa-membership-options__side">
+          {% if tab.side_panel.heading %}<h4>{{ tab.side_panel.heading }}</h4>{% endif %}
+          {% if tab.side_panel.items %}
+          <ul role="list">
+            {% for item in tab.side_panel.items %}
+            {% if item.item_text %}<li>{{ item.item_text }}</li>{% endif %}
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </aside>
+        {% endif %}
+      </div>
+
+      {% if tab.note %}
+      <div class="wa-membership-options__note wa-richtext">{{ tab.note }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+</section>
+{% endif %}

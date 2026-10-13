@@ -1,0 +1,131 @@
+[
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "You're registered"
+  },
+  {
+    "name": "body_text",
+    "label": "Body",
+    "type": "richtext",
+    "default": "<p>We've sent a confirmation email to your inbox. See you at the course!</p>"
+  },
+  {
+    "name": "show_calendar_buttons",
+    "label": "Show calendar download buttons",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_zoom_link",
+    "label": "Show Zoom join link if applicable",
+    "type": "boolean",
+    "default": true,
+    "help_text": "Displays the Zoom link if the registered session includes one (stored in sessionStorage by the checkout tunnel)."
+  },
+  {
+    "name": "next_step_cta_label",
+    "label": "Next step CTA label",
+    "type": "text",
+    "default": "Back to dashboard"
+  },
+  {
+    "name": "next_step_cta_link",
+    "label": "Next step CTA link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "CONTENT",
+        "href": "/portal/"
+      }
+    }
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

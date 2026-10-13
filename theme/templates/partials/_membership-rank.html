@@ -1,0 +1,72 @@
+<!--
+  templateType: none
+-->
+{#
+  _membership-rank.html - where the logged-in visitor sits on the corporate
+  ladder, for the downgrade guard (QA ref 44).
+
+  A Corporate or Industry Supplier member may stay at their level or move up,
+  never down. Every surface that sells the ranked levels asks this one partial,
+  so the corporate cards on /membership (membership-options) and the tier table
+  on /membership/corporate (tier-comparison) cannot disagree about who is Gold.
+
+  Include it, then read the namespace:
+
+    {% include "../../templates/partials/_membership-rank.html" %}
+    wa_membership_rank.rank        3 gold, 2 silver, 0 anything else
+    wa_membership_rank.tier_label  the tier as the CRM spells it, for copy
+
+  Bronze is deliberately 0 here: a Bronze member may take every card, so there
+  is nothing to restrict and no reason to rank them.
+
+  Three sources, in order:
+
+  1. The company tier, through the shared ladder in _member-company-resolve.html
+     (contact mirror, associatedcompanyid, association sweep).
+  2. A Refuel QA persona (_qa-persona-resolve.html), which OUTRANKS the CRM, as it
+     does on the portal and every pricing surface. The first guard ignored it, so
+     a tester logged in as nick+portal-qa-corporate-gold@… was Gold on the
+     dashboard and nobody on /membership, and saw "Apply now" on all three
+     corporate cards. QA test with exactly those accounts, which is the likeliest
+     reading of the ref 44 retest failure.
+  3. An explicitly lapsed, expired or cancelled status resets the rank to 0. A
+     member whose Gold membership ran out is not a Gold member, and may rejoin at
+     whatever level they like.
+
+  FAILS OPEN, deliberately. Only a tier positively recognised as gold or silver
+  restricts anything. Of the two ways to be wrong, one shows a member a plan they
+  cannot take, and the other hides the plan a prospect came to buy.
+#}
+{% set wa_membership_rank = namespace(rank=0, tier_label='') %}
+
+{% if request_contact.is_logged_in %}
+  {% set wa_company_in_company_id = request_contact.associatedcompanyid | default(contact.associatedcompanyid, true) | default('', true) %}
+  {% set wa_company_in_contact_ids = [request_contact.hs_object_id | default(contact.hs_object_id, true) | default('', true)] %}
+  {% include "./_member-company-resolve.html" %}
+  {% set _wa_rank_tier = wa_member_company.tier | default('', true) | string | trim %}
+  {% set _wa_rank_status = wa_member_company.status | default('', true) | string | trim %}
+
+  {% set qa_persona_email = request_contact.email | default(request_contact.hs_content_membership_email, true) | default(contact.email, true) | default('', true) %}
+  {% include "./_qa-persona-resolve.html" %}
+  {% if qa_persona.found %}
+    {% if qa_persona.entitled %}
+      {% set _wa_rank_tier = qa_persona.company_tier %}
+      {% set _wa_rank_status = qa_persona.membership_status %}
+    {% else %}
+      {% set _wa_rank_tier = '' %}
+    {% endif %}
+  {% endif %}
+
+  {% set _wa_rank_tier_key = _wa_rank_tier | lower %}
+  {% set _wa_rank_status_key = _wa_rank_status | lower | trim %}
+  {#- "inactive" is matched exactly: it contains "active". -#}
+  {% set _wa_rank_lapsed = 'lapsed' in _wa_rank_status_key or 'expired' in _wa_rank_status_key or 'cancel' in _wa_rank_status_key or _wa_rank_status_key == 'inactive' %}
+  {% if not _wa_rank_lapsed %}
+    {% if 'gold' in _wa_rank_tier_key %}
+      {% set wa_membership_rank.rank = 3 %}
+    {% elif 'silver' in _wa_rank_tier_key %}
+      {% set wa_membership_rank.rank = 2 %}
+    {% endif %}
+  {% endif %}
+  {% set wa_membership_rank.tier_label = _wa_rank_tier %}
+{% endif %}

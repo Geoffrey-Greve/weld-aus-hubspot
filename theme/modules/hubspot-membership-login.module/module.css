@@ -1,0 +1,92 @@
+/*
+ * hubspot-membership-login.module/module.css
+ * Login form component styles - rendered inside .auth-layout__form-inner.
+ * Full auth page layout lives in theme/assets/css/auth.css.
+ * Shared field/button styles from theme/assets/css/components.css.
+ */
+
+/* ── Login wrapper ───────────────────────────────────────────────────────── */
+
+.auth-login {
+  width: 100%;
+}
+
+.auth-login__eyebrow {
+  margin: 0 0 var(--wa-space-3);
+}
+
+.auth-login__eyebrow::before {
+  background: var(--wa-color-accent-magenta, #ed128d);
+}
+
+.auth-login__eyebrow .wa-overline__text {
+  color: var(--wa-color-accent-magenta, #ed128d);
+}
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+
+.auth-login__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl);
+  font-weight: var(--wa-weight-bold);
+  line-height: var(--wa-leading-tight);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-8) 0;
+}
+
+/* ── Error alert ─────────────────────────────────────────────────────────── */
+
+.auth-login__error {
+  margin-bottom: var(--wa-space-6);
+}
+
+.auth-login__error a {
+  color: inherit;
+  font-weight: var(--wa-weight-semibold);
+}
+
+/* ── Form layout ─────────────────────────────────────────────────────────── */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-5);
+}
+
+/* ── Forgot password row ─────────────────────────────────────────────────── */
+
+.auth-form__forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: calc(var(--wa-space-1) * -1);
+}
+
+.auth-form__forgot-link {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-primary);
+  text-decoration: none;
+  min-height: var(--wa-touch-min);
+  display: inline-flex;
+  align-items: center;
+  transition: color var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.auth-form__forgot-link:hover,
+.auth-form__forgot-link:focus-visible {
+  color: var(--wa-color-primary-dark);
+  text-decoration: underline;
+}
+
+.auth-form__forgot-link:focus-visible {
+  outline: 3px solid var(--wa-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+}
+
+/* ── Submit button ───────────────────────────────────────────────────────── */
+
+.auth-form__submit {
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--wa-space-2);
+}

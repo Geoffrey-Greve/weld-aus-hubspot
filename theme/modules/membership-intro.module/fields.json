@@ -1,0 +1,139 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "benefits"
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      ["surface", "White"],
+      ["surface_alt", "Light grey"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Benefits of welding association membership"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Lifting capability, quality and safety - together"
+  },
+  {
+    "name": "body_text",
+    "label": "Body copy",
+    "type": "richtext"
+  },
+  {
+    "name": "primary_cta",
+    "label": "Primary CTA",
+    "type": "group",
+    "children": [
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text",
+        "default": "Explore membership options"
+      },
+      {
+        "name": "link",
+        "label": "Link",
+        "type": "link"
+      }
+    ]
+  },
+  {
+    "name": "secondary_cta",
+    "label": "Secondary CTA",
+    "type": "group",
+    "children": [
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text",
+        "default": "Membership prospectus"
+      },
+      {
+        "name": "link",
+        "label": "Link",
+        "type": "link"
+      }
+    ]
+  },
+  {
+    "name": "media_image",
+    "label": "Media image",
+    "type": "image"
+  },
+  {
+    "name": "video_url",
+    "label": "Optional video URL",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "video_label",
+    "label": "Video label",
+    "type": "text",
+    "default": "Watch: why members join"
+  },
+  {
+    "name": "highlights",
+    "label": "Highlight cards",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 6,
+      "default": 4
+    },
+    "children": [
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text"
+      },
+      {
+        "name": "body_text",
+        "label": "Body text",
+        "type": "text"
+      },
+      {
+        "name": "accent_color",
+        "label": "Accent colour",
+        "type": "choice",
+        "choices": [
+          ["gold", "Gold"],
+          ["magenta", "Magenta"]
+        ],
+        "default": "gold"
+      }
+    ]
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

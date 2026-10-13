@@ -1,0 +1,17 @@
+{#
+  brand-line.html
+  Shared Weld Australia flame-gradient line.
+
+  Optional variables:
+    _brand_line_context  - modifier suffix, e.g. "hero" or "footer"
+    _brand_line_class    - extra classes for legacy/module compatibility
+#}
+{%- set _brand_line_context = _brand_line_context | default('', true) | trim -%}
+{%- set _brand_line_class = _brand_line_class | default('', true) | trim -%}
+{%- if _brand_line_context == 'footer' -%}
+  {%- set _brand_line_class = '' -%}
+{%- endif -%}
+<span
+  class="wa-brand-line{% if _brand_line_context %} wa-brand-line--{{ _brand_line_context | escape_attr }}{% endif %}{% if _brand_line_class %} {{ _brand_line_class | escape_attr }}{% endif %}"
+  aria-hidden="true"
+></span>

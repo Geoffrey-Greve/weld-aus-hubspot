@@ -1,0 +1,327 @@
+{#
+  pricing-table.module/module.html
+  Side-by-side pricing cards. Member price in success green.
+  Optional green callout banner above when show_member_discount_callout=true and 2+ tiers.
+
+  Fields:
+    module.section_id                  - optional anchor id
+    module.background                  - background variant
+    module.spacing                     - vertical spacing variant
+    module.members_only                - gating flag
+    module.section_heading             - heading
+    module.intro                       - optional intro richtext
+    module.show_member_discount_callout - boolean
+    module.member_savings_message      - callout text (rendered as-is)
+    module.tiers                       - repeater group (tier_name, price_member, price_non_member, includes, cta_label, cta_link)
+#}
+
+{% import "../../templates/partials/_member-pricing.html" as wa_price %}
+{% import "../../templates/partials/_member-tier.html" as wa_tier %}
+{% import "../../templates/partials/_session-priceable.html" as wa_session %}
+{% if not module.members_only or request_contact.is_logged_in %}
+{% set _configured_ns = namespace(has_tier=false, has_member_price=false) %}
+{% for tier in module.tiers %}
+  {% if tier.tier_name or tier.price_member or tier.price_non_member or tier.includes %}
+    {% set _configured_ns.has_tier = true %}
+  {% endif %}
+  {% if tier.price_member %}
+    {% set _configured_ns.has_member_price = true %}
+  {% endif %}
+{% endfor %}
+
+{% set _price_ns = namespace(member=0, public=0, saving=0) %}
+
+{# Course price cards use the same read-only tier resolution as checkout:
+   contact first, associated company second, legacy members HubDB last. #}
+{% set _member_tier_raw = request_contact.individual_membership_type_2 | default(contact.individual_membership_type_2, true) | default('', true) | string | trim %}
+{% set _member_status_raw = request_contact.individual_membership_status | default(contact.individual_membership_status, true) | default('', true) | string | trim %}
+{% set _member_company_id_raw = request_contact.associatedcompanyid | default(contact.associatedcompanyid, true) | default('', true) | string | trim %}
+{% set _member_company_id = _member_company_id_raw | int | default(0) %}
+
+{% set _member_contact_ns = namespace(tier='', status='', company_id=0, email='', found=false, seen=[]) %}
+{% if request_contact.is_logged_in %}
+  {% set _member_contact_id_candidates = [
+    request_contact.id | default('', true) | string | trim,
+    request_contact.hs_object_id | default('', true) | string | trim,
+    request_contact.vid | default('', true) | string | trim,
+    contact.id | default('', true) | string | trim,
+    contact.hs_object_id | default('', true) | string | trim,
+    contact.vid | default('', true) | string | trim
+  ] %}
+  {% for contact_candidate in _member_contact_id_candidates %}
+    {% set contact_candidate_id = contact_candidate | string | trim %}
+    {% if contact_candidate_id and contact_candidate_id != '[object Object]' and contact_candidate_id != '[object object]' and contact_candidate_id not in _member_contact_ns.seen and not _member_contact_ns.found %}
+      {% set _member_contact_ns.seen = _member_contact_ns.seen + [contact_candidate_id] %}
+      {% set member_contact_record = crm_object('contact', contact_candidate_id, 'email,associatedcompanyid,individual_membership_status,individual_membership_type_2') %}
+      {% if member_contact_record %}
+        {% set member_contact_props = member_contact_record.properties | default({}, true) %}
+        {% set candidate_tier = member_contact_record.individual_membership_type_2 | default(member_contact_props.individual_membership_type_2, true) | default('', true) | string | trim %}
+        {% set candidate_status = member_contact_record.individual_membership_status | default(member_contact_props.individual_membership_status, true) | default('', true) | string | trim %}
+        {% set candidate_company_id = member_contact_record.associatedcompanyid | default(member_contact_props.associatedcompanyid, true) | default(0, true) | int %}
+        {% set candidate_email = member_contact_record.email | default(member_contact_props.email, true) | default('', true) | string | lower | trim %}
+        {% if candidate_tier or candidate_status or candidate_company_id or candidate_email %}
+          {% set _member_contact_ns.tier = candidate_tier %}
+          {% set _member_contact_ns.status = candidate_status %}
+          {% set _member_contact_ns.company_id = candidate_company_id %}
+          {% set _member_contact_ns.email = candidate_email %}
+          {% set _member_contact_ns.found = true %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% if not _member_contact_ns.found %}
+    {% set _member_email_lookup = request_contact.email | default(request_contact.hs_content_membership_email, true) | default(request_contact.member_email, true) | default(contact.email, true) | default(contact.hs_content_membership_email, true) | default(contact.member_email, true) | default('', true) | string | lower | trim %}
+    {% if _member_email_lookup and '@' in _member_email_lookup %}
+      {% set _member_contact_query = crm_objects('contact', 'email=' ~ _member_email_lookup ~ '&limit=1', 'email,associatedcompanyid,individual_membership_status,individual_membership_type_2') %}
+      {% set _member_contact_matches = _member_contact_query.results if _member_contact_query.results else _member_contact_query %}
+      {% for member_contact_match in _member_contact_matches %}
+        {% if member_contact_match and not _member_contact_ns.found %}
+          {% set member_contact_match_props = member_contact_match.properties | default({}, true) %}
+          {% set _member_contact_ns.tier = member_contact_match.individual_membership_type_2 | default(member_contact_match_props.individual_membership_type_2, true) | default('', true) | string | trim %}
+          {% set _member_contact_ns.status = member_contact_match.individual_membership_status | default(member_contact_match_props.individual_membership_status, true) | default('', true) | string | trim %}
+          {% set _member_contact_ns.company_id = member_contact_match.associatedcompanyid | default(member_contact_match_props.associatedcompanyid, true) | default(0, true) | int %}
+          {% set _member_contact_ns.email = member_contact_match.email | default(member_contact_match_props.email, true) | default('', true) | string | lower | trim %}
+          {% set _member_contact_ns.found = true %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% if _member_contact_ns.found %}
+  {% set _member_tier_raw = _member_contact_ns.tier %}
+  {% set _member_status_raw = _member_contact_ns.status %}
+  {% set _member_company_id = _member_contact_ns.company_id %}
+{% else %}
+  {% if not _member_tier_raw and _member_contact_ns.tier %}
+    {% set _member_tier_raw = _member_contact_ns.tier %}
+  {% endif %}
+  {% if not _member_status_raw and _member_contact_ns.status %}
+    {% set _member_status_raw = _member_contact_ns.status %}
+  {% endif %}
+  {% if not _member_company_id and _member_contact_ns.company_id %}
+    {% set _member_company_id = _member_contact_ns.company_id %}
+  {% endif %}
+{% endif %}
+
+{# Company tier/status via the shared resolver: contact mirror, then
+   `associatedcompanyid`, then an association sweep for the corporate employees who
+   have no PRIMARY association - which is most of Weld's. This block used to read
+   `associatedcompanyid` alone, in five identical copies, so those members were
+   quoted the PUBLIC price everywhere except the checkout (QA Ref 72). #}
+{% set wa_company_in_company_id = _member_company_id %}
+{% set wa_company_in_contact_ids = _member_contact_ns.seen %}
+{% include "../../templates/partials/_member-company-resolve.html" %}
+{% if wa_member_company.tier or wa_member_company.status %}
+  {% set _contact_status_is_real = wa_tier.is_real_tier(_member_contact_ns.status) | trim %}
+  {% set _member_tier_raw = wa_tier.prefer_pricing_tier(_member_tier_raw, wa_member_company.tier) | trim %}
+  {% if wa_member_company.status and not _contact_status_is_real %}
+    {% set _member_status_raw = wa_member_company.status %}
+  {% endif %}
+{% endif %}
+{% set _member_tier_raw = wa_tier.scrub(_member_tier_raw) | trim %}
+{% set _member_status_raw = wa_tier.scrub(_member_status_raw) | trim %}
+
+{% set _member_status_key = _member_status_raw | lower | replace(' ', '_') | replace('-', '_') %}
+{% set _member_status_is_active = _member_status_key in ['current', 'active', 'grace', 'grace_period', 'honorary', 'honourary'] %}
+{% set _member_status_is_inactive = _member_status_key in ['lapsed', 'expired', 'inactive', 'cancelled', 'canceled'] %}
+
+{% set _member_email_candidates = [
+  _member_contact_ns.email | default('', true) | string | lower | trim,
+  request_contact.email | default('', true) | string | lower | trim,
+  request_contact.hs_content_membership_email | default('', true) | string | lower | trim,
+  request_contact.member_email | default('', true) | string | lower | trim,
+  contact.email | default('', true) | string | lower | trim,
+  contact.hs_content_membership_email | default('', true) | string | lower | trim,
+  contact.member_email | default('', true) | string | lower | trim
+] %}
+{% set _member_email_ns = namespace(value='') %}
+{% for email_candidate in _member_email_candidates %}
+  {% set normalized_email = email_candidate | default('', true) | string | lower | trim %}
+  {% if not _member_email_ns.value and normalized_email and normalized_email != '[object object]' and normalized_email != '[object Object]' and '@' in normalized_email %}
+    {% set _member_email_ns.value = normalized_email %}
+  {% endif %}
+{% endfor %}
+
+{% set _member_directory_ns = namespace(tier='', active=false) %}
+{% if request_contact.is_logged_in and _member_email_ns.value %}
+  {% for member_row in hubdb_table_rows('members', 'orderBy=company_name&limit=1000') %}
+    {% set member_row_email = member_row.contact_email | default('', true) | string | lower | trim %}
+    {% if not _member_directory_ns.active and member_row_email and member_row_email == _member_email_ns.value %}
+      {% set member_row_active = member_row.is_active | default(false, true) | string | lower | trim %}
+      {% set _member_directory_ns.active = member_row_active in ['true', '1', 'yes'] %}
+      {% if _member_directory_ns.active %}
+        {% set _member_directory_ns.tier = member_row.member_tier.name | default(member_row.member_tier.label, true) | default(member_row.member_tier, true) | default('', true) | string | trim %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% if not _member_tier_raw and _member_directory_ns.tier %}
+  {% set _member_tier_raw = _member_directory_ns.tier %}
+{% endif %}
+{% set _member_tier_key = _member_tier_raw | lower | replace(' ', '_') | replace('-', '_') %}
+{% set _member_tier_is_member = wa_tier.is_real_tier(_member_tier_raw) | trim %}
+{% set _visitor_is_member = request_contact.is_logged_in and not _member_status_is_inactive and (_member_status_is_active or _member_directory_ns.active or _member_tier_is_member) %}
+
+{% set qa_persona_email = _member_email_ns.value %}
+{% include '../../templates/partials/_qa-persona-resolve.html' %}
+{% if request_contact.is_logged_in and qa_persona.found %}
+  {% if qa_persona.entitled %}
+    {% set _visitor_is_member = true %}
+    {% set _member_tier_raw = qa_persona.pricing_tier %}
+    {% set _member_tier_key = _member_tier_raw | lower | replace(' ', '_') | replace('-', '_') %}
+  {% else %}
+    {% set _visitor_is_member = false %}
+    {% set _member_tier_raw = '' %}
+    {% set _member_tier_key = '' %}
+  {% endif %}
+{% endif %}
+{#
+  The "from" price is the MINIMUM across this course's sessions, and it is only honest
+  if every session it is drawn from is one a visitor could actually book today. Ref 46
+  round 2 item 4: AS1796 Cert 10 advertised "From $4,950" against a single bookable
+  session at $6,000, and IWI-S "From $8,800" against $9,450, because the cheap rows
+  setting those numbers had already run. A headline price nobody can pay is worse than
+  no headline price.
+
+  Which rows qualify now lives in `_session-priceable.html`, shared with the /courses
+  directory card - Ref 40 found the same course quoting four numbers across four
+  surfaces, so the rule that picks them has to be one rule. It adds the third condition
+  this panel was missing: a row a visitor has no way to BUY cannot set the price either.
+  /courses/iwe advertised "Members save $10.00", member From $50.00, against a single
+  bookable session at $18,786.36, because a row called "IWE Module 1 Test" carried $60
+  and was marked "Online booking is not available for this session yet".
+
+  When nothing survives, both figures stay 0 and the panel falls through to "Contact us"
+  over a "View sessions" link - which lands on the session selector's expression-of-
+  interest form. That is the honest answer for a course with nothing scheduled, and it is
+  the one place this change can remove a price from a page.
+#}
+{% set _today_key = local_dt | datetimeformat('%Y%m%d') %}
+{% if not _configured_ns.has_tier and dynamic_page_hubdb_row.course_id %}
+  {% for row in hubdb_table_rows('courses', 'course_id__eq=' ~ dynamic_page_hubdb_row.course_id ~ '&orderBy=start_date') %}
+    {% if wa_session.priceable(row, _today_key) | trim %}
+      {# Defect 213: local copy of the tier -> column chain, replaced by the shared
+         resolver. Note this block then takes the MINIMUM across sessions, so what it
+         renders is a "from" price - see the label below. #}
+      {% set _member_price = wa_price.member_price(row, _member_tier_key if _visitor_is_member else '') | trim | float %}
+      {% set _public_price = wa_price.non_member_price(row) | trim | float %}
+      {% if _member_price > 0 and (_price_ns.member == 0 or _member_price < _price_ns.member) %}
+        {% set _price_ns.member = _member_price %}
+      {% endif %}
+      {% if _public_price > 0 and (_price_ns.public == 0 or _public_price < _price_ns.public) %}
+        {% set _price_ns.public = _public_price %}
+      {% endif %}
+      {# The saving is tracked PER ROW, then the largest kept, because the two minima
+         above are taken independently and can land on different sessions: differencing
+         them advertises a discount no single session offers. "up to" is then literally
+         what the number is - the best saving on any session a visitor can still book. #}
+      {% if _member_price > 0 and _public_price > _member_price and (_public_price - _member_price) > _price_ns.saving %}
+        {% set _price_ns.saving = _public_price - _member_price %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% set _dynamic_prices = not _configured_ns.has_tier and (_price_ns.member > 0 or _price_ns.public > 0) %}
+{% set _show_dynamic_member_price = _dynamic_prices and _price_ns.member > 0 and (_price_ns.public == 0 or _price_ns.public > _price_ns.member) %}
+{% set _show_dynamic_member_savings = _show_dynamic_member_price and _price_ns.saving > 0 %}
+<section
+  class="wa-pricing-table wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-pricing-table__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    {% if module.intro %}
+    <div class="wa-pricing-table__intro">{{ module.intro }}</div>
+    {% endif %}
+
+    {# Member savings callout - shown for dynamic course pricing, or member-view configured tiers #}
+    {% if module.show_member_discount_callout and (_show_dynamic_member_savings or (_visitor_is_member and _configured_ns.has_member_price and module.tiers | length >= 2)) %}
+    <div class="wa-pricing-table__savings-callout" role="note">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8Zm1 12H9v-2h2v2Zm0-4H9V6h2v4Z" fill="currentColor"/>
+      </svg>
+      <span>
+        {% if _show_dynamic_member_savings %}
+          Members save up to {{ _price_ns.saving | format_currency('AUD') }} on current sessions.
+        {% else %}
+          {{ module.member_savings_message }}
+        {% endif %}
+      </span>
+    </div>
+    {% endif %}
+
+    <div class="wa-pricing-table__grid">
+      {% if _dynamic_prices %}
+      {% if _show_dynamic_member_price %}
+        <div class="wa-pricing-table__card wa-pricing-table__card--member">
+          <p class="wa-pricing-table__card-kicker">Weld Australia members</p>
+          <h3 class="wa-pricing-table__tier-name">Member price</h3>
+          <strong class="wa-pricing-table__dynamic-price wa-pricing-table__dynamic-price--member">
+            From {{ _price_ns.member | format_currency('AUD') }} <span class="wa-pricing-table__price-label">ex GST</span>
+          </strong>
+          <p class="wa-pricing-table__dynamic-note">Your exact price is confirmed when you select a session.</p>
+          <a class="wa-pricing-table__cta" href="#sessions">View sessions</a>
+        </div>
+      {% endif %}
+      <div class="wa-pricing-table__card">
+        <p class="wa-pricing-table__card-kicker">Standard enrolment</p>
+        <h3 class="wa-pricing-table__tier-name">{% if _visitor_is_member %}Standard price{% else %}Course price{% endif %}</h3>
+        <strong class="wa-pricing-table__dynamic-price">
+          {% if _price_ns.public > 0 %}From {{ _price_ns.public | format_currency('AUD') }} <span class="wa-pricing-table__price-label">ex GST</span>{% else %}Contact us{% endif %}
+        </strong>
+        <p class="wa-pricing-table__dynamic-note">Prices may vary by date, delivery mode and location.</p>
+        <a class="wa-pricing-table__cta" href="#sessions">View sessions</a>
+      </div>
+      {% else %}
+      {% for tier in module.tiers %}
+      {% if tier.tier_name or tier.price_member or tier.price_non_member or tier.includes %}
+      <div class="wa-pricing-table__card{% if _visitor_is_member %} wa-pricing-table__card--member-view{% endif %}">
+
+        {% if tier.tier_name %}
+        <h3 class="wa-pricing-table__tier-name">{{ tier.tier_name }}</h3>
+        {% endif %}
+
+        <div class="wa-pricing-table__prices">
+          {% if _visitor_is_member and tier.price_member %}
+          <div class="wa-pricing-table__price-row wa-pricing-table__price-row--member">
+            <span class="wa-pricing-table__price-label">Member price</span>
+            <strong class="wa-pricing-table__price wa-pricing-table__price--member">{{ tier.price_member }}</strong>
+          </div>
+          {% endif %}
+
+          {% if tier.price_non_member %}
+          <div class="wa-pricing-table__price-row wa-pricing-table__price-row--non-member">
+            <span class="wa-pricing-table__price-label">{% if _visitor_is_member %}Standard price{% else %}Price{% endif %}</span>
+            <span class="wa-pricing-table__price wa-pricing-table__price--non-member">{{ tier.price_non_member }}</span>
+          </div>
+          {% endif %}
+        </div>
+
+        {% if tier.includes %}
+        <div class="wa-pricing-table__includes">{{ tier.includes }}</div>
+        {% endif %}
+
+        {% if tier.cta_label and tier.cta_link %}
+        <a
+          href="{{ tier.cta_link.url.href }}"
+          class="wa-pricing-table__cta"
+          {% if tier.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ tier.cta_label }}</a>
+        {% endif %}
+
+      </div>
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endif %}

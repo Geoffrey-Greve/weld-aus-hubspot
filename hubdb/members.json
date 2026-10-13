@@ -1,0 +1,75 @@
+{
+  "name": "members",
+  "label": "Members - Find a Member Directory",
+  "useForPages": false,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "columns": [
+    {
+      "name": "company_name",
+      "label": "Company name",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "member_tier",
+      "label": "Member tier",
+      "type": "SELECT",
+      "options": [
+        { "name": "Gold", "type": "option" },
+        { "name": "Silver", "type": "option" },
+        { "name": "Bronze", "type": "option" },
+        { "name": "Reciprocal", "type": "option" },
+        { "name": "Industry Supplier", "type": "option" },
+        { "name": "Individual", "type": "option" }
+      ]
+    },
+    {
+      "name": "company_logo",
+      "label": "Company logo",
+      "type": "IMAGE"
+    },
+    {
+      "name": "company_blurb",
+      "label": "Short description",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "website_url",
+      "label": "Website URL",
+      "type": "URL"
+    },
+    {
+      "name": "contact_email",
+      "label": "Public contact email",
+      "type": "TEXT"
+    },
+    {
+      "name": "state_operation",
+      "label": "States of operation",
+      "type": "MULTISELECT",
+      "options": [
+        { "name": "NSW", "type": "option" },
+        { "name": "VIC", "type": "option" },
+        { "name": "QLD", "type": "option" },
+        { "name": "WA", "type": "option" },
+        { "name": "SA", "type": "option" },
+        { "name": "TAS", "type": "option" },
+        { "name": "NT", "type": "option" },
+        { "name": "ACT", "type": "option" },
+        { "name": "National", "type": "option" }
+      ]
+    },
+    {
+      "name": "is_active",
+      "label": "Active",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "hubspot_company_id",
+      "label": "HubSpot Company ID (backref)",
+      "type": "NUMBER"
+    }
+  ]
+}

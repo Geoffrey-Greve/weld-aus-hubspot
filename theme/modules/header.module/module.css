@@ -1,0 +1,1049 @@
+/*
+ * header.module/module.css
+ * Dark navy two-tier header: utility bar (#0f1030) + nav bar (#1c1e4c).
+ * Design reference: bundle-2/site/wa-chrome.jsx WAHeader.
+ * WCAG 2.5.5: All interactive elements ≥ 44×44px (--wa-touch-min).
+ * Mobile-first: tablet/mobile < 1140px shows hamburger; desktop >= 1140px full nav.
+ * Breakpoint is 1140px, not 1024px: measured in Poppins, the seven-item desktop
+ * menu needs 670px and only gets 574px at 1024px (iPad 9.7"/10.2" landscape),
+ * overlapping the actions group by 79px. It first fits at 1120px, but with only
+ * 12px to spare - 1140px leaves 31px, which is the margin that keeps it stable
+ * across rendering environments. See the Issue 54 note further down. Paired with
+ * the matchMedia in module.js - change both together.
+ */
+
+/* Skip-to-content is styled globally in base.css (WCAG 2.4.1); the base.html
+   skip link is the single canonical instance for every layout. */
+
+/* ── Site header wrapper ──────────────────────────────────────────────────── */
+
+.wa-site-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  z-index: var(--wa-z-sticky);
+  font-family: var(--wa-font-body);
+}
+
+:root {
+  --wa-site-header-offset: 72px;
+}
+
+@media (min-width: 1140px) {
+  :root {
+    --wa-site-header-offset: 110px;
+  }
+}
+
+body:has(.wa-site-header) #main-content {
+  padding-top: var(--wa-site-header-offset);
+}
+
+/* ── Utility bar ─────────────────────────────────────────────────────────── */
+
+.wa-utility-bar {
+  background-color: var(--wa-color-primary-dark);
+  height: 38px;
+  display: none; /* hidden on mobile/tablet */
+}
+
+@media (min-width: 1140px) {
+  .wa-utility-bar {
+    display: block;
+  }
+}
+
+.wa-utility-bar__inner {
+  max-width: var(--wa-container-wide);
+  margin: 0 auto;
+  padding: 0 var(--wa-space-12);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--wa-space-6);
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.wa-utility-bar__contact {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-6);
+}
+
+.wa-utility-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-6);
+}
+
+.wa-utility-bar__sep {
+  display: block;
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.wa-utility-bar__link {
+  color: inherit;
+  text-decoration: none;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  transition: color var(--wa-duration-fast);
+}
+
+.wa-utility-bar__link:hover,
+.wa-utility-bar__link:focus-visible {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: underline;
+}
+
+.wa-utility-bar__link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+}
+
+.wa-utility-bar__link--bold {
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 600;
+}
+
+/* ── Main nav bar ─────────────────────────────────────────────────────────── */
+
+.wa-nav-bar {
+  background-color: var(--wa-color-primary);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.28);
+  height: 72px;
+}
+
+.wa-nav-bar__inner {
+  max-width: var(--wa-container-wide);
+  margin: 0 auto;
+  padding: 0 var(--wa-space-12);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3);
+}
+
+@media (max-width: 1139px) {
+  .wa-nav-bar__inner {
+    padding: 0 var(--wa-space-5);
+  }
+}
+
+/* ── Logo ─────────────────────────────────────────────────────────────────── */
+
+.wa-nav-bar__logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.wa-nav-bar__logo:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 4px;
+  border-radius: var(--wa-radius-sm);
+}
+
+/* ── Desktop primary navigation ───────────────────────────────────────────── */
+
+/*
+  Issue 54 - min-width: 0 is load-bearing. As a flex item .wa-primary-nav
+  defaults to min-width: auto, which refuses to shrink below the intrinsic
+  width of its (nowrap) links, so a tight viewport pushes the actions group -
+  and the member name inside it - off the right edge no matter how short the
+  name is truncated. Capping the name alone only fixed one of the two inputs.
+*/
+.wa-primary-nav {
+  flex: 1;
+  min-width: 0;
+  display: none;
+  margin-left: var(--wa-space-6);
+}
+
+@media (min-width: 1140px) {
+  .wa-primary-nav {
+    display: flex;
+    align-items: stretch;
+  }
+}
+
+/*
+  Issue 54 - the min-width: 0 chain has to run all the way down, not stop at
+  .wa-primary-nav. Letting only the nav shrink means its nowrap list keeps its
+  intrinsic width and simply paints OVER the non-shrinking actions group, which
+  looks different from the reported bug but is no better.
+
+  The 1140px breakpoint above is what actually makes the menu fit; this is the
+  backstop. The production menu comes from HubSpot, so it can carry more or
+  longer items than the seven-item fallback that breakpoint was measured
+  against. If that happens, the links shrink and clip at the nav's edge instead
+  of overlapping the member control.
+
+  overflow: hidden is safe HERE and only here: .wa-nav-dropdown is absolutely
+  positioned inside .wa-primary-nav__item, so it is a SIBLING of the link, not a
+  descendant. Putting overflow on the nav, list or item would clip every desktop
+  dropdown.
+*/
+.wa-primary-nav__list {
+  display: flex;
+  align-items: stretch;
+  list-style: none;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.wa-primary-nav__item {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.wa-primary-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 13px;
+  font-family: var(--wa-font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: color var(--wa-duration-fast);
+  min-height: var(--wa-touch-min);
+}
+
+.wa-site-header .wa-primary-nav__link,
+.wa-site-header .wa-primary-nav__link:visited {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+
+.wa-primary-nav__link:hover,
+.wa-primary-nav__link.is-open,
+.wa-primary-nav__item--has-dropdown:has(.wa-primary-nav__link[aria-expanded="true"]) .wa-primary-nav__link,
+.wa-site-header .wa-primary-nav__link:hover,
+.wa-site-header .wa-primary-nav__link:focus-visible {
+  color: var(--wa-color-accent) !important;
+  text-decoration: none;
+}
+
+.wa-primary-nav__link.is-active,
+.wa-primary-nav__link[aria-current="page"] {
+  color: var(--wa-color-accent);
+}
+
+.wa-primary-nav__link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: -2px;
+  border-radius: var(--wa-radius-sm);
+  color: var(--wa-color-accent);
+}
+
+.wa-primary-nav__chevron {
+  flex-shrink: 0;
+  transition: transform var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.wa-primary-nav__link[aria-expanded="true"] .wa-primary-nav__chevron {
+  transform: rotate(180deg);
+}
+
+/* ── Desktop dropdown ──────────────────────────────────────────────────────── */
+
+.wa-nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  background-color: #ffffff;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  z-index: var(--wa-z-dropdown);
+  display: none;
+}
+
+.wa-primary-nav__item--has-dropdown:has(.wa-primary-nav__link[aria-expanded="true"]) .wa-nav-dropdown,
+.wa-nav-dropdown.is-open {
+  display: block;
+}
+
+.wa-nav-dropdown__link {
+  display: flex;
+  align-items: center;
+  min-height: var(--wa-touch-min);
+  padding: 10px 18px;
+  font-family: var(--wa-font-body);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--wa-color-text);
+  text-decoration: none;
+  transition: background-color var(--wa-duration-fast), color var(--wa-duration-fast);
+}
+
+.wa-nav-dropdown__item:not(:last-child) .wa-nav-dropdown__link {
+  border-bottom: 1px solid var(--wa-color-surface-2);
+}
+
+.wa-nav-dropdown__link:hover,
+.wa-nav-dropdown__link:focus-visible {
+  background-color: var(--wa-color-surface-2);
+  color: var(--wa-color-primary);
+  text-decoration: none;
+}
+
+.wa-nav-dropdown__link:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: -2px;
+}
+
+.wa-nav-dropdown__link.is-active,
+.wa-nav-dropdown__link[aria-current="page"] {
+  color: var(--wa-color-primary);
+  background-color: var(--wa-color-surface-2);
+}
+
+.wa-nav-dropdown__link--overview {
+  font-weight: 400;
+  color: var(--wa-color-text);
+  margin-bottom: 0;
+}
+
+/* ── Nav bar actions ──────────────────────────────────────────────────────── */
+
+.wa-nav-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-2);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.wa-nav-bar__action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--wa-touch-min);
+  height: var(--wa-touch-min);
+  color: #ffffff !important;
+  background: none;
+  border: none;
+  border-radius: var(--wa-radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color var(--wa-duration-fast), background-color var(--wa-duration-fast);
+}
+
+.wa-nav-bar__action-btn:visited,
+.wa-nav-bar__action-btn:hover,
+.wa-nav-bar__action-btn:focus-visible {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+.wa-nav-bar__action-btn svg {
+  stroke: currentColor !important;
+}
+
+.wa-nav-bar__action-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Login CTA button - hidden on mobile/tablet */
+/* Header search panel */
+.wa-header-search {
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 16, 48, 0.08);
+  border-bottom: 1px solid rgba(15, 16, 48, 0.12);
+  box-shadow: 0 18px 48px rgba(15, 16, 48, 0.18);
+}
+
+.wa-header-search[hidden] {
+  display: none;
+}
+
+.wa-header-search__inner {
+  max-width: var(--wa-container-wide);
+  margin: 0 auto;
+  padding: 14px var(--wa-space-5);
+}
+
+.wa-header-search__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--wa-space-3);
+  align-items: center;
+}
+
+.wa-header-search__input {
+  width: 100%;
+  min-height: 48px;
+  border: 1.5px solid rgba(15, 16, 48, 0.16);
+  border-radius: var(--wa-radius-md);
+  background: var(--wa-color-surface);
+  color: var(--wa-color-text);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-base);
+  line-height: var(--wa-leading-normal);
+  padding: 0 var(--wa-space-4);
+  transition:
+    border-color var(--wa-duration-fast) var(--wa-ease-default),
+    box-shadow var(--wa-duration-fast) var(--wa-ease-default),
+    background-color var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.wa-header-search__input::placeholder {
+  color: var(--wa-color-text-muted);
+}
+
+.wa-header-search__input:focus {
+  outline: none;
+  border-color: var(--wa-color-primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(28, 30, 76, 0.14);
+}
+
+.wa-header-search__submit,
+.wa-header-search__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border-radius: var(--wa-radius-md);
+  border: 1.5px solid transparent;
+  font-family: var(--wa-font-body);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--wa-duration-fast) var(--wa-ease-default),
+    border-color var(--wa-duration-fast) var(--wa-ease-default),
+    color var(--wa-duration-fast) var(--wa-ease-default),
+    box-shadow var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.wa-header-search__submit {
+  padding: 0 var(--wa-space-6);
+  background: var(--wa-color-primary);
+  border-color: var(--wa-color-primary);
+  color: #ffffff;
+}
+
+.wa-header-search__submit:hover,
+.wa-header-search__submit:focus-visible {
+  background: var(--wa-color-primary-dark);
+  border-color: var(--wa-color-primary-dark);
+  color: #ffffff;
+}
+
+.wa-header-search__close {
+  width: 48px;
+  padding: 0;
+  background: var(--wa-color-surface-2);
+  border-color: var(--wa-color-border);
+  color: var(--wa-color-text);
+}
+
+.wa-header-search__close:hover,
+.wa-header-search__close:focus-visible {
+  background: #ffffff;
+  border-color: var(--wa-color-primary);
+  color: var(--wa-color-primary);
+}
+
+.wa-header-search__submit:focus-visible,
+.wa-header-search__close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(28, 30, 76, 0.18);
+}
+
+@media (min-width: 1140px) {
+  .wa-header-search__inner {
+    padding-right: var(--wa-space-12);
+    padding-left: var(--wa-space-12);
+  }
+}
+
+@media (max-width: 640px) {
+  .wa-header-search__form {
+    grid-template-columns: minmax(0, 1fr) 48px;
+  }
+
+  .wa-header-search__input {
+    grid-column: 1 / -1;
+  }
+
+  .wa-header-search__submit {
+    width: 100%;
+  }
+}
+
+.wa-nav-bar__member-menu {
+  position: relative;
+  display: none;
+}
+
+.wa-nav-bar__cta {
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 2px solid var(--wa-color-accent);
+  border-radius: var(--wa-radius-md);
+  background-color: var(--wa-color-accent);
+  color: var(--wa-color-on-accent);
+  font-size: 13px;
+  font-weight: 700;
+  min-height: 40px;
+  padding: 0 18px;
+  display: none;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--wa-duration-fast) var(--wa-ease-default),
+    border-color var(--wa-duration-fast) var(--wa-ease-default),
+    color var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.wa-nav-bar__cta:hover,
+.wa-nav-bar__cta:focus-visible {
+  background-color: var(--wa-color-accent-dark);
+  border-color: var(--wa-color-accent-dark);
+  color: var(--wa-color-on-accent);
+  text-decoration: none;
+}
+
+.wa-nav-bar__cta:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 3px;
+}
+
+.wa-nav-bar__cta--profile {
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 12px 4px 6px;
+}
+
+.wa-nav-bar__profile-avatar,
+.wa-nav-bar__profile-icon {
+  align-items: center;
+  background: var(--wa-color-primary);
+  border-radius: 9px;
+  color: #ffffff;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 32px;
+  justify-content: center;
+  line-height: 1;
+  width: 32px;
+}
+
+.wa-nav-bar__profile-avatar {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.wa-nav-bar__profile-icon svg {
+  display: block;
+  height: 16px;
+  width: 16px;
+}
+
+.wa-nav-bar__profile-name {
+  display: inline-block;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+  Issue 54 - Tablet landscape. Just above the desktop breakpoint the full nav is
+  showing but horizontal space is tight, so a long first name at the 150px cap
+  eats room the menu needs. Tighten the member-name cap through the tablet band
+  so it truncates (ellipsis above) instead. Full-width desktop keeps 150px.
+
+  The band runs to 1366px: iPad Pro 12.9" landscape is exactly 1366 CSS px and
+  used to fall through to the roomier desktop cap while still showing the full
+  desktop nav. 1180 (iPad Air / Pro 11") and 1366 both sit inside it.
+
+  1024 (iPad 9.7"/10.2" landscape) is deliberately NOT in this band any more -
+  it is below the 1140px breakpoint and now gets the hamburger, because at that
+  width the menu overlaps the actions by 79px no matter how short the name is.
+*/
+@media (min-width: 1140px) and (max-width: 1366px) {
+  .wa-nav-bar__profile-name {
+    max-width: 96px;
+  }
+
+  /*
+    Shrink the nav's intrinsic width in the same band rather than clipping it.
+    .wa-primary-nav cannot take overflow: hidden - .wa-nav-dropdown is
+    position: absolute inside .wa-primary-nav__item, so clipping the nav would
+    clip every desktop dropdown. Trimming the horizontal padding buys back
+    roughly 4px per link with no effect on the 44px touch target, which is set
+    by min-height.
+  */
+  .wa-primary-nav__link {
+    padding: 0 9px;
+  }
+}
+
+.wa-nav-bar__cta-chevron {
+  flex-shrink: 0;
+  transition: transform var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.wa-nav-bar__member-menu:hover .wa-nav-bar__cta-chevron,
+.wa-nav-bar__member-menu:focus-within .wa-nav-bar__cta-chevron,
+.wa-nav-bar__member-menu.is-open .wa-nav-bar__cta-chevron {
+  transform: rotate(180deg);
+}
+
+.wa-member-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 210px;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid rgba(15, 16, 48, 0.08);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+  z-index: var(--wa-z-dropdown);
+  display: none;
+}
+
+.wa-member-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 0;
+  left: 0;
+  height: 8px;
+}
+
+.wa-nav-bar__member-menu:hover .wa-member-dropdown,
+.wa-nav-bar__member-menu:focus-within .wa-member-dropdown,
+.wa-nav-bar__member-menu.is-open .wa-member-dropdown {
+  display: block;
+}
+
+.wa-member-dropdown__link {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 16px;
+  color: var(--wa-color-text);
+  font-family: var(--wa-font-body);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color var(--wa-duration-fast), color var(--wa-duration-fast);
+}
+
+.wa-member-dropdown__item:not(:last-child) .wa-member-dropdown__link {
+  border-bottom: 1px solid var(--wa-color-surface-2);
+}
+
+.wa-member-dropdown__link:hover,
+.wa-member-dropdown__link:focus-visible {
+  background-color: var(--wa-color-surface-2);
+  color: var(--wa-color-primary);
+  text-decoration: none;
+}
+
+.wa-member-dropdown__link:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: -2px;
+}
+
+@media (min-width: 1140px) {
+  .wa-nav-bar__member-menu {
+    display: block;
+  }
+
+  .wa-nav-bar__cta {
+    display: inline-flex;
+  }
+}
+
+/* ── Hamburger button ─────────────────────────────────────────────────────── */
+
+.wa-hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: var(--wa-touch-min);
+  height: var(--wa-touch-min);
+  background: none;
+  border: none;
+  border-radius: var(--wa-radius-sm);
+  cursor: pointer;
+  padding: var(--wa-space-2);
+  color: #ffffff;
+  transition: color var(--wa-duration-fast), background-color var(--wa-duration-fast);
+  flex-shrink: 0;
+}
+
+.wa-hamburger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.wa-hamburger:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.wa-hamburger__line {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: 2px;
+  transform-origin: center;
+  transition:
+    transform var(--wa-duration-normal) var(--wa-ease-default),
+    opacity var(--wa-duration-normal) var(--wa-ease-default);
+}
+
+.wa-hamburger[aria-expanded="true"] .wa-hamburger__line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.wa-hamburger[aria-expanded="true"] .wa-hamburger__line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.wa-hamburger[aria-expanded="true"] .wa-hamburger__line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Hide hamburger on desktop */
+@media (min-width: 1140px) {
+  .wa-hamburger {
+    display: none;
+  }
+}
+
+/* ── Mobile nav overlay ───────────────────────────────────────────────────── */
+
+.wa-mobile-nav {
+  background-color: var(--wa-color-primary);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  max-height: 80vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* [hidden] uses native behavior - JS removes to show */
+.wa-mobile-nav[hidden] {
+  display: none;
+}
+
+/* Hide on desktop */
+@media (min-width: 1140px) {
+  .wa-mobile-nav {
+    display: none !important;
+  }
+}
+
+.wa-mobile-nav__cta-row {
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wa-mobile-nav__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  border: 2px solid var(--wa-color-accent);
+  border-radius: var(--wa-radius-md);
+  background-color: var(--wa-color-accent);
+  color: var(--wa-color-on-accent);
+  min-height: var(--wa-touch-min);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.wa-mobile-nav__cta-chevron {
+  flex-shrink: 0;
+  transition: transform var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.wa-mobile-nav__cta[aria-expanded="true"] .wa-mobile-nav__cta-chevron {
+  transform: rotate(180deg);
+}
+
+.wa-mobile-nav__cta:hover,
+.wa-mobile-nav__cta:focus-visible {
+  background-color: var(--wa-color-accent-dark);
+  border-color: var(--wa-color-accent-dark);
+  color: var(--wa-color-on-accent);
+  text-decoration: none;
+}
+
+.wa-mobile-nav__cta--profile {
+  justify-content: flex-start;
+  padding-right: 14px;
+}
+
+.wa-mobile-nav__cta--profile .wa-nav-bar__profile-name {
+  flex: 1 1 auto;
+  max-width: none;
+  text-align: left;
+}
+
+.wa-mobile-nav__member-list {
+  display: grid;
+  gap: 2px;
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.wa-mobile-nav__member-list[hidden] {
+  display: none;
+}
+
+.wa-mobile-nav__member-link {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 8px 12px;
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--wa-font-body);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--wa-radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  transition: background-color var(--wa-duration-fast), color var(--wa-duration-fast);
+}
+
+.wa-site-header .wa-mobile-nav__member-link,
+.wa-site-header .wa-mobile-nav__member-link:visited {
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+}
+
+.wa-mobile-nav__member-link:hover,
+.wa-mobile-nav__member-link:focus-visible,
+.wa-site-header .wa-mobile-nav__member-link:hover,
+.wa-site-header .wa-mobile-nav__member-link:focus-visible {
+  color: var(--wa-color-accent);
+  background: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+.wa-mobile-nav__member-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: -2px;
+}
+
+.wa-mobile-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wa-mobile-nav__item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.wa-mobile-nav__link,
+.wa-mobile-nav__parent-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--wa-touch-min);
+  padding: 14px 20px;
+  font-family: var(--wa-font-body);
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: color var(--wa-duration-fast);
+}
+
+.wa-site-header .wa-mobile-nav__link,
+.wa-site-header .wa-mobile-nav__link:visited,
+.wa-site-header .wa-mobile-nav__parent-btn {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+
+.wa-mobile-nav__link:hover,
+.wa-mobile-nav__link:focus-visible,
+.wa-mobile-nav__parent-btn:hover,
+.wa-mobile-nav__parent-btn:focus-visible,
+.wa-site-header .wa-mobile-nav__link:hover,
+.wa-site-header .wa-mobile-nav__link:focus-visible,
+.wa-site-header .wa-mobile-nav__parent-btn:hover,
+.wa-site-header .wa-mobile-nav__parent-btn:focus-visible {
+  color: var(--wa-color-accent);
+  text-decoration: none;
+}
+
+.wa-mobile-nav__link:focus-visible,
+.wa-mobile-nav__parent-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: -2px;
+  border-radius: var(--wa-radius-sm);
+}
+
+.wa-mobile-nav__chevron {
+  flex-shrink: 0;
+  transition: transform var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.wa-mobile-nav__parent-btn[aria-expanded="true"] .wa-mobile-nav__chevron {
+  transform: rotate(180deg);
+}
+
+.wa-mobile-nav__sub {
+  list-style: none;
+  margin: 0;
+  padding-bottom: 4px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.wa-mobile-nav__sub[hidden] {
+  display: none;
+}
+
+.wa-mobile-nav__sub-link {
+  display: block;
+  padding: 11px 32px;
+  font-family: var(--wa-font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  min-height: var(--wa-touch-min);
+  display: flex;
+  align-items: center;
+  transition: color var(--wa-duration-fast);
+}
+
+.wa-site-header .wa-mobile-nav__sub-link,
+.wa-site-header .wa-mobile-nav__sub-link:visited {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+}
+
+.wa-mobile-nav__sub-link:hover,
+.wa-mobile-nav__sub-link:focus-visible,
+.wa-site-header .wa-mobile-nav__sub-link:hover,
+.wa-site-header .wa-mobile-nav__sub-link:focus-visible {
+  color: var(--wa-color-accent);
+  text-decoration: none;
+}
+
+.wa-mobile-nav__sub-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: -2px;
+  border-radius: var(--wa-radius-sm);
+}
+
+.wa-mobile-nav__sub-link--overview {
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.wa-mobile-nav__sub-link.is-active {
+  color: var(--wa-color-accent);
+}
+
+.wa-mobile-nav__contact {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3);
+}
+
+.wa-mobile-nav__contact-link {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  min-height: var(--wa-touch-min);
+  display: inline-flex;
+  align-items: center;
+  transition: color var(--wa-duration-fast);
+}
+
+.wa-mobile-nav__contact-link:hover,
+.wa-mobile-nav__contact-link:focus-visible {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── prefers-reduced-motion ───────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-hamburger__line,
+  .wa-primary-nav__chevron,
+  .wa-mobile-nav__chevron {
+    transition: none !important;
+  }
+}
+
+/*
+ * Portal sub-nav (.wa-portal-nav) styles have moved to the global
+ * components.css so they load on every page via critical.css - the
+ * portal-nav.html partial no longer depends on this module being present.
+ * The offset still reads --wa-site-header-offset (defined above), with
+ * static fallbacks (110px / 72px) for pages without the header module.
+ */
+
+/* ── Utility: sr-only ─────────────────────────────────────────────────────── */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

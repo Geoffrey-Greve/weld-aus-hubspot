@@ -1,0 +1,27 @@
+<!--
+  templateType: page
+  label: Team & Board
+  isAvailableForNewContent: true
+-->
+{#
+  team.html - Public Team & Board directory page.
+  Intended URL: /team/
+
+  This is a plain listing page. Individual profile links currently point to the
+  existing HubDB dynamic parent at /about/team/{person}.
+#}
+{% set page_title = 'Our Team & Board' %}
+{% set page_description = "Meet the people behind Weld Australia - the Board of Directors and the welding engineers, trainers and specialists who support the Australian welding industry." %}
+
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/team-profile.css') }}">
+{% endblock %}
+
+{% block body_class %} is-team-listing-page{% endblock %}
+
+{% block body %}
+{% set team_profile_base = '/about/team/' %}
+{% include "../partials/team-directory-listing.html" %}
+{% endblock %}

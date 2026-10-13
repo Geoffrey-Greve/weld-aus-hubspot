@@ -1,0 +1,160 @@
+[
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Signature events"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Weld Australia's flagship events"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext",
+    "default": "<p>Our marquee dates on the national welding calendar. Explore the National Manufacturing Summit and the Welding Excellence Awards.</p>"
+  },
+  {
+    "name": "features",
+    "label": "Feature links",
+    "type": "group",
+    "help_text": "Each card only appears once it has a link. Leave a link empty to hide a feature until it goes live.",
+    "occurrence": {
+      "min": 0,
+      "max": 4,
+      "default": 2
+    },
+    "default": [
+      {
+        "badge": "Summit",
+        "title": "National Manufacturing Summit",
+        "description": "<p>Australia's premier gathering for manufacturing and sovereign capability. Details and registration open closer to the event.</p>",
+        "link": {
+          "url": {
+            "type": "EXTERNAL",
+            "href": ""
+          },
+          "open_in_new_tab": false,
+          "no_follow": false
+        },
+        "cta_label": "Visit the Summit"
+      },
+      {
+        "badge": "Awards",
+        "title": "Welding Excellence Awards",
+        "description": "<p>Celebrating outstanding achievement across the Australian welding and fabrication industry.</p>",
+        "link": {
+          "url": {
+            "type": "EXTERNAL",
+            "href": "/awards/"
+          },
+          "open_in_new_tab": false,
+          "no_follow": false
+        },
+        "cta_label": "View the Awards"
+      }
+    ],
+    "children": [
+      {
+        "name": "badge",
+        "label": "Badge / eyebrow",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "description",
+        "label": "Description",
+        "type": "richtext",
+        "default": ""
+      },
+      {
+        "name": "image",
+        "label": "Image (optional)",
+        "type": "image",
+        "default": {
+          "src": "",
+          "alt": ""
+        }
+      },
+      {
+        "name": "link",
+        "label": "Link",
+        "type": "link",
+        "help_text": "Leave empty to hide this card until the feature is available.",
+        "default": {
+          "url": {
+            "type": "EXTERNAL",
+            "href": ""
+          },
+          "open_in_new_tab": false,
+          "no_follow": false
+        }
+      },
+      {
+        "name": "cta_label",
+        "label": "Button label",
+        "type": "text",
+        "default": "Learn more"
+      }
+    ]
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"]
+    ],
+    "default": "surface_alt"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact"],
+      ["default", "Default"],
+      ["spacious", "Spacious"]
+    ],
+    "default": "spacious"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in members."
+  }
+]

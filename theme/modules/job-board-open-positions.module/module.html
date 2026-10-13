@@ -1,0 +1,892 @@
+{#
+  job-board-open-positions.module/module.html
+  Editable wrapper/UI for the Job Board listing. Reads published rows from HubDB only.
+#}
+
+{% import "../../templates/partials/_job-apply.html" as ja %}
+
+{#
+  apply_attrs - href/target for a normal (non-email) Apply CTA.
+  Email-apply roles use obfuscated data-job-apply-* attrs instead (defect 68).
+#}
+{% macro apply_attrs(href, new_tab) %}
+  href="{{ href }}"{% if new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}
+{% endmacro %}
+
+{% set _section_id = module.section_id|default('job-board-open-roles', true) %}
+{# Only jobs ticked "Active (visible on site)" should appear publicly. #}
+{% set _jobs_rows = hubdb_table_rows('jobs', 'is_active__eq=true&orderBy=-is_featured&orderBy=-date_posted&limit=200') %}
+{% set _jobs_count = _jobs_rows|length %}
+{% set _page_size = module.jobs_per_page|default(10, true)|int %}
+{% if _page_size < 1 or _page_size > 10 %}
+  {% set _page_size = 10 %}
+{% endif %}
+{% set _total_pages = ((_jobs_count + _page_size - 1) / _page_size)|int %}
+{% set _initial_visible_count = _page_size %}
+{% if _jobs_count < _page_size %}
+  {% set _initial_visible_count = _jobs_count %}
+{% endif %}
+{% set _jobs_ns = namespace(featured=false) %}
+{% for _job in _jobs_rows %}
+  {% if _job.is_featured and not _jobs_ns.featured %}
+    {% set _jobs_ns.featured = _job %}
+  {% endif %}
+{% endfor %}
+{% if not _jobs_ns.featured and _jobs_count > 0 %}
+  {% set _jobs_ns.featured = _jobs_rows[0] %}
+{% endif %}
+
+<section class="wa-job-board wa-section wa-section--surface wa-section--spacious" id="{{ _section_id }}" data-job-board data-page-size="{{ _page_size }}" data-updated-label="{{ module.updated_label|default('updated daily', true)|escape_attr }}">
+  <div class="container">
+    {% if _jobs_ns.featured %}
+      {% set _featured = _jobs_ns.featured %}
+      {% set _featured_type = _featured.job_type.name|default(_featured.job_type, true) %}
+      {% set _featured_state = _featured.job_state.name|default(_featured.job_state, true) %}
+      {% set _featured_arrangement = _featured.arrangement.name|default(_featured.arrangement, true) %}
+      {% set _featured_category = _featured.category.name|default(_featured.category, true) %}
+      {% set _featured_title_lower = _featured.job_title|default('', true)|lower %}
+      {% set _featured_role_family = module.trades_label|default('Trades & Workshop', true) %}
+      {% set _featured_role_key = 'trades' %}
+      {% if _featured_category == 'Inspector' or 'inspector' in _featured_title_lower or 'quality' in _featured_title_lower %}
+        {% set _featured_role_family = module.inspection_label|default('Inspection & Quality', true) %}
+        {% set _featured_role_key = 'inspection' %}
+      {% elif _featured_category == 'Supervisor' or _featured_category == 'Management' or 'supervisor' in _featured_title_lower or 'manager' in _featured_title_lower or 'lead' in _featured_title_lower %}
+        {% set _featured_role_family = module.leadership_label|default('Supervision & Leadership', true) %}
+        {% set _featured_role_key = 'leadership' %}
+      {% elif _featured_category == 'Apprentice' or 'apprentice' in _featured_title_lower %}
+        {% set _featured_role_family = module.apprenticeships_label|default('Apprenticeships', true) %}
+        {% set _featured_role_key = 'apprenticeships' %}
+      {% elif _featured_category == 'Engineer' or _featured_category == 'Technologist' or 'engineer' in _featured_title_lower or 'technologist' in _featured_title_lower %}
+        {% set _featured_role_family = module.engineering_label|default('Engineering', true) %}
+        {% set _featured_role_key = 'engineering' %}
+      {% endif %}
+      {% set _featured_excerpt = _featured.excerpt|default('', true) %}
+      {% if not _featured_excerpt %}
+        {% set _featured_excerpt = _featured.job_description|striptags|truncate(220) %}
+      {% endif %}
+      {% set _featured_mode = ja.apply_mode(_featured) | trim %}
+      {% set _featured_web_url = ja.apply_url(_featured) | trim %}
+      {% set _featured_loc_label = _featured.job_location|default('', true) %}
+      {% if _featured_state %}{% if _featured_loc_label %}{% set _featured_loc_label = _featured_loc_label ~ ', ' ~ _featured_state %}{% else %}{% set _featured_loc_label = _featured_state %}{% endif %}{% endif %}
+      {% set _featured_route = _featured.hs_path|default(_featured.path, true)|default(_featured.slug, true) %}
+      {% set _featured_detail_href = '#' %}
+      {% if _featured_route %}
+        {% set _featured_detail_href = '/job-board/' ~ _featured_route %}
+      {% elif _featured_web_url %}
+        {% set _featured_detail_href = _featured_web_url %}
+      {% endif %}
+      {#- Email-apply: obfuscated mailto on click (defect 68). Fallback href
+          lands on the job page #apply section if JS is unavailable. -#}
+      {% set _featured_apply_subject = 'Application: ' ~ (_featured.job_title | default('role', true) | striptags) %}
+      {% if _featured.ref %}
+        {% set _featured_apply_subject = _featured_apply_subject ~ ' (ref ' ~ (_featured.ref | striptags) ~ ')' %}
+      {% endif %}
+      {% if _featured_mode == 'url' %}
+        {% set _featured_apply_href = _featured_web_url %}
+        {% set _featured_apply_new_tab = true %}
+        {% set _featured_apply_email = false %}
+      {% elif _featured_mode == 'email' %}
+        {% set _featured_apply_href = _featured_detail_href ~ '#apply' %}
+        {% set _featured_apply_new_tab = false %}
+        {% set _featured_apply_email = true %}
+      {% else %}
+        {% set _featured_apply_href = '' %}
+        {% set _featured_apply_new_tab = false %}
+        {% set _featured_apply_email = false %}
+      {% endif %}
+
+      <div class="wa-job-board-featured" data-job-featured>
+        <div class="wa-job-board-section-head">
+          {% if module.featured_eyebrow %}
+            <p class="wa-job-board__eyebrow">{{ module.featured_eyebrow }}</p>
+          {% endif %}
+          {% if module.featured_heading %}
+            <h2>{{ module.featured_heading }}</h2>
+          {% endif %}
+        </div>
+
+        <article class="wa-job-featured-card wa-job-featured-card--{{ _featured_role_key }}"
+          data-job-url="{{ _featured_detail_href }}"
+          data-job-title="{{ _featured.job_title|default('Welding opportunity', true)|striptags|escape_attr }}"
+          data-job-company="{{ _featured.company_name|default('', true)|striptags|escape_attr }}"
+          data-job-location="{{ _featured_loc_label|striptags|escape_attr }}"
+          data-job-category="{{ _featured_role_family|escape_attr }}">
+          <div class="wa-job-featured-card__topline"></div>
+          <div class="wa-job-featured-card__body">
+            <div class="wa-job-featured-card__badges">
+              {% if module.featured_badge_label %}
+                <span class="wa-job-featured-card__badge wa-job-featured-card__badge--featured">{{ module.featured_badge_label }}</span>
+              {% endif %}
+              <span class="wa-job-board-category wa-job-board-category--{{ _featured_role_key }}">{{ _featured_role_family }}</span>
+            </div>
+
+            <div class="wa-job-featured-card__layout">
+              <div class="wa-job-featured-card__main">
+                <div class="wa-job-board-monogram wa-job-board-monogram--inverse" aria-hidden="true">
+                  {{ _featured.company_name|default('Weld Australia', true)|striptags|truncate(2, true, '') }}
+                </div>
+                <div>
+                  <h3>{{ _featured.job_title|default('Welding opportunity', true) }}</h3>
+                  {% if _featured.company_name %}
+                    <p class="wa-job-featured-card__company">{{ _featured.company_name }}</p>
+                  {% endif %}
+                  {% if _featured.sector and _featured.sector.name %}
+                    <p class="wa-job-featured-card__sector">{{ _featured.sector.name }}</p>
+                  {% elif _featured.sector %}
+                    <p class="wa-job-featured-card__sector">{{ _featured.sector }}</p>
+                  {% endif %}
+                  {% if _featured_excerpt %}
+                    <p class="wa-job-featured-card__excerpt">{{ _featured_excerpt }}</p>
+                  {% endif %}
+                  <ul class="wa-job-featured-card__facts" role="list">
+                    {% if _featured.job_location or _featured_state %}
+                      <li>{% if _featured.job_location %}{{ _featured.job_location }}{% if _featured_state %}, {% endif %}{% endif %}{{ _featured_state }}</li>
+                    {% endif %}
+                    {% if _featured_type or _featured_arrangement %}
+                      <li>{% if _featured_type %}{{ _featured_type }}{% if _featured_arrangement %} · {% endif %}{% endif %}{{ _featured_arrangement }}</li>
+                    {% endif %}
+                    {% if _featured.salary %}
+                      <li>{{ _featured.salary }}{% if _featured.salary_note %} {{ _featured.salary_note }}{% endif %}</li>
+                    {% endif %}
+                  </ul>
+                </div>
+              </div>
+
+              <div class="wa-job-featured-card__actions">
+                {% if _featured_apply_href and module.featured_apply_label %}
+                  {% if _featured_apply_email %}
+                    <a class="btn btn-gold" href="{{ _featured_apply_href }}"{{ ja.obfuscated_apply_attrs(_featured, _featured_apply_subject) }}>{{ module.featured_apply_label }}</a>
+                  {% else %}
+                    <a class="btn btn-gold" {{ apply_attrs(_featured_apply_href, _featured_apply_new_tab) }}>{{ module.featured_apply_label }}</a>
+                  {% endif %}
+                {% endif %}
+                {% if module.featured_details_label %}
+                  <a class="wa-job-featured-card__details" href="{{ _featured_detail_href }}">{{ module.featured_details_label }} <span aria-hidden="true">→</span></a>
+                {% endif %}
+                {#- Defect 67: Save jobs UI hidden for now (device-local saves have no
+                    clear home for individual vs corporate members). Restore with a
+                    portal-aware saved list when ready. -#}
+                <p class="wa-job-featured-card__meta">
+                  {% if _featured.closing_date %}
+                    Closes {{ _featured.closing_date|datetimeformat('%d %b %Y') }}
+                  {% endif %}
+                  {% if _featured.ref %}
+                    {% if _featured.closing_date %} · {% endif %}ref {{ _featured.ref }}
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    {% endif %}
+
+    <div class="wa-job-board-section-head wa-job-board-section-head--listing">
+      <div>
+        {% if module.listing_eyebrow %}
+          <p class="wa-job-board__eyebrow">{{ module.listing_eyebrow }}</p>
+        {% endif %}
+        {% if module.listing_heading %}
+          <h2>{{ module.listing_heading }}</h2>
+        {% endif %}
+      </div>
+      <p class="wa-job-board__result-count" data-job-count aria-live="polite">
+        {{ _jobs_count }} role{% if _jobs_count != 1 %}s{% endif %}
+      </p>
+    </div>
+
+    <div class="wa-job-board-toolbar" aria-label="Filter jobs">
+      <div class="wa-job-board-tabs" role="list" aria-label="Role family filters">
+        <button class="wa-job-board-chip is-active" type="button" data-filter-category="all" aria-pressed="true">
+          {{ module.all_roles_label|default('All', true) }} <span data-category-count="all"></span>
+        </button>
+        <button class="wa-job-board-chip" type="button" data-filter-category="trades" aria-pressed="false">
+          <span class="wa-job-board-chip__dot wa-job-board-chip__dot--trades" aria-hidden="true"></span>
+          {{ module.trades_label|default('Trades & Workshop', true) }} <span data-category-count="trades"></span>
+        </button>
+        <button class="wa-job-board-chip" type="button" data-filter-category="engineering" aria-pressed="false">
+          <span class="wa-job-board-chip__dot wa-job-board-chip__dot--engineering" aria-hidden="true"></span>
+          {{ module.engineering_label|default('Engineering', true) }} <span data-category-count="engineering"></span>
+        </button>
+        <button class="wa-job-board-chip" type="button" data-filter-category="inspection" aria-pressed="false">
+          <span class="wa-job-board-chip__dot wa-job-board-chip__dot--inspection" aria-hidden="true"></span>
+          {{ module.inspection_label|default('Inspection & Quality', true) }} <span data-category-count="inspection"></span>
+        </button>
+        <button class="wa-job-board-chip" type="button" data-filter-category="leadership" aria-pressed="false">
+          <span class="wa-job-board-chip__dot wa-job-board-chip__dot--leadership" aria-hidden="true"></span>
+          {{ module.leadership_label|default('Supervision & Leadership', true) }} <span data-category-count="leadership"></span>
+        </button>
+        <button class="wa-job-board-chip" type="button" data-filter-category="apprenticeships" aria-pressed="false">
+          <span class="wa-job-board-chip__dot wa-job-board-chip__dot--apprenticeships" aria-hidden="true"></span>
+          {{ module.apprenticeships_label|default('Apprenticeships', true) }} <span data-category-count="apprenticeships"></span>
+        </button>
+      </div>
+
+      <div class="wa-job-board-toolbar__utility">
+        <label class="wa-job-board-search" for="{{ name }}-search">
+          <span class="wa-visually-hidden">Search roles or companies</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input id="{{ name }}-search" type="search" placeholder="{{ module.search_placeholder|default('Search roles or companies...', true)|escape_attr }}" data-job-search autocomplete="off">
+        </label>
+        {#- Defect 67: Saved jobs toggle hidden until a portal-aware list ships. -#}
+      </div>
+
+      <div class="wa-job-board-filters">
+        <label class="wa-job-board-select">
+          <span>{{ module.location_label|default('Location', true) }}</span>
+          <select data-filter-state>
+            <option value="all">{{ module.all_locations_label|default('All locations', true) }}</option>
+            <option value="NSW">New South Wales</option>
+            <option value="VIC">Victoria</option>
+            <option value="QLD">Queensland</option>
+            <option value="SA">South Australia</option>
+            <option value="WA">Western Australia</option>
+            <option value="TAS">Tasmania</option>
+            <option value="NT">Northern Territory</option>
+            <option value="ACT">Australian Capital Territory</option>
+          </select>
+        </label>
+
+        <div class="wa-job-board-filter-group" aria-label="Employment type">
+          <button class="wa-job-board-filter is-active" type="button" data-filter-type="all" aria-pressed="true">{{ module.all_types_label|default('All types', true) }}</button>
+          <button class="wa-job-board-filter" type="button" data-filter-type="Full-time" aria-pressed="false">Full-time</button>
+          <button class="wa-job-board-filter" type="button" data-filter-type="Part-time" aria-pressed="false">Part-time</button>
+          <button class="wa-job-board-filter" type="button" data-filter-type="Contract" aria-pressed="false">Contract</button>
+          <button class="wa-job-board-filter" type="button" data-filter-type="Apprenticeship" aria-pressed="false">Apprenticeship</button>
+        </div>
+
+        <div class="wa-job-board-filter-group" aria-label="Work arrangement">
+          <button class="wa-job-board-filter is-active" type="button" data-filter-arrangement="all" aria-pressed="true">{{ module.all_arrangements_label|default('All arrangements', true) }}</button>
+          <button class="wa-job-board-filter" type="button" data-filter-arrangement="onsite" aria-pressed="false">On-site</button>
+          <button class="wa-job-board-filter" type="button" data-filter-arrangement="hybrid" aria-pressed="false">Hybrid</button>
+          <button class="wa-job-board-filter" type="button" data-filter-arrangement="remote" aria-pressed="false">Remote</button>
+          <button class="wa-job-board-filter" type="button" data-filter-arrangement="fifo" aria-pressed="false">FIFO</button>
+        </div>
+
+        <button class="wa-job-board-clear" type="button" data-clear-filters hidden>{{ module.clear_filters_label|default('Clear filters', true) }}</button>
+      </div>
+    </div>
+
+    {% if _jobs_count > 0 %}
+      <div class="wa-job-board-list" data-job-list>
+        {% set _render_ns = namespace(display_index=0) %}
+        {% for _job in _jobs_rows %}
+          {% if _job.job_title or _job.company_name %}
+            {% set _render_ns.display_index = _render_ns.display_index + 1 %}
+            {% set _job_type = _job.job_type.name|default(_job.job_type, true) %}
+            {% set _job_state = _job.job_state.name|default(_job.job_state, true) %}
+            {% set _job_arrangement_raw = _job.arrangement.name|default(_job.arrangement, true) %}
+            {% set _job_arrangement_lower = _job_arrangement_raw|default('', true)|lower %}
+            {% set _job_arrangement_label = _job_arrangement_raw %}
+            {% set _job_arrangement_key = '' %}
+            {% if _job_arrangement_lower == 'on-site' or _job_arrangement_lower == 'on site' or _job_arrangement_lower == 'onsite' %}
+              {% set _job_arrangement_label = 'On-site' %}
+              {% set _job_arrangement_key = 'onsite' %}
+            {% elif _job_arrangement_lower == 'fly-in fly-out' or _job_arrangement_lower == 'fifo' %}
+              {% set _job_arrangement_label = 'FIFO' %}
+              {% set _job_arrangement_key = 'fifo' %}
+            {% elif _job_arrangement_lower == 'remote' %}
+              {% set _job_arrangement_key = 'remote' %}
+            {% elif _job_arrangement_lower == 'hybrid' %}
+              {% set _job_arrangement_key = 'hybrid' %}
+            {% endif %}
+            {% set _job_category = _job.category.name|default(_job.category, true) %}
+            {% set _job_title_lower = _job.job_title|default('', true)|lower %}
+            {% set _job_role_family = module.trades_label|default('Trades & Workshop', true) %}
+            {% set _job_role_key = 'trades' %}
+            {% if _job_category == 'Inspector' or 'inspector' in _job_title_lower or 'quality' in _job_title_lower %}
+              {% set _job_role_family = module.inspection_label|default('Inspection & Quality', true) %}
+              {% set _job_role_key = 'inspection' %}
+            {% elif _job_category == 'Supervisor' or _job_category == 'Management' or 'supervisor' in _job_title_lower or 'manager' in _job_title_lower or 'lead' in _job_title_lower %}
+              {% set _job_role_family = module.leadership_label|default('Supervision & Leadership', true) %}
+              {% set _job_role_key = 'leadership' %}
+            {% elif _job_category == 'Apprentice' or 'apprentice' in _job_title_lower %}
+              {% set _job_role_family = module.apprenticeships_label|default('Apprenticeships', true) %}
+              {% set _job_role_key = 'apprenticeships' %}
+            {% elif _job_category == 'Engineer' or _job_category == 'Technologist' or 'engineer' in _job_title_lower or 'technologist' in _job_title_lower %}
+              {% set _job_role_family = module.engineering_label|default('Engineering', true) %}
+              {% set _job_role_key = 'engineering' %}
+            {% endif %}
+            {% set _job_excerpt = _job.excerpt|default('', true) %}
+            {% if not _job_excerpt %}
+              {% set _job_excerpt = _job.job_description|striptags|truncate(190) %}
+            {% endif %}
+            {% set _job_mode = ja.apply_mode(_job) | trim %}
+            {% set _job_web_url = ja.apply_url(_job) | trim %}
+            {% set _job_route = _job.hs_path|default(_job.path, true)|default(_job.slug, true) %}
+            {% set _job_detail_href = '#' %}
+            {% if _job_route %}
+              {% set _job_detail_href = '/job-board/' ~ _job_route %}
+            {% elif _job_web_url %}
+              {% set _job_detail_href = _job_web_url %}
+            {% endif %}
+            {#- Email-apply: obfuscated mailto on click (defect 68). -#}
+            {% set _job_apply_subject = 'Application: ' ~ (_job.job_title | default('role', true) | striptags) %}
+            {% if _job.ref %}
+              {% set _job_apply_subject = _job_apply_subject ~ ' (ref ' ~ (_job.ref | striptags) ~ ')' %}
+            {% endif %}
+            {% if _job_mode == 'url' %}
+              {% set _job_apply_href = _job_web_url %}
+              {% set _job_apply_new_tab = true %}
+              {% set _job_apply_email = false %}
+            {% elif _job_mode == 'email' %}
+              {% set _job_apply_href = _job_detail_href ~ '#apply' %}
+              {% set _job_apply_new_tab = false %}
+              {% set _job_apply_email = true %}
+            {% else %}
+              {% set _job_apply_href = '' %}
+              {% set _job_apply_new_tab = false %}
+              {% set _job_apply_email = false %}
+            {% endif %}
+            {% set _job_loc_label = _job.job_location|default('', true) %}
+            {% if _job_state %}{% if _job_loc_label %}{% set _job_loc_label = _job_loc_label ~ ', ' ~ _job_state %}{% else %}{% set _job_loc_label = _job_state %}{% endif %}{% endif %}
+
+            <article
+              class="wa-job-board-card wa-job-board-card--{{ _job_role_key }}{% if _render_ns.display_index > _page_size %} is-job-hidden{% endif %}"
+              data-job-card
+              data-category="{{ _job_role_key }}"
+              data-state="{{ _job_state }}"
+              data-type="{{ _job_type }}"
+              data-arrangement="{{ _job_arrangement_key }}"
+              data-job-url="{{ _job_detail_href }}"
+              data-job-title="{{ _job.job_title|default('Welding opportunity', true)|striptags|escape_attr }}"
+              data-job-company="{{ _job.company_name|default('', true)|striptags|escape_attr }}"
+              data-job-location="{{ _job_loc_label|striptags|escape_attr }}"
+              data-job-category="{{ _job_role_family|escape_attr }}"
+              data-search="{{ _job.job_title|striptags|lower|escape }} {{ _job.company_name|striptags|lower|escape }} {{ _job.job_location|striptags|lower|escape }} {{ _job_role_family|lower|escape }} {{ _job_excerpt|striptags|lower|escape }}"
+              aria-hidden="{% if _render_ns.display_index > _page_size %}true{% else %}false{% endif %}"
+              {% if _render_ns.display_index > _page_size %}hidden{% endif %}
+            >
+              <div class="wa-job-board-card__identity">
+                <div class="wa-job-board-monogram wa-job-board-monogram--{{ _job_role_key }}" aria-hidden="true">
+                  {{ _job.company_name|default('WA', true)|striptags|truncate(2, true, '') }}
+                </div>
+
+                <div class="wa-job-board-card__content">
+                  <div class="wa-job-board-card__title-row">
+                    <h3><a href="{{ _job_detail_href }}">{{ _job.job_title|default('Welding opportunity', true) }}</a></h3>
+                  </div>
+                  <div class="wa-job-board-card__meta">
+                    {% if _job.company_name %}
+                      <span class="wa-job-board-card__company">{{ _job.company_name }}</span>
+                    {% endif %}
+                    {% if _job.job_location or _job_state %}
+                      <span>{% if _job.job_location %}{{ _job.job_location }}{% if _job_state %}, {% endif %}{% endif %}{{ _job_state }}</span>
+                    {% endif %}
+                    {% if _job_arrangement_label %}
+                      <span>{{ _job_arrangement_label }}</span>
+                    {% endif %}
+                  </div>
+                  {% if _job_excerpt %}
+                    <p class="wa-job-board-card__excerpt">{{ _job_excerpt }}</p>
+                  {% endif %}
+                  <div class="wa-job-board-card__tags">
+                    <span class="wa-job-board-category wa-job-board-category--{{ _job_role_key }}">{{ _job_role_family }}</span>
+                    {% if _job_type %}
+                      <span class="wa-job-board-type">{{ _job_type }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="wa-job-board-card__side">
+                <div class="wa-job-board-card__salary">
+                  {% if _job.salary %}
+                    <span>{{ _job.salary }}</span>
+                    {% if _job.salary_note %}<small>{{ _job.salary_note }}</small>{% endif %}
+                  {% else %}
+                    <span>Competitive</span>
+                    <small>Salary details on application</small>
+                  {% endif %}
+                </div>
+                <div class="wa-job-board-card__actions">
+                  {#- Defect 67: per-card Save control hidden for now. -#}
+                  {% if _job.date_posted %}
+                    <span class="wa-job-board-card__posted">Posted {{ _job.date_posted|datetimeformat('%d %b %Y') }}</span>
+                  {% endif %}
+                  {% if module.card_details_label %}
+                    <a class="wa-job-board-card__link" href="{{ _job_detail_href }}">{{ module.card_details_label }} <span aria-hidden="true">→</span></a>
+                  {% endif %}
+                  {% if _job_apply_href and module.card_apply_label %}
+                    {% if _job_apply_email %}
+                      <a class="wa-job-board-card__apply" href="{{ _job_apply_href }}"{{ ja.obfuscated_apply_attrs(_job, _job_apply_subject) }}>{{ module.card_apply_label }}</a>
+                    {% else %}
+                      <a class="wa-job-board-card__apply" {{ apply_attrs(_job_apply_href, _job_apply_new_tab) }}>{{ module.card_apply_label }}</a>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            </article>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="wa-job-board-empty" data-job-empty hidden
+        data-empty-filter-heading="{{ module.no_filter_results_heading|default('No roles match those filters', true)|escape_attr }}"
+        data-empty-filter-text="{{ module.no_filter_results_text|default('Try a different role family, location, employment type or keyword.', true)|escape_attr }}"
+        data-empty-saved-heading="{{ module.no_saved_heading|default('You haven\'t saved any jobs yet', true)|escape_attr }}"
+        data-empty-saved-text="{{ module.no_saved_text|default('Tap the bookmark on any role to save it here so you can find it again later.', true)|escape_attr }}">
+        <h3 data-job-empty-heading>{{ module.no_filter_results_heading|default('No roles match those filters', true) }}</h3>
+        <p data-job-empty-text>{{ module.no_filter_results_text|default('Try a different role family, location, employment type or keyword.', true) }}</p>
+        <button class="btn btn-primary" type="button" data-clear-filters-empty>{{ module.clear_filters_label|default('Clear filters', true) }}</button>
+      </div>
+      <nav class="wa-job-board-pagination" data-job-pagination aria-label="Job listings pagination" {% if _jobs_count <= _page_size %}hidden{% endif %}>
+        {% if _total_pages > 1 %}
+          <button class="wa-job-board-pagination__button" type="button" data-job-page-prev disabled>Previous</button>
+          {% for _page in range(1, _total_pages + 1) %}
+            <button
+              class="wa-job-board-pagination__button{% if _page == 1 %} is-active{% endif %}"
+              type="button"
+              data-job-page="{{ _page }}"
+              {% if _page == 1 %}aria-current="page"{% endif %}
+            >{{ _page }}</button>
+          {% endfor %}
+          <button class="wa-job-board-pagination__button" type="button" data-job-page-next {% if _jobs_count <= _page_size %}disabled{% endif %}>Next</button>
+        {% endif %}
+      </nav>
+      <p class="wa-job-board-showing" data-job-showing>Showing 1-{{ _initial_visible_count }} of {{ _jobs_count }} open roles · {{ module.updated_label|default('updated daily', true) }}</p>
+    {% else %}
+      <div class="wa-job-board-empty wa-job-board-empty--visible">
+        <h3>{{ module.no_jobs_heading|default('No jobs are listed currently.', true) }}</h3>
+        <p>{{ module.no_jobs_text|default('Please check back soon, or contact Weld Australia if you would like to advertise a vacancy.', true) }}</p>
+      </div>
+    {% endif %}
+
+    {#- Defect 67: Saved orphans panel hidden with the rest of Save jobs. -#}
+  </div>
+</section>
+
+<script>
+(() => {
+  const roots = Array.from(document.querySelectorAll('[data-job-board]'));
+  if (!roots.length) return;
+
+  // Saved jobs (defect 67) - device-local localStorage contract. UI is hidden
+  // until a portal-aware saved list exists for individual + corporate members.
+  const SAVED_JOBS_ENABLED = false;
+  const SAVED_KEY = 'wa_saved_jobs';
+  const toPath = (href) => {
+    try { return new URL(href, window.location.origin).pathname; }
+    catch (e) { return href || ''; }
+  };
+  const readSaved = () => {
+    try {
+      const raw = window.localStorage.getItem(SAVED_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+  };
+  const writeSaved = (list) => {
+    try { window.localStorage.setItem(SAVED_KEY, JSON.stringify(list)); }
+    catch (e) {}
+  };
+  const savedPathSet = () => new Set(readSaved().map((item) => toPath(item && item.url)));
+
+  roots.forEach((root) => {
+  if (root.dataset.jobBoardPaginationReady === 'true') return;
+  root.dataset.jobBoardPaginationReady = 'true';
+
+  const cards = Array.from(root.querySelectorAll('[data-job-card]'));
+  const categoryButtons = Array.from(root.querySelectorAll('[data-filter-category]'));
+  const typeButtons = Array.from(root.querySelectorAll('[data-filter-type]'));
+  const arrangementButtons = Array.from(root.querySelectorAll('[data-filter-arrangement]'));
+  const saveToggles = Array.from(root.querySelectorAll('[data-job-save-toggle]'));
+  const featuredEl = root.querySelector('[data-job-featured]');
+  const stateSelect = root.querySelector('[data-filter-state]');
+  const searchInput = root.querySelector('[data-job-search]');
+  const countEl = root.querySelector('[data-job-count]');
+  const showingEl = root.querySelector('[data-job-showing]');
+  const emptyEl = root.querySelector('[data-job-empty]');
+  const emptyHeadingEl = root.querySelector('[data-job-empty-heading]');
+  const emptyTextEl = root.querySelector('[data-job-empty-text]');
+  const paginationEl = root.querySelector('[data-job-pagination]');
+  const clearButton = root.querySelector('[data-clear-filters]');
+  const clearEmptyButton = root.querySelector('[data-clear-filters-empty]');
+  const orphansEl = root.querySelector('[data-job-saved-orphans]');
+  const orphansListEl = root.querySelector('[data-job-saved-orphans-list]');
+  const updatedLabel = root.getAttribute('data-updated-label') || 'updated daily';
+  const rawPageSize = Number.parseInt(root.getAttribute('data-page-size') || '10', 10);
+  const pageSize = Number.isFinite(rawPageSize) && rawPageSize > 0 ? Math.min(rawPageSize, 10) : 10;
+  let currentPage = 1;
+
+  let filters = {
+    category: 'all',
+    state: 'all',
+    type: 'all',
+    arrangement: 'all',
+    query: '',
+  };
+
+  const normaliseText = (value) => String(value || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+  const cardSearchIndex = new Map(cards.map((card) => [
+    card,
+    normaliseText(`${card.getAttribute('data-search') || ''} ${card.textContent || ''}`),
+  ]));
+
+  const setPressed = (buttons, activeValue, attr) => {
+    buttons.forEach((button) => {
+      const isActive = button.getAttribute(attr) === activeValue;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+  };
+
+  const updateCounts = () => {
+    categoryButtons.forEach((button) => {
+      const key = button.getAttribute('data-filter-category') || 'all';
+      let count;
+      if (key === 'all') {
+        count = cards.length;
+      } else if (key === 'saved') {
+        // Everything saved on this device, including roles no longer on the
+        // board - the saved view renders both, so the count must match.
+        count = readSaved().length;
+      } else {
+        count = cards.filter((card) => card.dataset.category === key).length;
+      }
+      const target = button.querySelector(`[data-category-count="${key}"]`);
+      if (target) target.textContent = count ? String(count) : '0';
+    });
+  };
+
+  const refreshSaveButtons = () => {
+    const saved = savedPathSet();
+    saveToggles.forEach((toggle) => {
+      const host = toggle.closest('[data-job-url]');
+      const path = host ? toPath(host.dataset.jobUrl) : '';
+      const isOn = Boolean(path) && saved.has(path);
+      toggle.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+      toggle.classList.toggle('is-saved', isOn);
+      toggle.setAttribute('aria-label', isOn ? 'Remove from saved jobs' : 'Save this role');
+      toggle.setAttribute('title', isOn ? 'Saved' : 'Save this role');
+      const label = toggle.querySelector('[data-job-save-toggle-label]');
+      if (label) label.textContent = isOn ? 'Saved - remove from saved jobs' : 'Save this role';
+    });
+    updateCounts();
+  };
+
+  // Saved entries with no card on this page - a role that has been withdrawn or
+  // that falls outside the 200-row query. Rebuilt from the payload captured at
+  // save time so the saved view never silently drops one (defect 67).
+  const orphanEntries = () => {
+    const cardPaths = new Set(cards.map((card) => toPath(card.dataset.jobUrl)));
+    return readSaved().filter((item) => {
+      const path = toPath(item && item.url);
+      return Boolean(path) && !cardPaths.has(path);
+    });
+  };
+
+  const renderOrphans = (show) => {
+    if (!orphansEl || !orphansListEl) return 0;
+    const entries = show ? orphanEntries() : [];
+    orphansEl.hidden = entries.length === 0;
+    orphansListEl.textContent = '';
+
+    entries.forEach((entry) => {
+      const item = document.createElement('li');
+      item.className = 'wa-job-board-saved-orphan';
+
+      const link = document.createElement('a');
+      link.className = 'wa-job-board-saved-orphan__title';
+      link.href = entry.url || '#';
+      link.textContent = entry.title || 'Saved role';
+      item.appendChild(link);
+
+      const meta = [entry.company, entry.location].filter(Boolean).join(' · ');
+      if (meta) {
+        const metaEl = document.createElement('p');
+        metaEl.className = 'wa-job-board-saved-orphan__meta';
+        metaEl.textContent = meta;
+        item.appendChild(metaEl);
+      }
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'wa-job-board-saved-orphan__remove';
+      remove.textContent = 'Remove';
+      remove.setAttribute('aria-label', 'Remove ' + (entry.title || 'this role') + ' from saved jobs');
+      remove.addEventListener('click', () => {
+        const path = toPath(entry.url);
+        writeSaved(readSaved().filter((saved) => saved && toPath(saved.url) !== path));
+        refreshSaveButtons();
+        applyFilters();
+      });
+      item.appendChild(remove);
+
+      orphansListEl.appendChild(item);
+    });
+
+    return entries.length;
+  };
+
+  const hasActiveFilters = () => (
+    filters.category !== 'all' ||
+    filters.state !== 'all' ||
+    filters.type !== 'all' ||
+    filters.arrangement !== 'all' ||
+    filters.query.length > 0
+  );
+
+  const renderPagination = (totalPages) => {
+    if (!paginationEl) return;
+
+    paginationEl.innerHTML = '';
+    paginationEl.hidden = totalPages <= 1;
+    if (totalPages <= 1) return;
+
+    const createButton = (label, page, options = {}) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'wa-job-board-pagination__button';
+      button.textContent = label;
+      button.disabled = Boolean(options.disabled);
+      if (options.current) {
+        button.classList.add('is-active');
+        button.setAttribute('aria-current', 'page');
+      }
+      if (options.label) {
+        button.setAttribute('aria-label', options.label);
+      }
+      button.addEventListener('click', () => {
+        if (button.disabled || currentPage === page) return;
+        currentPage = page;
+        applyFilters();
+        root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      return button;
+    };
+
+    paginationEl.appendChild(createButton('Previous', Math.max(1, currentPage - 1), {
+      disabled: currentPage === 1,
+      label: 'Go to previous jobs page',
+    }));
+
+    for (let page = 1; page <= totalPages; page += 1) {
+      paginationEl.appendChild(createButton(String(page), page, {
+        current: page === currentPage,
+        label: `Go to jobs page ${page}`,
+      }));
+    }
+
+    paginationEl.appendChild(createButton('Next', Math.min(totalPages, currentPage + 1), {
+      disabled: currentPage === totalPages,
+      label: 'Go to next jobs page',
+    }));
+  };
+
+  const applyFilters = (resetPage = false) => {
+    if (resetPage) {
+      currentPage = 1;
+    }
+
+    const savedView = filters.category === 'saved';
+    const saved = savedView ? savedPathSet() : null;
+    const visibleCards = cards.filter((card) => {
+      const matchesCategory = filters.category === 'all'
+        || (savedView ? saved.has(toPath(card.dataset.jobUrl)) : card.dataset.category === filters.category);
+      const matchesState = filters.state === 'all' || card.dataset.state === filters.state;
+      const matchesType = filters.type === 'all' || card.dataset.type === filters.type;
+      const matchesArrangement = filters.arrangement === 'all' || card.dataset.arrangement === filters.arrangement;
+      const matchesQuery = !filters.query || (cardSearchIndex.get(card) || '').includes(filters.query);
+      return matchesCategory && matchesState && matchesType && matchesArrangement && matchesQuery;
+    });
+
+    // Hide the featured spotlight in the saved-jobs view so it only shows saved roles.
+    if (featuredEl) featuredEl.hidden = savedView;
+    const orphanCount = renderOrphans(savedView);
+
+    const totalPages = Math.max(1, Math.ceil(visibleCards.length / pageSize));
+    currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const pageCards = visibleCards.slice(startIndex, endIndex);
+
+    cards.forEach((card) => {
+      const isVisible = pageCards.includes(card);
+      card.hidden = !isVisible;
+      card.classList.toggle('is-job-hidden', !isVisible);
+      card.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+    });
+
+    if (countEl) {
+      const totalShown = visibleCards.length + orphanCount;
+      const roleLabel = totalShown === 1 ? 'role' : 'roles';
+      countEl.textContent = `${totalShown} ${roleLabel}${filters.category !== 'all' ? ' · filtered' : ''}`;
+    }
+    if (showingEl) {
+      if (visibleCards.length === 0) {
+        showingEl.textContent = `Showing 0 of ${cards.length} open roles · ${updatedLabel}`;
+      } else {
+        const visibleStart = startIndex + 1;
+        const visibleEnd = Math.min(endIndex, visibleCards.length);
+        showingEl.textContent = `Showing ${visibleStart}-${visibleEnd} of ${visibleCards.length} open roles · ${updatedLabel}`;
+      }
+    }
+    if (emptyEl) {
+      // Orphaned saves still count as content, so "you haven't saved anything"
+      // never shows while withdrawn saved roles are on screen.
+      const isEmpty = visibleCards.length === 0 && orphanCount === 0;
+      emptyEl.hidden = !isEmpty;
+      if (isEmpty && emptyHeadingEl && emptyTextEl) {
+        emptyHeadingEl.textContent = savedView
+          ? (emptyEl.getAttribute('data-empty-saved-heading') || emptyHeadingEl.textContent)
+          : (emptyEl.getAttribute('data-empty-filter-heading') || emptyHeadingEl.textContent);
+        emptyTextEl.textContent = savedView
+          ? (emptyEl.getAttribute('data-empty-saved-text') || emptyTextEl.textContent)
+          : (emptyEl.getAttribute('data-empty-filter-text') || emptyTextEl.textContent);
+      }
+    }
+    if (clearButton) {
+      clearButton.hidden = !hasActiveFilters();
+    }
+    renderPagination(visibleCards.length === 0 ? 0 : totalPages);
+  };
+
+  // Deep link (defect 67) - /job-board?view=saved opens straight into the saved
+  // view, so the job detail page has somewhere concrete to send people.
+  const SAVED_VIEW_PARAM = 'view';
+  const SAVED_VIEW_VALUE = 'saved';
+
+  const syncSavedViewUrl = () => {
+    if (!window.history || !window.history.replaceState) return;
+    try {
+      const url = new URL(window.location.href);
+      const current = url.searchParams.get(SAVED_VIEW_PARAM);
+      if (filters.category === 'saved') {
+        if (current === SAVED_VIEW_VALUE) return;
+        url.searchParams.set(SAVED_VIEW_PARAM, SAVED_VIEW_VALUE);
+      } else {
+        if (current !== SAVED_VIEW_VALUE) return;
+        url.searchParams.delete(SAVED_VIEW_PARAM);
+      }
+      window.history.replaceState({}, '', url.toString());
+    } catch (e) { /* URL unsupported - the view still works, it just is not linkable */ }
+  };
+
+  const savedViewRequested = () => {
+    try {
+      return new URL(window.location.href).searchParams.get(SAVED_VIEW_PARAM) === SAVED_VIEW_VALUE;
+    } catch (e) { return false; }
+  };
+
+  const clearFilters = () => {
+    filters = { category: 'all', state: 'all', type: 'all', arrangement: 'all', query: '' };
+    if (stateSelect) stateSelect.value = 'all';
+    if (searchInput) searchInput.value = '';
+    setPressed(categoryButtons, 'all', 'data-filter-category');
+    setPressed(typeButtons, 'all', 'data-filter-type');
+    setPressed(arrangementButtons, 'all', 'data-filter-arrangement');
+    syncSavedViewUrl();
+    applyFilters(true);
+  };
+
+  categoryButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      filters.category = button.getAttribute('data-filter-category') || 'all';
+      setPressed(categoryButtons, filters.category, 'data-filter-category');
+      syncSavedViewUrl();
+      applyFilters(true);
+    });
+  });
+
+  typeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      filters.type = button.getAttribute('data-filter-type') || 'all';
+      setPressed(typeButtons, filters.type, 'data-filter-type');
+      applyFilters(true);
+    });
+  });
+
+  arrangementButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      filters.arrangement = button.getAttribute('data-filter-arrangement') || 'all';
+      setPressed(arrangementButtons, filters.arrangement, 'data-filter-arrangement');
+      applyFilters(true);
+    });
+  });
+
+  if (stateSelect) {
+    stateSelect.addEventListener('change', () => {
+      filters.state = stateSelect.value || 'all';
+      applyFilters(true);
+    });
+  }
+
+  const updateSearchFilter = () => {
+    if (!searchInput) return;
+    filters.query = normaliseText(searchInput.value);
+    applyFilters(true);
+  };
+
+  if (searchInput) {
+    searchInput.addEventListener('input', updateSearchFilter);
+    searchInput.addEventListener('search', updateSearchFilter);
+  }
+
+  if (clearButton) clearButton.addEventListener('click', clearFilters);
+  if (clearEmptyButton) clearEmptyButton.addEventListener('click', clearFilters);
+
+  if (SAVED_JOBS_ENABLED) {
+  saveToggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const host = toggle.closest('[data-job-url]');
+      if (!host) return;
+      const path = toPath(host.dataset.jobUrl);
+      if (!path) return;
+      let list = readSaved();
+      const exists = list.some((item) => item && toPath(item.url) === path);
+      if (exists) {
+        list = list.filter((item) => item && toPath(item.url) !== path);
+      } else {
+        list.push({
+          url: host.dataset.jobUrl,
+          title: host.dataset.jobTitle || '',
+          company: host.dataset.jobCompany || '',
+          location: host.dataset.jobLocation || '',
+          category: host.dataset.jobCategory || '',
+          saved_at: new Date().toISOString(),
+        });
+      }
+      writeSaved(list);
+      refreshSaveButtons();
+      if (filters.category === 'saved') applyFilters(true);
+    });
+  });
+
+  // Keep saved state in sync if it changes in another tab.
+  window.addEventListener('storage', (event) => {
+    if (event.key && event.key !== SAVED_KEY) return;
+    refreshSaveButtons();
+    if (filters.category === 'saved') applyFilters();
+  });
+
+  refreshSaveButtons();
+  }
+
+  updateCounts();
+
+  if (SAVED_JOBS_ENABLED && savedViewRequested()) {
+    filters.category = 'saved';
+    setPressed(categoryButtons, 'saved', 'data-filter-category');
+  }
+
+  applyFilters(true);
+
+  // Arriving from a "View your saved jobs" link should land on the list, not the
+  // top of the page. Instant, not smooth - a scroll animation on load is jarring.
+  if (SAVED_JOBS_ENABLED && filters.category === 'saved') {
+    root.scrollIntoView({ block: 'start' });
+  }
+  });
+})();
+</script>
+{% include "../../templates/partials/_job-apply-script.html" %}

@@ -1,0 +1,343 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White / Light (default)"
+      ],
+      [
+        "surface_alt",
+        "Surface alt (subtle grey)"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  },
+  {
+    "name": "overline",
+    "label": "Section overline",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "label": "Section heading",
+    "type": "text"
+  },
+  {
+    "name": "intro",
+    "label": "Section intro",
+    "type": "richtext"
+  },
+  {
+    "name": "section_align",
+    "label": "Section head alignment",
+    "type": "choice",
+    "choices": [
+      [
+        "left",
+        "Left"
+      ],
+      [
+        "center",
+        "Centre"
+      ]
+    ],
+    "default": "center"
+  },
+  {
+    "name": "card_style",
+    "label": "Card style",
+    "type": "choice",
+    "choices": [
+      [
+        "photo_overlay",
+        "Photo overlay (dark image + white text)"
+      ],
+      [
+        "clean_white",
+        "Clean white (image top + content below)"
+      ],
+      [
+        "bordered",
+        "Bordered (outline card)"
+      ],
+      [
+        "icon_overlay",
+        "Icon + title + body"
+      ],
+      [
+        "detail",
+        "Detail (code badge + metadata)"
+      ]
+    ],
+    "default": "clean_white"
+  },
+  {
+    "name": "columns",
+    "label": "Columns (desktop)",
+    "type": "choice",
+    "choices": [
+      [
+        "2",
+        "2 columns"
+      ],
+      [
+        "3",
+        "3 columns (default)"
+      ],
+      [
+        "4",
+        "4 columns"
+      ]
+    ],
+    "default": "3"
+  },
+  {
+    "name": "news_source",
+    "label": "News card source",
+    "type": "choice",
+    "choices": [
+      [
+        "blog",
+        "Latest HubSpot blog posts"
+      ],
+      [
+        "manual",
+        "Manual cards below"
+      ]
+    ],
+    "default": "blog",
+    "help_text": "Used when this module is configured as the Latest News section. Blog mode keeps the existing card design and fills it from the same HubSpot blog used by /news."
+  },
+  {
+    "name": "news_blog_id",
+    "label": "News blog",
+    "type": "blog",
+    "help_text": "Optional. Leave blank to use the portal default blog."
+  },
+  {
+    "name": "news_post_count",
+    "label": "Number of latest news posts",
+    "type": "number",
+    "default": 3,
+    "help_text": "The homepage design is intended for three cards."
+  },
+  {
+    "name": "news_fallback_image",
+    "label": "Fallback news thumbnail",
+    "type": "image",
+    "responsive": false,
+    "help_text": "Used only when a HubSpot blog post has no Settings > Featured image. Change an individual article card by editing that post's Featured image.",
+    "default": {
+      "src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1299734004%20(3).jpg",
+      "alt": "Weld Australia welding and fabrication"
+    }
+  },
+  {
+    "name": "news_read_label",
+    "label": "News card link label",
+    "type": "text",
+    "default": "Read more"
+  },
+  {
+    "name": "cards",
+    "label": "Cards",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 30,
+      "default": 1
+    },
+    "children": [
+      {
+        "name": "tag_text",
+        "label": "Tag / badge text",
+        "type": "text"
+      },
+      {
+        "name": "tag_color",
+        "label": "Tag colour",
+        "type": "choice",
+        "choices": [
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "magenta",
+            "Magenta"
+          ],
+          [
+            "navy",
+            "Navy"
+          ],
+          [
+            "green",
+            "Green"
+          ],
+          [
+            "grey",
+            "Grey"
+          ]
+        ],
+        "default": "navy"
+      },
+      {
+        "name": "title",
+        "label": "Card title",
+        "type": "text"
+      },
+      {
+        "name": "body_text",
+        "label": "Card body",
+        "type": "text"
+      },
+      {
+        "name": "date_text",
+        "label": "Date text",
+        "type": "text",
+        "help_text": "Optional. Used by news-style cards."
+      },
+      {
+        "name": "image",
+        "label": "Card image",
+        "type": "image"
+      },
+      {
+        "name": "link_url",
+        "label": "Link URL",
+        "type": "link"
+      },
+      {
+        "name": "link_label",
+        "label": "Link label",
+        "type": "text",
+        "default": "Learn more"
+      },
+      {
+        "name": "link_style",
+        "label": "Link style",
+        "type": "choice",
+        "choices": [
+          [
+            "arrow",
+            "Arrow link"
+          ],
+          [
+            "button_primary",
+            "Button - navy"
+          ],
+          [
+            "button_gold",
+            "Button - gold"
+          ],
+          [
+            "button_outline",
+            "Button - outline"
+          ]
+        ],
+        "default": "arrow"
+      }
+    ]
+  },
+  {
+    "name": "cta_label",
+    "label": "Section bottom CTA label",
+    "type": "text",
+    "help_text": "Optional CTA shown below the card grid."
+  },
+  {
+    "name": "cta_link",
+    "label": "Section bottom CTA link",
+    "type": "link"
+  },
+  {
+    "name": "cta_style",
+    "label": "CTA style",
+    "type": "choice",
+    "choices": [
+      [
+        "primary",
+        "Navy (primary)"
+      ],
+      [
+        "gold",
+        "Gold"
+      ],
+      [
+        "outline",
+        "Outline"
+      ]
+    ],
+    "default": "primary"
+  }
+]

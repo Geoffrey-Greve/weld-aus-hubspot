@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A11y Test - Page Structure</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/assets/css/components.css" />
+  <style>
+    body { font-family: sans-serif; }
+    a.skip-to-content {
+      position: absolute; left: -9999px; top: 0; z-index: 9999;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; min-width: 44px;
+      padding: 0.5rem 1rem; background: #002f5f; color: #fff;
+    }
+    a.skip-to-content:focus { left: 0; }
+    .wa-utility-bar { background: #002f5f; color: #fff; padding: 0.5rem 1rem; display:flex; gap:1rem; }
+    .wa-header { background: #fff; padding: 1rem 2rem; border-bottom: 1px solid #dde0e5; display:flex; align-items:center; gap:1rem; }
+    .wa-nav__list { display:flex; list-style:none; gap:1rem; margin:0; padding:0; }
+    .wa-header__actions { margin-left:auto; display:flex; gap:0.5rem; }
+    .wa-hamburger { display:none; }
+    main { padding: 2rem; }
+    footer { padding: 2rem; background: #1a2533; color:#fff; }
+
+    /* This fixture hand-rolls a simplified header (it predates the current
+       header.module markup and doesn't load its CSS). Without a breakpoint the
+       desktop nav stayed laid out at 375px and overflowed, which tripped
+       overflow.spec.ts. Mirror the real header's 1024px collapse - desktop nav
+       out, hamburger in - so the fixture is a fair stand-in at mobile width.
+       The axe/structure specs run at desktop width and are unaffected. */
+    @media (max-width: 1023px) {
+      .wa-header { padding: 1rem; flex-wrap: wrap; }
+      .wa-nav { display: none; }
+      .wa-hamburger { display: inline-flex; }
+      .wa-utility-bar { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-to-content" href="#main-content">Skip to main content</a>
+
+  <!-- Utility bar - must NOT carry role="banner" -->
+  <div class="wa-utility-bar" aria-label="Utility bar">
+    <nav aria-label="Utility navigation">
+      <ul role="list" style="display:flex;gap:1rem;list-style:none;margin:0;padding:0;">
+        <li><a href="/about/" style="color:#fff;">About</a></li>
+        <li><a href="/contact/" style="color:#fff;">Contact</a></li>
+      </ul>
+    </nav>
+    <div>
+      <a href="tel:1300000000" aria-label="Call us at 1300 000 000" style="color:#fff;">1300 000 000</a>
+    </div>
+  </div>
+
+  <!-- Primary header carries the implicit banner landmark -->
+  <header class="wa-header">
+    <a href="/" aria-label="Weld Australia - home">
+      <span style="font-weight:700;font-size:1.25rem;">Weld Australia</span>
+    </a>
+    <nav class="wa-nav" aria-label="Primary navigation" id="wa-primary-nav">
+      <ul class="wa-nav__list" role="list">
+        <li><a href="/training-hub/">Training</a></li>
+        <li><a href="/membership/">Membership</a></li>
+        <li><a href="/resources/">Resources</a></li>
+        <li>
+          <button
+            type="button"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-controls="wa-dropdown-1"
+          >
+            About
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul id="wa-dropdown-1" role="list" aria-label="About submenu" style="display:none;">
+            <li><a href="/about/">About us</a></li>
+            <li><a href="/team/">Our team</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <div class="wa-header__actions">
+      <a href="/login/" class="btn btn-primary btn-sm">Member Login</a>
+      <button
+        class="wa-hamburger"
+        id="wa-hamburger"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="wa-mobile-nav"
+        type="button"
+      >
+        <span aria-hidden="true">&#9776;</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile nav dialog (hidden by default) -->
+  <div
+    id="wa-mobile-nav"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Navigation menu"
+    hidden
+  >
+    <button id="wa-mobile-nav-close" aria-label="Close navigation menu" type="button">&#x2715;</button>
+    <nav aria-label="Mobile navigation">
+      <ul role="list">
+        <li><a href="/training-hub/">Training</a></li>
+        <li><a href="/membership/">Membership</a></li>
+        <li><a href="/resources/">Resources</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div id="wa-mobile-nav-overlay" aria-hidden="true"></div>
+
+  <main id="main-content" tabindex="-1">
+    <h1>Page heading</h1>
+    <p>This fixture tests global page structure landmarks.</p>
+  </main>
+
+  <footer>
+    <nav aria-label="Footer navigation">
+      <ul role="list" style="display:flex;gap:1rem;list-style:none;margin:0;padding:0;">
+        <li><a href="/privacy/" style="color:#fff;">Privacy</a></li>
+        <li><a href="/terms/" style="color:#fff;">Terms</a></li>
+      </ul>
+    </nav>
+  </footer>
+</body>
+</html>

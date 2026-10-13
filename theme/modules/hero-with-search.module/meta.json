@@ -1,0 +1,14 @@
+{
+  "label": "Hero - With Search",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Hero with an inline search bar wired to Resources, Find a Member, or Course Timetable.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["hero", "search", "resources", "find-a-member"]
+}

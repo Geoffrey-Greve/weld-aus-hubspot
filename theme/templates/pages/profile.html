@@ -1,0 +1,106 @@
+<!--
+  templateType: page
+  label: Member Portal - My Profile
+  isAvailableForNewContent: true
+-->
+{#
+  Member portal profile page.
+
+  The route is protected by HubSpot Private Content at page level. This page
+  intentionally extends the standard base layout, then renders the original
+  profile form modules directly so the profile experience stays stable while
+  avoiding the heavier portal layout render path that caused a white page.
+#}
+{% set page_title_exact = 'My Profile - Weld Australia Member Portal' %}
+{% set page_description = 'Update your Weld Australia profile, communication preferences, and linked organisations.' %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+{{ super() }}
+<meta name="robots" content="noindex, nofollow">
+<style>
+  body.is-profile-page #profile-page-hero.wa-hero {
+    min-height: clamp(460px, 42vw, 540px);
+    padding-block-start: calc(var(--wa-site-header-offset, 112px) + 96px);
+  }
+
+  body.is-profile-page #profile-page-hero .wa-hero__content {
+    max-width: 680px;
+  }
+
+  body.is-profile-page #profile-page-hero .wa-hero__cta.btn-white-outline,
+  body.is-profile-page #profile-page-hero .wa-hero__cta.btn-white-outline:link,
+  body.is-profile-page #profile-page-hero .wa-hero__cta.btn-white-outline:visited {
+    background: #ffffff;
+    border-color: #ffffff;
+    color: var(--wa-color-primary, #1c1e4c);
+  }
+
+  body.is-profile-page #profile-page-hero .wa-hero__cta.btn-white-outline:hover,
+  body.is-profile-page #profile-page-hero .wa-hero__cta.btn-white-outline:focus-visible {
+    background: var(--wa-color-accent, #fecf05);
+    border-color: var(--wa-color-accent, #fecf05);
+    color: var(--wa-color-primary, #1c1e4c);
+  }
+
+  body.is-profile-page .wa-profile-form {
+    background: linear-gradient(180deg, #f5f7fb 0%, #ffffff 100%);
+    padding-block-start: clamp(48px, 6vw, 72px);
+  }
+
+  @media (max-width: 767px) {
+    body.is-profile-page #profile-page-hero.wa-hero {
+      min-height: auto;
+      padding-block-start: calc(var(--wa-site-header-offset, 112px) + 72px);
+      padding-block-end: 56px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body_class %} is-portal is-profile-page{% endblock %}
+
+{% block portal_nav %}
+  {% include "../partials/portal-nav.html" %}
+{% endblock %}
+
+{% block body %}
+
+  {% module "profile_page_hero" path="../../modules/hero"
+    label="Profile page hero"
+    section_id="profile-page-hero"
+    background="primary"
+    spacing="default"
+    height="compact"
+    alignment="left"
+    accent_bar=true
+    media_type="none"
+    eyebrow="Member portal"
+    headline="My profile"
+    subheadline="<p>Keep your contact details, membership information, and security settings up to date.</p>"
+    primary_cta={ "label_text": "Update details", "link": { "url": { "type": "EXTERNAL", "href": "#profile-details" } }, "style": "gold" }
+    secondary_cta={ "label_text": "Security", "link": { "url": { "type": "EXTERNAL", "href": "#profile-security" } }, "style": "white-outline" }
+  %}
+
+  {#- No profile_update_form param: hardcoding the GUID locks the field in the
+      page editor. The form is chosen from the module's form picker.
+
+      Same reason for no preferences_link / show_preferences_link params: those
+      stay editable in the page editor. show_preferences_link defaults to false
+      so the /email-subscriptions/ CTA stays hidden until that system page is
+      confirmed live; members manage prefs via marketing-email footer links. -#}
+  {% module "profile_form" path="../../modules/profile-form"
+    section_id="profile-details"
+    heading="Profile & details"
+    portal_id="441838610"
+    editable_fields=["firstname", "lastname", "phone", "mobile", "address", "job_title", "date_of_birth", "primary_discipline"]
+    show_password_change_link=true
+    password_change_label="Change password"
+    password_change_link={ "url": { "type": "EXTERNAL", "href": "/_hcms/mem/reset/request?redirect_url=/portal/profile/" } }
+    save_success_message="Profile updated."
+    background="surface_alt"
+    spacing="spacious"
+    members_only=true
+  %}
+
+{% endblock %}

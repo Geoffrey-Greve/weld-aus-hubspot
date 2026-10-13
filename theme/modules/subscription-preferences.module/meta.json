@@ -1,0 +1,14 @@
+{
+  "label": "Communications Preferences",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Member portal communications-preferences card. Shows an intro, a summary of subscription categories, and a CTA that links out to HubSpot's native Subscription Preferences system page (default /email-subscriptions/) - the source of truth for email consent. That system page must be assigned + published in HubSpot Settings → Website → Pages → System pages, or the link 404s. Place on profile.html (portal layout).",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["portal", "members-only", "subscription", "preferences"]
+}

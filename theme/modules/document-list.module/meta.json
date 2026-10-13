@@ -1,0 +1,14 @@
+{
+  "label": "Document List",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Renders a curated document/resource list from HubDB Table 'resources' filtered by category. When 'Apply Member Wall gating' is enabled, members-only documents are hidden for non-logged-in visitors.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["documents", "resources", "hubdb", "members"]
+}

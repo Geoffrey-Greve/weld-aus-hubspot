@@ -1,0 +1,194 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  },
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text"
+  },
+  {
+    "name": "card_style",
+    "label": "Card style",
+    "type": "choice",
+    "choices": [
+      [
+        "elevated",
+        "Elevated (icon + text)"
+      ],
+      [
+        "photo",
+        "Photo cards (image background)"
+      ]
+    ],
+    "default": "elevated",
+    "help_text": "Elevated: light icon cards. Photo: full-bleed photo with a dark overlay, category tag and CTA - best in a 2-column layout."
+  },
+  {
+    "name": "services",
+    "label": "Services",
+    "type": "group",
+    "occurrence": {
+      "min": 2,
+      "max": 6,
+      "default": 4
+    },
+    "children": [
+      {
+        "name": "icon",
+        "label": "Icon",
+        "type": "image",
+        "help_text": "Used by the Elevated card style."
+      },
+      {
+        "name": "image",
+        "label": "Photo",
+        "type": "image",
+        "help_text": "Background photo for the Photo card style."
+      },
+      {
+        "name": "tag",
+        "label": "Category tag",
+        "type": "text",
+        "help_text": "Small pill label shown on Photo cards (e.g. Training). Optional.",
+        "default": ""
+      },
+      {
+        "name": "tag_color",
+        "label": "Tag colour",
+        "type": "choice",
+        "choices": [
+          [
+            "blue",
+            "Blue"
+          ],
+          [
+            "amber",
+            "Amber"
+          ],
+          [
+            "green",
+            "Green"
+          ],
+          [
+            "red",
+            "Red"
+          ],
+          [
+            "navy",
+            "Navy"
+          ]
+        ],
+        "default": "blue"
+      },
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "body_text",
+        "label": "Body",
+        "type": "richtext"
+      },
+      {
+        "name": "cta_label",
+        "label": "CTA label",
+        "type": "text",
+        "default": "Learn more"
+      },
+      {
+        "name": "cta_link",
+        "label": "CTA link",
+        "type": "link"
+      }
+    ]
+  }
+]

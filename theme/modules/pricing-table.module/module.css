@@ -1,0 +1,238 @@
+/*
+ * pricing-table.module/module.css
+ * Side-by-side pricing cards. Member price in --wa-color-success.
+ * Mobile-first: 1-col → 2-col at 768px.
+ */
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+
+.wa-pricing-table__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-4);
+  text-align: center;
+}
+
+.wa-section--primary .wa-pricing-table__heading,
+.wa-section--primary-dark .wa-pricing-table__heading {
+  color: var(--wa-color-on-primary);
+}
+
+/* ── Intro ───────────────────────────────────────────────────────────────── */
+
+.wa-pricing-table__intro {
+  font-size: var(--wa-text-lg);
+  color: var(--wa-color-text-muted);
+  line-height: 1.6;
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto var(--wa-space-8);
+}
+
+.wa-pricing-table__intro > *:first-child { margin-top: 0; }
+.wa-pricing-table__intro > *:last-child  { margin-bottom: 0; }
+
+.wa-section--primary .wa-pricing-table__intro,
+.wa-section--primary-dark .wa-pricing-table__intro {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Savings callout ─────────────────────────────────────────────────────── */
+
+.wa-pricing-table__savings-callout {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3);
+  background-color: #e8f7ef; /* soft success green tint */
+  border: 1px solid var(--wa-color-success);
+  border-radius: var(--wa-radius-md);
+  padding: var(--wa-space-4) var(--wa-space-5);
+  color: var(--wa-color-success);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  margin-bottom: var(--wa-space-8);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wa-pricing-table__savings-callout svg {
+  flex-shrink: 0;
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+
+.wa-pricing-table__grid {
+  display: grid;
+  gap: var(--wa-space-6);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .wa-pricing-table__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.wa-pricing-table__card {
+  background-color: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  padding: var(--wa-space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-5);
+  box-shadow: var(--wa-shadow-card);
+}
+
+.wa-pricing-table__card--member {
+  border-color: rgba(31, 138, 77, 0.45);
+  box-shadow: 0 14px 36px rgba(31, 138, 77, 0.1);
+}
+
+.wa-pricing-table__card-kicker {
+  margin: 0;
+  color: var(--wa-color-text-muted);
+  font-size: var(--wa-text-xs);
+  font-weight: var(--wa-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wa-pricing-table__dynamic-price {
+  color: var(--wa-color-text);
+  font-family: var(--wa-font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+}
+
+.wa-pricing-table__dynamic-price--member {
+  color: var(--wa-color-success);
+}
+
+.wa-pricing-table__dynamic-note {
+  flex: 1;
+  margin: 0;
+  color: var(--wa-color-text-muted);
+}
+
+/* ── Tier name ───────────────────────────────────────────────────────────── */
+
+.wa-pricing-table__tier-name {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0;
+}
+
+/* ── Prices block ────────────────────────────────────────────────────────── */
+
+.wa-pricing-table__prices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3);
+  padding-bottom: var(--wa-space-5);
+  border-bottom: 1px solid var(--wa-color-border);
+}
+
+.wa-pricing-table__price-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-1);
+}
+
+.wa-pricing-table__price-label {
+  font-size: var(--wa-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: var(--wa-weight-semibold);
+  color: var(--wa-color-text-muted);
+}
+
+/* Member price - success green + bold */
+.wa-pricing-table__price--member {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-success);
+  line-height: 1.1;
+}
+
+/* Non-member price - muted, struck through when member price also present */
+.wa-pricing-table__price-row--non-member + .wa-pricing-table__price-row--member ~ .wa-pricing-table__price--non-member,
+.wa-pricing-table__price--non-member {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl);
+  font-weight: var(--wa-weight-semibold);
+  color: var(--wa-color-text-muted);
+  line-height: 1.1;
+}
+
+/* Show strikethrough on non-member price only when both prices present */
+.wa-pricing-table__card--member-view:has(.wa-pricing-table__price--member) .wa-pricing-table__price--non-member {
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
+/* ── Includes list ───────────────────────────────────────────────────────── */
+
+.wa-pricing-table__includes {
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text-muted);
+  line-height: 1.7;
+  flex: 1;
+}
+
+.wa-pricing-table__includes ul {
+  margin: 0;
+  padding-left: var(--wa-space-5);
+}
+
+.wa-pricing-table__includes li {
+  margin-bottom: var(--wa-space-2);
+}
+
+.wa-pricing-table__includes > *:first-child { margin-top: 0; }
+.wa-pricing-table__includes > *:last-child  { margin-bottom: 0; }
+
+/* ── CTA button ──────────────────────────────────────────────────────────── */
+
+.wa-pricing-table__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-3) var(--wa-space-6);
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary, #fff) !important;
+  font-size: var(--wa-text-base);
+  font-weight: var(--wa-weight-semibold);
+  text-decoration: none;
+  border-radius: var(--wa-radius-md);
+  width: 100%;
+  text-align: center;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+  margin-top: auto;
+}
+
+.wa-pricing-table__cta:visited,
+.wa-pricing-table__cta:hover,
+.wa-pricing-table__cta:focus {
+  color: var(--wa-color-on-primary, #fff) !important;
+  text-decoration: none;
+}
+
+.wa-pricing-table__cta:hover {
+  opacity: 0.9;
+  box-shadow: var(--wa-shadow-md);
+}
+
+.wa-pricing-table__cta:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 3px;
+}

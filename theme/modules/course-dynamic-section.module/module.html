@@ -1,0 +1,250 @@
+{#
+  course-dynamic-section.module/module.html
+
+  Dynamic course detail content derived from the current HubDB course row.
+  Editors can override heading/body/image/cards/steps per module instance.
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<style data-wa-course-detail-cleanup="legacy-dnd">
+  .wa-hero-video,
+  .wa-stat-tiles,
+  #why,
+  #outcomes,
+  #syllabus,
+  #audience,
+  #trainer,
+  .wa-team,
+  .wa-testimonials,
+  .wa-logo-strip,
+  #faq,
+  .wa-cta-banner {
+    display: none !important;
+  }
+</style>
+
+{% set row = dynamic_page_hubdb_row %}
+{% set course_name = row.course_name | default('this course') %}
+{% set category = row.category.name | default('Weld Australia training') %}
+{% set delivery = row.delivery_mode.name | default('Flexible delivery') %}
+{% set duration = row.duration | default('Varies by session') %}
+{% set standards = row.standards | default('industry-recognised welding standards') %}
+{% set category_lower = category | lower %}
+{% set fallback_image = get_asset_url('../../assets/img/weld-australia-course-fallback.svg') %}
+{% set image_url = module.image.src | default(row.photo.url, true) | default(row.og_image.url, true) | default(fallback_image, true) %}
+{% set image_alt = module.image.alt | default(course_name, true) %}
+{% set variant = module.variant | default('proof_points') %}
+{% set dark = module.background in ['primary', 'primary_dark'] %}
+
+{% set session_ns = namespace(count=0, cities=[], city_keys='|') %}
+{% if row.course_id %}
+  {% for session in hubdb_table_rows('courses', 'course_id__eq=' ~ row.course_id ~ '&orderBy=start_date') %}
+    {% set session_ns.count = session_ns.count + 1 %}
+    {% set city_name = session.city.name | default('') %}
+    {% set city_key = '|' ~ city_name ~ '|' %}
+    {% if city_name and city_key not in session_ns.city_keys %}
+      {% set session_ns.cities = session_ns.cities + [city_name] %}
+      {% set session_ns.city_keys = session_ns.city_keys ~ city_name ~ '|' %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% set city_text = session_ns.cities | join(', ') %}
+{% if session_ns.count > 0 %}
+  {% set session_summary = session_ns.count ~ ' session' ~ (session_ns.count != 1 and 's' or '') ~ ' currently listed' %}
+{% else %}
+  {% set session_summary = 'New sessions can be added as dates are confirmed.' %}
+{% endif %}
+
+{% set dynamic_cards = [] %}
+{% set dynamic_steps = [] %}
+
+{% if variant == 'proof_points' %}
+  {% set default_eyebrow = 'Why train with Weld Australia' %}
+  {% set default_heading = 'The home of welding excellence in Australia' %}
+  {% set default_body = '<p>' ~ course_name ~ ' is part of Weld Australia’s structured training program, backed by industry-recognised standards, practical delivery and nationally connected course sessions.</p>' %}
+  {% set dynamic_cards = [
+    {'title': category, 'body': 'This course belongs to the ' ~ category ~ ' training stream.', 'accent': 'gold'},
+    {'title': delivery, 'body': 'Delivery mode is listed as ' ~ delivery ~ ', with session details confirmed when you select a date.', 'accent': 'gold'},
+    {'title': duration, 'body': 'Typical course duration: ' ~ duration ~ '.', 'accent': 'magenta'},
+    {'title': 'Standards', 'body': standards, 'accent': 'magenta'}
+  ] %}
+{% elif variant == 'trainers' %}
+  {% set default_eyebrow = 'Course delivery' %}
+  {% set default_heading = 'Taught by practising engineers and inspectors' %}
+  {% set default_body = '<p>' ~ course_name ~ ' is delivered by Weld Australia training specialists with practical industry experience. The course content is aligned to ' ~ standards ~ ' and supported by real-world welding, inspection and compliance knowledge.</p>' %}
+  {% set dynamic_cards = [
+    {'title': 'Industry-led training', 'body': 'Learn from specialists who understand current welding practice and compliance expectations.', 'accent': 'gold'},
+    {'title': 'Course stream', 'body': category, 'accent': 'navy'},
+    {'title': 'Delivery', 'body': delivery ~ ' delivery with session dates managed through the course timetable.', 'accent': 'green'},
+    {'title': 'Next sessions', 'body': session_summary, 'accent': 'magenta'}
+  ] %}
+{% elif variant == 'workplace' %}
+  {% set default_eyebrow = 'In-house & corporate training' %}
+  {% set default_heading = 'Bring ' ~ course_name ~ ' to your workplace' %}
+  {% set default_body = '<p>If your team needs ' ~ category_lower ~ ' capability, Weld Australia can discuss options for tailored workplace delivery, group bookings or training plans aligned to your procedures and standards.</p>' %}
+  {% set dynamic_cards = [
+    {'title': 'Tailored to your team', 'body': 'Adapt the learning focus around your organisation’s roles, skill gaps and compliance requirements.', 'accent': 'gold'},
+    {'title': 'Standards aligned', 'body': standards, 'accent': 'navy'},
+    {'title': 'Flexible delivery', 'body': delivery ~ ' public sessions are listed; workplace delivery can be discussed with the training team.', 'accent': 'green'},
+    {'title': 'Group planning', 'body': 'Useful for upskilling multiple staff or preparing teams for certification and audit requirements.', 'accent': 'magenta'}
+  ] %}
+{% else %}
+  {% set default_eyebrow = 'Qualification pathways' %}
+  {% set default_heading = 'Find your pathway to certification' %}
+  {% set default_body = '<p>' ~ course_name ~ ' sits within the ' ~ category ~ ' pathway. Use this course as a step toward stronger capability, recognised certification and ongoing professional development.</p>' %}
+  {% if 'Inspection' in category %}
+    {% set dynamic_steps = [
+      {'title': 'Build inspection foundations', 'body': 'Develop the practical and technical knowledge needed for weld quality and inspection work.', 'meta': category},
+      {'title': course_name, 'body': 'Use this course to progress your inspection capability and prepare for recognised credentials.', 'meta': duration},
+      {'title': 'Progress to advanced inspection roles', 'body': 'Continue toward higher-level inspection, NDE coordination and quality assurance responsibilities.', 'meta': standards}
+    ] %}
+  {% elif 'Supervision' in category or 'AS1796' in course_name %}
+    {% set dynamic_steps = [
+      {'title': 'Strengthen welding fundamentals', 'body': 'Build or confirm the practical welding knowledge needed for supervision and quality control.', 'meta': category},
+      {'title': course_name, 'body': 'Progress through this qualification to support supervisory responsibilities and compliance systems.', 'meta': duration},
+      {'title': 'Apply capability on the job', 'body': 'Use the qualification to support procedure control, team supervision and certification pathways.', 'meta': standards}
+    ] %}
+  {% else %}
+    {% set dynamic_steps = [
+      {'title': 'Choose the right starting point', 'body': 'Start with the course stream that matches your current role and experience.', 'meta': category},
+      {'title': course_name, 'body': 'Complete the course to build practical capability and recognised knowledge.', 'meta': duration},
+      {'title': 'Continue professional development', 'body': 'Use the course as a foundation for further Weld Australia training or workplace certification.', 'meta': standards}
+    ] %}
+  {% endif %}
+{% endif %}
+
+{% set heading = module.heading | default(default_heading, true) %}
+{% set eyebrow = module.eyebrow | default(default_eyebrow, true) %}
+{% set body = module.body_text | default(default_body, true) %}
+{% set has_custom_cards = false %}
+{% for card in module.cards %}
+  {% if card.title or card.body_text %}
+    {% set has_custom_cards = true %}
+  {% endif %}
+{% endfor %}
+{% set has_custom_steps = false %}
+{% for step in module.steps %}
+  {% if step.title or step.body_text %}
+    {% set has_custom_steps = true %}
+  {% endif %}
+{% endfor %}
+
+<section
+  class="wa-cds wa-cds--{{ variant }} wa-section wa-section--bg-{{ module.background | default('surface') }} wa-section--spacing-{{ module.spacing | default('spacious') }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    {% if variant == 'proof_points' %}
+      <div class="wa-cds__header">
+        {% if eyebrow %}
+          <div class="wa-overline{% if dark %} wa-overline--light{% endif %}"><span class="wa-overline__text">{{ eyebrow }}</span></div>
+        {% endif %}
+        <h2 class="wa-cds__heading">{{ heading }}</h2>
+        {% if body %}<div class="wa-cds__intro wa-richtext">{{ body }}</div>{% endif %}
+      </div>
+      <div class="wa-cds__grid">
+        {% if has_custom_cards %}
+          {% for card in module.cards %}
+            {% if card.title or card.body_text %}
+              <article class="wa-cds__card wa-cds__card--{{ card.accent_color | default('gold') }}">
+                {% if card.title %}<h3>{{ card.title }}</h3>{% endif %}
+                {% if card.body_text %}<p>{{ card.body_text }}</p>{% endif %}
+              </article>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {% for card in dynamic_cards %}
+            <article class="wa-cds__card wa-cds__card--{{ card.accent }}">
+              <h3>{{ card.title }}</h3>
+              <p>{{ card.body }}</p>
+            </article>
+          {% endfor %}
+        {% endif %}
+      </div>
+    {% elif variant == 'pathway' %}
+      <div class="wa-cds__header wa-cds__header--center">
+        {% if eyebrow %}
+          <div class="wa-overline{% if dark %} wa-overline--light{% endif %}"><span class="wa-overline__text">{{ eyebrow }}</span></div>
+        {% endif %}
+        <h2 class="wa-cds__heading">{{ heading }}</h2>
+        {% if body %}<div class="wa-cds__intro wa-richtext">{{ body }}</div>{% endif %}
+      </div>
+      <ol class="wa-cds__steps">
+        {% if has_custom_steps %}
+          {% for step in module.steps %}
+            {% if step.title or step.body_text %}
+              <li class="wa-cds__step">
+                <span class="wa-cds__step-number">{{ loop.index }}</span>
+                <div>
+                  {% if step.title %}<h3>{{ step.title }}</h3>{% endif %}
+                  {% if step.body_text %}<p>{{ step.body_text }}</p>{% endif %}
+                  {% if step.meta %}<span class="wa-cds__step-meta">{{ step.meta }}</span>{% endif %}
+                </div>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {% for step in dynamic_steps %}
+            <li class="wa-cds__step">
+              <span class="wa-cds__step-number">{{ loop.index }}</span>
+              <div>
+                <h3>{{ step.title }}</h3>
+                <p>{{ step.body }}</p>
+                {% if step.meta %}<span class="wa-cds__step-meta">{{ step.meta }}</span>{% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ol>
+      {% if module.cta_label and module.cta_link.url.href %}
+        <div class="wa-cds__cta">
+          <a class="btn btn-primary" href="{{ module.cta_link.url.href }}">{{ module.cta_label }}</a>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="wa-cds__split{% if module.media_side == 'left' %} wa-cds__split--reverse{% endif %}">
+        <div class="wa-cds__copy">
+          {% if eyebrow %}
+            <div class="wa-overline{% if dark %} wa-overline--light{% endif %}"><span class="wa-overline__text">{{ eyebrow }}</span></div>
+          {% endif %}
+          <h2 class="wa-cds__heading">{{ heading }}</h2>
+          {% if body %}<div class="wa-cds__intro wa-richtext">{{ body }}</div>{% endif %}
+          <div class="wa-cds__mini-grid">
+            {% if has_custom_cards %}
+              {% for card in module.cards %}
+                {% if card.title or card.body_text %}
+                  <article class="wa-cds__mini-card wa-cds__mini-card--{{ card.accent_color | default('gold') }}">
+                    {% if card.title %}<h3>{{ card.title }}</h3>{% endif %}
+                    {% if card.body_text %}<p>{{ card.body_text }}</p>{% endif %}
+                  </article>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              {% for card in dynamic_cards %}
+                <article class="wa-cds__mini-card wa-cds__mini-card--{{ card.accent }}">
+                  <h3>{{ card.title }}</h3>
+                  <p>{{ card.body }}</p>
+                </article>
+              {% endfor %}
+            {% endif %}
+          </div>
+          {% if module.cta_label and module.cta_link.url.href %}
+            <div class="wa-cds__buttons">
+              <a class="btn {% if dark %}btn-white-outline{% else %}btn-primary{% endif %}" href="{{ module.cta_link.url.href }}">{{ module.cta_label }}</a>
+            </div>
+          {% endif %}
+        </div>
+        <div class="wa-cds__media">
+          <img src="{{ image_url }}" alt="{{ image_alt | escape_attr }}" loading="lazy" decoding="async">
+          <div class="wa-cds__media-card">
+            <span>{{ course_name }}</span>
+            <strong>{{ category }}</strong>
+            {% if city_text %}<small>{{ city_text }}</small>{% endif %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}

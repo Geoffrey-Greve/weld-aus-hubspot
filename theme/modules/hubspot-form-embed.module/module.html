@@ -1,0 +1,100 @@
+{#
+  hubspot-form-embed.module/module.html
+  Generic HubSpot form embed via the v2 Forms JS API.
+
+  Fields:
+    module.form            - HubSpot form picker (required); module.form.form_id holds the GUID
+    module.heading         - optional heading
+    module.intro           - optional intro rich text
+    module.success_message - optional HTML to show after submit instead of the form's default
+    module.redirect_url    - optional URL to redirect to after submit (takes precedence
+                             over success_message when both are set)
+    module.section_id      - anchor ID
+    module.background      - surface | surface_alt | primary | primary_dark | transparent
+    module.spacing         - compact | default | spacious
+    module.visibility      - array: mobile, tablet, desktop
+    module.members_only    - boolean gate
+
+  When redirect_url is set, the page navigates there on submit.
+  When success_message is set (and no redirect_url), the form is replaced with
+  the supplied markup.
+  When neither is set, the form's own thank-you message is used.
+#}
+
+{%- if module.members_only and not request_contact.is_logged_in -%}{%- else -%}
+
+{# ── Visibility classes ───────────────────────────────────────────────────── #}
+{%- set vis_classes = [] -%}
+{%- if 'mobile' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-mobile'] -%}{%- endif -%}
+{%- if 'tablet' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-tablet'] -%}{%- endif -%}
+{%- if 'desktop' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-desktop'] -%}{%- endif -%}
+
+<section
+  class="wa-section wa-form-embed wa-bg--{{ module.background }} wa-spacing--{{ module.spacing }}{{ ' ' ~ vis_classes | join(' ') if vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  aria-label="{% if module.heading %}{{ module.heading }}{% else %}Contact form{% endif %}"
+>
+  <div class="container">
+    <div class="wa-form-embed__inner">
+
+      {# ── Heading + intro ────────────────────────────────────────────────── #}
+      {% if module.heading %}
+      <h2 class="wa-form-embed__heading">{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+      <div class="wa-form-embed__intro">{{ module.intro }}</div>
+      {% endif %}
+
+      {# ── Form mount target ─────────────────────────────────────────────── #}
+      <div class="wa-form-embed__form"></div>
+
+      {# ── HubSpot forms v2 embed ────────────────────────────────────────── #}
+      <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+      <script>
+      (function () {
+        var formTarget = document.currentScript.previousElementSibling.previousElementSibling;
+        var uid = 'wa-form-' + Math.random().toString(36).slice(2, 9);
+        formTarget.id = uid;
+
+        {%- set has_redirect = module.redirect_url and module.redirect_url.href -%}
+        {%- set has_success  = module.success_message -%}
+
+        var successHtml = {{ module.success_message | default('') | tojson }};
+        var redirectUrl = {{ (module.redirect_url.href if module.redirect_url else '') | tojson }};
+        {# Some legacy Dev page layouts were created with an empty saved form
+           selection. In Dev, use the safe copied general-enquiry form until a
+           page editor selection is saved. Explicit selections always win and
+           Production retains its existing blank-state behaviour. #}
+        {%- set selected_form_id = module.form.form_id | default(module.form_id, true) | default('', true) -%}
+        {%- if not selected_form_id and hub_id|string == '443253065' -%}
+          {%- set selected_form_id = 'a6e4307a-ae36-496b-9039-4fc553e7cb4e' -%}
+        {%- endif -%}
+
+        hbspt.forms.create({
+          region: 'ap1',
+          portalId: '{{ hub_id | default('441838610', true) }}',
+          formId: '{{ selected_form_id }}',
+          target: '#' + uid,
+          {% if has_redirect %}
+          onFormSubmitted: function () {
+            if (redirectUrl) {
+              window.location.href = redirectUrl;
+            }
+          },
+          {% elif has_success %}
+          onFormSubmitted: function ($form, data) {
+            var container = document.getElementById(uid);
+            if (container && successHtml) {
+              container.innerHTML = '<div class="wa-form-embed__success" role="alert">' + successHtml + '</div>';
+            }
+          },
+          {% endif %}
+        });
+      }());
+      </script>
+
+    </div>
+  </div>
+</section>
+
+{%- endif -%}

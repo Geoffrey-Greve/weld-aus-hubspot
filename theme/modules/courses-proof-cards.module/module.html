@@ -1,0 +1,38 @@
+{% if not module.members_only or request_contact.is_logged_in %}
+{% set _fallback_cards = [
+  {'title': 'Industry-led training', 'body': 'Courses are delivered by specialists who understand current welding practice, quality systems and compliance expectations.', 'accent': 'gold'},
+  {'title': 'Flexible delivery', 'body': 'Choose from online, blended and face-to-face sessions, with details confirmed when you select a course date.', 'accent': 'gold'},
+  {'title': 'Pathways by role', 'body': 'Build from practical capability into supervision, inspection, engineering and recognised certification pathways.', 'accent': 'magenta'},
+  {'title': 'Standards aligned', 'body': 'Training is aligned to Australian and international welding standards, helping teams apply learning on the job.', 'accent': 'magenta'}
+] %}
+{% set _cards_ns = namespace(items=[]) %}
+{% for card in module.cards %}
+  {% if card.title or card.body_text %}
+    {% set _cards_ns.items = _cards_ns.items + [card] %}
+  {% endif %}
+{% endfor %}
+{% set _cards = _cards_ns.items if _cards_ns.items | length > 0 else _fallback_cards %}
+
+<section class="wa-courses-proof" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container">
+    <div class="wa-courses-proof__header">
+      {% if module.eyebrow %}<p class="wa-courses-eyebrow">{{ module.eyebrow }}</p>{% endif %}
+      {% if module.heading %}<h2>{{ module.heading }}</h2>{% endif %}
+      {% if module.intro %}<div class="wa-courses-proof__intro">{{ module.intro }}</div>{% endif %}
+    </div>
+
+    {% if _cards | length > 0 %}
+    <div class="wa-courses-proof__grid">
+      {% for card in _cards %}
+      <article class="wa-courses-proof__card wa-courses-proof__card--{{ card.accent | default('gold') }}">
+        <span aria-hidden="true"></span>
+        {% if card.title %}<h3>{{ card.title }}</h3>{% endif %}
+        {% set _card_body = card.body_text | default(card.body, true) %}
+        {% if _card_body %}<p>{{ _card_body }}</p>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}

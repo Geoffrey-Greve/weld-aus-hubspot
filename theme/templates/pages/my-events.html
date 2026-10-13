@@ -1,0 +1,46 @@
+<!--
+  templateType: page
+  label: Member Portal - My Events
+  isAvailableForNewContent: true
+-->
+{#
+  my-events.html - Member portal My Events page.
+  URL: /portal/events/
+
+  ── HubSpot configuration required ──────────────────────────────────────────
+  • Assign this template to the page at /portal/events/
+  • Private Content audience: "Active Members" list
+    (individual_membership_status IN Active, Grace Period)
+  • The portal.html layout provides the secondary auth gate, window.__WELD_MEMBER__
+    injection, and the portal sub-nav.
+
+  ── Data notes ───────────────────────────────────────────────────────────────
+  Phase 1: Empty events array - Event Ticket Deals cannot be queried via HubL Pro.
+  Upcoming events tab shows the "Browse events" empty state.
+  See my-events.module/module.html for the full data strategy note.
+
+  ── Layout ───────────────────────────────────────────────────────────────────
+  Extends portal.html. The my-events module fills the portal_content block.
+#}
+{% set page_title_exact = 'My Events - Weld Australia Member Portal' %}
+{% set page_description = 'View your registered Weld Australia events - upcoming sessions with Zoom links and calendar downloads.' %}
+{% extends "../layouts/portal.html" %}
+
+{% block extra_head %}
+{{ super() }}
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+
+{% block portal_content %}
+
+  {% module "my_events" path="../../modules/my-events"
+    heading="My Events"
+    intro=""
+    empty_state_message=""
+    browse_url={ "url": { "type": "CONTENT", "href": "/events/" } }
+    background="surface"
+    spacing="default"
+    members_only=true
+  %}
+
+{% endblock %}

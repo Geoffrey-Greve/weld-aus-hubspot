@@ -1,0 +1,118 @@
+<!--
+  templateType: none
+-->
+{#
+  _member-content-gate.html
+
+  One definition of "may this visitor see member-only CONTENT", for the editor's
+  "Members only" tickbox on an ordinary content module.
+
+  WHY THIS EXISTS. Ten content modules each decided it for themselves, and all ten
+  decided it the same wrong way:
+
+    {% set _member_status = request_contact.individual_membership_status %}
+    {% set _is_active_member = _member_status in ['Current'] %}
+
+  That is the contact's OWN membership and nothing else, so a corporate employee -
+  whose membership lives on their employer's company record and reaches them as the
+  mirrored `wa_company_membership_*` properties - is not a member by this rule. It
+  is Ref 72 in a different costume: the same population, the same cause (a narrower
+  resolution than the one beside it), a different symptom. There it was the public
+  price on a course card; here it is member content that never renders.
+
+  Nothing shipped ticks that box today, which is the only reason this has not been
+  reported. It is one tick in the page editor away from being live on any page, and
+  whoever ticks it will have no way to tell: the page looks right to them, and to
+  every member whose own contact record happens to carry a status.
+
+  WHAT COUNTS. Any positive signal, on either record, with the CRM "no membership"
+  sentinels scrubbed through `_member-tier.html` first (so "Not Applicable" on the
+  contact falls through to the employer's tier rather than reading as a membership):
+
+    - an active status on the contact, OR
+    - an active status on the mirrored company, OR
+    - a real membership tier on either.
+
+  An explicitly lapsed / expired / cancelled status on EITHER record is a hard no
+  and outranks all of it, matching the worker's gate (events-engine CLAUDE.md,
+  "an explicitly lapsed/expired/cancelled status on either record is a hard no").
+
+  WHAT DOES NOT COUNT. A CAMS person id, and a membership expiry date. Both merely
+  say this contact was migrated, not that they are a member, and counting them is
+  precisely what "quoted every logged-in migrated contact a member rate they were
+  then refused" (events-engine CLAUDE.md). A gate that says yes to every migrated
+  contact is not a gate.
+
+  COST. Mirror only - no `crm_object` call, no association sweep. Every property it
+  reads is already on `request_contact`. That is deliberate: this runs on ordinary
+  marketing pages where the tickbox is usually OFF, and the deeper ladders
+  (`_member-company-resolve.html` for pricing, `_resource-member-resolve.html` for
+  the Resources wall) are paid for by surfaces that need a TIER, not a yes/no. If a
+  content gate ever needs to survive an employee with no mirrored company, that is
+  the moment to include the company resolver here, not before.
+
+  USAGE. Include, then read the namespace:
+
+    {% include "../../templates/partials/_member-content-gate.html" %}
+    {% if not module.members_only or wa_member_gate.is_member %}
+#}
+{% import "./_member-tier.html" as wa_gate_tier %}
+
+{% set wa_member_gate = namespace(logged_in=false, is_member=false) %}
+{% set wa_member_gate.logged_in = request_contact.is_logged_in | default(false) %}
+
+{% if wa_member_gate.logged_in %}
+  {# Sentinels scrubbed on the way in: a contact reading "Non Member" must not
+     shadow their employer's Gold. Same list as every other surface. #}
+  {% set wa_gate_contact_status = wa_gate_tier.scrub(
+       request_contact.individual_membership_status
+         | default(contact.individual_membership_status, true)
+     ) | trim %}
+  {% set wa_gate_contact_tier = wa_gate_tier.scrub(
+       request_contact.individual_membership_type_2
+         | default(contact.individual_membership_type_2, true)
+     ) | trim %}
+  {% set wa_gate_company_status = wa_gate_tier.scrub(
+       request_contact.wa_company_membership_status
+         | default(contact.wa_company_membership_status, true)
+     ) | trim %}
+  {% set wa_gate_company_tier = wa_gate_tier.scrub(
+       request_contact.wa_company_membership_tier
+         | default(contact.wa_company_membership_tier, true)
+     ) | trim %}
+
+  {% set wa_gate_contact_key = wa_gate_contact_status | lower | replace(' ', '_') | replace('-', '_') %}
+  {% set wa_gate_company_key = wa_gate_company_status | lower | replace(' ', '_') | replace('-', '_') %}
+
+  {% set wa_gate_active_keys = ['current', 'active', 'grace', 'grace_period', 'honorary', 'honourary'] %}
+  {% set wa_gate_inactive_keys = ['lapsed', 'expired', 'inactive', 'cancelled', 'canceled'] %}
+
+  {% set wa_gate_contact_active = wa_gate_contact_key in wa_gate_active_keys
+       or 'current' in wa_gate_contact_key
+       or 'active' in wa_gate_contact_key
+       or 'grace' in wa_gate_contact_key
+       or 'honorary' in wa_gate_contact_key
+       or 'honourary' in wa_gate_contact_key %}
+  {% set wa_gate_company_active = wa_gate_company_key in wa_gate_active_keys
+       or 'current' in wa_gate_company_key
+       or 'active' in wa_gate_company_key
+       or 'grace' in wa_gate_company_key
+       or 'honorary' in wa_gate_company_key
+       or 'honourary' in wa_gate_company_key %}
+
+  {# "Inactive" is checked against the exact list, never a substring: "inactive"
+     contains "active", so a substring test here would read every lapsed member as
+     current - and this is the clause that is supposed to outrank the rest. #}
+  {% set wa_gate_inactive = wa_gate_contact_key in wa_gate_inactive_keys
+       or wa_gate_company_key in wa_gate_inactive_keys %}
+
+  {% set wa_gate_contact_tier_real = wa_gate_tier.is_real_tier(wa_gate_contact_tier) | trim %}
+  {% set wa_gate_company_tier_real = wa_gate_tier.is_real_tier(wa_gate_company_tier) | trim %}
+
+  {% set wa_member_gate.is_member = (not wa_gate_inactive) and (
+       wa_gate_contact_active
+       or wa_gate_company_active
+       or wa_gate_contact_tier_real
+       or wa_gate_company_tier_real
+     ) %}
+{% endif %}

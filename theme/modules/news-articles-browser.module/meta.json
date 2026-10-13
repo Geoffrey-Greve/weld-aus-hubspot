@@ -1,0 +1,14 @@
+{
+  "label": "News Articles Browser",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Editable Featured + Latest Articles browser for the News & Publications blog listing page. Uses HubSpot Blog posts as the source of truth.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["blog", "news", "articles", "listing"]
+}

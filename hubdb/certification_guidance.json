@@ -1,0 +1,38 @@
+{
+  "name": "certification_guidance",
+  "label": "Certification Guidance (lookup)",
+  "useForPages": false,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "columns": [
+    {
+      "name": "certification_type",
+      "label": "Certification type",
+      "type": "SELECT",
+      "options": [
+        { "name": "AS1796", "type": "option" },
+        { "name": "IIW Inspector", "type": "option" },
+        { "name": "IIW Supervisor", "type": "option" },
+        { "name": "ISO 3834", "type": "option" },
+        { "name": "Welder Certification", "type": "option" }
+      ]
+    },
+    {
+      "name": "step",
+      "label": "Pipeline stage / step name",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "guidance_text",
+      "label": "Guidance text",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "evidence_checklist",
+      "label": "Evidence checklist",
+      "type": "RICHTEXT"
+    }
+  ]
+}

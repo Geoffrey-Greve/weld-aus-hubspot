@@ -1,0 +1,238 @@
+/*
+ * ProfileSwitcher - header utility context switcher.
+ *
+ * Designed to sit in wa-header__actions alongside the login CTA.
+ * Token references: --wa-* from theme/assets/css/tokens.css.
+ * WCAG 2.5.5: all interactive targets min --wa-touch-min (44px).
+ * Mobile-first: compact trigger on small screens, full label on ≥ 640px.
+ */
+
+/* ── Wrapper ─────────────────────────────────────────────────────────────── */
+
+.wa-profile-switcher {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ── Trigger button ──────────────────────────────────────────────────────── */
+
+.wa-profile-switcher__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wa-space-2);
+  min-height: var(--wa-touch-min);
+  padding: 0 var(--wa-space-3);
+  background: none;
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-md);
+  cursor: pointer;
+  color: var(--wa-color-text);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-sm);
+  transition:
+    color var(--wa-duration-fast),
+    background-color var(--wa-duration-fast),
+    border-color var(--wa-duration-fast);
+  white-space: nowrap;
+}
+
+.wa-profile-switcher__trigger:hover {
+  color: var(--wa-color-primary);
+  background-color: var(--wa-color-surface-2);
+  border-color: var(--wa-color-primary);
+}
+
+.wa-profile-switcher__trigger:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-md);
+}
+
+.wa-profile-switcher__trigger.is-open {
+  color: var(--wa-color-primary);
+  background-color: var(--wa-color-surface-2);
+  border-color: var(--wa-color-primary);
+}
+
+/* User icon */
+.wa-profile-switcher__user-icon {
+  flex-shrink: 0;
+  color: var(--wa-color-text-muted);
+  transition: color var(--wa-duration-fast);
+}
+
+.wa-profile-switcher__trigger:hover .wa-profile-switcher__user-icon,
+.wa-profile-switcher__trigger.is-open .wa-profile-switcher__user-icon {
+  color: var(--wa-color-primary);
+}
+
+/* Text block (name + role) - hidden on mobile, shown on sm+ */
+.wa-profile-switcher__trigger-text {
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .wa-profile-switcher__trigger-text {
+    display: flex;
+  }
+}
+
+.wa-profile-switcher__trigger-name {
+  font-weight: var(--wa-weight-semibold);
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wa-profile-switcher__trigger-role {
+  font-size: 0.75rem; /* 12px - WCAG 1.4.4 */
+  color: var(--wa-color-text-muted);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Chevron */
+.wa-profile-switcher__chevron {
+  flex-shrink: 0;
+  color: var(--wa-color-text-muted);
+  transition: transform var(--wa-duration-fast) var(--wa-ease-default), color var(--wa-duration-fast);
+}
+
+.wa-profile-switcher__trigger.is-open .wa-profile-switcher__chevron {
+  transform: rotate(180deg);
+  color: var(--wa-color-primary);
+}
+
+/* ── Dropdown menu ───────────────────────────────────────────────────────── */
+
+.wa-profile-switcher__menu {
+  position: absolute;
+  top: calc(100% + var(--wa-space-2));
+  right: 0;
+  min-width: 240px;
+  background-color: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-md);
+  box-shadow: var(--wa-shadow-md);
+  list-style: none;
+  margin: 0;
+  padding: var(--wa-space-2) 0;
+  z-index: var(--wa-z-dropdown);
+  animation: wa-dropdown-in var(--wa-duration-fast) var(--wa-ease-out) forwards;
+}
+
+@keyframes wa-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Option items ────────────────────────────────────────────────────────── */
+
+.wa-profile-switcher__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wa-space-3);
+  width: 100%;
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-2) var(--wa-space-4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text);
+  transition: background-color var(--wa-duration-fast), color var(--wa-duration-fast);
+}
+
+.wa-profile-switcher__option:hover {
+  background-color: var(--wa-color-surface-2);
+  color: var(--wa-color-primary);
+}
+
+.wa-profile-switcher__option:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: -2px;
+  color: var(--wa-color-primary);
+}
+
+.wa-profile-switcher__option.is-active {
+  color: var(--wa-color-primary);
+  background-color: rgba(var(--wa-color-primary-rgb, 0 60 130), 0.06);
+}
+
+/* Text within option */
+.wa-profile-switcher__option-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.wa-profile-switcher__option-name {
+  font-weight: var(--wa-weight-semibold);
+  font-size: var(--wa-text-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.wa-profile-switcher__option-role {
+  font-size: 0.75rem; /* 12px - WCAG 1.4.4 */
+  color: var(--wa-color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.wa-profile-switcher__option.is-active .wa-profile-switcher__option-role {
+  color: var(--wa-color-primary);
+  opacity: 0.8;
+}
+
+/* Checkmark icon */
+.wa-profile-switcher__option-check {
+  flex-shrink: 0;
+  color: var(--wa-color-primary);
+}
+
+/* ── Dashboard tile variant ──────────────────────────────────────────────── */
+/* When rendered as a dashboard tile (inside .wa-dashboard__tile),
+   the dropdown opens upward to avoid clipping. */
+
+.wa-dashboard__tile .wa-profile-switcher {
+  width: 100%;
+}
+
+.wa-dashboard__tile .wa-profile-switcher__trigger {
+  width: 100%;
+  justify-content: space-between;
+  padding: var(--wa-space-3) var(--wa-space-4);
+}
+
+.wa-dashboard__tile .wa-profile-switcher__trigger-text {
+  display: flex;
+}
+
+.wa-dashboard__tile .wa-profile-switcher__menu {
+  width: 100%;
+  left: 0;
+  right: 0;
+}

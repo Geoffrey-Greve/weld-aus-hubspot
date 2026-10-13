@@ -1,0 +1,59 @@
+{#
+  my-events.module/module.html
+
+  React island: Member portal My Events page.
+
+  Data strategy (Phase 1):
+    HubSpot Pro cannot query a contact's associated Deals directly in HubL.
+    Event registration data (Deal Type = Event Ticket) is not accessible
+    via standard contact properties in Phase 1. Both "upcoming" and "past"
+    event arrays are empty here.
+
+    The React island renders the tab switcher with the correct empty states
+    so members see useful guidance rather than a broken page. The arrays will
+    be populated in a later sprint via:
+      a. Workflow-synced contact properties (e.g. next_registered_event_name)
+      b. A lightweight client-side API call using HubSpot's Private Content API
+
+    Zoom join links (zoom_url) come from the hapily platform integration on
+    the Contact via the associated Event Ticket Deal.
+
+  Note on registered_events in member-dashboard:
+    The dashboard module also passes an empty registered_events array for the
+    same reason - see member-dashboard.module/module.html for the comment.
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{# ── Phase 1: empty events array (populated by workflow sync in sprint 2) #}
+{% set events_array = [] %}
+
+{# ── Compose props blob ───────────────────────────────────────────────── #}
+{% set island_props = {
+  'events':              events_array,
+  'empty_state_message': module.empty_state_message | default(''),
+  'browse_url':          module.browse_url.url.href | default('/events/')
+} %}
+
+{# ── Section wrapper + React mount point ─────────────────────────────── #}
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-my-events-section"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    {% if module.heading %}
+      <h1 class="wa-section__heading">{{ module.heading }}</h1>
+    {% endif %}
+    {% if module.intro %}
+      <div class="wa-section__intro">{{ module.intro }}</div>
+    {% endif %}
+    <div
+      data-wa-module="my-events"
+      data-props="{{ island_props | tojson | escape }}"
+    ></div>
+  </div>
+</section>
+
+<script type="module" src="{{ get_asset_url('../../assets/js/my-events.standalone.js') }}"></script>
+
+{% endif %}

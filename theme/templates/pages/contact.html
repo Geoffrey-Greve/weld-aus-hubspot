@@ -1,0 +1,274 @@
+<!--
+  templateType: "page"
+  isAvailableForNewContent: true
+  label: "Contact Us"
+-->
+{#
+  contact.html - Weld Australia Contact Us Page
+  URL: /contact-us/
+  Modules: hero → contact-methods-grid (get in touch) →
+           contact-methods-grid (directory) → locations →
+           contact-form → faq-accordion → cta-banner
+#}
+{% set page_title_exact = page_meta.html_title | default('Contact Weld Australia | Training, Certification & Membership Enquiries') %}
+{% set page_description = page_meta.meta_description | default('Contact Weld Australia for training, certification, membership, engineering services and general enquiries. Call 1800 189 900 or send an enquiry to our national team.') %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<style>
+  .is-contact-page #get-in-touch,
+  .is-contact-page #offices,
+  .is-contact-page #all-offices,
+  .is-contact-page #enquiry {
+    scroll-margin-top: 120px;
+  }
+
+  /* On phones the enquiry section has its own generous top padding. Keeping
+     the desktop scroll margin would leave a large blank gap after an anchor
+     link, so let the mobile layout position that section naturally. */
+  @media (max-width: 767px) {
+    .is-contact-page #enquiry {
+      scroll-margin-top: 0;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}is-contact-page{% endblock %}
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ── § 1  HERO ────────────────────────────────────────────────────────── #}
+  {%- set _contact_general_form_id = 'a6e4307a-ae36-496b-9039-4fc553e7cb4e' if hub_id|string == '443253065' else '1f11d63a-ca92-4619-a7ec-17a92bb544ac' -%}
+  {%- set _contact_soldamatic_form_id = '3f24d497-734a-4f51-9617-7923df1f2737' if hub_id|string == '443253065' else 'da8bf201-d6db-46dc-9d1b-55ae11e379ac' -%}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero"
+          background="primary"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+          eyebrow="Contact Weld Australia"
+          headline="Contact Weld Australia"
+          subheadline="<p>Speak with our team about training, certification, membership, engineering services, Soldamatic support or general enquiries. We’ll help direct your message to the right national team.</p>"
+          primary_cta={"label_text": "Send an enquiry", "link": {"url": {"href": "#enquiry", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "Call 1800 189 900", "link": {"url": {"href": "tel:1800189900", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 2  GET IN TOUCH ───────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/contact-methods-grid"
+          label="Contact Weld Australia"
+          section_id="get-in-touch"
+          background="surface_alt"
+          style="feature"
+          section_heading="Get in touch"
+          cards=[
+            {"icon_name": "phone",    "heading": "Call us",     "body_text": "<p>Speak directly with our team. Free call within Australia during business hours.</p>",          "link_url": "tel:1800189900",                  "link_label": "1800 189 900"},
+            {"icon_name": "email",    "heading": "Email us",    "body_text": "<p>Send us an enquiry and our team will respond within 1-2 business days.</p>",                 "link_url": "mailto:info@weldaustralia.com.au", "link_label": "info@weldaustralia.com.au"},
+            {"icon_name": "location", "heading": "Head office", "body_text": "<p>Suite G1, Ground Floor<br>25 Ryde Road<br>Pymble NSW 2073</p>",                 "link_url": "#offices",               "link_label": "View all offices"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 3  REACH THE RIGHT TEAM ───────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/contact-methods-grid"
+          label="Reach the Right Team"
+          section_id="phone-directory"
+          background="surface_alt"
+          style="directory"
+          overline="Phone directory"
+          section_heading="Reach the right team"
+          intro="<p>Call <strong>1800 189 900</strong> and select the option for your team, or use our enquiry form below.</p>"
+          entries=[
+            {"number": "1", "department": "Training & courses",                   "phone": "1800 189 900", "extension_text": "select option 1"},
+            {"number": "2", "department": "Qualification, certification & exams", "phone": "1800 189 900", "extension_text": "select option 2"},
+            {"number": "3", "department": "Engineering - VIC, TAS, WA & SA",      "phone": "1800 189 900", "extension_text": "select option 3"},
+            {"number": "4", "department": "Engineering - NSW, ACT, QLD & NT",     "phone": "1800 189 900", "extension_text": "select option 4"},
+            {"number": "5", "department": "Membership",                           "phone": "1800 189 900", "extension_text": "select option 5"},
+            {"number": "6", "department": "Marketing, communications & events",   "phone": "1800 189 900", "extension_text": "select option 6"},
+            {"number": "7", "department": "Finance",                              "phone": "1800 189 900", "extension_text": "select option 7"},
+            {"number": "8", "department": "General enquiries",                    "phone": "1800 189 900", "extension_text": "select option 8"},
+            {"number": "",  "department": "Soldamatic AR welder training",        "phone": "",             "extension_text": "Contact via enquiry form"},
+            {"number": "",  "department": "Industry networks",                    "phone": "",             "extension_text": "Contact via enquiry form"}
+          ]
+          directory_cta={
+            "show": true,
+            "heading": "Technical hotline",
+            "body_text": "<p>For technical welding enquiries, use our general enquiry form and select the relevant topic.</p>",
+            "link_label": "Send enquiry",
+            "link_url": "#enquiry"
+          }
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 4  NATIONAL PRESENCE ──────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/locations"
+          label="Our Offices"
+          section_id="offices"
+          background="surface"
+          overline="Our offices"
+          heading="National offices and committees"
+          intro="<p>Weld Australia supports members and industry through national offices, state committees and specialist sub-committees across Australia.</p>"
+          map_side="right"
+          cities=[
+            {"name_text": "Pymble (Head Office)",          "is_primary": true,  "city_preset": "sydney"},
+            {"name_text": "Wollongong Office",             "is_primary": false, "city_preset": "custom", "cx": 82, "cy": 74},
+            {"name_text": "Mackay Office",                 "is_primary": false, "city_preset": "custom", "cx": 88, "cy": 43},
+            {"name_text": "Maryborough Office",            "is_primary": false, "city_preset": "custom", "cx": 88, "cy": 50},
+            {"name_text": "VIC State Committee",           "is_primary": false, "city_preset": "melbourne"},
+            {"name_text": "SA State Committee",            "is_primary": false, "city_preset": "adelaide"},
+            {"name_text": "QLD State Committee",           "is_primary": false, "city_preset": "brisbane"},
+            {"name_text": "Mackay Sub Committee",          "is_primary": false, "city_preset": "custom", "cx": 88, "cy": 43},
+            {"name_text": "NT State Committee",            "is_primary": false, "city_preset": "darwin"},
+            {"name_text": "NSW State Committee",           "is_primary": false, "city_preset": "sydney"},
+            {"name_text": "WA State Committee",            "is_primary": false, "city_preset": "perth"},
+            {"name_text": "Hunter Valley Sub Committee",   "is_primary": false, "city_preset": "custom", "cx": 82, "cy": 67},
+            {"name_text": "TAS State Committee",           "is_primary": false, "city_preset": "hobart"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 5  CONTACT FORM ───────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/contact-form"
+          label="Enquiry Form"
+          section_id="enquiry"
+          background="surface"
+          overline="Send a message"
+          heading="Send us a message"
+          form={"form_id": _contact_general_form_id}
+          soldamatic_form={"form_id": _contact_soldamatic_form_id}
+          enable_soldamatic_selector=true
+          general_form_label="General enquiry"
+          soldamatic_form_label="Soldamatic support"
+          soldamatic_submit_label="Submit support request"
+          soldamatic_success_title="Support request received"
+          soldamatic_success_body="<p>A member of our Soldamatic team will be in touch as soon as possible.</p>"
+          soldamatic_reset_label="Submit another request"
+          soldamatic_machine_label="Soldamatic machine number"
+          soldamatic_machine_hint="Found on the label on the back of your simulator unit."
+          soldamatic_machine_placeholder="e.g. SM-2024-XXXX"
+          soldamatic_message_label="Brief description of the issue"
+          soldamatic_message_placeholder="Describe the issue with your Soldamatic simulator…"
+          soldamatic_sidebar_heading="About Soldamatic support"
+          soldamatic_sidebar_body="<p>Need assistance with your Soldamatic augmented reality welding simulator? Complete the form and our dedicated team will respond as soon as possible.</p>"
+          enquiry_types=[
+            {"type": "New business"},
+            {"type": "Training & courses"},
+            {"type": "Machine repair & servicing"},
+            {"type": "Qualification, certification & exams"},
+            {"type": "Engineering services"},
+            {"type": "Membership"},
+            {"type": "Marketing, communications & events"},
+            {"type": "Finance"},
+            {"type": "General enquiry"}
+          ]
+          show_phone=true
+          show_company=true
+          show_company_on_general=false
+          submit_label="Send enquiry"
+          success_title="Enquiry received"
+          success_body="<p>Thank you for contacting Weld Australia. Our team will be in touch within 1-2 business days.</p>"
+          show_sidebar=true
+          sidebar_phone_number="1800 189 900"
+          sidebar_phone_sub="Free call within Australia"
+          sidebar_list_heading="We work with"
+          sidebar_list_items=[
+            {"item": "Individuals and apprentices"},
+            {"item": "Businesses and fabricators"},
+            {"item": "Training organisations"},
+            {"item": "Engineering firms"}
+          ]
+          response_time="We aim to respond to all enquiries within 1-2 business days."
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 6  FAQ ACCORDION ───────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/faq-accordion"
+          label="Frequently Asked Questions"
+          background="surface_alt"
+          overline="Common questions"
+          section_heading="Frequently asked questions"
+          emit_jsonld=true
+          items=[
+            {"title": "Which team should I contact?", "body_text": "<p>If you are unsure where to start, call 1800 189 900 or send an enquiry through the form and we will direct your message to the right Weld Australia team.</p>", "is_open_default": true},
+            {"title": "Can I speak to someone about training or course enrolment?", "body_text": "<p>Yes. Call 1800 189 900 and select the training option, or submit the enquiry form with the course name, preferred location and any timing requirements.</p>"},
+            {"title": "Can I get help with qualification or certification enquiries?", "body_text": "<p>Yes. Our qualification and certification team can help with exam pathways, certification requirements, renewal questions and application next steps.</p>"},
+            {"title": "Do you provide support for Soldamatic simulators?", "body_text": "<p>Yes. Select Soldamatic support on the enquiry form and include your machine number and a brief description of the issue so our team can follow up efficiently.</p>"},
+            {"title": "Where should postal correspondence be sent?", "body_text": "<p>Please send correspondence to Suite G1, Ground Floor, 25 Ryde Road, Pymble NSW 2073.</p>"},
+            {"title": "Who should members contact for support?", "body_text": "<p>Members can contact the membership team by calling 1800 189 900 or emailing membership@weldaustralia.com.au.</p>"},
+            {"title": "What is Weld Australia?",                      "body_text": "<p>Weld Australia is the peak body representing welding in Australia - supporting industry through training, qualification and certification, technical services, advocacy, resources and member programs.</p>"},
+            {"title": "Who can join Weld Australia?",                 "body_text": "<p>Membership is open to individuals, businesses, fabricators, educators, suppliers, inspectors and organisations connected to welding, fabrication and allied industries.</p>"},
+            {"title": "What does Weld Australia do?",                 "body_text": "<p>Weld Australia delivers internationally recognised training and certification, technical guidance, industry advocacy, member support, events, resources and workforce development initiatives.</p>"},
+            {"title": "Is Weld Australia part of the IIW?",           "body_text": "<p>Yes. Weld Australia represents Australia in the International Institute of Welding and delivers internationally recognised qualification and certification pathways.</p>"},
+            {"title": "How does Weld Australia support my career?",   "body_text": "<p>We support welding careers through training, certification, professional development, member resources, technical support and industry connections.</p>"},
+            {"title": "What are your office hours?",                  "body_text": "<p>Our national office is open Monday to Friday, 9am to 5pm AEST. We are closed on national public holidays. For urgent engineering support, contact us by email and we will respond as quickly as possible.</p>"},
+            {"title": "How quickly will you respond to my enquiry?",  "body_text": "<p>We aim to respond to all enquiries within 1-2 business days. For training enrolments and urgent matters, please call 1800 189 900.</p>"},
+            {"title": "Where is Weld Australia based?",               "body_text": "<p>Our head office is Suite G1, Ground Floor, 25 Ryde Road, Pymble NSW 2073. We have representatives in Melbourne, Brisbane, Perth and Adelaide, and deliver training nationally in all capital cities.</p>"},
+            {"title": "Can I book a training course by phone?",       "body_text": "<p>Yes. Call 1800 189 900 and press 1 for training enquiries. Our team can advise on available courses, dates, locations and pricing, and process your enrolment over the phone.</p>"},
+            {"title": "I'm a member - who do I contact for support?", "body_text": "<p>Members can contact their dedicated membership support team on 1800 189 900 and press 2, or email membership@weldaustralia.com.au. For technical enquiries, members can access the engineering support service through the member portal.</p>"}
+          ]
+          contact_cta_label="Contact us"
+          contact_cta_link={"url": {"href": "/contact-us#enquiry", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 7  CTA BANNER ─────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA"
+          background="primary"
+          align="split"
+          headline="Can't find what you need?"
+          body_text="<p>If you are not sure which team to contact, send us an enquiry or call our national team and we will connect you with the right person.</p>"
+          cta_label="Send an enquiry"
+          cta_link={"url": {"href": "#enquiry", "type": "EXTERNAL"}}
+          secondary_cta_label="Call 1800 189 900"
+          secondary_cta_link={"url": {"href": "tel:1800189900", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

@@ -1,0 +1,227 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface light"
+      ],
+      [
+        "surface_alt",
+        "Alt grey"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  },
+  {
+    "name": "overline",
+    "label": "Overline text (optional)",
+    "type": "text"
+  },
+  {
+    "name": "heading",
+    "label": "Section heading (optional)",
+    "type": "text"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text (optional)",
+    "type": "richtext"
+  },
+  {
+    "name": "section_align",
+    "label": "Section header alignment",
+    "type": "choice",
+    "choices": [
+      [
+        "center",
+        "Centre"
+      ],
+      [
+        "left",
+        "Left"
+      ]
+    ],
+    "default": "center"
+  },
+  {
+    "name": "card_style",
+    "label": "Card layout",
+    "type": "choice",
+    "choices": [
+      [
+        "stacked",
+        "Stacked - icon above text"
+      ],
+      [
+        "row",
+        "Row - icon beside text"
+      ]
+    ],
+    "default": "stacked"
+  },
+  {
+    "name": "columns",
+    "label": "Columns (desktop)",
+    "type": "choice",
+    "choices": [
+      [
+        "2",
+        "2 columns"
+      ],
+      [
+        "3",
+        "3 columns"
+      ],
+      [
+        "4",
+        "4 columns"
+      ]
+    ],
+    "default": "3"
+  },
+  {
+    "name": "features",
+    "label": "Features",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 16,
+      "default": 3
+    },
+    "children": [
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "body_text",
+        "label": "Body text",
+        "type": "text"
+      },
+      {
+        "name": "accent_color",
+        "label": "Icon accent colour",
+        "type": "choice",
+        "choices": [
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "magenta",
+            "Magenta"
+          ],
+          [
+            "navy",
+            "Navy"
+          ],
+          [
+            "green",
+            "Green"
+          ]
+        ],
+        "default": "gold"
+      }
+    ]
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA button label (optional)",
+    "type": "text"
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA button link",
+    "type": "link"
+  },
+  {
+    "name": "cta_align",
+    "label": "CTA alignment",
+    "type": "choice",
+    "choices": [
+      [
+        "center",
+        "Centre"
+      ],
+      [
+        "left",
+        "Left"
+      ]
+    ],
+    "default": "center"
+  }
+]

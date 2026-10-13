@@ -1,0 +1,75 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background_image",
+    "label": "Background image",
+    "type": "image"
+  },
+  {
+    "name": "overlay_opacity",
+    "label": "Overlay opacity",
+    "type": "number",
+    "default": 55,
+    "min": 20,
+    "max": 90,
+    "suffix": "%",
+    "help_text": "Dark overlay on top of the background image."
+  },
+  {
+    "name": "overlay_position",
+    "label": "Content position",
+    "type": "choice",
+    "choices": [
+      ["left", "Left"],
+      ["center", "Center"],
+      ["right", "Right"]
+    ],
+    "default": "left"
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "statement",
+    "label": "Statement text",
+    "type": "text"
+  },
+  {
+    "name": "attribution",
+    "label": "Attribution",
+    "type": "text",
+    "help_text": "Optional - name or title of the person being quoted."
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical padding",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact"],
+      ["default", "Default"],
+      ["spacious", "Spacious"]
+    ],
+    "default": "spacious"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  }
+]

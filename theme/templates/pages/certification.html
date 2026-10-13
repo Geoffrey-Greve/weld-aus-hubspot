@@ -1,0 +1,469 @@
+<!--
+  templateType: page
+  label: Certification
+  isAvailableForNewContent: true
+-->
+{#
+  certification.html - Weld Australia Certification Page
+  URL: /certification/ and /certification/{slug}
+  Modules: hero → split-feature (video, overview) →
+           split-feature (info_cards, company, primary) → card-grid (detail, 3-col) →
+           credential-grid (individual) → checklist (benefits, cards) → cta-banner
+  Anchor IDs: overview / company / individual / benefits
+
+  When configured as a HubDB dynamic page for `certification_pathways`:
+  - /certification/ renders the overview/listing
+  - /certification/{hs_path} renders the selected certification pathway detail
+#}
+{% set _certification_row = dynamic_page_hubdb_row %}
+{% set _certification_query_slug = request.query_dict.pathway | default('', true) %}
+{% if not _certification_row and _certification_query_slug %}
+  {% set _certification_query_rows = hubdb_table_rows('certification_pathways', 'is_active__eq=true&slug__eq=' ~ _certification_query_slug ~ '&limit=1') %}
+  {% if _certification_query_rows %}
+    {% set _certification_row = _certification_query_rows[0] %}
+  {% endif %}
+{% endif %}
+{# Title and description are resolved ABOVE the extends. layouts/base.html
+   includes partials/_head.html, which emits the document's ONLY <title> and
+   meta description; an assignment made after the extends lands too late for
+   it, and a second <title> emitted from extra_head is ignored by crawlers,
+   which take the first. #}
+{% if _certification_row %}
+  {% set page_title_exact = _certification_row.page_title | default(_certification_row.title ~ ' - Weld Australia') %}
+  {% set page_description = _certification_row.meta_description | default(_certification_row.summary | striptags | truncate(160)) %}
+{% else %}
+  {% set page_title_exact = 'Welding Certification Australia | ISO 3834, AS/NZS 5131, EN 15085 & DIN 2303 - Weld Australia' %}
+  {% set page_description = "Australia's leading provider of internationally recognised welding certification - for companies and individuals. Aligned with AS/NZS ISO 3834, AS/NZS 5131, ISO 9606, EN 15085, and DIN 2303." %}
+{% endif %}
+{% extends "../layouts/base.html" %}
+{% block extra_head %}
+{% if _certification_row %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/certification-detail.css') }}?v=20260812-cert-spacing">
+<link rel="stylesheet" href="{{ get_asset_url('../../modules/hero.module/module.css') }}">
+{% endif %}
+{% endblock %}
+
+{% block body_class %}{% if _certification_row %}is-certification-detail-page{% else %}is-certification-page{% endif %}{% endblock %}
+
+{% block body %}
+{% if _certification_row %}
+{% set _cert_audience = _certification_row.audience | default('certification', true) %}
+{% set _cert_audience_key = _cert_audience | lower %}
+{% set _cert_code = _certification_row.code | default('', true) %}
+{% set _cert_slug = _certification_row.hs_path | default(_certification_row.slug, true) | default(_certification_query_slug, true) | default('', true) | string | lower | trim %}
+{% set _cert_identity_haystack = (_cert_slug ~ ' ' ~ (_certification_row.category | default('', true)) ~ ' ' ~ _cert_code ~ ' ' ~ (_certification_row.title | default('', true))) | lower %}
+{% set _cert_is_iso3834 = _cert_slug == 'iso-3834' or 'iso 3834' in _cert_identity_haystack or 'iso-3834' in _cert_identity_haystack %}
+{% set _cert_cta_label = _certification_row.cta_label | default('Enquire about this pathway', true) %}
+{% if _cert_cta_label | lower == 'view pathway' %}
+  {% set _cert_cta_label = 'Enquire about this pathway' %}
+{% endif %}
+{% set _related_query = 'is_active__eq=true&audience__eq=' ~ _cert_audience ~ '&orderBy=sort_order' %}
+{% set _related_rows = hubdb_table_rows('certification_pathways', _related_query) %}
+
+{# Best-effort map of this pathway to a /courses directory category filter, so the
+   "Browse courses" link surfaces the courses relevant to the pathway. The pathway
+   category/code/title columns are free text, so we match on keywords. #}
+{% set _training_haystack = _cert_identity_haystack %}
+{% set _training_course_slug = '' %}
+{% if _cert_slug in ['iwe', 'iwt', 'iws', 'iwi-s', 'iwi-b', 'as1796-cert-1-9', 'as1796-cert-10', 'iso9606', 'welding-supervisor', 'as2214'] %}
+  {% set _training_course_slug = _cert_slug %}
+{% endif %}
+{% set _training_filter = '' %}
+{% if 'inspection' in _training_haystack or 'inspector' in _training_haystack or 'iwi' in _training_haystack %}
+  {% set _training_filter = 'inspector' %}
+{% elif 'supervis' in _training_haystack or 'as1796' in _training_haystack or 'as2214' in _training_haystack %}
+  {% set _training_filter = 'supervision' %}
+{% elif 'engineer' in _training_haystack or 'technologist' in _training_haystack or 'specialist' in _training_haystack or 'practitioner' in _training_haystack or 'iwe' in _training_haystack or 'iwt' in _training_haystack or 'iws' in _training_haystack or 'iwp' in _training_haystack or 'certification' in _training_haystack or 'ndt' in _training_haystack or 'robotic' in _training_haystack %}
+  {% set _training_filter = 'certification' %}
+{% endif %}
+{% if _training_course_slug %}
+  {% set _training_href = '/courses/' ~ _training_course_slug %}
+{% elif _training_filter %}
+  {% set _training_href = '/courses?category=' ~ _training_filter ~ '#all-courses' %}
+{% else %}
+  {% set _training_href = '/courses' %}
+{% endif %}
+
+{% set _cert_hero_eyebrow = _certification_row.category | default('Certification pathway', true) %}
+{% set _cert_hero_headline = _certification_row.title | default('Certification pathway', true) %}
+{% set _cert_hero_subheadline %}
+  {% if _certification_row.summary %}
+  <p><strong>{{ _certification_row.summary }}</strong></p>
+  {% endif %}
+{% endset %}
+{% set _cert_hero_extra %}
+  <div class="wa-hero__badges" aria-label="Pathway details">
+    {% if _cert_code %}
+    <span class="wa-hero__badge wa-hero__badge--accent">{{ _cert_code }}</span>
+    {% endif %}
+    <span class="wa-hero__badge wa-hero__badge--muted">
+      {% if _cert_audience_key == 'company' %}
+        For organisations
+      {% elif _cert_audience_key == 'individual' %}
+        For individuals
+      {% else %}
+        Certification pathway
+      {% endif %}
+    </span>
+  </div>
+{% endset %}
+{% set _shared_hero_id = 'certification-detail-hero' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'large' %}
+{% set _shared_hero_spacing = 'default' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = 'none' %}
+{% set _shared_hero_show_breadcrumb = true %}
+{% set _shared_hero_show_breadcrumb_home = true %}
+{% set _shared_hero_breadcrumb_home_label = 'Home' %}
+{% set _shared_hero_breadcrumb_home_href = '/' %}
+{% set _shared_hero_breadcrumb_parent_label = 'Certification' %}
+{% set _shared_hero_breadcrumb_parent_href = '/certification' %}
+{% set _shared_hero_breadcrumb_current_label = _cert_hero_headline %}
+{% set _shared_hero_eyebrow = _cert_hero_eyebrow %}
+{% set _shared_hero_headline = _cert_hero_headline %}
+{% set _shared_hero_subheadline = _cert_hero_subheadline %}
+{% set _shared_hero_extra = _cert_hero_extra %}
+{% set _shared_hero_primary_label = _cert_cta_label %}
+{% set _shared_hero_primary_href = '/contact-us?topic=certification#enquiry' %}
+{% set _shared_hero_primary_style = 'gold' %}
+{% set _shared_hero_secondary_label = 'Back to certification' %}
+{% set _shared_hero_secondary_href = '/certification' %}
+{% set _shared_hero_secondary_style = 'white-outline' %}
+{% include "../partials/shared-hero.html" %}
+
+{% if false %}
+<section class="wa-cert-detail-hero" aria-labelledby="wa-cert-detail-heading">
+  <span class="wa-cert-detail-hero__bg" aria-hidden="true"></span>
+  <div class="container wa-cert-detail-hero__inner">
+    <div class="wa-cert-detail-hero__content">
+      <nav class="wa-cert-detail-breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="/certification">Certification</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{{ _certification_row.title }}</span>
+      </nav>
+
+      <div class="wa-cert-detail-hero__kicker">
+        <span class="wa-overline__text">{{ _certification_row.category | default('Certification pathway', true) }}</span>
+      </div>
+
+      <h1 class="wa-cert-detail-hero__title" id="wa-cert-detail-heading">
+        {{ _certification_row.title | default('Certification pathway') }}
+      </h1>
+
+      {% if _certification_row.summary %}
+      <div class="wa-cert-detail-hero__summary">
+        <p><strong>{{ _certification_row.summary }}</strong></p>
+      </div>
+      {% endif %}
+
+      <div class="wa-cert-detail-hero__badges" aria-label="Pathway details">
+        {% if _cert_code %}
+        <span class="wa-cert-detail-badge">{{ _cert_code }}</span>
+        {% endif %}
+        <span class="wa-cert-detail-badge wa-cert-detail-badge--muted">
+          {% if _cert_audience_key == 'company' %}
+            For organisations
+          {% elif _cert_audience_key == 'individual' %}
+            For individuals
+          {% else %}
+            Certification pathway
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="wa-cert-detail-hero__actions">
+        <a class="btn btn-gold wa-cert-detail-hero__cta" href="/contact-us?topic=certification#enquiry">
+          <span>{{ _cert_cta_label }}</span>
+          <svg class="wa-btn__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+        <a class="btn btn-white-outline wa-cert-detail-hero__cta" href="/certification">Back to certification</a>
+      </div>
+    </div>
+  </div>
+  <span class="wa-cert-detail-hero__accent" aria-hidden="true"></span>
+</section>
+{% endif %}
+
+<section class="wa-cert-detail-main wa-section wa-section--bg-surface wa-section--spacing-spacious">
+  <div class="container">
+    <div class="wa-cert-detail-main__grid">
+      <article class="wa-cert-detail-content">
+        <div class="wa-overline">
+          <span class="wa-overline__text">Pathway overview</span>
+        </div>
+        <h2>About this certification pathway</h2>
+        {% if _certification_row.detail %}
+          <div class="wa-richtext">{{ _certification_row.detail }}</div>
+        {% elif _certification_row.summary %}
+          <div class="wa-richtext"><p>{{ _certification_row.summary }}</p></div>
+        {% else %}
+          <div class="wa-richtext"><p>Details for this certification pathway are being finalised. Please contact Weld Australia for current guidance.</p></div>
+        {% endif %}
+      </article>
+
+      <aside class="wa-cert-detail-sidebar">
+        <div class="wa-cert-detail-sidebar__card">
+          <h2>How to progress</h2>
+          <ol>
+            <li>Confirm the pathway suits your role or organisation.</li>
+            <li>Speak with Weld Australia about eligibility and documentation.</li>
+            <li>Plan the required training, assessment or audit pathway.</li>
+          </ol>
+          <a href="/contact-us?topic=certification#enquiry" class="btn btn-primary">Start an enquiry</a>
+        </div>
+
+        {% if _cert_is_iso3834 %}
+        <div class="wa-cert-detail-sidebar__card wa-cert-detail-sidebar__card--accent">
+          <h2>ISO 3834 links</h2>
+          <p>Start an ISO 3834 expression of interest, or view the public register of Weld Australia certified companies.</p>
+          <div class="wa-cert-detail-sidebar__actions">
+            <a href="https://iso3834.com.au/interest_form/" class="btn btn-gold" target="_blank" rel="noopener noreferrer">Register for Expression of Interest</a>
+            <a href="https://iso3834.com.au/directory/" class="wa-cert-detail-sidebar__text-link" target="_blank" rel="noopener noreferrer">View Certified Companies Register</a>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if _cert_audience_key == 'individual' %}
+        <div class="wa-cert-detail-sidebar__card wa-cert-detail-sidebar__card--subtle">
+          <h2>Looking for training?</h2>
+          <p>Some individual certification pathways are supported by Weld Australia training courses and upcoming sessions.</p>
+          <a href="{{ _training_href }}" class="wa-cert-detail-sidebar__text-link">Browse courses</a>
+        </div>
+        {% endif %}
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% if _related_rows %}
+<section class="wa-cert-detail-related wa-section wa-section--bg-surface_alt wa-section--spacing-spacious">
+  <div class="container">
+    <div class="wa-section-head">
+      <div class="wa-overline">
+        <span class="wa-overline__text">Explore more</span>
+      </div>
+      <h2>Related certification pathways</h2>
+    </div>
+    <div class="wa-cert-detail-related__grid">
+      {% for row in _related_rows %}
+        {% if row.hs_id != _certification_row.hs_id and loop.index <= 5 %}
+          {% set _related_slug = row.hs_path | default(row.slug, true) %}
+          <a class="wa-cert-detail-related__card" href="/certification?pathway={{ _related_slug }}">
+            {% if row.code %}
+            <span class="wa-cert-detail-related__code" style="background:#fdeaf4;border-color:rgba(139,10,80,0.16);color:#8b0a50;">{{ row.code }}</span>
+            {% endif %}
+            <strong>{{ row.title }}</strong>
+            {% if row.summary %}
+            <span>{{ row.summary }}</span>
+            {% endif %}
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% else %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ── § 1  HERO ────────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero"
+          background="primary"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="image"
+          background_image={"src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1290244385%20(1).jpg", "alt": "Welding Certification Australia", "width": 5120, "height": 2880}
+          eyebrow="Weld Australia Certification"
+          headline="Welding Certification Australia"
+          subheadline="<p>Australia's leading provider of internationally recognised welding certification - for companies and individuals. Aligned with AS/NZS ISO 3834, AS/NZS 5131, ISO 9606, EN 15085, and DIN 2303.</p>"
+          primary_cta={"label_text": "Company certification", "link": {"url": {"href": "#company", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "Individual certification", "link": {"url": {"href": "#individual", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 2  SPLIT FEATURE - OVERVIEW + VIDEO ───────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Certification Overview"
+          section_id="overview"
+          background="surface"
+          media_type="video"
+          media_side="right"
+          overline="Australia's peak certification body"
+          heading="IIW Authorised Nominated Body for Company Certification"
+          body_text="<p>As the International Institute of Welding (IIW) Authorised Nominated Body for Company Certification (ANBCC), Weld Australia delivers internationally recognised certification pathways trusted across both Australian and global markets.</p><p>For individuals, welder certification provides independent, third-party verification of skills and competence - building credibility with employers and clients, and providing a clear pathway for career progression.</p><p>For employers, hiring certified welders delivers measurable benefits - improving productivity, reducing rework and risk, and helping businesses win new work, meet compliance requirements, and build a culture of continuous improvement.</p>"
+          video_url="https://www.youtube.com/embed/ItvKIUBWzFs"
+          video_label="Overview of Weld Australia's certification programs"
+          buttons=[
+            {"label_text": "Get in touch",        "url": {"url": {"href": "/contact-us?topic=certification#enquiry",  "type": "EXTERNAL"}}, "style": "primary"},
+            {"label_text": "Download brochure",   "url": {"url": {"href": "https://weldingtech.sharepoint.com/sites/WeldsPublicDocuments/_layouts/15/download.aspx?share=EepC0EpcRT1OjptEQzolHsQBbBn2MyGah-VoxHDyiznQPg", "type": "EXTERNAL"}}, "style": "navy-outline", "open_in_new_tab": true}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 3  SPLIT FEATURE - COMPANY CERTIFICATION ───────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Company Certification"
+          section_id="company"
+          background="primary"
+          media_type="info_cards"
+          media_side="right"
+          items_source="hubdb_certification_pathways"
+          items_hubdb_table="certification_pathways"
+          items_hubdb_audience="company"
+          overline="For organisations"
+          heading="Company welding certification"
+          body_text="<p>Weld Australia provides internationally recognised company certification pathways for welding quality, structural steel, rail and defence applications.</p><p>These programs help organisations demonstrate compliance, strengthen technical capability, reduce audit duplication and compete for high-value Australian and international supply chain opportunities.</p>"
+          items=[
+            {"title": "AS/NZS ISO 3834 - Welding Quality Management", "desc": "The internationally recognised benchmark for welding quality, specifying production control requirements for fusion welding of metallic materials - in workshop or on site.", "link_url": {"url": {"href": "/certification#company", "type": "EXTERNAL"}}},
+            {"title": "IIW MCS + AS/NZS 5131 - Combined Certification", "desc": "A streamlined pathway for steel fabricators to demonstrate compliance with both global welding quality standards and Australian structural steel requirements.", "link_url": {"url": {"href": "/certification#company", "type": "EXTERNAL"}}},
+            {"title": "EN 15085 - Rail Welding Certification", "desc": "The internationally recognised standard for welding in railway applications, covering manufacture, maintenance, and overhaul of rail vehicles, components, and sub-assemblies.", "link_url": {"url": {"href": "/certification#company", "type": "EXTERNAL"}}},
+            {"title": "DIN 2303 - Defence Welding Certification", "desc": "The internationally recognised standard for welding in military and defence applications, including naval vessels, submarines, and military vehicles.", "link_url": {"url": {"href": "/certification#company", "type": "EXTERNAL"}}}
+          ]
+          buttons=[
+            {"label_text": "Enquire about company certification", "url": {"url": {"href": "/contact-us?form=general#enquiry", "type": "EXTERNAL"}}, "style": "white-outline"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 4  CARD GRID - COMPANY CERT PATHWAY ────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/card-grid"
+          label="Why Choose Weld Australia"
+          background="surface"
+          overline="Why choose Weld Australia"
+          heading="The premier independent certification body for welding quality"
+          card_style="detail"
+          columns="3"
+          cards=[
+            {"tag_text": "ANBCC", "tag_color": "navy",  "title": "Australia's trusted certification body", "body_text": "Weld Australia is the IIW Authorised Nominated Body for Company Certification (ANBCC) - making us Australia's most trusted and respected independent welding certification body."},
+            {"tag_text": "Experts", "tag_color": "gold", "title": "Highly-qualified assessors", "body_text": "Our assessors are qualified and experienced in quality system auditing, welded fabrication, factory production control systems and quality management systems."},
+            {"tag_text": "Support", "tag_color": "green", "title": "Smooth certification pathway", "body_text": "Our welding experts work closely with you to improve processes and procedures, ensuring alignment with Australian and International Standards."}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 5  CREDENTIAL GRID - INDIVIDUAL CREDENTIALS ────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/credential-grid"
+          label="Individual Credentials"
+          section_id="individual"
+          background="surface_alt"
+          overline="For individuals"
+          heading="Welder certification for individuals"
+          intro="<p>Individual certification delivers ongoing professional development, career opportunities, and greater assurance throughout the welding sector - offering third-party verification of qualifications and a recognised career path.</p>"
+          source="hubdb_certification_pathways"
+          pathways_table="certification_pathways"
+          pathways_audience="individual"
+          groups=[
+            {
+              "group_label": "IIW International Qualifications",
+              "items": [
+                {"code": "IWE",   "title": "International Welding Engineer",              "description": "Engineer",      "accent_color": "gold", "link_url": {"url": {"href": "/courses/iwe", "type": "EXTERNAL"}}},
+                {"code": "IWT",   "title": "International Welding Technologist",          "description": "Technologist",  "accent_color": "gold", "link_url": {"url": {"href": "/courses/iwt", "type": "EXTERNAL"}}},
+                {"code": "IWS",   "title": "International Welding Specialist",            "description": "Specialist",    "accent_color": "gold", "link_url": {"url": {"href": "/courses/iws", "type": "EXTERNAL"}}},
+                {"code": "IWI-S", "title": "International Welding Inspector - Standard",  "description": "Inspector",     "accent_color": "navy", "link_url": {"url": {"href": "/courses/iwi-s", "type": "EXTERNAL"}}},
+                {"code": "IWI-B", "title": "International Welding Inspector - Basic",     "description": "Inspector",     "accent_color": "navy", "link_url": {"url": {"href": "/courses/iwi-b", "type": "EXTERNAL"}}},
+                {"code": "IWP",   "title": "International Welding Practitioner",          "description": "Practitioner",  "accent_color": "navy", "link_url": {"url": {"href": "/courses", "type": "EXTERNAL"}}}
+              ]
+            },
+            {
+              "group_label": "Australian Qualifications",
+              "items": [
+                {"code": "AS1796", "title": "AS1796 Welding Supervisor Certificate 10", "description": "Supervisor", "accent_color": "gold", "link_url": {"url": {"href": "/courses/as1796-cert-10", "type": "EXTERNAL"}}},
+                {"code": "AS2214", "title": "AS2214 Welding Supervisor",                "description": "Supervisor", "accent_color": "gold", "link_url": {"url": {"href": "/courses/welding-supervisor", "type": "EXTERNAL"}}}
+              ]
+            }
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 6  CHECKLIST - BENEFITS OF CERTIFICATION ───────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/checklist"
+          label="Benefits of Certification"
+          section_id="benefits"
+          background="surface"
+          overline="Why get certified"
+          heading="Benefits of certification"
+          layout="cards"
+          columns="2"
+          tick_color="gold"
+          items=[
+            {"text": "Improved employability and job security with third-party verified qualifications to present to prospective employers", "category_label": "For welders"},
+            {"text": "International recognition of qualifications - affording the opportunity to work overseas", "category_label": "For welders"},
+            {"text": "Clear opportunities for career growth and progression", "category_label": "For welders"},
+            {"text": "Easier pathways to obtain future welding qualifications", "category_label": "For welders"},
+            {"text": "Reduced costs - certification confirms competency, minimising welder tests required for specific welding procedures", "category_label": "For employers"},
+            {"text": "Minimised risk - confirmation of a certified competency level significantly reduces the risk of a welder failing a procedure", "category_label": "For employers"},
+            {"text": "Assured currency - welders are certified based on current, rather than past, performance", "category_label": "For employers"},
+            {"text": "Simplified record-keeping - independent records of qualification for quality management systems", "category_label": "For employers"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 7  CTA BANNER ─────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA"
+          background="primary"
+          align="split"
+          headline="Ready to get certified?"
+          body_text="<p>Contact our team to begin your certification pathway today.</p>"
+          cta_label="Contact us"
+          cta_link={"url": {"href": "/contact-us?topic=certification#enquiry", "type": "EXTERNAL"}}
+          secondary_cta_label="View all services"
+          secondary_cta_link={"url": {"href": "/", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endif %}
+{% endblock %}

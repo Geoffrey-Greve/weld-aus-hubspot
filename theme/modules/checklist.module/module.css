@@ -1,0 +1,282 @@
+/*
+ * checklist.module/module.css
+ * Checklist module - list and cards layout variants.
+ * BEM prefix: wa-checklist.
+ */
+
+/* ── Section head ─────────────────────────────────────────────────────────── */
+
+.wa-checklist__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: 800;
+  color: inherit;
+  margin: 0 0 var(--wa-space-4) 0;
+}
+
+.wa-checklist__intro {
+  font-size: var(--wa-text-base);
+  color: inherit;
+  margin: 0 0 var(--wa-space-8) 0;
+}
+
+/* ── List layout ──────────────────────────────────────────────────────────── */
+
+.wa-checklist__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-3);
+}
+
+@media (min-width: 640px) {
+  .wa-checklist__list--2col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .wa-checklist__list--3col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-checklist__list--2col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .wa-checklist__list--3col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── List item ────────────────────────────────────────────────────────────── */
+
+.wa-checklist__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wa-space-3);
+  font-size: var(--wa-text-base);
+  line-height: 1.6;
+  color: inherit;
+}
+
+/* ── Tick icon ────────────────────────────────────────────────────────────── */
+
+.wa-checklist__tick {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.wa-checklist__tick--navy {
+  color: var(--wa-color-primary);
+}
+
+.wa-checklist__tick--gold {
+  color: var(--wa-color-gold-text); /* WCAG 1.4.11 - 3:1 on light bg */
+}
+
+.wa-checklist__tick--green {
+  color: var(--wa-color-success);
+}
+
+.wa-checklist__tick--magenta {
+  color: var(--wa-color-magenta);
+}
+
+/* Dark background overrides */
+.wa-section--bg-primary .wa-checklist__tick--navy,
+.wa-section--bg-primary_dark .wa-checklist__tick--navy {
+  color: #fff;
+}
+
+/* Coloured ticks on dark sections revert to bright brand tones so the icon
+   clears the 3:1 non-text contrast requirement (WCAG 1.4.11) on navy. The
+   light-surface tones (--wa-color-gold-text #7a5c00 etc.) are too dark here. */
+.wa-section--bg-primary .wa-checklist__tick--gold,
+.wa-section--bg-primary_dark .wa-checklist__tick--gold {
+  color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-section--bg-primary .wa-checklist__tick--green,
+.wa-section--bg-primary_dark .wa-checklist__tick--green {
+  color: #4ade80;
+}
+
+.wa-section--bg-primary .wa-checklist__tick--magenta,
+.wa-section--bg-primary_dark .wa-checklist__tick--magenta {
+  color: var(--wa-color-magenta-on-dark, #ff7eb8);
+}
+
+.wa-section--bg-primary .wa-checklist__item,
+.wa-section--bg-primary_dark .wa-checklist__item {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Cards layout ─────────────────────────────────────────────────────────── */
+
+.wa-checklist__cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-4);
+}
+
+@media (min-width: 640px) {
+  .wa-checklist__cards--2col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .wa-checklist__cards--3col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-checklist__cards--2col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .wa-checklist__cards--3col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.wa-checklist__card {
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-md);
+  padding: var(--wa-space-5);
+}
+
+.wa-section--bg-primary .wa-checklist__card,
+.wa-section--bg-primary_dark .wa-checklist__card {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.wa-checklist__card-label {
+  display: block;
+  font-size: var(--wa-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--wa-color-text-muted);
+  margin-bottom: var(--wa-space-2);
+}
+
+.wa-section--bg-primary .wa-checklist__card-label,
+.wa-section--bg-primary_dark .wa-checklist__card-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.wa-checklist__check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wa-space-3);
+  font-size: var(--wa-text-base);
+  line-height: 1.6;
+  color: var(--wa-color-text);
+}
+
+.wa-section--bg-primary .wa-checklist__check-row,
+.wa-section--bg-primary_dark .wa-checklist__check-row {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Grouped benefit panels ─────────────────────────────────────────────── */
+
+.wa-checklist__benefit-groups {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-6, 1.5rem);
+}
+
+@media (min-width: 900px) {
+  .wa-checklist__benefit-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.wa-checklist__benefit-panel {
+  background: var(--wa-color-surface, #fff);
+  border: 1px solid rgba(11, 18, 53, 0.1);
+  border-radius: var(--wa-radius-lg, 1rem);
+  box-shadow: 0 18px 44px rgba(11, 18, 53, 0.08);
+  overflow: hidden;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  position: relative;
+}
+
+.wa-checklist__benefit-panel::before {
+  content: "";
+  display: block;
+  height: 4px;
+  inset: 0 0 auto;
+  position: absolute;
+}
+
+.wa-checklist__benefit-panel--welders::before {
+  background: var(--wa-color-accent, #fecf05);
+}
+
+.wa-checklist__benefit-panel--employers::before {
+  background: var(--wa-gradient-flame, linear-gradient(90deg, #ed128d 0%, #f04828 40%, #fecf05 100%));
+}
+
+.wa-checklist__benefit-panel-head {
+  border-bottom: 1px solid rgba(11, 18, 53, 0.08);
+  margin-bottom: var(--wa-space-5, 1.25rem);
+  padding-bottom: var(--wa-space-4, 1rem);
+}
+
+.wa-checklist__benefit-kicker {
+  color: var(--wa-color-magenta-text, #c00d74);
+  display: block;
+  font-size: var(--wa-text-xs, 0.75rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--wa-space-2, 0.5rem);
+  text-transform: uppercase;
+}
+
+.wa-checklist__benefit-title {
+  color: var(--wa-color-primary, #1c1e4c);
+  font-family: var(--wa-font-heading, Poppins, system-ui, sans-serif);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: var(--wa-weight-extrabold, 800);
+  line-height: 1.08;
+  margin: 0;
+}
+
+.wa-checklist__benefit-list {
+  display: grid;
+  gap: var(--wa-space-4, 1rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wa-checklist__benefit-item {
+  align-items: flex-start;
+  color: var(--wa-color-text, #172033);
+  display: flex;
+  font-size: var(--wa-text-base, 1rem);
+  gap: var(--wa-space-3, 0.75rem);
+  line-height: 1.65;
+}
+
+.wa-checklist__benefit-item + .wa-checklist__benefit-item {
+  border-top: 1px solid rgba(11, 18, 53, 0.08);
+  padding-top: var(--wa-space-4, 1rem);
+}
+
+.wa-section--bg-primary .wa-checklist__benefit-panel,
+.wa-section--bg-primary_dark .wa-checklist__benefit-panel {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+}
+
+.wa-section--bg-primary .wa-checklist__benefit-title,
+.wa-section--bg-primary_dark .wa-checklist__benefit-title,
+.wa-section--bg-primary .wa-checklist__benefit-item,
+.wa-section--bg-primary_dark .wa-checklist__benefit-item {
+  color: rgba(255, 255, 255, 0.92);
+}

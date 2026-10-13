@@ -1,0 +1,63 @@
+{#
+  _linkify-emails.html - turn a bare email address into a mailto link.
+
+  QA ref 63, second round. The first fix linked addresses in ONE field of the
+  Contact Us phone directory (`extension_text`) by splitting it on spaces, and the
+  page still failed on production:
+
+  - every other field printed an address verbatim: the department label, the
+    directory callout, the intro, the feature cards, and the FAQ further down the
+    same page, whose own default content says "emailing
+    membership@weldaustralia.com.au" as plain text;
+  - splitting on a space missed an address joined to its neighbour by a
+    non-breaking space, a slash or a colon ("Email:membership@…"), and in the
+    colon case linked the whole token, "mailto:Email:membership@…", which goes
+    nowhere.
+
+  So the address is matched by pattern rather than by token, and every module on
+  the page runs its text through here.
+
+  Import it; do not copy it:
+
+    {% import "../../templates/partials/_linkify-emails.html" as wa_email %}
+    {{ wa_email.text(entry.department, 'my-link-class') }}   (a plain text field)
+    {{ wa_email.html(module.intro, 'my-link-class') }}       (a rich text field)
+
+  The pattern carries no backslashes and no lookarounds on purpose: HubL string
+  literals treat a backslash inconsistently, and HubSpot's regex engine (RE2)
+  refuses lookarounds outright. `[.]` is a literal full stop. The domain must
+  carry at least one dot followed by more characters, so a full stop ending a
+  sentence stays outside the link. No character the pattern accepts can close an
+  attribute or open a tag, so `$1` is safe inside the href.
+#}
+
+{% macro text(raw, cls='') -%}
+{{ raw|default('', true)|string|regex_replace('([A-Za-z0-9._%+-]+@[A-Za-z0-9-]+([.][A-Za-z0-9-]+)+)', '<a href="mailto:$1" class="wa-email-link ' ~ cls ~ '">$1</a>') }}
+{%- endmacro %}
+
+{#
+  Rich text: an editor may already have linked an address, and the pattern would
+  then wrap that anchor's href and text a second time. Without lookarounds the
+  anchors are stepped round instead: the block is split on `<a`, and a piece
+  holding `</a>` is an anchor (kept verbatim) followed by ordinary text (linked).
+  A piece without `</a>` began with `<abbr`, `<aside` or `<address`, not an
+  anchor, so it is ordinary text too. The marker keeps the first piece non-empty
+  whatever the split filter does with a leading separator. Skipping the WHOLE
+  block when it held any link at all, as this first did, left every address
+  unlinked in a card that also linked to a form.
+#}
+{% macro html(raw, cls='') -%}
+{%- set _pieces = ('[[wa-email-start]]' ~ raw|default('', true)|string)|split('<a') -%}
+{%- set _out = namespace(html='') -%}
+{%- for _piece in _pieces -%}
+{%- if loop.first -%}
+{%- set _out.html = _out.html ~ text(_piece|replace('[[wa-email-start]]', ''), cls) -%}
+{%- elif '</a>' in _piece -%}
+{%- set _halves = _piece|split('</a>', 2) -%}
+{%- set _out.html = _out.html ~ '<a' ~ _halves[0] ~ '</a>' ~ (text(_halves[1], cls) if (_halves|length) > 1 else '') -%}
+{%- else -%}
+{%- set _out.html = _out.html ~ '<a' ~ text(_piece, cls) -%}
+{%- endif -%}
+{%- endfor -%}
+{{ _out.html }}
+{%- endmacro %}

@@ -1,0 +1,64 @@
+<!--
+  templateType: page
+  label: Member Portal - Manage My Team
+  isAvailableForNewContent: true
+-->
+{#
+  portal-team.html - Member portal: Manage My Team page.
+  Intended URL: /portal/team/
+
+  This keeps the private corporate-admin template separate from the public
+  /team directory page.
+#}
+{% set page_title_exact = 'Manage My Team - Weld Australia Member Portal' %}
+{% set page_description = 'Corporate admins: view linked team members, manage employees, and bulk-book courses.' %}
+{% extends "../layouts/portal.html" %}
+
+{% block extra_head %}
+{{ super() }}
+<meta name="robots" content="noindex, nofollow">
+<style>
+  body.is-portal #manage-my-team-hero.wa-hero {
+    min-height: clamp(460px, 42vw, 540px);
+    padding-block-start: calc(var(--wa-site-header-offset, 112px) + 96px);
+  }
+
+  body.is-portal #manage-my-team-hero .wa-hero__content {
+    max-width: 680px;
+  }
+
+  @media (max-width: 767px) {
+    body.is-portal #manage-my-team-hero.wa-hero {
+      min-height: auto;
+      padding-block-start: calc(var(--wa-site-header-offset, 112px) + 72px);
+      padding-block-end: 56px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block portal_content %}
+
+  {% module "corporate_admin_team_hero" path="../../modules/hero"
+    label="Manage my team hero"
+    section_id="manage-my-team-hero"
+    background="primary"
+    spacing="default"
+    height="compact"
+    alignment="left"
+    eyebrow="Corporate membership"
+    headline="Manage my team"
+    subheadline="<p>Review the people linked to your corporate membership, manage team changes, and bulk book training from one private member portal area.</p>"
+    primary_cta={ "label_text": "View team members", "link": { "url": { "type": "EXTERNAL", "href": "#team-members" } }, "style": "gold" }
+    secondary_cta={ "label_text": "Bulk book training", "link": { "url": { "type": "EXTERNAL", "href": "#bulk-booking" } }, "style": "white-outline" }
+    accent_bar=true
+  %}
+
+  {% module "corporate_admin_team" path="../../modules/corporate-admin"
+    courses_table="courses"
+    office_email="office@weldaustralia.com.au"
+    show_access_notice=true
+    background="white"
+  %}
+
+{% endblock %}

@@ -1,0 +1,105 @@
+{#
+  cta-banner.html
+
+  Shared markup for the bottom CTA/banner pattern used by cta-banner.module and
+  cta-banner-conditional.module. Calling modules prepare the resolved content,
+  button URLs/classes and any gating; this partial only renders the section.
+#}
+
+{% set _cta_banner_align = _cta_banner_align | default('centered') %}
+{% set _cta_banner_bg = _cta_banner_bg | default('primary') %}
+{% set _cta_banner_spacing = _cta_banner_spacing | default('default') %}
+{% set _cta_banner_vis_classes = _cta_banner_vis_classes | default('') %}
+{% set _cta_banner_img_mod = _cta_banner_img_mod | default('') %}
+{% set _cta_banner_extra_classes = _cta_banner_extra_classes | default('') %}
+{% set _cta_banner_section_id = _cta_banner_section_id | default('') %}
+{% set _cta_banner_visitor_state = _cta_banner_visitor_state | default('') %}
+{% set _cta_banner_eyebrow = _cta_banner_eyebrow | default('') %}
+{% set _cta_banner_primary_class = _cta_banner_primary_class | default('btn-gold') %}
+{% set _cta_banner_secondary_class = _cta_banner_secondary_class | default('btn-white-outline') %}
+{% set _cta_banner_image_position = _cta_banner_image_position | default('right') %}
+
+<section
+  class="wa-cta-banner{% if _cta_banner_extra_classes %} {{ _cta_banner_extra_classes }}{% endif %} wa-cta-banner--{{ _cta_banner_align }} wa-section wa-section--bg-{{ _cta_banner_bg }} wa-section--spacing-{{ _cta_banner_spacing }}{{ _cta_banner_img_mod }}{{ _cta_banner_vis_classes }}"
+  {% if _cta_banner_section_id %}id="{{ _cta_banner_section_id }}"{% endif %}
+  {% if _cta_banner_visitor_state %}data-visitor-state="{{ _cta_banner_visitor_state }}"{% endif %}
+>
+  <div class="container-wide">
+    <div class="wa-cta-banner__inner">
+
+      {# Image - left position (rendered before text column) #}
+      {% if _cta_banner_image and _cta_banner_image.src and _cta_banner_image_position == 'left' %}
+      <div class="wa-cta-banner__media" aria-hidden="true">
+        <img
+          src="{{ _cta_banner_image.src }}"
+          alt="{{ _cta_banner_image.alt | default('') }}"
+          class="wa-cta-banner__image"
+          loading="lazy"
+          decoding="async"
+          {% if _cta_banner_image.width %}width="{{ _cta_banner_image.width }}"{% endif %}
+          {% if _cta_banner_image.height %}height="{{ _cta_banner_image.height }}"{% endif %}
+        >
+      </div>
+      {% endif %}
+
+      {# Text + CTAs #}
+      <div class="wa-cta-banner__content">
+        <div class="wa-cta-banner__text">
+          {% if _cta_banner_eyebrow %}
+          <div class="wa-overline wa-overline--light">
+            <span class="wa-overline__text">{{ _cta_banner_eyebrow }}</span>
+          </div>
+          {% endif %}
+
+          <h2 class="wa-cta-banner__headline">{{ _cta_banner_headline }}</h2>
+
+          {% if _cta_banner_body %}
+          <div class="wa-cta-banner__body">{{ _cta_banner_body }}</div>
+          {% endif %}
+        </div>
+
+        <div class="wa-cta-banner__actions">
+          {% if _cta_banner_primary_label %}
+          <a
+            href="{% if _cta_banner_primary_is_direct %}{{ _cta_banner_primary_href | escape }}{% else %}{{ _cta_banner_primary_href | escape_url }}{% endif %}"
+            class="btn {{ _cta_banner_primary_class }} wa-cta-banner__cta"
+            {% if _cta_banner_primary_open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ _cta_banner_primary_label }}</a>
+          {% endif %}
+
+          {% if _cta_banner_secondary_label %}
+          <a
+            href="{% if _cta_banner_secondary_is_direct %}{{ _cta_banner_secondary_href | escape }}{% else %}{{ _cta_banner_secondary_href | escape_url }}{% endif %}"
+            class="btn {{ _cta_banner_secondary_class }} wa-cta-banner__cta-secondary"
+            {% if _cta_banner_secondary_open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ _cta_banner_secondary_label }}</a>
+          {% endif %}
+
+          {% if _cta_banner_tertiary_label %}
+          <a
+            href="{% if _cta_banner_tertiary_is_direct %}{{ _cta_banner_tertiary_href | escape }}{% else %}{{ _cta_banner_tertiary_href | escape_url }}{% endif %}"
+            class="btn {{ _cta_banner_secondary_class }} wa-cta-banner__cta-secondary"
+            {% if _cta_banner_tertiary_open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ _cta_banner_tertiary_label }}</a>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Image - right position (rendered after text column) #}
+      {% if _cta_banner_image and _cta_banner_image.src and _cta_banner_image_position == 'right' %}
+      <div class="wa-cta-banner__media" aria-hidden="true">
+        <img
+          src="{{ _cta_banner_image.src }}"
+          alt="{{ _cta_banner_image.alt | default('') }}"
+          class="wa-cta-banner__image"
+          loading="lazy"
+          decoding="async"
+          {% if _cta_banner_image.width %}width="{{ _cta_banner_image.width }}"{% endif %}
+          {% if _cta_banner_image.height %}height="{{ _cta_banner_image.height }}"{% endif %}
+        >
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>

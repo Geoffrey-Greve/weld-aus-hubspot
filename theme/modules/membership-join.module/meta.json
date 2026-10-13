@@ -1,0 +1,14 @@
+{
+  "label": "Membership Join",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Tier-aware membership join handoff. Paid tiers use payment links; free/by-agreement tiers (student-apprentice, reciprocal, tafe-rto) use a theme-styled application form posted to a per-tier HubSpot form GUID (issue 251).",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["membership", "signup", "payment"]
+}

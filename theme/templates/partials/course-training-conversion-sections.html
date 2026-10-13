@@ -1,0 +1,35 @@
+<!--
+  templateType: none
+-->
+{#
+  course-training-conversion-sections.html
+
+  Closing dynamic course-detail sections. These sit after the HubDB-powered
+  fees and session selector so the detail page moves from course proof points
+  into the real enrolment data, then back into pathway/workplace support.
+#}
+
+{% module
+  "course_dynamic_workplace"
+  path="../../modules/course-dynamic-section"
+  label="Workplace training details"
+  variant="workplace"
+  section_id="in-house-training"
+  background="primary"
+  spacing="spacious"
+  media_side="left"
+  cta_label="Enquire about in-house training"
+  cta_link={"url": {"href": "/contact-us?topic=training#enquiry", "type": "EXTERNAL"}}
+%}
+
+{% module
+  "course_dynamic_pathway"
+  path="../../modules/course-dynamic-section"
+  label="Course pathway"
+  variant="pathway"
+  section_id="pathways"
+  background="surface_alt"
+  spacing="spacious"
+  cta_label="Speak to a trainer"
+  cta_link={"url": {"href": "/contact-us?topic=training#enquiry", "type": "EXTERNAL"}}
+%}

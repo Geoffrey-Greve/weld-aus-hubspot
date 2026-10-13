@@ -1,0 +1,185 @@
+[
+  {
+    "name": "headline",
+    "label": "Headline",
+    "type": "text",
+    "required": true,
+    "default": ""
+  },
+  {
+    "name": "body_text",
+    "label": "Body",
+    "type": "richtext"
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA label",
+    "type": "text",
+    "required": true,
+    "default": ""
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA link",
+    "type": "link",
+    "required": true,
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": ""
+      },
+      "open_in_new_tab": false,
+      "no_follow": false
+    }
+  },
+  {
+    "name": "secondary_cta_label",
+    "label": "Secondary CTA label",
+    "type": "text"
+  },
+  {
+    "name": "secondary_cta_link",
+    "label": "Secondary CTA link",
+    "type": "link"
+  },
+  {
+    "name": "tertiary_cta_label",
+    "label": "Third CTA label",
+    "type": "text",
+    "help_text": "Optional. Adds a third button alongside the primary and secondary CTAs."
+  },
+  {
+    "name": "tertiary_cta_link",
+    "label": "Third CTA link",
+    "type": "link"
+  },
+  {
+    "name": "image",
+    "label": "Image (optional)",
+    "type": "image"
+  },
+  {
+    "name": "image_position",
+    "label": "Image position",
+    "type": "choice",
+    "choices": [
+      [
+        "left",
+        "Left"
+      ],
+      [
+        "right",
+        "Right"
+      ],
+      [
+        "none",
+        "No image"
+      ]
+    ],
+    "default": "right"
+  },
+  {
+    "name": "align",
+    "label": "Layout",
+    "type": "choice",
+    "choices": [
+      [
+        "centered",
+        "Centered (heading + body + CTAs stacked)"
+      ],
+      [
+        "split",
+        "Split (heading/body left, CTAs right)"
+      ]
+    ],
+    "default": "centered"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "primary"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

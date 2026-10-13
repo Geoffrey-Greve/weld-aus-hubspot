@@ -1,0 +1,23 @@
+/*
+  course-filter.module - section-level wrapper styles.
+  Component-level styles live in the Vite-bundled CourseFilter.css.
+*/
+
+.wa-section {
+  /* Section spacing driven by the `spacing` module field */
+}
+
+.wa-section--compact {
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+.wa-section--default {
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+.wa-section--spacious {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}

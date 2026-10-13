@@ -1,0 +1,123 @@
+<!--
+  templateType: none
+-->
+﻿{#
+  job-detail-head.html - Head/meta for Job Board dynamic detail rows.
+  Expects dynamic_page_hubdb_row from the parent template.
+
+  The document <title>, meta description and canonical are NOT emitted here:
+  partials/_head.html emits exactly one title and description, from the
+  page_title_exact / page_description that job-board.html sets before its
+  {% extends %}, and HubSpot's own standard_header_includes emits the canonical.
+  This partial owns only the tags neither of those covers - og:image, the
+  stylesheets and the JSON-LD blocks. Keep the excerpt logic below in step with
+  the page_description in job-board.html.
+#}
+{% set _row = dynamic_page_hubdb_row %}
+
+{% set _job_title = _row.job_title | default('Welding opportunity', true) %}
+{% set _company = _row.company_name | default('Weld Australia member employer', true) %}
+{% set _job_type = _row.job_type.name | default(_row.job_type, true) | default('', true) %}
+{% set _state = _row.job_state.name | default(_row.job_state, true) | default('', true) %}
+{% set _location = _row.job_location | default('', true) %}
+{% set _arrangement_raw = _row.arrangement.name | default(_row.arrangement, true) | default('', true) %}
+{% set _arrangement_lower = _arrangement_raw | lower %}
+{% if _arrangement_lower == 'on-site' or _arrangement_lower == 'on site' or _arrangement_lower == 'onsite' %}
+  {% set _arrangement = 'On-site' %}
+{% elif _arrangement_lower == 'fly-in fly-out' or _arrangement_lower == 'fifo' %}
+  {% set _arrangement = 'FIFO' %}
+{% else %}
+  {% set _arrangement = _arrangement_raw %}
+{% endif %}
+{% set _sector = _row.sector.name | default(_row.sector, true) | default('Welding and fabrication', true) %}
+{% set _category = _row.category.name | default(_row.category, true) | default('Welding role', true) %}
+{% set _salary = _row.salary | default('Competitive', true) %}
+{% set _salary_note = _row.salary_note | default('Salary details on application', true) %}
+{% set _salary_note_text = _salary_note | striptags | trim %}
+{% set _reference = _row.ref | default(_row.hs_id, true) | default('', true) %}
+{% set _excerpt = _row.excerpt | default('', true) %}
+{% if not _excerpt and _row.job_description %}
+  {% set _excerpt = _row.job_description | striptags | truncate(190) %}
+{% endif %}
+{% if not _excerpt %}
+  {% set _excerpt = 'Explore this welding, fabrication or manufacturing opportunity advertised through the Weld Australia Jobs Board.' %}
+{% endif %}
+
+{#
+  No apply-destination resolution here: the head renders meta and JSON-LD only.
+  Employer emails are never emitted here (defect 68) - Apply CTAs live in the
+  body and use obfuscated data-job-apply-* attributes.
+#}
+
+{% set _location_label = '' %}
+{% if _location %}
+  {% set _location_label = _location %}
+  {% if _state %}
+    {% set _location_label = _location_label ~ ', ' ~ _state %}
+  {% endif %}
+{% elif _state %}
+  {% set _location_label = _state %}
+{% else %}
+  {% set _location_label = 'Australia' %}
+{% endif %}
+
+{% set _closing_label = '' %}
+{% if _row.closing_date %}
+  {% set _closing_label = _row.closing_date | datetimeformat('%d %b %Y') %}
+{% endif %}
+{% set _posted_label = '' %}
+{% if _row.date_posted %}
+  {% set _posted_label = _row.date_posted | datetimeformat('%d %b %Y') %}
+{% endif %}
+
+{% set _category_key = 'trades' %}
+{% set _category_lower = (_category ~ ' ' ~ _job_title) | lower %}
+{% if 'inspector' in _category_lower or 'quality' in _category_lower %}
+  {% set _category_key = 'inspection' %}
+{% elif 'supervisor' in _category_lower or 'management' in _category_lower or 'manager' in _category_lower or 'lead' in _category_lower %}
+  {% set _category_key = 'leadership' %}
+{% elif 'apprentice' in _category_lower %}
+  {% set _category_key = 'apprenticeships' %}
+{% elif 'engineer' in _category_lower or 'technologist' in _category_lower %}
+  {% set _category_key = 'engineering' %}
+{% endif %}
+
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/job-board.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/job-detail.css') }}">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "JobPosting",
+  "title": "{{ _job_title | escape }}",
+  "hiringOrganization": {
+    "@type": "Organization",
+    "name": "{{ _company | escape }}"
+  },
+  "jobLocation": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{{ _location | escape }}",
+      "addressRegion": "{{ _state | escape }}",
+      "addressCountry": "AU"
+    }
+  },
+  "employmentType": "{{ _job_type | upper | replace('-', '_') | replace(' ', '_') }}",
+  {% if _row.date_posted %}"datePosted": "{{ _row.date_posted | datetimeformat('%Y-%m-%d') }}",{% endif %}
+  {% if _row.closing_date %}"validThrough": "{{ _row.closing_date | datetimeformat('%Y-%m-%dT23:59:59') }}",{% endif %}
+  "industry": "{{ _sector | escape }}",
+  "description": "{{ _row.job_description | default(_excerpt, true) | striptags | escape }}"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Jobs Board", "item": "{{ site_settings.site_url | default('https://weldaustralia.com.au') }}/job-board" },
+    { "@type": "ListItem", "position": 2, "name": "{{ _job_title | escape }}" }
+  ]
+}
+</script>

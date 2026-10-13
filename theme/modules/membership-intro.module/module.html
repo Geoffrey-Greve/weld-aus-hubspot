@@ -1,0 +1,185 @@
+{%- set _bg = module.background|default('surface') -%}
+{%- set _vis = module.visibility|default(['mobile','tablet','desktop']) -%}
+{%- set _section_classes = 'wa-membership-intro wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-spacious' -%}
+{%- if 'mobile' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+{%- set _video_url = module.video_url|default('')|trim -%}
+{%- set _video_url_key = _video_url|lower -%}
+{%- set _embed_url = _video_url -%}
+{%- set _has_embedded_video = false -%}
+{%- set _has_native_video = false -%}
+{%- set _native_video_type = 'video/mp4' -%}
+{%- set _secondary_cta_href = module.secondary_cta.link.url.href | default('/resources', true) | trim -%}
+{%- set _secondary_cta_open_in_new_tab = module.secondary_cta.link.open_in_new_tab -%}
+{%- set _secondary_cta_label = module.secondary_cta.label_text | default('', true) | lower | trim -%}
+{%- set _secondary_cta_href_key = _secondary_cta_href | lower -%}
+{%- if (_secondary_cta_label == 'membership prospectus' or _secondary_cta_label == 'download prospectus') and (_secondary_cta_href_key == '' or _secondary_cta_href_key == '#' or _secondary_cta_href_key == '#download' or _secondary_cta_href_key == '/resources' or _secondary_cta_href_key == '/resources/' or _secondary_cta_href_key == '/resources?hslang=en' or _secondary_cta_href_key == '/resources/?hslang=en') -%}
+  {%- set _secondary_cta_href = 'https://weldaustralia.com.au/wp-content/uploads/2025/10/Weld-Australia-Membership-Prospectus-2025-FINAL.pdf' -%}
+  {%- set _secondary_cta_open_in_new_tab = true -%}
+{%- endif -%}
+{%- if _video_url -%}
+  {%- if '.mp4' in _video_url_key -%}
+    {%- set _has_native_video = true -%}
+    {%- set _native_video_type = 'video/mp4' -%}
+  {%- elif '.webm' in _video_url_key -%}
+    {%- set _has_native_video = true -%}
+    {%- set _native_video_type = 'video/webm' -%}
+  {%- elif '.ogg' in _video_url_key or '.ogv' in _video_url_key -%}
+    {%- set _has_native_video = true -%}
+    {%- set _native_video_type = 'video/ogg' -%}
+  {%- elif 'youtube.com/watch' in _video_url -%}
+    {%- set _video_id = _video_url.split('v=')[1].split('&')[0] -%}
+    {%- set _embed_url = 'https://www.youtube-nocookie.com/embed/' ~ _video_id ~ '?rel=0&modestbranding=1' -%}
+    {%- set _has_embedded_video = true -%}
+  {%- elif 'youtu.be/' in _video_url -%}
+    {%- set _video_id = _video_url.split('youtu.be/')[1].split('\\?')[0] -%}
+    {%- set _embed_url = 'https://www.youtube-nocookie.com/embed/' ~ _video_id ~ '?rel=0&modestbranding=1' -%}
+    {%- set _has_embedded_video = true -%}
+  {%- elif 'youtube.com/embed/' in _video_url or 'youtube-nocookie.com/embed/' in _video_url -%}
+    {%- set _embed_url = _video_url -%}
+    {%- set _has_embedded_video = true -%}
+  {%- elif 'vimeo.com/' in _video_url and 'player.vimeo.com/video/' not in _video_url -%}
+    {%- set _video_id = _video_url.split('vimeo.com/')[1].split('\\?')[0] -%}
+    {%- set _embed_url = 'https://player.vimeo.com/video/' ~ _video_id ~ '?dnt=1' -%}
+    {%- set _has_embedded_video = true -%}
+  {%- elif 'player.vimeo.com/video/' in _video_url -%}
+    {%- set _embed_url = _video_url -%}
+    {%- set _has_embedded_video = true -%}
+  {%- endif -%}
+{%- endif -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section class="{{ _section_classes }}" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container wa-membership-intro__inner">
+    <div class="wa-membership-intro__copy">
+      {% if module.eyebrow %}
+      <div class="wa-overline">
+        <span class="wa-overline__text">{{ module.eyebrow }}</span>
+      </div>
+      {% endif %}
+
+      {% if module.heading %}
+      <h2 class="wa-membership-intro__heading">{{ module.heading }}</h2>
+      {% endif %}
+
+      {% if module.body_text %}
+      <div class="wa-membership-intro__body wa-richtext">{{ module.body_text }}</div>
+      {% endif %}
+
+      {% if module.primary_cta.label_text or module.secondary_cta.label_text %}
+      <div class="wa-membership-intro__actions">
+        {% if module.primary_cta.label_text %}
+        <a class="btn btn-primary" href="{{ module.primary_cta.link.url.href|default('#membership-options') }}" {% if module.primary_cta.link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ module.primary_cta.label_text }}</a>
+        {% endif %}
+        {% if module.secondary_cta.label_text %}
+        <a class="btn btn-navy-outline" href="{{ _secondary_cta_href|escape_url }}" {% if _secondary_cta_open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ module.secondary_cta.label_text }}</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="wa-membership-intro__media">
+      <div class="wa-membership-intro__image-wrap">
+        {% if _has_embedded_video %}
+        <div class="wa-membership-intro__video-frame">
+          <iframe
+            src="{{ _embed_url }}"
+            title="{{ module.video_label|default('Membership video')|escape_attr }}"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+        {% elif _has_native_video %}
+        <div class="wa-membership-intro__video-frame">
+          {% if module.media_image and module.media_image.src %}
+          <button
+            type="button"
+            class="wa-membership-intro__video-facade"
+            data-video-src="{{ _video_url|escape_url }}"
+            data-video-type="{{ _native_video_type|escape_attr }}"
+            data-video-label="{{ module.video_label|default('Membership video')|escape_attr }}"
+            aria-label="Play {{ module.video_label|default('membership video')|escape_attr }}"
+          >
+            <img
+              class="wa-membership-intro__poster"
+              src="{{ module.media_image.src|escape_url }}"
+              alt="{{ module.media_image.alt|default('')|escape_attr }}"
+              loading="lazy"
+              decoding="async"
+              {% if module.media_image.width %}width="{{ module.media_image.width }}"{% endif %}
+              {% if module.media_image.height %}height="{{ module.media_image.height }}"{% endif %}
+            >
+            <span class="wa-membership-intro__poster-play" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" focusable="false"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+            </span>
+            <span class="wa-membership-intro__poster-label">{{ module.video_label|default('Watch video') }}</span>
+          </button>
+          <noscript>
+            <video class="wa-membership-intro__video" controls playsinline preload="metadata" poster="{{ module.media_image.src|escape_url }}">
+              <source src="{{ _video_url|escape_url }}" type="{{ _native_video_type|escape_attr }}">
+              <a href="{{ _video_url|escape_url }}" target="_blank" rel="noopener noreferrer">{{ module.video_label|default('Watch video') }}</a>
+            </video>
+          </noscript>
+          {% else %}
+          <video
+            class="wa-membership-intro__video"
+            controls
+            playsinline
+            preload="metadata"
+            {% if module.media_image and module.media_image.src %}poster="{{ module.media_image.src|escape_url }}"{% endif %}
+          >
+            <source src="{{ _video_url|escape_url }}" type="{{ _native_video_type|escape_attr }}">
+            <a href="{{ _video_url|escape_url }}" target="_blank" rel="noopener noreferrer">{{ module.video_label|default('Watch video') }}</a>
+          </video>
+          {% endif %}
+        </div>
+        {% else %}
+        {% if module.media_image and module.media_image.src %}
+        <img
+          class="wa-membership-intro__image"
+          src="{{ module.media_image.src }}"
+          alt="{{ module.media_image.alt|default('Weld Australia member at work') }}"
+          loading="lazy"
+          decoding="async"
+          {% if module.media_image.width %}width="{{ module.media_image.width }}"{% endif %}
+          {% if module.media_image.height %}height="{{ module.media_image.height }}"{% endif %}
+        >
+        {% else %}
+        <img
+          class="wa-membership-intro__image"
+          src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&w=900&q=80"
+          alt="Welding professional at work"
+          loading="lazy"
+          decoding="async"
+        >
+        {% endif %}
+
+        {% if _video_url %}
+        <a class="wa-membership-intro__video-link" href="{{ _video_url }}" target="_blank" rel="noopener noreferrer">
+          <span class="wa-membership-intro__play" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" focusable="false"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </span>
+          <span>{{ module.video_label|default('Watch video') }}</span>
+        </a>
+        {% endif %}
+        {% endif %}
+      </div>
+
+      {% if module.highlights %}
+      <div class="wa-membership-intro__highlights">
+        {% for item in module.highlights %}
+        {% if item.heading or item.body_text %}
+        <article class="wa-membership-intro__highlight wa-membership-intro__highlight--{{ item.accent_color|default('gold') }}">
+          {% if item.heading %}<h3>{{ item.heading }}</h3>{% endif %}
+          {% if item.body_text %}<p>{{ item.body_text }}</p>{% endif %}
+        </article>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}

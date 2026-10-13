@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A11y Test - Resource Library</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/assets/css/components.css" />
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    a.skip-to-content {
+      position: absolute; left: -9999px; top: 0; z-index: 9999;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; min-width: 44px;
+      padding: 0.5rem 1rem; background: #002f5f; color: #fff;
+    }
+    a.skip-to-content:focus { left: 0; }
+  </style>
+</head>
+<body>
+  <a class="skip-to-content" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <div
+      data-wa-module="resource-library"
+      data-props='{
+        "rows": [
+          {
+            "id": 1,
+            "title": "AS/NZS 2980 Qualification of Welding Procedures",
+            "abstract": "<p>Comprehensive guide to welding procedure qualification.</p>",
+            "file_url": "https://cdn.example.com/resources/as2980.pdf",
+            "file_type": "pdf",
+            "category": "standards",
+            "preview_image_url": "",
+            "preview_image_alt": "",
+            "published_date": "2025-03-01",
+            "locked": false
+          },
+          {
+            "id": 2,
+            "title": "IIW Inspector Study Guide",
+            "abstract": "<p>Study materials for IIW International Welding Inspector certification.</p>",
+            "file_url": "https://cdn.example.com/resources/iiw-guide.pdf",
+            "file_type": "pdf",
+            "category": "technical",
+            "preview_image_url": "",
+            "preview_image_alt": "",
+            "published_date": "2025-06-15",
+            "locked": true
+          },
+          {
+            "id": 3,
+            "title": "Welding Technology Webinar - May 2026",
+            "abstract": "<p>Recording of our monthly technology webinar series.</p>",
+            "file_url": "https://cdn.example.com/resources/webinar-may-2026.mp4",
+            "file_type": "video",
+            "category": "webinar",
+            "preview_image_url": "",
+            "preview_image_alt": "",
+            "published_date": "2026-05-10",
+            "locked": false
+          }
+        ],
+        "section_heading": "Resources",
+        "intro": "<p>Download technical resources, standards guidance and more.</p>",
+        "categories_visible": ["standards", "technical", "webinar", "case_study", "report", "template", "advocacy"],
+        "default_filter_category": "",
+        "show_file_type_filter": true,
+        "show_member_only_filter": true,
+        "page_size": 18,
+        "locked_overlay_message": "<p>This resource is available to Weld Australia members.</p>",
+        "locked_cta_label": "Become a member",
+        "locked_cta_url": "/membership/",
+        "member_tier": ""
+      }'
+    ></div>
+  </main>
+  <script type="module" src="/src/modules/resource-library/index.tsx"></script>
+</body>
+</html>

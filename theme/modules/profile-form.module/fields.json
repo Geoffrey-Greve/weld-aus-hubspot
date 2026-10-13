@@ -1,0 +1,242 @@
+[
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "My profile"
+  },
+  {
+    "name": "portal_id",
+    "label": "HubSpot portal ID",
+    "type": "text",
+    "required": true,
+    "help_text": "Weld Australia staging portal is 441838610. Used by the Forms API submission URL.",
+    "default": "441838610"
+  },
+  {
+    "name": "profile_update_form",
+    "label": "Profile update form",
+    "type": "form",
+    "required": false,
+    "help_text": "Select the Weld HubSpot form whose fields map to the editable contact properties below. Submitted via Forms API to update the logged-in contact. Create this form in HubSpot with fields named: firstname, lastname, email, phone, mobilephone, address, city, state, zip, jobtitle, date_of_birth, job_function.",
+    "default": {
+      "form_id": "809fa5de-e922-45c5-8ec3-f43eabfd1e2f",
+      "response_type": "inline",
+      "message": "Profile updated."
+    }
+  },
+  {
+    "name": "company_link_property",
+    "label": "Member company ID property",
+    "type": "text",
+    "required": false,
+    "default": "",
+    "help_text": "Issue 30. Leave EMPTY to hide the 'Connect your company' field entirely. To switch it on, enter the internal name of the contact property that stores the member company ID (agree it with Ollie first) AND add a field with that exact name to the profile update form above. The form submits every named input to the Forms API, so a property that is not on the form makes HubSpot reject the whole submission and no profile change saves at all - that is why this is off until it is configured on both sides."
+  },
+  {
+    "name": "company_link_help",
+    "label": "Member company ID help text",
+    "type": "text",
+    "required": false,
+    "default": "Work for a Weld Australia member company? Enter its member company ID to have member pricing applied to your training and event bookings."
+  },
+  {
+    "name": "editable_fields",
+    "label": "Editable fields",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "firstname",
+        "First name"
+      ],
+      [
+        "lastname",
+        "Last name"
+      ],
+      [
+        "email",
+        "Email"
+      ],
+      [
+        "phone",
+        "Phone"
+      ],
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "address",
+        "Postal address"
+      ],
+      [
+        "job_title",
+        "Job title"
+      ],
+      [
+        "date_of_birth",
+        "Date of birth"
+      ],
+      [
+        "primary_discipline",
+        "Primary discipline"
+      ]
+    ],
+    "default": [
+      "firstname",
+      "lastname",
+      "phone",
+      "mobile",
+      "address",
+      "job_title",
+      "date_of_birth",
+      "primary_discipline"
+    ]
+  },
+  {
+    "name": "show_password_change_link",
+    "label": "Show password change link",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "password_change_label",
+    "label": "Password change link label",
+    "type": "text",
+    "default": "Change password"
+  },
+  {
+    "name": "password_change_link",
+    "label": "Password change link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": "/_hcms/mem/reset/request?redirect_url=/portal"
+      }
+    }
+  },
+  {
+    "name": "show_preferences_link",
+    "label": "Show email preferences link",
+    "type": "boolean",
+    "default": false,
+    "help_text": "Turn on to show the Communications preferences card. Keep off until /email-subscriptions/ is confirmed live — members can still manage preferences via the link in any marketing email."
+  },
+  {
+    "name": "preferences_label",
+    "label": "Email preferences link label",
+    "type": "text",
+    "default": "Manage preferences"
+  },
+  {
+    "name": "preferences_link",
+    "label": "Email preferences page",
+    "type": "link",
+    "help_text": "Choose the published Subscription Preferences page. Defaults to /email-subscriptions/, which only resolves once the Subscription Preferences Page is assigned + published in HubSpot Settings -> Website -> Pages -> System pages. Until then this link 404s.",
+    "default": {
+      "url": {
+        "type": "CONTENT",
+        "href": "/email-subscriptions/"
+      },
+      "open_in_new_tab": false,
+      "no_follow": false
+    }
+  },
+  {
+    "name": "save_success_message",
+    "label": "Success message",
+    "type": "text",
+    "default": "Profile updated."
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": true,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

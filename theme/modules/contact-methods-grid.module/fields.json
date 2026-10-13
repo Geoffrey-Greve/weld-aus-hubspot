@@ -1,0 +1,274 @@
+[
+  {
+    "name": "style",
+    "label": "Display style",
+    "type": "choice",
+    "choices": [
+      [
+        "feature",
+        "Feature cards (icon + heading + body)"
+      ],
+      [
+        "directory",
+        "Directory list (numbered departments)"
+      ],
+      [
+        "legacy",
+        "Basic grid (label + value)"
+      ]
+    ],
+    "default": "feature",
+    "help_text": "Feature: large icon cards in 3 columns. Directory: numbered phone menu list. Legacy: original icon + label + value grid."
+  },
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext",
+    "default": ""
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "directory_cta",
+    "label": "Directory CTA",
+    "type": "group",
+    "children": [
+      {
+        "name": "show",
+        "label": "Show CTA",
+        "type": "boolean",
+        "default": false
+      },
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text",
+        "default": "Technical hotline"
+      },
+      {
+        "name": "body_text",
+        "label": "Body text",
+        "type": "richtext",
+        "default": "<p>For technical welding enquiries, use our general enquiry form and select the relevant topic.</p>"
+      },
+      {
+        "name": "link_label",
+        "label": "Link label",
+        "type": "text",
+        "default": "Send enquiry"
+      },
+      {
+        "name": "link_url",
+        "label": "Link URL",
+        "type": "text",
+        "default": "#enquiry"
+      }
+    ]
+  },
+  {
+    "name": "cards",
+    "label": "Feature cards",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 12,
+      "default": 1
+    },
+    "help_text": "Used when style is 'Feature cards'.",
+    "children": [
+      {
+        "name": "icon_name",
+        "label": "Icon (SVG name or emoji)",
+        "type": "text"
+      },
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text"
+      },
+      {
+        "name": "body_text",
+        "label": "Body text",
+        "type": "richtext"
+      },
+      {
+        "name": "link_url",
+        "label": "Link URL",
+        "type": "text"
+      },
+      {
+        "name": "link_label",
+        "label": "Link label",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "entries",
+    "label": "Directory entries",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 20,
+      "default": 1
+    },
+    "help_text": "Used when style is 'Directory list'.",
+    "children": [
+      {
+        "name": "number",
+        "label": "Option number",
+        "type": "text"
+      },
+      {
+        "name": "department",
+        "label": "Department / label",
+        "type": "text"
+      },
+      {
+        "name": "phone",
+        "label": "Phone number",
+        "type": "text"
+      },
+      {
+        "name": "email",
+        "label": "Department email",
+        "type": "text",
+        "help_text": "Rendered as a mailto link beside the phone number. An address typed into the Extension / note field is linked too, so existing entries keep working."
+      },
+      {
+        "name": "extension_text",
+        "label": "Extension / note",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "methods",
+    "label": "Contact methods (legacy)",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "default": 1
+    },
+    "help_text": "Used when style is 'Basic grid (legacy)'.",
+    "children": [
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "value_text",
+        "label": "Value (display)",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "link",
+        "label": "Link (tel:/mailto:/url)",
+        "type": "text"
+      },
+      {
+        "name": "icon",
+        "label": "Icon",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "help_text": "Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White / Light"
+      ],
+      [
+        "surface_alt",
+        "Alt grey"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, only rendered for logged-in active members."
+  }
+]

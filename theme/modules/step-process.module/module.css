@@ -1,0 +1,162 @@
+/*
+ * step-process.module/module.css
+ * Numbered process steps.
+ * Mobile: vertical stack. Desktop (≥1024px): horizontal row with connectors.
+ */
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+
+.wa-step-process__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-10);
+  text-align: center;
+}
+
+.wa-section--primary .wa-step-process__heading,
+.wa-section--primary-dark .wa-step-process__heading {
+  color: var(--wa-color-on-primary);
+}
+
+/* ── List ────────────────────────────────────────────────────────────────── */
+
+.wa-step-process__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-8);
+}
+
+@media (min-width: 1024px) {
+  .wa-step-process__list {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+  }
+}
+
+/* ── Step ────────────────────────────────────────────────────────────────── */
+
+.wa-step-process__step {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--wa-space-3);
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .wa-step-process__step {
+    flex: 1;
+    align-items: center;
+    text-align: center;
+    padding: 0 var(--wa-space-4);
+  }
+}
+
+/* ── Number circle ───────────────────────────────────────────────────────── */
+
+.wa-step-process__number-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-lg);
+  font-weight: var(--wa-weight-bold);
+  flex-shrink: 0;
+  line-height: 1;
+  z-index: 1;
+}
+
+.wa-section--primary .wa-step-process__number-circle,
+.wa-section--primary-dark .wa-step-process__number-circle {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--wa-color-on-primary);
+}
+
+/* ── Icon ────────────────────────────────────────────────────────────────── */
+
+.wa-step-process__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-step-process__icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* ── Content ─────────────────────────────────────────────────────────────── */
+
+.wa-step-process__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-2);
+}
+
+.wa-step-process__step-heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-lg);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.wa-section--primary .wa-step-process__step-heading,
+.wa-section--primary-dark .wa-step-process__step-heading {
+  color: var(--wa-color-on-primary);
+}
+
+.wa-step-process__step-body {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+  line-height: 1.6;
+}
+
+.wa-step-process__step-body > *:first-child { margin-top: 0; }
+.wa-step-process__step-body > *:last-child  { margin-bottom: 0; }
+
+.wa-section--primary .wa-step-process__step-body,
+.wa-section--primary-dark .wa-step-process__step-body {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Connector arrow ─────────────────────────────────────────────────────── */
+
+/* Mobile: hide connectors (flow is vertical, no arrows needed) */
+.wa-step-process__connector {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .wa-step-process__connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--wa-color-text-muted);
+    flex-shrink: 0;
+    /* Position between steps - sits inside the step li, at desktop it becomes
+       an absolute overlay on the right edge */
+    position: absolute;
+    right: calc(-1 * var(--wa-space-6));
+    top: 12px; /* Align with number circle center */
+    z-index: 2;
+  }
+}
+
+.wa-section--primary .wa-step-process__connector,
+.wa-section--primary-dark .wa-step-process__connector {
+  color: rgba(255, 255, 255, 0.5);
+}

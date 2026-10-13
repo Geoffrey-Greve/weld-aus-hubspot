@@ -1,0 +1,14 @@
+{
+  "label": "Google Map Embed",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Lazy-loaded Google Maps embed. Paste the iframe src URL from Google Maps 'Share > Embed a map'. Height is editor-configurable.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["map", "embed", "google"]
+}

@@ -1,0 +1,319 @@
+/* ============================================================
+   jobs-listing - React island styles
+   Follows the --wa-* design token system from CLAUDE.md §5.3
+   Mobile-first: list layout (not grid) with card styling per row.
+   CSS class prefix: wa-jl
+   ============================================================ */
+
+/* ---- Container ---- */
+.wa-jl {
+  container-type: inline-size;
+}
+
+/* ---- Header ---- */
+.wa-jl__header {
+  margin-block-end: var(--wa-space-8, 2rem);
+}
+
+.wa-jl__heading {
+  font-family: var(--wa-font-heading);
+  color: var(--wa-color-text);
+  margin-block-end: var(--wa-space-3, 0.75rem);
+}
+
+.wa-jl__intro {
+  color: var(--wa-color-text-muted, #6b7280);
+  max-inline-size: 65ch;
+}
+
+/* ---- Toolbar ---- */
+.wa-jl__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-4, 1rem);
+  align-items: flex-start;
+  margin-block-end: var(--wa-space-6, 1.5rem);
+}
+
+.wa-jl__search-wrap {
+  flex: 1 1 240px;
+  min-inline-size: 200px;
+}
+
+.wa-jl__search {
+  inline-size: 100%;
+  min-block-size: var(--wa-touch-min, 44px);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--wa-color-border, #d1d5db);
+  border-radius: var(--wa-radius-sm, 4px);
+  font-size: 0.9375rem;
+  background: var(--wa-color-surface, #fff);
+  color: var(--wa-color-text, #111);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wa-jl__search:focus {
+  outline: 2px solid var(--wa-color-primary, #00518a);
+  outline-offset: 1px;
+  border-color: var(--wa-color-primary, #00518a);
+}
+
+.wa-jl__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-3, 0.75rem);
+  flex: 1 1 auto;
+}
+
+.wa-jl__toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3, 0.75rem);
+  flex-shrink: 0;
+}
+
+/* ---- Result count ---- */
+.wa-jl__count {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  margin-block-end: var(--wa-space-4, 1rem);
+}
+
+/* ---- Job List ---- */
+.wa-jl__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4, 1rem);
+}
+
+.wa-jl__list-item {
+  display: flex;
+  min-inline-size: 0;
+}
+
+.wa-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--wa-space-2, 0.5rem);
+  margin-block-start: var(--wa-space-8, 2rem);
+}
+
+.wa-pagination__btn {
+  min-inline-size: 42px;
+  min-block-size: 40px;
+  padding: 0 0.875rem;
+  border: 1.5px solid var(--wa-color-border, #dde0e5);
+  border-radius: 999px;
+  background: var(--wa-color-surface, #fff);
+  color: var(--wa-color-primary, #1c1e4c);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.wa-pagination__btn:hover:not(:disabled),
+.wa-pagination__btn:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--wa-color-primary, #1c1e4c);
+}
+
+.wa-pagination__btn--active {
+  border-color: var(--wa-color-primary, #1c1e4c);
+  background: var(--wa-color-primary, #1c1e4c);
+  color: #fff;
+}
+
+.wa-pagination__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* ---- Job Card (list-style) ---- */
+.wa-jl__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 0.75rem);
+  background: var(--wa-color-surface, #fff);
+  border: 1px solid var(--wa-color-border, #e5e7eb);
+  border-radius: var(--wa-radius-md, 8px);
+  padding: var(--wa-space-5, 1.25rem);
+  width: 100%;
+  transition: box-shadow 0.2s ease;
+}
+
+.wa-jl__card:hover {
+  box-shadow: var(--wa-shadow-card, 0 2px 12px rgba(0, 0, 0, 0.08));
+}
+
+.wa-jl__card--featured {
+  border-color: var(--wa-color-primary, #00518a);
+  border-width: 2px;
+  background: color-mix(
+    in srgb,
+    var(--wa-color-primary, #00518a) 4%,
+    var(--wa-color-surface, #fff)
+  );
+}
+
+/* Tablet+: row layout with CTA on the right */
+@container (min-width: 640px) {
+  .wa-jl__card {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .wa-jl__card-main {
+    flex: 1 1 auto;
+    /* Flex items default to min-width:auto; without this a long unbroken job
+       title or URL widens the card instead of wrapping. */
+    min-width: 0;
+  }
+
+  .wa-jl__card-action {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    padding-inline-start: var(--wa-space-5, 1.25rem);
+  }
+}
+
+/* ---- Card header ---- */
+.wa-jl__card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wa-space-3, 0.75rem);
+}
+
+.wa-jl__card-titles {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.wa-jl__job-title {
+  font-family: var(--wa-font-heading);
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--wa-color-text, #111);
+  margin: 0 0 var(--wa-space-1, 0.25rem);
+}
+
+.wa-jl__company {
+  font-size: 0.9375rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  margin: 0;
+}
+
+/* Featured badge */
+.wa-jl__featured-badge {
+  display: inline-block;
+  flex-shrink: 0;
+  padding: 0.2em 0.6em;
+  border-radius: var(--wa-radius-sm, 4px);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--wa-color-primary, #00518a);
+  color: var(--wa-color-on-primary, #fff);
+  white-space: nowrap;
+}
+
+/* ---- Meta row ---- */
+.wa-jl__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--wa-space-2, 0.5rem) var(--wa-space-3, 0.75rem);
+}
+
+.wa-jl__type-badge {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  border-radius: var(--wa-radius-sm, 4px);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--wa-color-surface-alt, #f0f0f0);
+  color: var(--wa-color-text, #111);
+}
+
+.wa-jl__type-badge--full_time {
+  background: #e0f0ff;
+  color: #0050a0;
+}
+
+.wa-jl__type-badge--part_time {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+.wa-jl__type-badge--contract {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.wa-jl__type-badge--apprenticeship {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.wa-jl__location {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+}
+
+.wa-jl__closing {
+  font-size: 0.8125rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  font-style: italic;
+}
+
+/* ---- Description ---- */
+.wa-jl__description {
+  font-size: 0.875rem;
+  color: var(--wa-color-text, #111);
+  /* Clamp to ~4 lines */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
+/* ---- Card action (Apply CTA) ---- */
+.wa-jl__card-action {
+  padding-block-start: var(--wa-space-3, 0.75rem);
+}
+
+.wa-jl__apply-btn {
+  min-height: var(--wa-touch-min, 44px);
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ---- Toolbar action buttons ---- */
+.wa-jl__clear-btn,
+.wa-jl__post-btn {
+  min-height: var(--wa-touch-min, 44px);
+  white-space: nowrap;
+}
+
+/* ---- Visually hidden utility (shared pattern) ---- */
+.wa-visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

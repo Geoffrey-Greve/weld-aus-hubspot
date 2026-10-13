@@ -1,0 +1,98 @@
+[
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Resources"
+  },
+  {
+    "name": "section_intro",
+    "label": "Section intro",
+    "type": "richtext"
+  },
+  {
+    "name": "max_count",
+    "label": "Max resources to show",
+    "type": "number",
+    "default": 2
+  },
+  {
+    "name": "locked_overlay_message",
+    "label": "Locked overlay message",
+    "type": "text",
+    "default": "Available to Weld Australia members."
+  },
+  {
+    "name": "locked_cta_label",
+    "label": "Locked CTA label",
+    "type": "text",
+    "default": "Become a member to download"
+  },
+  {
+    "name": "locked_cta_link",
+    "label": "Locked CTA link",
+    "type": "link"
+  },
+  {
+    "name": "view_all_label",
+    "label": "View all label",
+    "type": "text",
+    "default": "Browse all resources"
+  },
+  {
+    "name": "view_all_link",
+    "label": "View all link",
+    "type": "link"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface_alt"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this entire section is only rendered for logged-in active members."
+  }
+]

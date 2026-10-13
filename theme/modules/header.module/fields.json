@@ -1,0 +1,63 @@
+[
+  {
+    "name": "primary_nav",
+    "label": "Primary navigation menu",
+    "type": "menu",
+    "default": {
+      "name": "For the Weld Australia"
+    }
+  },
+  {
+    "name": "phone_number",
+    "label": "Phone number (utility bar)",
+    "type": "text",
+    "default": "1300 660 660"
+  },
+  {
+    "name": "email",
+    "label": "Email (utility bar)",
+    "type": "text",
+    "default": "info@weldaustralia.com.au"
+  },
+  {
+    "name": "find_a_member_link",
+    "label": "Find a member URL",
+    "type": "link",
+    "default": {
+      "url": {
+        "href": "/find-a-member/"
+      }
+    }
+  },
+  {
+    "name": "login_label_logged_out",
+    "label": "Login button label (logged out)",
+    "type": "text",
+    "default": "Member Login"
+  },
+  {
+    "name": "login_label_logged_in",
+    "label": "Logged-in button label",
+    "type": "text",
+    "default": "Member Profile"
+  },
+  {
+    "name": "login_url",
+    "label": "Login page URL",
+    "type": "text",
+    "default": "/portal/"
+  },
+  {
+    "name": "dashboard_url",
+    "label": "Member dashboard URL",
+    "type": "text",
+    "default": "/portal/"
+  },
+  {
+    "name": "show_search",
+    "label": "Show global site search",
+    "help_text": "Toggle the header search icon and expandable search bar.",
+    "type": "boolean",
+    "default": true
+  }
+]

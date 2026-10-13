@@ -1,0 +1,83 @@
+{#
+  sticky-sub-nav.module/module.html
+
+  Horizontal anchor-link navigation that:
+    1. Becomes sticky after scrolling past `show_on_scroll_after_px` pixels.
+    2. Highlights the link whose target section is currently in view
+       (via Intersection Observer in module.js).
+
+  Fields:
+    module.show_on_scroll_after_px  - px threshold before sticking (default 200)
+    module.links                    - group of anchor links (min 2, max 8)
+      .label_text      - display label (required)
+      .anchor_id  - target section id without # (required)
+    module.primary_cta_label        - optional CTA label
+    module.primary_cta_link         - optional CTA link
+    module.section_id               - standard: anchor ID for the nav itself
+    module.background               - standard: bg style
+    module.spacing                  - standard: vertical padding
+    module.visibility               - standard: device show/hide
+    module.members_only             - standard: member wall gate
+#}
+
+{% set _request_path = request.path | default('', true) %}
+{% set _content_slug = content.slug | default('', true) %}
+{% set _suppress_on_certification_page = _request_path == '/certification' or _request_path == '/certification/' or _request_path == 'certification' or _content_slug == 'certification' %}
+{% set _suppress_on_training_page = _request_path == '/training' or _request_path == '/training/' or _request_path == 'training' or _content_slug == 'training' %}
+{% if not _suppress_on_certification_page and not _suppress_on_training_page %}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{# QA: member-only content is company-aware. See _member-content-gate.html -
+   a corporate employee's membership lives on their employer's record, and
+   `individual_membership_status == 'Current'` cannot see it. #}
+{% include "../../templates/partials/_member-content-gate.html" %}
+{% set _is_active_member = wa_member_gate.is_member %}
+{% if module.members_only and not _is_active_member %}{% else %}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+{# ── Serialise config for JS ────────────────────────────────────────────────── #}
+{% set _scroll_threshold = module.show_on_scroll_after_px | default(200) %}
+
+<nav
+  class="wa-sub-nav wa-section wa-section--bg-{{ module.background | default('surface') }} wa-section--spacing-{{ module.spacing | default('compact') }}{{ _vis_classes }}"
+  id="{% if module.section_id %}{{ module.section_id }}{% else %}wa-sub-nav{% endif %}"
+  aria-label="Page sections"
+  data-scroll-threshold="{{ _scroll_threshold }}"
+>
+  <div class="container wa-sub-nav__inner">
+
+    {# Anchor links #}
+    <ul class="wa-sub-nav__list" role="list">
+      {% for link in module.links %}
+      <li class="wa-sub-nav__item">
+        <a
+          href="#{{ link.anchor_id }}"
+          class="wa-sub-nav__link"
+          data-target="{{ link.anchor_id }}"
+        >{{ link.label_text }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    {# Optional primary CTA - pushed to the right #}
+    {% if module.primary_cta_label and module.primary_cta_link %}
+    <div class="wa-sub-nav__cta-wrap">
+      <a
+        href="{{ module.primary_cta_link.url.href }}"
+        class="btn btn-primary btn-sm wa-sub-nav__cta"
+        {% if module.primary_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >{{ module.primary_cta_label }}</a>
+    </div>
+    {% endif %}
+
+  </div>
+</nav>
+
+{% endif %}{# end members_only gate #}
+{% endif %}{# end page-specific suppression #}

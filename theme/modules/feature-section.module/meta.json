@@ -1,0 +1,14 @@
+{
+  "label": "Feature Section",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Anchored feature section with eyebrow, heading, body, image or video, and CTA. Used for product/technology feature pages. Each instance is targeted by the sticky-sub-nav via its Anchor ID.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["feature", "layout", "image", "video", "technology"]
+}

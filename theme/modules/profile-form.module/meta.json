@@ -1,0 +1,14 @@
+{
+  "label": "Profile Form",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Member portal profile editor. Pre-fills from the logged-in contact's HubSpot properties and submits changes via HubSpot Forms API (no auth required - contact identified by email). Place on profile.html (portal layout). Requires a HubSpot form whose fields map to the editable contact properties; select it in the Profile update form picker.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["portal", "members-only", "profile", "form"]
+}

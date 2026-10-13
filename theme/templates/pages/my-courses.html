@@ -1,0 +1,47 @@
+<!--
+  templateType: page
+  label: Member Portal - My Courses & Events
+  isAvailableForNewContent: true
+-->
+{#
+  my-courses.html - Member portal My Courses page.
+  URL: /portal/courses/
+
+  ── HubSpot configuration required ──────────────────────────────────────────
+  • Assign this template to the page at /portal/courses/
+  • Private Content audience: "Active Members" list
+    (individual_membership_status IN Active, Grace Period)
+  • The portal.html layout provides the secondary auth gate, window.__WELD_MEMBER__
+    injection, and the portal sub-nav.
+
+  ── Data notes ───────────────────────────────────────────────────────────────
+  Phase 1: One upcoming course from synced contact properties.
+  Past courses: empty state (workflow sync to be wired in a later sprint).
+  See my-courses.module/module.html for the full data strategy note.
+
+  ── Layout ───────────────────────────────────────────────────────────────────
+  Extends portal.html. The my-courses module fills the portal_content block.
+#}
+{% set page_title_exact = 'My Courses - Weld Australia Member Portal' %}
+{% set page_description = 'View your registered Weld Australia training courses - upcoming sessions and past completions.' %}
+{% extends "../layouts/portal.html" %}
+
+{% block extra_head %}
+{{ super() }}
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+
+{% block portal_content %}
+
+  {% module "my_courses" path="../../modules/my-courses"
+    heading="My Courses"
+    intro=""
+    empty_state_message="No upcoming courses booked."
+    browse_url={ "url": { "type": "CONTENT", "href": "/courses/" } }
+    support_email="training@weldaustralia.com.au"
+    background="surface"
+    spacing="default"
+    members_only=true
+  %}
+
+{% endblock %}

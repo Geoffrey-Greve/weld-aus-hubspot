@@ -1,0 +1,192 @@
+[
+  {
+    "name": "section_eyebrow",
+    "label": "Section eyebrow",
+    "type": "text",
+    "default": "Course sessions"
+  },
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Choose your location and session"
+  },
+  {
+    "name": "section_intro",
+    "label": "Section intro",
+    "type": "richtext",
+    "default": "<p>Select a location to view available dates, pricing and booking options for this course.</p>"
+  },
+  {
+    "name": "session_card_image",
+    "label": "Default session card image",
+    "type": "image",
+    "help_text": "Used when a HubDB session row does not have its own photo/OG image. To change one specific card image, edit that session row in HubDB.",
+    "default": {
+      "src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1266644220%20(2).jpg",
+      "alt": "Weld Australia training session location",
+      "width": 1200,
+      "height": 675
+    }
+  },
+  {
+    "name": "session_card_category_label",
+    "label": "Fallback card category label",
+    "type": "text",
+    "help_text": "Used only when a HubDB session row does not have a category.",
+    "default": "Course session"
+  },
+  {
+    "name": "session_card_delivery_label",
+    "label": "Fallback delivery label",
+    "type": "text",
+    "help_text": "Used only when a HubDB session row does not have a delivery mode or city.",
+    "default": "Training session"
+  },
+  {
+    "name": "show_pricing",
+    "label": "Show pricing inline",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_seats_remaining",
+    "label": "Show 'seats remaining'",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "worker_portal_id",
+    "label": "Worker portal id override",
+    "type": "text",
+    "default": "",
+    "help_text": "Sent to the Event Engine worker as X-Portal-Id when reading live seat availability. Defaults to this HubSpot account's Hub ID. Set only if the worker keys tenants on a different id."
+  },
+  {
+    "name": "default_city",
+    "label": "Default city (optional override)",
+    "type": "choice",
+    "choices": [
+      ["any", "Any (all locations)"],
+      ["auto", "First available"],
+      ["sydney", "Sydney"],
+      ["melbourne", "Melbourne"],
+      ["brisbane", "Brisbane"],
+      ["perth", "Perth"],
+      ["adelaide", "Adelaide"],
+      ["canberra", "Canberra"],
+      ["darwin", "Darwin"],
+      ["hobart", "Hobart"],
+      ["newcastle", "Newcastle"],
+      ["wollongong", "Wollongong"],
+      ["geelong", "Geelong"],
+      ["mackay", "Mackay"],
+      ["maryborough", "Maryborough"],
+      ["online", "Online"]
+    ],
+    "default": "auto",
+    "help_text": "On the standard course detail template this is set to Any, which lists every session for the course across all locations - the same All locations behaviour as the /courses timetable - and the visitor narrows it with the selector. Elsewhere, First available pre-selects the first city that has sessions. Locations come from the courses HubDB \"city\" SELECT."
+  },
+  {
+    "name": "default_delivery_mode",
+    "label": "Default delivery type",
+    "type": "choice",
+    "choices": [
+      ["any", "All delivery types"],
+      ["Face-to-Face", "Face-to-Face"],
+      ["Online", "Online"],
+      ["Blended", "Blended"],
+      ["In-House", "In-House"]
+    ],
+    "default": "any",
+    "help_text": "The delivery-type filter only appears when this course has sessions across more than one delivery mode. Values must match the 'delivery_mode' Select options in the courses HubDB table."
+  },
+  {
+    "name": "register_cta_label",
+    "label": "Register CTA label",
+    "type": "text",
+    "default": "Register now"
+  },
+  {
+    "name": "contact_cta_label",
+    "label": "Contact fallback CTA label",
+    "type": "text",
+    "help_text": "Used when an imported session does not have Event Engine booking or a valid external registration URL.",
+    "default": "Contact to book"
+  },
+  {
+    "name": "eoi_form",
+    "label": "EOI form (used when no city sessions)",
+    "type": "form",
+    "required": false,
+    "help_text": "Select the HubSpot expression-of-interest form to show when no sessions match.",
+    "default": {
+      "form_id": "",
+      "response_type": "inline",
+      "message": "Thanks for your interest."
+    }
+  },
+  {
+    "name": "eoi_heading",
+    "label": "EOI heading",
+    "type": "text",
+    "default": "Register your interest"
+  },
+  {
+    "name": "eoi_message",
+    "label": "EOI message",
+    "type": "richtext",
+    "default": "<p>We don’t have a session scheduled here yet - register your interest and we’ll let you know.</p>"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

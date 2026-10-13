@@ -1,0 +1,258 @@
+<!--
+  templateType: none
+-->
+{#
+  team-profile-body.html - Body for team & board member profile pages.
+  Expects dynamic_page_hubdb_row from the parent template (about-team.html).
+
+  URL: /about/team/{person-name}
+  Data source: HubDB team_and_board (dynamic pages enabled; the {person-name}
+  segment is the row's built-in page path).
+
+  Read-only: renders published HubDB columns. No CRM, form or workflow writes.
+#}
+{% set _row = dynamic_page_hubdb_row %}
+
+{% set _name  = _row.name | default('Weld Australia team member', true) %}
+{% set _role  = _row.role | default('', true) %}
+{% set _quals = _row.quals | default('', true) %}
+{% set _org   = _row.org | default('', true) %}
+{% set _category = _row.category.name | default(_row.category, true) | default('', true) %}
+{% set _bio_text = _row.bio | default('', true) | striptags | trim %}
+
+{# ════════════════════════════════════════════════════════════════════════
+   § 1  HERO - breadcrumb, headshot, name, role
+   ════════════════════════════════════════════════════════════════════════ #}
+{% set _team_profile_photo %}
+  <div class="wa-team-profile__photo-wrap">
+    {% if _row.headshot and _row.headshot.url %}
+    <img
+      src="{{ _row.headshot.url }}"
+      alt="{{ _row.headshot.alt | default(_name, true) }}"
+      class="wa-team-profile__photo"
+      decoding="async"
+      {% if _row.headshot.width  %}width="{{ _row.headshot.width }}"{% endif %}
+      {% if _row.headshot.height %}height="{{ _row.headshot.height }}"{% endif %}
+    >
+    {% else %}
+    <span class="wa-team-profile__photo-fallback" aria-hidden="true">{{ _name | truncate(1, true, '') | upper }}</span>
+    {% endif %}
+  </div>
+{% endset %}
+
+{% set _team_profile_summary %}
+  {% if _role %}<p class="wa-team-profile__role">{{ _role }}</p>{% endif %}
+  {% if _org %}<p class="wa-team-profile__org">{{ _org }}</p>{% endif %}
+{% endset %}
+
+{% set _team_profile_extra %}
+  {% if _quals %}<span class="wa-team-profile__quals">{{ _quals }}</span>{% endif %}
+{% endset %}
+
+{% set _shared_hero_id = 'team-profile-hero' %}
+{% set _shared_hero_section_id = 'wa-team-profile' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'medium' %}
+{% set _shared_hero_spacing = 'default' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = 'text' %}
+{% set _shared_hero_media_text = _team_profile_photo %}
+{% set _shared_hero_show_breadcrumb = true %}
+{% set _shared_hero_show_breadcrumb_home = true %}
+{% set _shared_hero_breadcrumb_home_label = 'Home' %}
+{% set _shared_hero_breadcrumb_home_href = '/' %}
+{% set _shared_hero_breadcrumb_parent_label = 'Our team' %}
+{% set _shared_hero_breadcrumb_parent_href = '/about/team/' %}
+{% set _shared_hero_breadcrumb_current_label = _name %}
+{% set _shared_hero_eyebrow = _category %}
+{% set _shared_hero_headline = _name %}
+{% set _shared_hero_subheadline = _team_profile_summary %}
+{% set _shared_hero_extra = _team_profile_extra %}
+{% include "./shared-hero.html" %}
+
+{% if false %}
+{# Legacy hero markup replaced by shared-hero in Batch 4. #}
+<section
+  class="wa-team-profile__hero wa-section wa-section--bg-primary_dark wa-section--spacing-default"
+  aria-labelledby="wa-team-profile-heading"
+>
+  <div class="container">
+
+    <nav class="wa-breadcrumb wa-team-profile__breadcrumb" aria-label="Breadcrumb">
+      <ol class="wa-breadcrumb__list">
+        <li><a href="/" class="wa-breadcrumb__link">Home</a></li>
+        <li aria-hidden="true" class="wa-breadcrumb__sep">/</li>
+        <li><a href="/about" class="wa-breadcrumb__link">About</a></li>
+        <li aria-hidden="true" class="wa-breadcrumb__sep">/</li>
+        <li><a href="/about/team/" class="wa-breadcrumb__link">Our team</a></li>
+        <li aria-hidden="true" class="wa-breadcrumb__sep">/</li>
+        <li aria-current="page" class="wa-breadcrumb__current">{{ _name }}</li>
+      </ol>
+    </nav>
+
+    <div class="wa-team-profile__hero-inner">
+
+      <div class="wa-team-profile__photo-wrap">
+        {% if _row.headshot and _row.headshot.url %}
+        <img
+          src="{{ _row.headshot.url }}"
+          alt="{{ _row.headshot.alt | default(_name, true) }}"
+          class="wa-team-profile__photo"
+          decoding="async"
+          {% if _row.headshot.width  %}width="{{ _row.headshot.width }}"{% endif %}
+          {% if _row.headshot.height %}height="{{ _row.headshot.height }}"{% endif %}
+        >
+        {% else %}
+        <span class="wa-team-profile__photo-fallback" aria-hidden="true">{{ _name | truncate(1, true, '') | upper }}</span>
+        {% endif %}
+      </div>
+
+      <div class="wa-team-profile__hero-content">
+        {% if _category %}
+        <div class="wa-overline wa-overline--light">
+          <span class="wa-overline__text">{{ _category }}</span>
+        </div>
+        {% endif %}
+
+        <h1 class="wa-team-profile__name" id="wa-team-profile-heading">{{ _name }}</h1>
+
+        {% if _role %}<p class="wa-team-profile__role">{{ _role }}</p>{% endif %}
+        {% if _org %}<p class="wa-team-profile__org">{{ _org }}</p>{% endif %}
+        {% if _quals %}<span class="wa-team-profile__quals">{{ _quals }}</span>{% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{# ════════════════════════════════════════════════════════════════════════
+   § 2  BIO + SUMMARY SIDEBAR
+   ════════════════════════════════════════════════════════════════════════ #}
+{% endif %}
+
+<section class="wa-team-profile__body wa-section wa-section--bg-surface wa-section--spacing-spacious">
+  <div class="container">
+    <div class="wa-team-profile__grid">
+
+      <article class="wa-team-profile__content">
+        {% if _bio_text %}
+          <h2 class="wa-team-profile__content-heading">About {{ _name }}</h2>
+          <div class="wa-richtext">{{ _row.bio }}</div>
+        {% else %}
+          {# No bio yet - say something useful rather than leaving a blank column. #}
+          <h2 class="wa-team-profile__content-heading">About {{ _name }}</h2>
+          <p class="wa-team-profile__content-empty">
+            {{ _name }}{% if _role %} is {{ _role }}{% if _org %} at {{ _org }}{% else %} at Weld Australia{% endif %}{% else %} is part of the Weld Australia team{% endif %}.
+            A full profile is on its way - in the meantime, our team is happy to help with any enquiry.
+          </p>
+          <p>
+            <a href="/contact-us" class="wa-btn wa-btn--primary">Contact Weld Australia</a>
+          </p>
+        {% endif %}
+      </article>
+
+      <aside class="wa-team-profile__sidebar" aria-label="Profile summary">
+        <div class="wa-team-profile__card">
+          <h2 class="wa-team-profile__card-heading">At a glance</h2>
+          <dl class="wa-team-profile__facts">
+            <div class="wa-team-profile__fact">
+              <dt>Name</dt>
+              <dd>{{ _name }}</dd>
+            </div>
+            {% if _role %}
+            <div class="wa-team-profile__fact">
+              <dt>Role</dt>
+              <dd>{{ _role }}</dd>
+            </div>
+            {% endif %}
+            {% if _category %}
+            <div class="wa-team-profile__fact">
+              <dt>Team</dt>
+              <dd>{{ _category }}</dd>
+            </div>
+            {% endif %}
+            {% if _quals %}
+            <div class="wa-team-profile__fact">
+              <dt>Qualifications</dt>
+              <dd>{{ _quals }}</dd>
+            </div>
+            {% endif %}
+            {% if _org %}
+            <div class="wa-team-profile__fact">
+              <dt>Representing</dt>
+              <dd>{{ _org }}</dd>
+            </div>
+            {% endif %}
+          </dl>
+        </div>
+
+        <p class="wa-team-profile__back">
+          <a href="/about/team/" class="wa-btn wa-btn--navy-outline wa-team-profile__back-link">
+            <span aria-hidden="true">&larr;</span>
+            <span>Back to our team</span>
+          </a>
+        </p>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+{# ════════════════════════════════════════════════════════════════════════
+   § 3  RELATED PEOPLE - same category, current person excluded
+   ════════════════════════════════════════════════════════════════════════ #}
+{# The category label goes into a query string, and one of the options is "Q&C" -
+   without urlencode the '&' would start a new query parameter and the lookup would
+   silently return nothing for that category. #}
+{% if _category %}
+  {% set _related_rows = hubdb_table_rows('team_and_board', 'is_active__eq=true&category__eq=' ~ (_category | urlencode) ~ '&hs_id__neq=' ~ (_row.hs_id | default('0')) ~ '&limit=4', 'display_order') %}
+{% else %}
+  {% set _related_rows = hubdb_table_rows('team_and_board', 'is_active__eq=true&hs_id__neq=' ~ (_row.hs_id | default('0')) ~ '&limit=4', 'display_order') %}
+{% endif %}
+
+{% if _related_rows %}
+<section
+  class="wa-team-profile__related wa-team wa-team--cols-4 wa-section wa-section--bg-surface_alt wa-section--spacing-default"
+  aria-labelledby="wa-team-profile-related-heading"
+>
+  <div class="container">
+    <h2 class="wa-team-profile__related-heading" id="wa-team-profile-related-heading">
+      {% if _category %}More from {{ _category }}{% else %}More from our team{% endif %}
+    </h2>
+
+    <p class="wa-team-profile__related-all">
+      <a href="/about/team/" class="wa-btn wa-btn--navy-outline">View the full team</a>
+    </p>
+
+    <div class="wa-team-profile__related-grid wa-team__grid">
+      {% for rel in _related_rows %}
+      {% set _rel_name = rel.name | default('', true) %}
+      {% if _rel_name %}
+      <article class="wa-team__card{% if rel.hs_path %} wa-team__card--linked{% endif %}">
+        {% if rel.hs_path %}<a class="wa-team__card-link" href="/about/team/{{ rel.hs_path }}">{% endif %}
+          <div class="wa-team__photo-wrap">
+            {% if rel.headshot and rel.headshot.url %}
+            <img
+              src="{{ rel.headshot.url }}"
+              alt="{{ rel.headshot.altText | default(_rel_name, true) }}"
+              class="wa-team__photo"
+              loading="lazy"
+              decoding="async"
+            >
+            {% else %}
+            <span class="wa-team__photo-fallback" aria-hidden="true">{{ _rel_name | truncate(1, true, '') | upper }}</span>
+            {% endif %}
+          </div>
+          <div class="wa-team__body">
+            <h3 class="wa-team__name">{{ _rel_name }}</h3>
+            {% if rel.role %}<p class="wa-team__role">{{ rel.role }}</p>{% endif %}
+          </div>
+        {% if rel.hs_path %}</a>{% endif %}
+      </article>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

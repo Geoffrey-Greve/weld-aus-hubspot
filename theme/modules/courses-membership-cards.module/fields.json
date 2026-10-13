@@ -1,0 +1,139 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "membership"
+  },
+  {
+    "name": "layout",
+    "label": "Layout",
+    "type": "choice",
+    "help_text": "CTA band = a single 'Join now' button (recommended). Tiles = the legacy per-tier card grid.",
+    "choices": [
+      ["cta", "CTA band (single button)"],
+      ["tiles", "Tier tiles"]
+    ],
+    "default": "cta"
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Membership"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Join Weld Australia"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext",
+    "default": "<p>Access member pricing, exclusive resources, and connect with Australia's welding industry.</p>"
+  },
+  {
+    "name": "cards",
+    "label": "Membership cards",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 6,
+      "default": 3
+    },
+    "children": [
+      {
+        "name": "badge_label",
+        "label": "Badge label",
+        "type": "text"
+      },
+      {
+        "name": "accent",
+        "label": "Badge/accent style",
+        "type": "choice",
+        "choices": [
+          ["blue", "Blue"],
+          ["grey", "Grey"],
+          ["gold", "Gold"]
+        ],
+        "default": "blue"
+      },
+      {
+        "name": "featured",
+        "label": "Featured card",
+        "type": "boolean",
+        "default": false
+      },
+      {
+        "name": "price",
+        "label": "Price",
+        "type": "text"
+      },
+      {
+        "name": "price_suffix",
+        "label": "Price suffix",
+        "type": "text",
+        "default": "/year"
+      },
+      {
+        "name": "feature_1",
+        "label": "Feature 1",
+        "type": "text"
+      },
+      {
+        "name": "feature_2",
+        "label": "Feature 2",
+        "type": "text"
+      },
+      {
+        "name": "feature_3",
+        "label": "Feature 3",
+        "type": "text"
+      },
+      {
+        "name": "feature_4",
+        "label": "Feature 4",
+        "type": "text"
+      },
+      {
+        "name": "feature_5",
+        "label": "Feature 5",
+        "type": "text"
+      },
+      {
+        "name": "cta_label",
+        "label": "CTA label",
+        "type": "text"
+      },
+      {
+        "name": "cta_link",
+        "label": "CTA link",
+        "type": "link"
+      }
+    ]
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA button label (CTA band layout)",
+    "type": "text",
+    "default": "Join now"
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA button link (CTA band layout)",
+    "type": "link",
+    "default": {
+      "url": { "type": "EXTERNAL", "href": "/membership/" },
+      "open_in_new_tab": false,
+      "no_follow": false
+    }
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

@@ -1,0 +1,273 @@
+{
+  "name": "portal_test_profiles",
+  "label": "Member Portal QA Test Personas",
+  "useForPages": false,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": false,
+  "columns": [
+    {
+      "name": "profile_code",
+      "label": "Plus-address profile code",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "is_active",
+      "label": "Active",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "member_type",
+      "label": "Membership type / tier label",
+      "type": "TEXT"
+    },
+    {
+      "name": "tier_key",
+      "label": "Portal tier key",
+      "type": "TEXT"
+    },
+    {
+      "name": "status_key",
+      "label": "Portal status key",
+      "type": "TEXT"
+    },
+    {
+      "name": "membership_status",
+      "label": "Dashboard membership status",
+      "type": "TEXT"
+    },
+    {
+      "name": "is_primary_admin",
+      "label": "Primary company admin",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "company_name",
+      "label": "QA company name",
+      "type": "TEXT"
+    },
+    {
+      "name": "role_label",
+      "label": "Portal role label",
+      "type": "TEXT"
+    },
+    {
+      "name": "linked_seats",
+      "label": "Linked seats",
+      "type": "NUMBER"
+    },
+    {
+      "name": "state",
+      "label": "State",
+      "type": "TEXT"
+    },
+    {
+      "name": "accent",
+      "label": "Dashboard accent",
+      "type": "TEXT"
+    },
+    {
+      "name": "renewal_date",
+      "label": "Renewal date (ISO)",
+      "type": "TEXT"
+    }
+  ],
+  "rows": [
+    {
+      "profile_code": "portal-qa-individual",
+      "is_active": true,
+      "member_type": "Individual Paid",
+      "tier_key": "individual",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA",
+      "role_label": "Individual member",
+      "linked_seats": 1,
+      "state": "SA",
+      "accent": "member",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-associate",
+      "is_active": true,
+      "member_type": "Associate Individual",
+      "tier_key": "individual",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA",
+      "role_label": "Associate individual member",
+      "linked_seats": 1,
+      "state": "SA",
+      "accent": "member",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-reciprocal",
+      "is_active": true,
+      "member_type": "Reciprocal",
+      "tier_key": "reciprocal",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA",
+      "role_label": "Reciprocal member",
+      "linked_seats": 1,
+      "state": "SA",
+      "accent": "member",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-tafe-rto",
+      "is_active": true,
+      "member_type": "TAFE or Government RTO",
+      "tier_key": "individual",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": true,
+      "company_name": "Refuel Creative QA Training Organisation",
+      "role_label": "Training organisation admin",
+      "linked_seats": 8,
+      "state": "SA",
+      "accent": "member",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-student",
+      "is_active": true,
+      "member_type": "Student",
+      "tier_key": "individual",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA",
+      "role_label": "Student member",
+      "linked_seats": 1,
+      "state": "SA",
+      "accent": "member",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-apprentice",
+      "is_active": true,
+      "member_type": "Apprentice",
+      "tier_key": "apprentice",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA",
+      "role_label": "Apprentice member",
+      "linked_seats": 1,
+      "state": "SA",
+      "accent": "member",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-industry-supplier",
+      "is_active": true,
+      "member_type": "Industry Supplier",
+      "tier_key": "industry_supplier",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": true,
+      "company_name": "Refuel Creative QA Industry Supplier",
+      "role_label": "Industry supplier admin",
+      "linked_seats": 10,
+      "state": "SA",
+      "accent": "gold",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-honourary",
+      "is_active": true,
+      "member_type": "Honourary",
+      "tier_key": "honorary",
+      "status_key": "honorary",
+      "membership_status": "Active",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA",
+      "role_label": "Honourary member",
+      "linked_seats": 1,
+      "state": "SA",
+      "accent": "gold",
+      "renewal_date": ""
+    },
+    {
+      "profile_code": "portal-qa-not-applicable",
+      "is_active": true,
+      "member_type": "Not Applicable",
+      "tier_key": "individual",
+      "status_key": "never_member",
+      "membership_status": "Lapsed",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA",
+      "role_label": "No applicable membership",
+      "linked_seats": 0,
+      "state": "SA",
+      "accent": "member",
+      "renewal_date": ""
+    },
+    {
+      "profile_code": "portal-qa-corporate-gold",
+      "is_active": true,
+      "member_type": "Gold Corporate",
+      "tier_key": "corporate_gold",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": true,
+      "company_name": "Refuel Creative QA - Gold",
+      "role_label": "Primary Admin",
+      "linked_seats": 14,
+      "state": "SA",
+      "accent": "gold",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-corporate-silver",
+      "is_active": true,
+      "member_type": "Silver Corporate",
+      "tier_key": "corporate_silver",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA - Silver",
+      "role_label": "Employee",
+      "linked_seats": 8,
+      "state": "SA",
+      "accent": "silver",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-corporate-bronze",
+      "is_active": true,
+      "member_type": "Bronze Corporate",
+      "tier_key": "corporate_bronze",
+      "status_key": "active",
+      "membership_status": "Active",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA - Bronze",
+      "role_label": "Employee",
+      "linked_seats": 5,
+      "state": "SA",
+      "accent": "bronze",
+      "renewal_date": "2027-06-30"
+    },
+    {
+      "profile_code": "portal-qa-lapsed",
+      "is_active": true,
+      "member_type": "Individual Paid",
+      "tier_key": "individual",
+      "status_key": "lapsed",
+      "membership_status": "Lapsed",
+      "is_primary_admin": false,
+      "company_name": "Refuel Creative QA",
+      "role_label": "Lapsed individual member",
+      "linked_seats": 1,
+      "state": "SA",
+      "accent": "member",
+      "renewal_date": "2026-06-30"
+    }
+  ]
+}

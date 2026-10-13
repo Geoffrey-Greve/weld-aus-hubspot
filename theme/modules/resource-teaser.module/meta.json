@@ -1,0 +1,14 @@
+{
+  "label": "Resource Teaser",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Teaser cards for the latest resources. Shows locked-state for non-members. Used on the Home page.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["resources", "teaser", "member-wall"]
+}

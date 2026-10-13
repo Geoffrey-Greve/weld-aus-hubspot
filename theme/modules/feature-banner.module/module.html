@@ -1,0 +1,110 @@
+{#
+  feature-banner.module/module.html
+  Navy rounded banner with copy + CTAs left, image/badge right.
+  Sits inside a neutral section background; the navy card spans container width.
+#}
+
+{%- set _bg  = module.background | default('surface_alt') -%}
+{%- set _sp  = module.spacing    | default('default') -%}
+{%- set _vis = module.visibility | default(['mobile','tablet','desktop']) -%}
+
+{%- set _section_classes = 'wa-feature-banner wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-' ~ _sp -%}
+{%- if 'mobile'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+<section
+  class="{{ _section_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div class="wa-feature-banner__card">
+
+      {# ── Text + CTAs ─────────────────────────────────────────────────────── #}
+      <div class="wa-feature-banner__text">
+
+        {% if module.overline %}
+        <div class="wa-overline wa-overline--light">
+          <span class="wa-overline__text">{{ module.overline }}</span>
+        </div>
+        {% endif %}
+
+        {% if module.heading %}
+        <h2 class="wa-feature-banner__heading">{{ module.heading }}</h2>
+        {% endif %}
+
+        {% if module.body_text %}
+        <div class="wa-feature-banner__body wa-richtext">{{ module.body_text }}</div>
+        {% endif %}
+
+        {% if module.primary_cta_label or module.secondary_cta_label %}
+        <div class="wa-feature-banner__actions">
+          {% if module.primary_cta_label and module.primary_cta_link %}
+          <a
+            href="{{ module.primary_cta_link.url.href | default('#') }}"
+            class="btn btn-{{ module.primary_cta_style | default('gold') }}"
+            {% if module.primary_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ module.primary_cta_label }}</a>
+          {% endif %}
+          {% if module.secondary_cta_label and module.secondary_cta_link %}
+          <a
+            href="{{ module.secondary_cta_link.url.href | default('#') }}"
+            class="btn btn-white-outline"
+            {% if module.secondary_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ module.secondary_cta_label }}</a>
+          {% endif %}
+        </div>
+        {% endif %}
+
+      </div>
+
+      {# ── Media / badge ───────────────────────────────────────────────────── #}
+      {% if module.media_image and module.media_image.src or module.show_iiw_badge %}
+      <div class="wa-feature-banner__media">
+
+        {% if module.media_image and module.media_image.src %}
+        <img
+          src="{{ module.media_image.src }}"
+          alt="{{ module.media_image.alt | default('') }}"
+          class="wa-feature-banner__img"
+          loading="lazy"
+          decoding="async"
+          {% if module.media_image.width %}width="{{ module.media_image.width }}"{% endif %}
+          {% if module.media_image.height %}height="{{ module.media_image.height }}"{% endif %}
+        >
+        {% endif %}
+
+        {% if module.show_iiw_badge %}
+        {% if module.badge_image and module.badge_image.src %}
+        <img
+          src="{{ module.badge_image.src }}"
+          alt="{{ module.badge_image.alt | default('IIW Australia') }}"
+          class="wa-feature-banner__badge"
+          loading="lazy"
+          decoding="async"
+          width="80"
+          height="80"
+        >
+        {% else %}
+        <img
+          src="{{ get_asset_url('../../assets/img/iiw-logo.webp') }}"
+          alt="IIW Australia"
+          class="wa-feature-banner__badge"
+          loading="lazy"
+          decoding="async"
+          width="80"
+          height="80"
+        >
+        {% endif %}
+        {% endif %}
+
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
+
+{% endif %}

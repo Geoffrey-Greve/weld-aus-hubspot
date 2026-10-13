@@ -1,0 +1,34 @@
+<!--
+  templateType: none
+-->
+{#
+  course-overview.html
+
+  Shared HubDB course-description section for dynamic course detail pages.
+  Expects dynamic_page_hubdb_row from course-router.html.
+#}
+{% set _course_overview_row = dynamic_page_hubdb_row %}
+{% set _course_overview_description_raw = _course_overview_row.description | default('', true) %}
+{% set _course_overview_description = _course_overview_description_raw
+  | regex_replace('(?is)<o:p>\\s*(?:&nbsp;|&#160;)?\\s*</o:p>', '')
+  | regex_replace('(?is)<p[^>]*>(?:\\s|&nbsp;|&#160;|<br\\s*/?>)*</p>', '')
+  | trim
+%}
+
+{% if _course_overview_description %}
+<section class="wa-course-overview wa-section wa-section--surface wa-section--spacious" id="course-overview" aria-labelledby="course-overview-heading">
+  <div class="container">
+    <div class="wa-course-overview__inner">
+      <div class="wa-course-overview__header">
+        <div class="wa-overline">
+          <span class="wa-overline__text">Course overview</span>
+        </div>
+        <h2 class="wa-course-overview__heading" id="course-overview-heading">About this course</h2>
+      </div>
+      <div class="wa-course-overview__content wa-richtext">
+        {{ _course_overview_description }}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}

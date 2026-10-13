@@ -1,0 +1,68 @@
+{% macro engineering_icon(name) %}
+  {% if name == 'eye' %}
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+  {% elif name == 'shield' %}
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+  {% elif name == 'lightbulb' %}
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path></svg>
+  {% elif name == 'cpu' %}
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+  {% elif name == 'scale' %}
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"></line><path d="M3 6l9-3 9 3"></path><path d="M6 6l-2 7c0 2.5 2 4 5 4s5-1.5 5-4L12 6"></path><line x1="3" y1="21" x2="21" y2="21"></line></svg>
+  {% else %}
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+  {% endif %}
+{% endmacro %}
+
+<section class="wa-engineering-services" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container">
+    <div class="wa-engineering-services__header">
+      {% if module.eyebrow %}
+      <div class="wa-overline">
+        <span class="wa-overline__text">{{ module.eyebrow }}</span>
+      </div>
+      {% endif %}
+      {% if module.heading %}
+      <h2>{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro_text %}
+      <div class="wa-engineering-services__intro">{{ module.intro_text }}</div>
+      {% endif %}
+    </div>
+
+    <div class="wa-engineering-services__grid">
+      {% for service in module.services %}
+        {% set image_url = service.image.src|default(service.image_url, true) %}
+        <article class="wa-engineering-service-card">
+          <div class="wa-engineering-service-card__media">
+            {% if image_url %}
+            <img src="{{ image_url }}" alt="{{ service.image.alt|default(service.title)|escape_attr }}" loading="lazy" decoding="async">
+            {% endif %}
+            <span class="wa-engineering-service-card__scrim" aria-hidden="true"></span>
+            <span class="wa-engineering-service-card__icon" aria-hidden="true">{{ engineering_icon(service.icon|default('clipboard')) }}</span>
+          </div>
+          <div class="wa-engineering-service-card__body">
+            {% if service.title %}
+            <h3>{{ service.title }}</h3>
+            {% endif %}
+            {% if service.description %}
+            <div class="wa-engineering-service-card__desc">{{ service.description }}</div>
+            {% endif %}
+            {% if service.cta_label %}
+            <a
+              href="{{ service.cta_link.url.href|default('#contact') }}"
+              {% if service.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >
+              {{ service.cta_label }}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>

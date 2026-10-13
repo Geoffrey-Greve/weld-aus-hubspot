@@ -1,0 +1,141 @@
+{#
+  news-subscribe.module/module.html
+  Weld Connect subscribe block for the news listing and news article pages.
+
+  The destination form comes from the module's form picker (module.form) - a
+  dropdown, never a hand-written GUID. module.js submits this form to the HubSpot
+  Forms API, so a signup is a real form submission (contact created/updated,
+  submission recorded, workflows fire) with the confirmation shown inline.
+
+  There is deliberately no action or method attribute on the form. It previously
+  carried a native GET target pointing at /subscribe as a degraded path behind a
+  HubSpot embed, which meant any hiccup in the embed sent the visitor to
+  /subscribe?email=... instead of subscribing them. Without JS the <noscript>
+  block hides this form and shows only the /subscribe link.
+
+  The selected form must be email-only - this posts just the email address, so a
+  form with other required fields or a consent checkbox is rejected by the API
+  (module.js surfaces that with a link to /subscribe).
+
+  Two layouts share one form picker:
+    banner       - full-width band (news listing, foot of an article)
+    sidebar_card - narrow card in the article sidebar
+
+  Both layouts render on the same article page, so every id is namespaced with
+  the module instance name - including the status line, so one instance's result
+  never lands in the other's.
+#}
+
+{%- set _form_id = module.form.form_id | default('', true) | string | trim -%}
+{%- set _portal_id = hub_id | default('441838610', true) | string | trim -%}
+{%- set _uid = name | default('news-subscribe', true) | string | replace(' ', '-') -%}
+{%- set _heading_id = 'wa-news-subscribe-heading-' ~ _uid -%}
+{%- set _email_id = 'wa-news-subscribe-email-' ~ _uid -%}
+{%- set _feedback_id = 'wa-news-subscribe-feedback-' ~ _uid -%}
+{%- set _submit_label = module.submit_label | default('Subscribe to Weld Connect', true) | string | trim -%}
+{%- set _redirect_url = '' -%}
+{%- set _success_message = module.form.message | default("Thanks - you're subscribed to Weld Connect.", true) -%}
+{%- if module.form.response_type == 'redirect' and module.form.redirect_url -%}
+  {%- set _redirect_url = module.form.redirect_url -%}
+{%- endif -%}
+{%- set _error_message = module.error_message | default('Something went wrong. Please try again, or subscribe from our subscribe page.', true) -%}
+
+{% macro subscribe_form(portal_id, form_id, email_id, feedback_id, submit_label, success_message, error_message, redirect_url) %}
+  {% if form_id %}
+  <form
+    class="wa-news-subscribe-form"
+    data-wa-news-subscribe
+    data-portal-id="{{ portal_id | escape }}"
+    data-form-id="{{ form_id | escape }}"
+    data-redirect-url="{{ redirect_url | escape }}"
+    {#- striptags: the form's inline message is rich text, but module.js renders
+        it as textContent, so tags would show up literally. -#}
+    data-success-message="{{ success_message | striptags | escape_attr }}"
+    data-error-message="{{ error_message | striptags | escape_attr }}"
+    data-subscribe-url="/subscribe"
+    data-feedback-id="{{ feedback_id | escape }}"
+  >
+    <label for="{{ email_id }}">Email address</label>
+    <input
+      id="{{ email_id }}"
+      type="email"
+      name="email"
+      placeholder="your@email.com.au"
+      autocomplete="email"
+      required
+    >
+    <button class="btn btn-gold" type="submit">{{ submit_label }}</button>
+  </form>
+  <p class="wa-news-subscribe__feedback" id="{{ feedback_id }}" role="status" aria-live="polite" tabindex="-1" hidden></p>
+  <noscript>
+    {#- Hide the API-backed form so it cannot submit a no-op GET with ?email=. -#}
+    <style>
+      .wa-news-subscribe-form { display: none; }
+    </style>
+    <a class="wa-news-subscribe__link" href="/subscribe">Subscribe to Weld Australia updates</a>
+  </noscript>
+  {% else %}
+  {#- No form selected: never render a submit button that cannot submit. -#}
+  <a class="wa-news-subscribe__link" href="/subscribe">Subscribe to Weld Australia updates</a>
+  {% if is_in_editor %}
+  <p class="wa-news-subscribe__note">
+    Select a HubSpot form in this module's <strong>Subscription form</strong> field so signups are
+    captured in HubSpot. Until then this block links to the /subscribe page instead of
+    showing a signup field.
+  </p>
+  {% endif %}
+  {% endif %}
+{% endmacro %}
+
+{% if module.layout == 'sidebar_card' %}
+
+<section class="wa-article-sidebar__subscribe" aria-labelledby="{{ _heading_id }}">
+  <div class="wa-article-sidebar__subscribe-inner">
+    <span class="wa-icon-tile" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="2.25" fill="none" stroke="currentColor" stroke-linejoin="round"/>
+        <path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <h2 class="wa-article-sidebar__subscribe-title" id="{{ _heading_id }}">{{ module.heading | default('Get Weld Connect', true) }}</h2>
+    {% if module.body_text %}
+      <p class="wa-article-sidebar__subscribe-copy">{{ module.body_text }}</p>
+    {% endif %}
+    {{ subscribe_form(_portal_id, _form_id, _email_id, _feedback_id, _submit_label, _success_message, _error_message, _redirect_url) }}
+    {% if module.note %}
+      <p class="wa-news-subscribe__note">
+        <span aria-hidden="true">•</span>
+        {{ module.note }}
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+{% else %}
+
+<section class="wa-blog-section wa-news-subscribe" aria-labelledby="{{ _heading_id }}">
+  <div class="wa-blog-container">
+    <div class="wa-news-subscribe__grid">
+      <div>
+        {% if module.overline %}
+          <p class="wa-blog-overline wa-blog-overline--light">{{ module.overline }}</p>
+        {% endif %}
+        <h2 class="wa-news-subscribe__title" id="{{ _heading_id }}">{{ module.heading | default('Industry news, delivered monthly', true) }}</h2>
+        {% if module.body_text %}
+          <p class="wa-news-subscribe__copy">{{ module.body_text }}</p>
+        {% endif %}
+      </div>
+      <div class="wa-news-subscribe__form-card">
+        {{ subscribe_form(_portal_id, _form_id, _email_id, _feedback_id, _submit_label, _success_message, _error_message, _redirect_url) }}
+        {% if module.note %}
+          <p class="wa-news-subscribe__note">
+            <span aria-hidden="true">•</span>
+            {{ module.note }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endif %}

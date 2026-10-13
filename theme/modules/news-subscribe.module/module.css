@@ -1,0 +1,16 @@
+/*
+  news-subscribe.module/module.css
+
+  Layout and field styling for this block live in assets/css/blog.css
+  (.wa-news-subscribe*, .wa-article-sidebar__subscribe). The one rule that has to
+  sit here is the [hidden] guard below, because it is specific to how module.js
+  hides the form.
+*/
+
+/* Load-bearing. blog.css:1244 gives .wa-news-subscribe-form a `display`, and an
+   author-origin `display` outranks the UA stylesheet's `[hidden] { display: none }`
+   - so without this the form stays on screen after a successful signup. Omitting
+   exactly this rule is what left two forms in the site footer previously. */
+.wa-news-subscribe-form[hidden] {
+  display: none !important;
+}

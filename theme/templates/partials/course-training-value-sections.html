@@ -1,0 +1,33 @@
+<!--
+  templateType: none
+-->
+{#
+  course-training-value-sections.html
+
+  Opening dynamic course-detail sections. Each section is a separate editable
+  module instance. The module derives defaults from dynamic_page_hubdb_row +
+  sibling HubDB session rows, while allowing editor overrides.
+#}
+
+{% module
+  "course_dynamic_proof_points"
+  path="../../modules/course-dynamic-section"
+  label="Course proof points"
+  variant="proof_points"
+  section_id="why-weld-australia"
+  background="surface"
+  spacing="spacious"
+%}
+
+{% module
+  "course_dynamic_trainers"
+  path="../../modules/course-dynamic-section"
+  label="Trainer and delivery details"
+  variant="trainers"
+  section_id="our-trainers"
+  background="surface_alt"
+  spacing="spacious"
+  media_side="right"
+  cta_label="Meet our team"
+  cta_link={"url": {"href": "/about", "type": "EXTERNAL"}}
+%}

@@ -1,0 +1,54 @@
+{#
+  ─────────────────────────────────────────────────────────────────────────────
+  _sharepoint.html - SharePoint share-link normaliser (QA #46)
+  ─────────────────────────────────────────────────────────────────────────────
+
+  Problem: SharePoint "share" links in the /:b:/s/<Site>/<token> format route
+  through SharePoint's guest-access *preview* page. On Android (Chrome + in-app
+  webviews) that page hands off to the OneDrive/SharePoint app or shows a
+  Microsoft sign-in interstitial instead of serving the file - even with
+  ?download=1 appended.
+
+  Fix: rewrite site-scoped share links to SharePoint's direct-download endpoint,
+  which returns the file bytes with Content-Disposition: attachment and skips the
+  preview UI / app handoff:
+
+      https://<tenant>.sharepoint.com/:<t>:/s/<Site>/<token>?<query>
+        ->  https://<tenant>.sharepoint.com/sites/<Site>/_layouts/15/download.aspx?share=<token>
+
+  Anything that is not a site-scoped SharePoint share link (plain URLs, HubSpot
+  file links, personal OneDrive /g/ links, empty values, or already-rewritten
+  download.aspx URLs) is returned unchanged, so the macro is safe to wrap around
+  every resource URL and is idempotent.
+
+  IMPORTANT CAVEAT: this only helps when the share is anonymous ("Anyone with the
+  link"). If the file is shared "People in <org> with the link", the Microsoft
+  login is mandatory and no URL rewrite can bypass it - the share must be
+  reconfigured or the file rehosted (e.g. on HubSpot File Manager). See
+  bugs/qa-log.md #46.
+
+  Usage:
+    {% import "../partials/_sharepoint.html" as sp %}
+    {% set safe_url = sp.sharepoint_direct_url(row.file_url) | trim %}
+
+  Do NOT rewrite URLs destined for a <video>/<iframe> player: the direct-download
+  endpoint serves an attachment, which downloads instead of playing. Callers guard
+  the video file_type themselves and pass the original URL through for videos.
+#}
+{% macro sharepoint_direct_url(raw) %}
+  {%- set u = raw | default('', true) | trim -%}
+  {%- if 'sharepoint.com/:' in u and '/s/' in u -%}
+    {%- set no_query = u | split('?') | first -%}
+    {%- set no_frag = no_query | split('#') | first -%}
+    {%- set after_scheme = no_frag | split('://') | last -%}
+    {%- set segs = after_scheme | split('/') -%}
+    {#- segs = [ host, ':b:', 's', '<Site>', '<token>', ... ] -#}
+    {%- if segs | length >= 5 and segs[2] == 's' -%}
+      {{- 'https://' ~ segs[0] ~ '/sites/' ~ segs[3] ~ '/_layouts/15/download.aspx?share=' ~ segs[4] -}}
+    {%- else -%}
+      {{- u -}}
+    {%- endif -%}
+  {%- else -%}
+    {{- u -}}
+  {%- endif -%}
+{% endmacro %}

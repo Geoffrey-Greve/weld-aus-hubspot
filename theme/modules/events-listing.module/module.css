@@ -1,0 +1,140 @@
+/* events-listing module - most styles are in the React island bundle (EventsListing.css).
+   Keep fallback pagination styles here because the current HubL module renders
+   and paginates server-side/vanilla when the React island is not mounted. */
+
+.wa-el__grid-item[hidden] {
+  display: none !important;
+}
+
+.wa-event-search {
+  position: relative;
+  display: block;
+  max-width: 340px;
+}
+
+.wa-event-search > .wa-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.wa-event-search svg {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  color: #6f757e;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.wa-event-search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px 0 42px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 999px;
+  background: #fff;
+  color: #1a1a1a;
+  font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.wa-event-search input::placeholder {
+  color: #6f757e;
+}
+
+.wa-event-search input:focus-visible {
+  outline: 3px solid color-mix(in srgb, #1c1e4c 32%, transparent);
+  outline-offset: 2px;
+}
+
+@media (min-width: 900px) {
+  .wa-event-filter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    align-items: start;
+  }
+
+  .wa-event-filter__top {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .wa-event-search {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: none;
+  }
+
+  .wa-event-filter__rule,
+  .wa-event-filter__bottom {
+    grid-column: 1 / -1;
+  }
+}
+
+.wa-el .wa-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-block-start: 32px;
+}
+
+.wa-el .wa-pagination[hidden] {
+  display: none !important;
+}
+
+.wa-el .wa-pagination__btn {
+  min-width: 42px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 999px;
+  background: #fff;
+  color: #1c1e4c;
+  cursor: pointer;
+  font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.wa-el .wa-pagination__btn:hover:not(:disabled),
+.wa-el .wa-pagination__btn:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #1c1e4c;
+}
+
+.wa-el .wa-pagination__btn--active {
+  border-color: #1c1e4c;
+  background: #1c1e4c;
+  color: #fff;
+}
+
+.wa-el .wa-pagination__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@media (max-width: 767px) {
+  .wa-event-search {
+    width: 100%;
+  }
+}

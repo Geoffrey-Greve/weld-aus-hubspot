@@ -1,0 +1,32 @@
+<section class="wa-engineering-capabilities" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container">
+    <div class="wa-engineering-capabilities__header">
+      {% if module.eyebrow %}
+      <div class="wa-overline">
+        <span class="wa-overline__text">{{ module.eyebrow }}</span>
+      </div>
+      {% endif %}
+      {% if module.heading %}
+      <h2>{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro_text %}
+      <div class="wa-engineering-capabilities__intro">{{ module.intro_text }}</div>
+      {% endif %}
+    </div>
+
+    <div class="wa-engineering-capabilities__grid">
+      {% for item in module.items %}
+        {% if item.text %}
+        <div class="wa-engineering-capabilities__item">
+          <span aria-hidden="true">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
+          <p>{{ item.text }}</p>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>

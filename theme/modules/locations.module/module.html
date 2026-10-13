@@ -1,0 +1,132 @@
+{# locations.module/module.html Australia map IMAGE with interactive, percentage-positioned city
+pins. Percentages keep every pin correctly placed at any screen size (desktop / tablet / mobile).
+Interaction (module.js): • Every pin shows a continuous pink radar pulse. • Clicking a city (list or
+pin) focuses its pin and turns it yellow. • The primary city (is_primary) is active on load. City
+preset positions are PERCENTAGES of the map image (left%, top%): Sydney 86,52 · Melbourne 73,63 ·
+Brisbane 84,39 · Perth 11,56 Adelaide 59,61 · Darwin 37,13 · Hobart 70,86 · Canberra 81,57 #} {%-
+set _bg = module.background | default('surface') -%} {%- set _sp = module.spacing |
+default('default') -%} {%- set _vis = module.visibility | default(['mobile','tablet','desktop']) -%}
+{%- set _side = module.map_side | default('right') -%} {%- set _dark = _bg in ['primary',
+'primary_dark'] -%} {%- set _map_url = module.map_image.src |
+default('https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/ThirdpartyImages/ChatGPT%20Image%20Jun%2022%2c%202026%2c%2010_06_52%20PM.png',
+true) -%} {%- set _section_classes = 'wa-locations wa-section wa-section--bg-' ~ _bg ~ '
+wa-section--spacing-' ~ _sp -%} {%- if 'mobile' not in _vis -%}{%- set _section_classes =
+_section_classes ~ ' wa-hide-mobile' -%}{%- endif -%} {%- if 'tablet' not in _vis -%}{%- set
+_section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%} {%- if 'desktop' not in
+_vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%} {%- set
+_path = request.path | default('', true) | lower -%} {%- set _locations_overline = module.overline | default('', true) | lower | trim -%} {%- set _locations_heading_key = module.heading | default('', true) | lower | trim -%} {%- set _is_contact_offices = ('contact-us' in
+_path) and (_locations_overline == 'our offices' or
+_locations_heading_key == 'national presence' or
+_locations_heading_key == 'national offices and committees') -%} {%- set _contact_office_intro =
+'<p>Weld Australia supports members and industry through national offices, state committees and specialist sub-committees across Australia.</p>'
+-%} {%- set _contact_office_locations = [
+  {"name_text": "Pymble (Head Office)", "is_primary": true, "city_preset": "sydney"},
+  {"name_text": "Wollongong Office", "is_primary": false, "city_preset": "wollongong"},
+  {"name_text": "Mackay Office", "is_primary": false, "city_preset": "mackay"},
+  {"name_text": "Maryborough Office", "is_primary": false, "city_preset": "maryborough"},
+  {"name_text": "VIC State Committee", "is_primary": false, "city_preset": "melbourne"},
+  {"name_text": "SA State Committee", "is_primary": false, "city_preset": "adelaide"},
+  {"name_text": "QLD State Committee", "is_primary": false, "city_preset": "brisbane"},
+  {"name_text": "Mackay Sub Committee", "is_primary": false, "city_preset": "mackay"},
+  {"name_text": "NT State Committee", "is_primary": false, "city_preset": "darwin"},
+  {"name_text": "NSW State Committee", "is_primary": false, "city_preset": "sydney"},
+  {"name_text": "WA State Committee", "is_primary": false, "city_preset": "perth"},
+  {"name_text": "Hunter Valley Sub Committee", "is_primary": false, "city_preset": "hunter-valley"},
+  {"name_text": "TAS State Committee", "is_primary": false, "city_preset": "hobart"}
+] -%} {%- set _locations_heading = 'National offices and committees' if _is_contact_offices else
+module.heading -%} {%- set _locations_intro = _contact_office_intro if _is_contact_offices else
+module.intro -%} {%- set _locations_cities = _contact_office_locations if _is_contact_offices else
+module.cities -%}
+{# Contact offices must stay on #offices — CMS DnD may still store section_id=all-offices. #}
+{%- set _section_id = 'offices' if _is_contact_offices else module.section_id -%}
+{# City
+preset positions as PERCENTAGES (left,top) of the map image #} {%- macro city_coords(preset) -%} {%-
+if preset == 'sydney' -%}81,70 {%- elif preset == 'melbourne' -%}69,80 {%- elif preset == 'brisbane'
+-%}88,51 {%- elif preset == 'perth' -%}12,62 {%- elif preset == 'adelaide' -%}56,69 {%- elif preset
+== 'darwin' -%}37,13 {%- elif preset == 'hobart' -%}70,86 {%- elif preset == 'canberra' -%}81,57 {%-
+elif preset == 'wollongong' -%}82,74 {%- elif preset == 'mackay' -%}88,43 {%- elif preset ==
+'maryborough' -%}88,50 {%- elif preset == 'hunter-valley' -%}82,67 {%- else -%}50,50 {%- endif -%}
+{%- endmacro -%}
+
+<section
+  class="{{ _section_classes }}"
+  {%
+  if
+  _section_id
+  %}id="{{ _section_id }}"
+  {%
+  endif
+  %}
+  data-wa-locations
+>
+  <div class="container">
+    <div
+      class="wa-locations__inner{% if _side == 'left' %} wa-locations__inner--map-left{% endif %}"
+    >
+      {# ── Text column ─────────────────────────────────────────────────────── #}
+      <div class="wa-locations__text">
+        {% if module.overline %}
+        <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+          <span class="wa-overline__text">{{ module.overline }}</span>
+        </div>
+        {% endif %} {% if _locations_heading %}
+        <h2 class="wa-locations__heading">{{ _locations_heading }}</h2>
+        {% endif %} {% if _locations_intro %}
+        <div class="wa-locations__intro wa-richtext">{{ _locations_intro }}</div>
+        {% endif %} {% if _locations_cities %}
+        <ul class="wa-locations__city-list" role="list">
+          {% for city in _locations_cities %} {%- set _city_name = city.name_text | default(city.name, true) -%} {%- set _city_key = _city_name | lower | trim -%}
+          <li>
+            <button
+              type="button"
+              class="wa-locations__city{% if city.is_primary %} is-active{% endif %}"
+              data-city="{{ _city_key }}"
+              aria-pressed="{% if city.is_primary %}true{% else %}false{% endif %}"
+            >
+              <span class="wa-locations__city-dot" aria-hidden="true"></span>
+              {{ _city_name }}
+            </button>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+
+      {# ── Map column ──────────────────────────────────────────────────────── #}
+      <div class="wa-locations__map">
+        <div class="wa-locations__map-wrap">
+          <img
+            src="{{ _map_url }}"
+            alt="{{ module.map_image.alt | default('Map of Australia showing Weld Australia office locations') }}"
+            class="wa-locations__map-img"
+            loading="lazy"
+            decoding="async"
+          />
+
+          {% if _locations_cities %} {% for city in _locations_cities %} {%- if city.city_preset and
+          city.city_preset != 'custom' -%} {%- set _coords = city_coords(city.city_preset) -%} {%-
+          set _x = _coords.split(',')[0] -%} {%- set _y = _coords.split(',')[1] -%} {%- else -%} {%-
+          set _x = city.cx | default(50) -%} {%- set _y = city.cy | default(50) -%} {%- endif -%}
+          {%- set _city_name = city.name_text | default(city.name, true) -%}
+          {%- set _city_key = _city_name | lower | trim -%}
+          <button
+            type="button"
+            class="wa-locations__pin{% if city.is_primary %} is-active{% endif %}"
+            data-city="{{ _city_key }}"
+            style="left: {{ _x }}%; top: {{ _y }}%;"
+            aria-label="{{ _city_name }}"
+            title="{{ _city_name }}"
+          >
+            <span class="wa-locations__pin-ping" aria-hidden="true"></span>
+            <span
+              class="wa-locations__pin-ping wa-locations__pin-ping--delay"
+              aria-hidden="true"
+            ></span>
+            <span class="wa-locations__pin-dot" aria-hidden="true"></span>
+          </button>
+          {% endfor %} {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

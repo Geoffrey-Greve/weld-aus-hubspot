@@ -1,0 +1,14 @@
+{
+  "label": "Stat Tiles",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "A row of 2-6 stat tiles. Used for 'By the numbers' sections.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["stats", "numbers", "about"]
+}

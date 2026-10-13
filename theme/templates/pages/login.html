@@ -1,0 +1,117 @@
+<!--
+  templateType: page
+  label: Member Login
+  isAvailableForNewContent: true
+-->
+{#
+  login.html - Member portal sign-in page
+  Suggested URL: /login/
+
+  Authentication is handled by HubSpot Private Content via the native
+  /_hcms/mem/login system route. Keep /login as a friendly public URL, but
+  do not render the native membership widget here: on normal CMS pages HubSpot
+  can render the widget without the CSRF context required for first-submit
+  password sign-in.
+#}
+{% set page_title_exact = 'Member login - Weld Australia' %}
+{% set page_description = 'Sign in to the Weld Australia member portal to manage your membership, training, certifications and events.' %}
+{% extends "../layouts/base.html" %}
+
+{%- set _member_dashboard_redirect = '/portal' -%}
+{%- set _raw_return = request.query_dict.redirect_url | default(request.query_dict.redirect, true) | default(request.query_dict.return, true) | default(_member_dashboard_redirect) -%}
+{%- if _raw_return and _raw_return[0:1] == '/' and _raw_return[0:2] != '//' -%}
+  {%- set _redirect = _raw_return -%}
+{%- else -%}
+  {%- set _redirect = _member_dashboard_redirect -%}
+{%- endif -%}
+{%- if _redirect == '/portal/' or _redirect == '/portal' or _redirect == '/membership/' or _redirect == '/membership' -%}
+  {%- set _redirect = _member_dashboard_redirect -%}
+{%- endif -%}
+{%- set _encoded_redirect = _redirect | urlencode -%}
+{%- set _login_url = '/_hcms/mem/login?redirect_url=' ~ _encoded_redirect -%}
+
+{% block extra_head %}
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="refresh" content="0;url={{ _login_url | escape_attr }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/auth.css') }}">
+<style>
+  .auth-login-hero {
+    background:
+      linear-gradient(135deg, var(--wa-color-primary-dark, #0f1030) 0%, var(--wa-color-primary, #1c1e4c) 100%);
+  }
+
+  .auth-login-hero::before {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 5px;
+    border-radius: 0;
+    background: var(--wa-gradient-flame, linear-gradient(90deg, #ed128d 0%, #f04828 40%, #fecf05 100%));
+  }
+
+  .auth-login__hero-eyebrow {
+    margin: 0 0 var(--wa-space-4);
+  }
+
+  .auth-login__aside {
+    background:
+      linear-gradient(145deg, var(--wa-color-primary-dark, #0f1030) 0%, var(--wa-color-primary, #1c1e4c) 100%);
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}is-auth-page{% endblock %}
+
+{% block body %}
+<script>
+  window.location.replace('{{ _login_url | escapejs }}');
+</script>
+
+{% set _shared_hero_id = 'member-login-hero' %}
+{% set _shared_hero_section_id = 'member-login-hero' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'compact' %}
+{% set _shared_hero_spacing = 'spacious' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = 'none' %}
+{% set _shared_hero_eyebrow = 'Member portal' %}
+{% set _shared_hero_headline = 'Sign in to Weld Australia' %}
+{% set _shared_hero_subheadline = '<p>Access your member dashboard, training activity, event registrations and member resources.</p>' %}
+{% include "../partials/shared-hero.html" %}
+
+<section class="auth-page-section" aria-labelledby="member-login-heading">
+  <div class="auth-page-shell">
+    <div class="auth-page-card">
+      <div class="auth-page-card__main">
+        <div class="auth-login">
+          <p class="wa-overline auth-login__eyebrow">
+            <span class="wa-overline__text">Member login</span>
+          </p>
+          <h2 class="auth-login__heading" id="member-login-heading">Taking you to secure sign in</h2>
+          <div class="auth-login__native">
+            <p>If you are not redirected automatically, use the secure sign-in button below.</p>
+            <p><a class="btn btn-primary" href="{{ _login_url | escape_attr }}">Continue to sign in</a></p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="auth-page-card__aside auth-login__aside" aria-label="Member login help">
+        {% module "login_support_panel" path="../../modules/auth-support-panel"
+          label="Login Support Panel"
+          overline="Need access?"
+          heading="New to the member portal?"
+          panel_body="<p>Your login gives you access to your Weld Australia member dashboard, resources, training activity and event registrations.</p>"
+          primary_link_label="Create your login"
+          primary_link={ "url": { "type": "EXTERNAL", "href": "/signup/" } }
+          primary_link_style="button"
+          secondary_link_label="Explore membership"
+          secondary_link={ "url": { "type": "EXTERNAL", "href": "/membership/" } }
+          secondary_link_style="text"
+        %}
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}

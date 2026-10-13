@@ -1,0 +1,14 @@
+{
+  "label": "Step Process",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Numbered step-by-step process. Horizontal with connecting arrows on desktop; vertical stack on mobile.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["content", "process", "steps"]
+}

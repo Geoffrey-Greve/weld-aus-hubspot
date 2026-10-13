@@ -1,0 +1,14 @@
+{
+  "label": "My Courses",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "React island: Member portal My Courses page. Displays a tab-switched Upcoming / Past list of the member's enrolled training courses. Data comes from contact properties synced via workflows. Place on my-courses.html (portal layout).",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["portal", "react-island", "my-courses", "members-only"]
+}

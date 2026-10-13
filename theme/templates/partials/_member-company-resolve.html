@@ -1,0 +1,143 @@
+<!--
+  templateType: none
+-->
+{#
+  _member-company-resolve.html
+
+  One definition of "which company does this logged-in visitor belong to, and what
+  tier is it", for the surfaces that price a course.
+
+  WHY THIS EXISTS. Three strengths of the same resolution shipped side by side:
+
+    surface                          mirror   associatedcompanyid   association sweep
+    checkout-tunnel.module             yes           yes                  yes
+    _resource-member-resolve.html      yes           yes                  no
+    the five course-pricing surfaces   no            yes                  no
+
+  The five weakest were course-filter, course-timetable-filter, featured-courses,
+  courses-upcoming-sessions and pricing-table - five byte-identical copies of the
+  same block, reading `associatedcompanyid` and nothing else.
+
+  `associatedcompanyid` is only ever set for a PRIMARY company association, and a
+  large part of Weld's corporate membership is linked to an employer by an ordinary
+  association with no primary among them. That is not a guess: it is the finding
+  that fixed the Worker's own `price_mismatch` failures (events-engine
+  membership.ts, `resolveAssociatedCompanyId`).
+
+  So a Gold employee with no primary association saw the PUBLIC price on the course
+  page, the /courses directory, the timetable, the fees panel and the course cards,
+  and their member price only once they reached the checkout - which is the one
+  surface that already swept associations. Most buyers never get that far. QA Ref 72,
+  "corporate partner discount is not visible to registrant at course registration",
+  and squarely against objective 5 in CLAUDE.md §1.
+
+  USAGE. Set the two inputs, include, then read the namespace:
+
+    {% set wa_company_in_company_id = _member_company_id %}
+    {% set wa_company_in_contact_ids = _member_contact_ns.seen %}
+    {% include "../../templates/partials/_member-company-resolve.html" %}
+    {% set _member_tier_raw = wa_tier.prefer_pricing_tier(_member_tier_raw, wa_member_company.tier) | trim %}
+
+  The caller keeps its own contact resolution and applies its own tier preference;
+  this partial answers the company half only. Sentinels are already scrubbed on the
+  way out, so callers must not scrub twice.
+
+  COST. Every step is gated on the previous one failing, and the whole thing is
+  gated on `request_contact.is_logged_in`, so an anonymous visitor - almost all of
+  the traffic on these pages - pays nothing at all. The association sweep only runs
+  for a logged-in visitor whose mirror AND `associatedcompanyid` are both empty,
+  which is exactly the population it exists to fix.
+#}
+{% import "./_member-tier.html" as wa_tier_co %}
+
+{# HubSpot hands back these for "no company" depending on which read produced it. #}
+{% set wa_company_invalid_ids = ['', '0', 'None', 'none', 'null', '[object Object]', '[object object]'] %}
+
+{% set wa_member_company = namespace(id='', tier='', status='', source='') %}
+{# Diagnostic only: which step supplied the tier. Declared up here because the
+   sweep block below does not run on every path. #}
+{% set wa_company_from_sweep = false %}
+
+{% if request_contact.is_logged_in %}
+
+  {# 1. The contact's own mirror of its employer's tier. Free: already on the
+        request_contact object, no API call. This is what checkout reads first. #}
+  {% set wa_company_mirror_tier = request_contact.wa_company_membership_tier | default(contact.wa_company_membership_tier, true) | default('', true) | string | trim %}
+  {% set wa_company_mirror_status = request_contact.wa_company_membership_status | default(contact.wa_company_membership_status, true) | default('', true) | string | trim %}
+  {% if wa_company_mirror_tier or wa_company_mirror_status %}
+    {% set wa_member_company.tier = wa_tier_co.scrub(wa_company_mirror_tier) | trim %}
+    {% set wa_member_company.status = wa_tier_co.scrub(wa_company_mirror_status) | trim %}
+    {% set wa_member_company.source = 'mirror' %}
+  {% endif %}
+
+  {# 2. The company id the caller already resolved, if any. #}
+  {% set wa_company_candidate_id = wa_company_in_company_id | default('', true) | string | trim %}
+  {% if wa_company_candidate_id in wa_company_invalid_ids %}
+    {% set wa_company_candidate_id = '' %}
+  {% endif %}
+
+  {# 3. No primary association, so sweep the ordinary ones. Unlabeled v4 (279) then
+        legacy (1), exactly as checkout-tunnel does. Ids stay STRINGS so a 12-digit
+        company id is not truncated by |int. A loop-local set does not survive the
+        loop, hence the namespace. #}
+  {% if not wa_company_candidate_id %}
+    {% set wa_company_sweep = namespace(id='', contact_ids=[]) %}
+    {% for wa_company_contact_id in wa_company_in_contact_ids | default([], true) %}
+      {% set wa_company_seen_id = wa_company_contact_id | default('', true) | string | trim %}
+      {% if wa_company_seen_id and wa_company_seen_id not in wa_company_invalid_ids and wa_company_seen_id not in wa_company_sweep.contact_ids %}
+        {% set wa_company_sweep.contact_ids = wa_company_sweep.contact_ids + [wa_company_seen_id] %}
+      {% endif %}
+    {% endfor %}
+
+    {% for wa_company_sweep_contact in wa_company_sweep.contact_ids %}
+      {% if not wa_company_sweep.id %}
+        {% for wa_company_assoc_type in [279, 1] %}
+          {% if not wa_company_sweep.id %}
+            {% set wa_company_assocs_raw = crm_associations(wa_company_sweep_contact, 'HUBSPOT_DEFINED', wa_company_assoc_type, 'limit=10', 'name,hs_object_id', false) %}
+            {% set wa_company_assocs = wa_company_assocs_raw.results if wa_company_assocs_raw.results else wa_company_assocs_raw %}
+            {% for wa_company_assoc in wa_company_assocs %}
+              {% if not wa_company_sweep.id %}
+                {% set wa_company_assoc_raw = wa_company_assoc.hs_object_id | default(wa_company_assoc.toObjectId, true) | default(wa_company_assoc.to_object_id, true) | default(wa_company_assoc.id, true) | default('', true) %}
+                {% set wa_company_assoc_id = wa_company_assoc_raw | string | trim %}
+                {% if wa_company_assoc_id not in wa_company_invalid_ids %}
+                  {% set wa_company_sweep.id = wa_company_assoc_id %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+
+    {% if wa_company_sweep.id %}
+      {% set wa_company_candidate_id = wa_company_sweep.id %}
+      {% set wa_company_from_sweep = true %}
+    {% endif %}
+  {% endif %}
+
+  {# 4. Read the company record. A real tier here OUTRANKS the mirror: the mirror is
+        a synced copy and can lag a tier change, while this is the record itself. #}
+  {% if wa_company_candidate_id %}
+    {% set wa_member_company.id = wa_company_candidate_id %}
+    {% set wa_company_record = crm_object('company', wa_company_candidate_id, 'corporate_membership_status,corporate_membership_level_2,industry_supplier_membership_status,industry_supplier_membership_level_2') %}
+    {% if wa_company_record %}
+      {% set wa_company_record_props = wa_company_record.properties | default({}, true) %}
+      {% set wa_company_record_tier = wa_company_record.corporate_membership_level_2 | default(wa_company_record_props.corporate_membership_level_2, true) | default(wa_company_record.industry_supplier_membership_level_2, true) | default(wa_company_record_props.industry_supplier_membership_level_2, true) | default('', true) | string | trim %}
+      {% set wa_company_record_status = wa_company_record.corporate_membership_status | default(wa_company_record_props.corporate_membership_status, true) | default(wa_company_record.industry_supplier_membership_status, true) | default(wa_company_record_props.industry_supplier_membership_status, true) | default('', true) | string | trim %}
+      {% set wa_company_record_tier = wa_tier_co.scrub(wa_company_record_tier) | trim %}
+      {% set wa_company_record_status = wa_tier_co.scrub(wa_company_record_status) | trim %}
+      {% if wa_company_record_tier %}
+        {% set wa_member_company.tier = wa_company_record_tier %}
+        {% if wa_company_from_sweep %}
+          {% set wa_member_company.source = 'association' %}
+        {% else %}
+          {% set wa_member_company.source = 'associated' %}
+        {% endif %}
+      {% endif %}
+      {% if wa_company_record_status %}
+        {% set wa_member_company.status = wa_company_record_status %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+{% endif %}

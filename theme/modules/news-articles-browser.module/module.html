@@ -1,0 +1,449 @@
+{#
+  news-articles-browser.module/module.html
+  Editable Featured + Latest Articles browser for HubSpot Blog listing pages.
+  Blog posts are preloaded from the current HubSpot blog so topic tabs can filter in-page.
+#}
+
+{%- set _section_id = module.section_id | default('latest-articles', true) -%}
+{%- set _outer_section_id = _section_id ~ '-section' if _section_id else '' -%}
+{%- set _bg = module.background | default('surface', true) -%}
+{%- set _spacing = module.spacing | default('default', true) -%}
+{%- set _client_fallback_image = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1299734004%20(3).jpg' -%}
+{%- set _fallback_image_src = module.images.fallback_image.src | default(_client_fallback_image, true) -%}
+{%- set _fallback_image_alt = module.images.fallback_image.alt | default('Weld Australia welding and fabrication', true) -%}
+{%- set _show_featured = module.featured.show != false -%}
+{%- set _show_browser = module.browser.show != false -%}
+{%- set _show_filters = module.browser.show_filters != false -%}
+{%- set _show_search = module.browser.show_search != false -%}
+{%- set _show_count = module.browser.show_article_count != false -%}
+{%- set _view_all_label = module.browser.view_all_label | default('View all announcements', true) | trim -%}
+{%- set _view_all_href = module.browser.view_all_href | default('/news/', true) | trim -%}
+{%- set _show_view_all = module.browser.show_view_all and _view_all_label and _view_all_href -%}
+{%- set _grid_cols = module.grid.columns | default('3', true) -%}
+{%- set _request_path = request.path | default('', true) -%}
+{%- set _is_tag_archive = '/tag/' in _request_path -%}
+{%- set _current_page_num = current_page_num | default(1, true) | int -%}
+{%- set _total_page_count = contents.total_page_count | default(1, true) | int -%}
+{%- set _tag_base = module.browser.category_base_path | default('/news/tag/', true) -%}
+{%- set _listing_base = _tag_base | cut('/tag/') -%}
+{%- set _search_action = module.browser.search_action | default('/hs-search-results', true) -%}
+{%- set _show_featured = _show_featured and not _is_tag_archive and _current_page_num == 1 -%}
+{%- set _blog_id = module.browser.blog_id | default(content.blog_list_id, true) | default(group.id, true) | default('default', true) -%}
+{%- set _post_limit = module.browser.max_posts | default(24, true) | int -%}
+{% if _post_limit < 1 %}
+  {% set _post_limit = 24 %}
+{% endif %}
+{%- set _is_news_listing_context = '/news' in _request_path -%}
+{% if _is_news_listing_context %}
+  {% set _article_posts = contents %}
+{% else %}
+  {% set _article_posts = blog_recent_posts(_blog_id, _post_limit) %}
+{% endif %}
+{% if is_in_editor and (not _article_posts or _article_posts|length == 0) %}
+  {% set _article_posts = blog_recent_posts(_blog_id, _post_limit) %}
+{% endif %}
+{% set _available_blog_tags = blog_tags(_blog_id, 250) %}
+{%- set _force_client_pagination = not _is_news_listing_context -%}
+{%- set _initial_render_limit = 12 -%}
+
+{% set featured_topic_ns = namespace(slugs=[], first_slug='', first_name='') %}
+{% if _article_posts and _article_posts|length %}
+  {% set _featured_source = _article_posts[0] %}
+  {% if _featured_source.tag_list %}
+    {% for tag in _featured_source.tag_list %}
+      {% if tag.slug %}
+        {% set featured_topic_ns.slugs = featured_topic_ns.slugs + [tag.slug] %}
+        {% if not featured_topic_ns.first_slug %}
+          {% set featured_topic_ns.first_slug = tag.slug %}
+          {% set featured_topic_ns.first_name = tag.name %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% if _featured_source.topic_list %}
+    {% for topic in _featured_source.topic_list %}
+      {% if topic.slug and topic.slug not in featured_topic_ns.slugs %}
+        {% set featured_topic_ns.slugs = featured_topic_ns.slugs + [topic.slug] %}
+        {% if not featured_topic_ns.first_slug %}
+          {% set featured_topic_ns.first_slug = topic.slug %}
+          {% set featured_topic_ns.first_name = topic.name | default(topic.label, true) | default(topic.slug | replace('-', ' '), true) %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% if _featured_source.tags %}
+    {% for tag in _featured_source.tags %}
+      {% set _featured_topic_label = tag.name | default(tag.label, true) | default(tag, true) %}
+      {% set _featured_topic_slug = tag.slug | default(_featured_topic_label | lower | replace(' ', '-'), true) %}
+      {% if _featured_topic_slug and _featured_topic_slug not in featured_topic_ns.slugs %}
+        {% set featured_topic_ns.slugs = featured_topic_ns.slugs + [_featured_topic_slug] %}
+        {% if not featured_topic_ns.first_slug %}
+          {% set featured_topic_ns.first_slug = _featured_topic_slug %}
+          {% set featured_topic_ns.first_name = _featured_topic_label %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% if not featured_topic_ns.slugs|length %}
+    {% set featured_topic_ns.slugs = ['industry-news'] %}
+    {% set featured_topic_ns.first_slug = 'industry-news' %}
+    {% set featured_topic_ns.first_name = 'Industry News' %}
+  {% endif %}
+{% endif %}
+
+{% set blog_ns = namespace(featured=null, posts=[]) %}
+{% for post in _article_posts %}
+  {% if loop.first and _show_featured %}
+    {% set blog_ns.featured = post %}
+  {% endif %}
+  {% set blog_ns.posts = blog_ns.posts + [post] %}
+{% endfor %}
+
+<section
+  class="wa-blog-section wa-blog-section--{{ 'white' if _bg == 'white' else 'surface' }} wa-news-articles wa-news-articles--spacing-{{ _spacing }}"
+  {% if _outer_section_id %}id="{{ _outer_section_id }}"{% endif %}
+  aria-labelledby="wa-latest-articles-heading"
+  data-news-browser
+  data-blog-index-url="{{ _listing_base | escape_url }}"
+  data-blog-total-pages="{{ _total_page_count }}"
+  data-blog-page-size="12"
+  {% if _force_client_pagination %}data-blog-force-client-pagination="true"{% endif %}
+>
+  <div class="wa-blog-container">
+    {% if _show_featured and blog_ns.featured %}
+    <div
+      class="wa-blog-featured-block"
+      aria-labelledby="wa-featured-article-heading"
+      data-blog-featured
+      data-topics="{{ featured_topic_ns.slugs | join(' ') | escape_attr }}"
+    >
+      <div class="wa-blog-section-head wa-blog-featured-block__head">
+        {% if module.featured.overline %}
+        <p class="wa-blog-overline">{{ module.featured.overline }}</p>
+        {% endif %}
+        {% if module.featured.heading %}
+        <h2 class="wa-blog-section-head__title" id="wa-featured-article-heading">{{ module.featured.heading }}</h2>
+        {% endif %}
+      </div>
+
+      <a class="wa-featured-post" href="{{ blog_ns.featured.absolute_url }}">
+        <div class="wa-featured-post__media">
+          {% set _featured_image_src = blog_ns.featured.featured_image | default(_fallback_image_src, true) %}
+          {% set _featured_image_alt = blog_ns.featured.featured_image_alt_text | default(blog_ns.featured.name, true) %}
+          {% if not blog_ns.featured.featured_image %}
+            {% set _featured_image_alt = _fallback_image_alt %}
+          {% endif %}
+          {% if _featured_image_src %}
+          <img
+            src="{{ _featured_image_src | escape_url }}"
+            alt="{{ _featured_image_alt | escape }}"
+            loading="lazy"
+          >
+          {% endif %}
+          {% if module.featured.badge_label %}
+          <span class="wa-featured-post__pick">
+            <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m12 3 2.7 5.48 6.05.88-4.38 4.27 1.03 6.02L12 16.81l-5.4 2.84 1.03-6.02-4.38-4.27 6.05-.88L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            {{ module.featured.badge_label }}
+          </span>
+          {% endif %}
+        </div>
+        <div class="wa-featured-post__body">
+          {% if featured_topic_ns.first_slug %}
+          <span class="wa-topic-tag wa-topic-tag--{{ featured_topic_ns.first_slug }}">{{ featured_topic_ns.first_name }}</span>
+          {% endif %}
+          <h3 class="wa-featured-post__title">{{ blog_ns.featured.name }}</h3>
+          <p class="wa-featured-post__excerpt">
+            {{ blog_ns.featured.meta_description | default(blog_ns.featured.post_summary | striptags | truncate(170)) }}
+          </p>
+          {% set _featured_read_source = blog_ns.featured.post_body | default(blog_ns.featured.post_summary, true) | default(blog_ns.featured.meta_description, true) %}
+          {% set _featured_word_count = _featured_read_source | striptags | wordcount %}
+          {% set _featured_read_minutes = (_featured_word_count / 220) | round(0, 'ceil') | int %}
+          {% if _featured_read_minutes < 1 %}
+            {% set _featured_read_minutes = 1 %}
+          {% endif %}
+          <div class="wa-blog-meta-row">
+            <span class="wa-blog-byline">
+              <span class="wa-blog-byline__text">
+                <span class="wa-blog-byline__meta">
+                  <time datetime="{{ blog_ns.featured.publish_date | datetimeformat('%Y-%m-%d') }}">
+                    {{ blog_ns.featured.publish_date | datetimeformat('%d %B %Y') }}
+                  </time>
+                  <span aria-hidden="true">•</span>
+                  <span>{{ _featured_read_minutes }} min read</span>
+                </span>
+              </span>
+            </span>
+            {% if module.featured.read_label %}
+            <span class="wa-featured-post__read">
+              {{ module.featured.read_label }}
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endif %}
+
+    {% if _show_browser %}
+    <div class="wa-blog-browser" {% if _section_id %}id="{{ _section_id }}"{% endif %} aria-labelledby="wa-latest-articles-heading">
+      <div class="wa-blog-browser__head">
+        <div class="wa-blog-section-head">
+          {% if module.browser.overline %}
+          <p class="wa-blog-overline">{{ module.browser.overline }}</p>
+          {% endif %}
+          {% if module.browser.heading %}
+          <h2 class="wa-blog-section-head__title" id="wa-latest-articles-heading">{{ module.browser.heading }}</h2>
+          {% endif %}
+          {% if module.browser.intro_text %}
+          <div class="wa-blog-section-head__intro wa-blog-browser__intro wa-richtext">{{ module.browser.intro_text }}</div>
+          {% endif %}
+        </div>
+        <div class="wa-blog-browser__meta">
+          {% if _show_count %}
+          <p class="wa-blog-browser__count">
+            {{ blog_ns.posts|length }} article{% if blog_ns.posts|length != 1 %}s{% endif %}
+          </p>
+          {% endif %}
+          {% if _show_view_all %}
+          <a class="wa-blog-browser__view-all" href="{{ _view_all_href | escape_url }}">{{ _view_all_label }}</a>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if _show_filters or _show_search %}
+      <div class="wa-blog-controls" aria-label="Filter and search news">
+        {% if _show_filters %}
+        <nav class="wa-blog-topic-nav" aria-label="Browse by topic">
+          <a class="wa-topic-chip{% if '/tag/' not in _request_path %} wa-topic-chip--active{% endif %}" href="{{ _listing_base | escape_url }}" data-topic-filter="all">{{ module.browser.all_label | default('All', true) }}</a>
+
+          {% if module.browser.category_tabs and module.browser.category_tabs|length %}
+            {% for tab in module.browser.category_tabs %}
+              {% if tab.tab_label and tab.slug %}
+              <a
+                class="wa-topic-chip wa-topic--{{ tab.style | default(tab.slug, true) }}{% if ('/tag/' ~ tab.slug) in _request_path %} wa-topic-chip--active{% endif %}"
+                href="{{ _tag_base }}{{ tab.slug }}/"
+                data-topic-filter="{{ tab.slug | escape_attr }}"
+              >{{ tab.tab_label }}</a>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {% for tag in _available_blog_tags %}
+              {% if tag.slug and tag.live_posts|default(0)|int > 0 %}
+              <a
+                class="wa-topic-chip wa-topic--{{ tag.slug }}{% if ('/tag/' ~ tag.slug) in _request_path %} wa-topic-chip--active{% endif %}"
+                href="{{ blog_tag_url(_blog_id, tag.slug) | escape_url }}"
+                data-topic-filter="{{ tag.slug | escape_attr }}"
+              >{{ tag.name | default(tag, true) }}</a>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </nav>
+        {% endif %}
+
+        {% if _show_search %}
+        <form class="wa-blog-search" action="{{ _search_action }}" method="get" role="search">
+          <label class="sr-only" for="wa-news-search">Search news and publications</label>
+          <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m21 21-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input id="wa-news-search" type="search" name="term" placeholder="{{ module.browser.search_placeholder | default('Search articles', true) | escape_attr }}">
+        </form>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="wa-blog-results" data-blog-results aria-live="polite">
+        {% if blog_ns.posts|length %}
+      <div class="wa-blog-grid wa-blog-grid--cols-{{ _grid_cols }}">
+        {% for post in blog_ns.posts %}
+        {% if not _force_client_pagination or loop.index <= _initial_render_limit %}
+        {% set card_topic_ns = namespace(slugs=[], first_slug='', first_name='') %}
+        {% if post.tag_list %}
+          {% for tag in post.tag_list %}
+            {% if tag.slug %}
+              {% set card_topic_ns.slugs = card_topic_ns.slugs + [tag.slug] %}
+              {% if not card_topic_ns.first_slug %}
+                {% set card_topic_ns.first_slug = tag.slug %}
+                {% set card_topic_ns.first_name = tag.name %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {% if post.topic_list %}
+          {% for topic in post.topic_list %}
+            {% if topic.slug and topic.slug not in card_topic_ns.slugs %}
+              {% set card_topic_ns.slugs = card_topic_ns.slugs + [topic.slug] %}
+              {% if not card_topic_ns.first_slug %}
+                {% set card_topic_ns.first_slug = topic.slug %}
+                {% set card_topic_ns.first_name = topic.name | default(topic.label, true) | default(topic.slug | replace('-', ' '), true) %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {% if post.tags %}
+          {% for tag in post.tags %}
+            {% set _fallback_topic_label = tag.name | default(tag.label, true) | default(tag, true) %}
+            {% set _fallback_topic_slug = tag.slug | default(_fallback_topic_label | lower | replace(' ', '-'), true) %}
+            {% if _fallback_topic_slug and _fallback_topic_slug not in card_topic_ns.slugs %}
+              {% set card_topic_ns.slugs = card_topic_ns.slugs + [_fallback_topic_slug] %}
+              {% if not card_topic_ns.first_slug %}
+                {% set card_topic_ns.first_slug = _fallback_topic_slug %}
+                {% set card_topic_ns.first_name = _fallback_topic_label %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {% if not card_topic_ns.slugs|length %}
+          {% set card_topic_ns.slugs = ['industry-news'] %}
+          {% set card_topic_ns.first_slug = 'industry-news' %}
+          {% set card_topic_ns.first_name = 'Industry News' %}
+        {% endif %}
+        {% set _card_read_source = post.post_body | default(post.post_summary, true) | default(post.meta_description, true) %}
+        {% set _card_word_count = _card_read_source | striptags | wordcount %}
+        {% set _card_read_minutes = (_card_word_count / 220) | round(0, 'ceil') | int %}
+        {% if _card_read_minutes < 1 %}
+          {% set _card_read_minutes = 1 %}
+        {% endif %}
+        {% set _card_image_src = post.featured_image | default(_fallback_image_src, true) %}
+        {% set _card_image_alt = post.featured_image_alt_text | default(post.name, true) %}
+        {% if not post.featured_image %}
+          {% set _card_image_alt = _fallback_image_alt %}
+        {% endif %}
+        <a class="wa-blog-card" href="{{ post.absolute_url }}" data-topics="{{ card_topic_ns.slugs | join(' ') | escape_attr }}">
+          <div class="wa-blog-card__media">
+            {% if _card_image_src %}
+            <img
+              src="{{ _card_image_src | escape_url }}"
+              alt="{{ _card_image_alt | escape }}"
+              loading="lazy"
+            >
+            {% endif %}
+            {% if card_topic_ns.first_slug %}
+            <span class="wa-blog-card__tag-wrap">
+              <span class="wa-topic-tag wa-topic-tag--{{ card_topic_ns.first_slug }}">{{ card_topic_ns.first_name }}</span>
+            </span>
+            {% endif %}
+          </div>
+          <div class="wa-blog-card__body">
+            <h3 class="wa-blog-card__title">{{ post.name }}</h3>
+            {% if module.grid.show_excerpt != false %}
+            <p class="wa-blog-card__excerpt">
+              {{ post.meta_description | default(post.post_summary | striptags | truncate(135)) }}
+            </p>
+            {% endif %}
+          </div>
+          <div class="wa-blog-card__footer">
+            {% if module.grid.show_date != false %}
+            <span class="wa-blog-card__byline">
+              <span>
+                <span class="wa-blog-card__date">
+                  <time datetime="{{ post.publish_date | datetimeformat('%Y-%m-%d') }}">{{ post.publish_date | datetimeformat('%d %b %Y') }}</time>
+                  <span aria-hidden="true">•</span>
+                  <span>{{ _card_read_minutes }} min read</span>
+                </span>
+              </span>
+            </span>
+            {% endif %}
+            <span class="wa-blog-card__arrow" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24">
+                <path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+        {% endif %}
+        {% endfor %}
+      </div>
+      <div class="wa-blog-empty wa-blog-empty--filtered" hidden>
+        {% if module.empty_state.heading %}
+        <h3>{{ module.empty_state.heading }}</h3>
+        {% endif %}
+        {% if module.empty_state.text %}
+        <p>{{ module.empty_state.text }}</p>
+        {% endif %}
+      </div>
+      {% elif not blog_ns.featured %}
+      <div class="wa-blog-empty">
+        {% if module.empty_state.heading %}
+        <h3>{{ module.empty_state.heading }}</h3>
+        {% endif %}
+        {% if module.empty_state.text %}
+        <p>{{ module.empty_state.text }}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if module.pagination.show != false and _total_page_count > 1 %}
+    {% set _first_page_link = blog_page_link(1) | cut('/page/1') %}
+    {% set _remaining_page_count = _total_page_count - _current_page_num %}
+    {% set _page_offset = 0 %}
+    {% if _remaining_page_count == 1 %}
+      {% set _page_offset = -1 %}
+    {% elif _remaining_page_count == 0 %}
+      {% set _page_offset = -2 %}
+    {% elif _current_page_num == 2 %}
+      {% set _page_offset = 1 %}
+    {% elif _current_page_num == 1 %}
+      {% set _page_offset = 2 %}
+    {% endif %}
+    <nav class="wa-blog-pagination" aria-label="News pagination">
+      {% if _current_page_num > 1 %}
+      {% set _previous_page_num = _current_page_num - 1 %}
+      {% set _previous_page_link = _first_page_link if _previous_page_num == 1 else blog_page_link(_previous_page_num) %}
+      <a
+        class="wa-blog-pagination__link"
+        href="{{ _previous_page_link | escape_url }}"
+        rel="prev"
+        aria-label="Go to previous news page"
+      >Previous</a>
+      {% else %}
+      <button
+        class="wa-blog-pagination__link"
+        type="button"
+        aria-label="Previous news page unavailable"
+        disabled
+      >Previous</button>
+      {% endif %}
+
+      {% for _page_delta in [-2, -1, 0, 1, 2] %}
+        {% set _page_num = _current_page_num + _page_delta + _page_offset %}
+        {% if _page_num > 0 and _page_num <= _total_page_count %}
+          {% set _page_link = _first_page_link if _page_num == 1 else blog_page_link(_page_num) %}
+          <a
+            class="wa-blog-pagination__link{% if _page_num == _current_page_num %} is-active{% endif %}"
+            href="{{ _page_link | escape_url }}"
+            aria-label="Go to news page {{ _page_num }}"
+            {% if _page_num == _current_page_num %}aria-current="page"{% endif %}
+          >{{ _page_num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if _current_page_num < _total_page_count %}
+      <a
+        class="wa-blog-pagination__link"
+        href="{{ blog_page_link(_current_page_num + 1) | escape_url }}"
+        rel="next"
+        aria-label="Go to next news page"
+      >Next</a>
+      {% else %}
+      <button
+        class="wa-blog-pagination__link"
+        type="button"
+        aria-label="Next news page unavailable"
+        disabled
+      >Next</button>
+      {% endif %}
+    </nav>
+    {% endif %}
+  </div>
+</section>
+
+<script src="{{ get_asset_url('../../assets/js/news-articles-browser.js') }}" defer></script>

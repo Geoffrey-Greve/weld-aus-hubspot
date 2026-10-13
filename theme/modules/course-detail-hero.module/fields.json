@@ -1,0 +1,76 @@
+[
+  {
+    "name": "headline_override",
+    "label": "Headline override",
+    "type": "text",
+    "help_text": "Leave blank to use the course name from HubDB.",
+    "default": ""
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Weld Australia training"
+  },
+  {
+    "name": "summary",
+    "label": "Summary",
+    "type": "richtext",
+    "default": "<p>Build practical capability with training developed and delivered by Australia’s peak welding industry body.</p>"
+  },
+  {
+    "name": "show_breadcrumb",
+    "label": "Show breadcrumb",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "primary_cta_label",
+    "label": "Primary CTA label",
+    "type": "text",
+    "default": "View sessions"
+  },
+  {
+    "name": "primary_cta_anchor",
+    "label": "Primary CTA anchor",
+    "type": "text",
+    "default": "sessions"
+  },
+  {
+    "name": "secondary_cta_label",
+    "label": "Secondary CTA label",
+    "type": "text",
+    "default": "Course content"
+  },
+  {
+    "name": "secondary_cta_anchor",
+    "label": "Secondary CTA anchor",
+    "type": "text",
+    "default": "syllabus"
+  },
+  {
+    "name": "background_image",
+    "label": "Background image",
+    "type": "image"
+  },
+  {
+    "name": "overlay_opacity",
+    "label": "Image overlay opacity",
+    "type": "number",
+    "default": 76,
+    "min": 0,
+    "max": 100,
+    "suffix": "%"
+  },
+  {
+    "name": "height",
+    "label": "Hero height",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact"],
+      ["standard", "Standard"],
+      ["large", "Large"]
+    ],
+    "default": "standard"
+  }
+]

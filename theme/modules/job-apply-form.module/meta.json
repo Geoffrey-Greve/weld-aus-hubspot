@@ -1,0 +1,14 @@
+{
+  "label": "Job Apply Form",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Deferred application form for Job Board email-apply roles. Not currently wired - Apply uses obfuscated mailto instead (see workflows/job-board-apply-routing.md). Keep for a future application system.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": false,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["job board", "form", "apply"]
+}

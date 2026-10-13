@@ -1,0 +1,177 @@
+{#
+  resource-teaser.module/module.html
+
+  Fields:
+    module.section_heading         - section heading text
+    module.section_intro           - optional richtext intro
+    module.max_count               - number of HubDB rows to fetch (default 2)
+    module.locked_overlay_message  - message shown to non-members on locked cards
+    module.locked_cta_label        - locked state CTA button label
+    module.locked_cta_link         - locked state CTA button href
+    module.view_all_label          - "Browse all resources" label
+    module.view_all_link           - link to the full resources hub page
+    module.section_id              - standard: anchor ID
+    module.background              - standard: bg style
+    module.spacing                 - standard: vertical padding
+    module.visibility              - standard: device show/hide
+    module.members_only            - standard: member wall gate (entire section)
+
+  HubDB Table 5: `resources`
+    Columns used (defensively - absent columns render as empty):
+      title, abstract, thumbnail, file_type, file_url, member_tier_required
+#}
+
+{% import "../../templates/partials/_sharepoint.html" as sp %}
+
+{# ── Section-level members-only gate ────────────────────────────────────────── #}
+{# QA: member-only content is company-aware. See _member-content-gate.html -
+   a corporate employee's membership lives on their employer's record, and
+   `individual_membership_status == 'Current'` cannot see it. #}
+{% include "../../templates/partials/_member-content-gate.html" %}
+{% set _is_active_member = wa_member_gate.is_member %}
+{% if module.members_only and not _is_active_member %}{% else %}
+
+{# ── Visibility classes ──────────────────────────────────────────────────────── #}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+{# ── HubDB query ─────────────────────────────────────────────────────────────── #}
+{% set _limit = [module.max_count | int | default(2), 1] | max %}
+{% set _resources = hubdb_table_rows('resources', 'orderBy=-updated&limit=' ~ _limit) %}
+
+<section
+  class="wa-resource-teaser wa-section wa-section--bg-{{ module.background | default('surface_alt') }} wa-section--spacing-{{ module.spacing | default('default') }}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {# ── Section header ───────────────────────────────────────────────────────── #}
+    {% if module.section_heading %}
+    <h2 class="wa-resource-teaser__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    {% if module.section_intro %}
+    <div class="wa-resource-teaser__intro">{{ module.section_intro }}</div>
+    {% endif %}
+
+    {# ── Resource cards ───────────────────────────────────────────────────────── #}
+    {% if _resources %}
+
+    <div class="wa-resource-teaser__grid">
+      {% for row in _resources %}
+
+      {#
+        Determine whether this individual card is locked.
+        A card is locked if:
+          (a) the visitor is NOT an active member, OR
+          (b) the resource's member_tier_required flag is truthy
+            AND the visitor is not an active member.
+        For simplicity and safety: lock if visitor is not an active member.
+        Editors can choose to put the whole section behind members_only instead.
+      #}
+      {% set _row_locked = not _is_active_member %}
+
+      {# Prefer file_url; fall back to download_url for schema flexibility #}
+      {# QA #46: normalise SharePoint share links so they open on Android without a Microsoft
+         login. Videos keep their original URL (opened/played, not downloaded); only downloadable
+         resource types get the direct-download rewrite. #}
+      {% set _raw_download_url = row.file_url | default(row.download_url) | default('') %}
+      {% if row.file_type.name | default('') == 'video' %}
+        {% set _download_url = _raw_download_url %}
+      {% else %}
+        {% set _download_url = sp.sharepoint_direct_url(_raw_download_url) | trim %}
+      {% endif %}
+
+      <article class="wa-resource-teaser__card">
+
+        {# Thumbnail #}
+        {% if row.thumbnail and row.thumbnail.url %}
+        <img
+          src="{{ row.thumbnail.url }}"
+          alt="{{ row.thumbnail.alt | default(row.title | default('Resource thumbnail')) }}"
+          class="wa-resource-teaser__card-img"
+          loading="lazy"
+          decoding="async"
+          width="560"
+          height="315"
+        >
+        {% else %}
+        <div class="wa-resource-teaser__card-img-placeholder" aria-hidden="true"></div>
+        {% endif %}
+
+        {# Card body #}
+        <div class="wa-resource-teaser__card-body">
+
+          {% if row.file_type %}
+          <span class="wa-resource-teaser__file-type">{{ row.file_type }}</span>
+          {% endif %}
+
+          <h3 class="wa-resource-teaser__title">
+            {{ row.title | default('Untitled resource') }}
+          </h3>
+
+          {% if row.abstract %}
+          <p class="wa-resource-teaser__abstract">{{ row.abstract | truncate(120, True, '…') }}</p>
+          {% elif row.short_description %}
+          <p class="wa-resource-teaser__abstract">{{ row.short_description | truncate(120, True, '…') }}</p>
+          {% endif %}
+
+          {# Download CTA - only shown to active members when URL is present #}
+          {% if not _row_locked and _download_url %}
+          <a
+            href="{{ _download_url }}"
+            class="btn btn-primary wa-resource-teaser__download"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Download {{ row.title | default('resource') }}"
+          >Download</a>
+          {% endif %}
+
+        </div>{# /.wa-resource-teaser__card-body #}
+
+        {# ── Locked overlay ──────────────────────────────────────────────────── #}
+        {% if _row_locked %}
+        <div class="wa-resource-teaser__locked" role="complementary" aria-label="Members only content">
+          <span class="wa-resource-teaser__lock-icon" aria-hidden="true">&#128274;</span>
+          <p class="wa-resource-teaser__locked-message">
+            {{ module.locked_overlay_message | default('Available to Weld Australia members.') }}
+          </p>
+          {% if module.locked_cta_label and module.locked_cta_link %}
+          <a
+            href="{{ module.locked_cta_link.url.href }}"
+            class="btn btn-primary wa-resource-teaser__locked-cta"
+            {% if module.locked_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ module.locked_cta_label }}</a>
+          {% endif %}
+        </div>
+        {% endif %}
+
+      </article>
+      {% endfor %}
+    </div>{# /.wa-resource-teaser__grid #}
+
+    {% else %}
+
+    {# ── Empty state: table not yet created or has zero rows ────────────────── #}
+    <p class="wa-resource-teaser__empty">Resources coming soon.</p>
+
+    {% endif %}
+
+    {# ── View all link ────────────────────────────────────────────────────────── #}
+    {% if module.view_all_label and module.view_all_link %}
+    <div class="wa-resource-teaser__view-all">
+      <a
+        href="{{ module.view_all_link.url.href }}"
+        class="btn btn-secondary"
+        {% if module.view_all_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >{{ module.view_all_label }}</a>
+    </div>
+    {% endif %}
+
+  </div>{# /.container #}
+</section>
+
+{% endif %}{# end section-level members_only gate #}

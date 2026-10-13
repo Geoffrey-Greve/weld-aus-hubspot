@@ -1,0 +1,217 @@
+/* cta-banner.module/module.css */
+
+.wa-cta-banner {
+  position: relative;
+  overflow: hidden;
+}
+
+.wa-cta-banner::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--wa-color-magenta, #ed128d),
+    var(--wa-color-accent, #fecf05)
+  );
+}
+
+.wa-cta-banner__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-6, 1.5rem);
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .wa-cta-banner--has-image .wa-cta-banner__inner {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* Image left: media first, content second */
+  .wa-cta-banner--image-left .wa-cta-banner__inner {
+    flex-direction: row;
+  }
+
+  /* Image right: content first, media second */
+  .wa-cta-banner--image-right .wa-cta-banner__inner {
+    flex-direction: row-reverse;
+  }
+
+  .wa-cta-banner--has-image .wa-cta-banner__content {
+    flex: 1 1 0;
+  }
+
+  .wa-cta-banner--has-image .wa-cta-banner__media {
+    flex: 0 0 40%;
+    max-width: 40%;
+  }
+}
+
+.wa-cta-banner__headline {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(32px, 3.1vw, 42px);
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: 0;
+  margin: 0 0 14px;
+}
+
+.wa-cta-banner__body {
+  margin-bottom: 0;
+  opacity: 1;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.wa-cta-banner__body > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-cta-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.wa-cta-banner__actions .btn {
+  min-height: 46px;
+  /* Block padding, not 0, so a label that wraps to two lines still has room.
+     `white-space: nowrap` was removed here - it out-specified the .btn base
+     and would have re-broken long CTA labels on mobile. */
+  padding: 8px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.wa-cta-banner__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--wa-radius-md, 8px);
+  object-fit: cover;
+}
+
+/* On primary backgrounds - invert text + button styles */
+.wa-section--bg-primary .wa-cta-banner__headline,
+.wa-section--bg-primary-dark .wa-cta-banner__headline,
+.wa-section--bg-primary_dark .wa-cta-banner__headline {
+  color: var(--wa-color-on-primary, #fff);
+}
+
+.wa-section--bg-primary .wa-cta-banner__body,
+.wa-section--bg-primary-dark .wa-cta-banner__body,
+.wa-section--bg-primary_dark .wa-cta-banner__body {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Primary CTA becomes gold (the navy btn-primary would be invisible on navy) */
+.wa-section--bg-primary .wa-cta-banner__cta,
+.wa-section--bg-primary-dark .wa-cta-banner__cta,
+.wa-section--bg-primary_dark .wa-cta-banner__cta {
+  background-color: var(--wa-color-accent);
+  color: var(--wa-color-on-accent);
+  border-color: var(--wa-color-accent);
+}
+
+.wa-section--bg-primary .wa-cta-banner__cta:hover,
+.wa-section--bg-primary .wa-cta-banner__cta:focus-visible,
+.wa-section--bg-primary-dark .wa-cta-banner__cta:hover,
+.wa-section--bg-primary-dark .wa-cta-banner__cta:focus-visible,
+.wa-section--bg-primary_dark .wa-cta-banner__cta:hover,
+.wa-section--bg-primary_dark .wa-cta-banner__cta:focus-visible {
+  background-color: var(--wa-color-accent-dark);
+  border-color: var(--wa-color-accent-dark);
+}
+
+/* Secondary CTA becomes a translucent white outline */
+.wa-section--bg-primary .wa-cta-banner__cta-secondary,
+.wa-section--bg-primary-dark .wa-cta-banner__cta-secondary,
+.wa-section--bg-primary_dark .wa-cta-banner__cta-secondary {
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.wa-section--bg-primary .wa-cta-banner__cta-secondary:hover,
+.wa-section--bg-primary .wa-cta-banner__cta-secondary:focus-visible,
+.wa-section--bg-primary-dark .wa-cta-banner__cta-secondary:hover,
+.wa-section--bg-primary-dark .wa-cta-banner__cta-secondary:focus-visible,
+.wa-section--bg-primary_dark .wa-cta-banner__cta-secondary:hover,
+.wa-section--bg-primary_dark .wa-cta-banner__cta-secondary:focus-visible {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Centered layout (default) */
+.wa-cta-banner--centered:not(.wa-cta-banner--has-image) .wa-cta-banner__inner {
+  text-align: center;
+  align-items: center;
+}
+
+.wa-cta-banner--centered:not(.wa-cta-banner--has-image) .wa-cta-banner__actions {
+  justify-content: center;
+}
+
+/* Split layout: heading/body left, CTAs right */
+@media (min-width: 768px) {
+  .wa-cta-banner--split:not(.wa-cta-banner--has-image) .wa-cta-banner__inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    gap: 32px;
+  }
+
+  /* Left text block: headline + body tightly stacked, flex column */
+  .wa-cta-banner--split:not(.wa-cta-banner--has-image) .wa-cta-banner__content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex: 1 1 100%;
+  }
+
+  /* Text group wraps headline + body together */
+  .wa-cta-banner--split:not(.wa-cta-banner--has-image) .wa-cta-banner__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 560px;
+    flex: 1 1 auto;
+  }
+
+  .wa-cta-banner--split:not(.wa-cta-banner--has-image) .wa-cta-banner__headline {
+    margin-bottom: 16px;
+  }
+
+  .wa-cta-banner--split:not(.wa-cta-banner--has-image) .wa-cta-banner__body {
+    margin-bottom: 0;
+  }
+
+  .wa-cta-banner--split:not(.wa-cta-banner--has-image) .wa-cta-banner__actions {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 767px) {
+  .wa-cta-banner__headline {
+    font-size: 30px;
+    line-height: 1.2;
+  }
+
+  .wa-cta-banner__actions {
+    width: 100%;
+    margin-top: var(--wa-space-6, 24px);
+  }
+}

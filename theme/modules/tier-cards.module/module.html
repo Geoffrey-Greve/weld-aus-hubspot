@@ -1,0 +1,112 @@
+{#
+  tier-cards.module/module.html
+  A single membership tier card with price block, benefits list, and CTA buttons.
+  Intended to be used standalone or nested inside a tabs.module.
+
+  Fields:
+    module.section_id        - optional anchor id
+    module.background        - background variant
+    module.spacing           - vertical spacing variant
+    module.tier_style        - gold | silver | bronze | individual | corporate | apprentice
+    module.name_text         - tier display name
+    module.price             - price string e.g. "$1,500"
+    module.price_period      - e.g. "per year + GST"
+    module.description       - richtext body
+    module.benefits[]        - (text, included boolean)
+    module.highlighted       - show Recommended badge + elevated styling
+    module.primary_cta_label - primary button label
+    module.primary_cta_link  - primary button link
+    module.secondary_cta_label - optional secondary link label
+    module.secondary_cta_link  - optional secondary link
+#}
+
+{%- set _tier = module.tier_style | default('gold') -%}
+{%- set _bg   = module.background | default('surface') -%}
+{%- set _sp   = module.spacing    | default('default') -%}
+{%- set _dark = _bg in ['primary', 'primary_dark'] -%}
+
+{# Map tier to the appropriate button class #}
+{%- if _tier == 'gold' -%}
+  {%- set _btn_class = 'btn-gold' -%}
+{%- else -%}
+  {%- set _btn_class = 'btn-primary' -%}
+{%- endif -%}
+
+<section
+  class="wa-tier-cards wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    <div class="wa-tier-card wa-tier-card--{{ _tier }}{% if module.highlighted %} wa-tier-card--highlighted{% endif %}">
+
+      {# ── Recommended badge ─────────────────────────────────────────────── #}
+      {% if module.highlighted %}
+      <div class="wa-tier-card__badge" aria-label="Recommended">Recommended</div>
+      {% endif %}
+
+      {# ── Header: name + price ──────────────────────────────────────────── #}
+      <div class="wa-tier-card__header">
+        <h3 class="wa-tier-card__name">{{ module.name_text }}</h3>
+        <div class="wa-tier-card__price-block">
+          <span class="wa-tier-card__price">{{ module.price }}</span>
+          {% if module.price_period %}
+          <span class="wa-tier-card__price-period">{{ module.price_period }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      {# ── Description ───────────────────────────────────────────────────── #}
+      {% if module.description %}
+      <div class="wa-tier-card__description">{{ module.description }}</div>
+      {% endif %}
+
+      {# ── Benefits list ─────────────────────────────────────────────────── #}
+      {% if module.benefits %}
+      <div class="wa-tier-card__benefits">
+        <ul>
+          {% for benefit in module.benefits %}
+          <li class="wa-tier-card__benefit{% if not benefit.included %} wa-tier-card__benefit--excluded{% endif %}">
+            {% if benefit.included %}
+            {# Check icon - navy circle with checkmark #}
+            <svg class="wa-tier-card__benefit-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" fill="#1c1e4c" opacity="0.1"/>
+              <polyline points="8 12 11 15 16 9" stroke="#1c1e4c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {% else %}
+            {# X icon - grey #}
+            <svg class="wa-tier-card__benefit-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            {% endif %}
+            <span>{{ benefit.text }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {# ── Actions ───────────────────────────────────────────────────────── #}
+      {% if module.primary_cta_label and module.primary_cta_link and module.primary_cta_link.url %}
+      <div class="wa-tier-card__actions">
+        <a
+          href="{{ module.primary_cta_link.url.href }}"
+          class="btn {{ _btn_class }}"
+          {% if module.primary_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ module.primary_cta_label }}</a>
+
+        {% if module.secondary_cta_label and module.secondary_cta_link and module.secondary_cta_link.url %}
+        <a
+          href="{{ module.secondary_cta_link.url.href }}"
+          class="wa-tier-card__secondary-cta"
+          {% if module.secondary_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ module.secondary_cta_label }}</a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>{# /.wa-tier-card #}
+
+  </div>
+</section>

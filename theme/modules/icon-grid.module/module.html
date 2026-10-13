@@ -1,0 +1,131 @@
+{#
+  icon-grid.module/module.html
+  Grid of icon + heading + body items.
+  Replaces value-props-3up.module with flexible column count and card layout modes.
+
+  Fields:
+    module.section_id    - optional anchor id
+    module.background    - background variant
+    module.spacing       - vertical spacing variant
+    module.visibility    - device show/hide
+    module.members_only  - gating flag
+    module.overline      - optional overline text
+    module.heading       - optional section heading
+    module.intro         - optional richtext intro
+    module.section_align - left | center
+    module.card_style    - stacked | row
+    module.columns       - 2 | 3 | 4
+    module.features      - repeater group (heading, body, accent_color)
+    module.cta_label     - optional CTA label
+    module.cta_link      - optional CTA link
+    module.cta_align     - left | center
+#}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{% set _member_status = request_contact.individual_membership_status | default('') %}
+{% set _is_active_member = _member_status in ['Current'] %}
+{% if not module.members_only or _is_active_member %}
+
+{# ── Derived flags ──────────────────────────────────────────────────────────── #}
+{%- set _bg     = module.background    | default('surface') -%}
+{%- set _sp     = module.spacing       | default('default') -%}
+{%- set _align  = module.section_align | default('center') -%}
+{%- if module.overline or module.heading|trim == 'Why join Weld Australia?' -%}
+  {%- set _align = 'left' -%}
+{%- endif -%}
+{%- set _style  = module.card_style    | default('stacked') -%}
+{%- set _cols   = module.columns       | default('3') -%}
+{%- set _dark   = _bg in ['primary', 'primary_dark'] -%}
+{%- set _is_why_join = module.heading|striptags|trim == 'Why join Weld Australia?' -%}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{%- set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) -%}
+{%- set _vis_classes = '' -%}
+{%- if 'mobile'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-mobile'  -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-tablet'  -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+<section
+  class="wa-icon-grid wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container-wide">
+
+    {# ── Section head ──────────────────────────────────────────────────────── #}
+    {% if module.overline or module.heading or module.intro %}
+    <div class="wa-section-head{% if _align == 'center' %} wa-section-head--center{% endif %}">
+      {% if module.overline %}
+      <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+        <span class="wa-overline__text">{{ module.overline }}</span>
+      </div>
+      {% endif %}
+      {% if module.heading %}
+      <h2 class="wa-icon-grid__heading">{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+      <div class="wa-icon-grid__intro wa-richtext">{{ module.intro }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# ── Features grid ─────────────────────────────────────────────────────── #}
+    {% if module.features %}
+    <div class="wa-icon-grid__grid wa-icon-grid__grid--{{ _cols }}col wa-icon-grid--{{ _style }}">
+      {% for feature in module.features %}
+      {%- set _feature_heading = feature.heading|striptags|lower|trim -%}
+      {%- set _fallback_icon = 'book.svg' -%}
+      {%- if 'technical expertise' in _feature_heading -%}
+        {%- set _fallback_icon = 'wrench.svg' -%}
+      {%- elif 'advocacy' in _feature_heading -%}
+        {%- set _fallback_icon = 'megaphone.svg' -%}
+      {%- elif 'network' in _feature_heading -%}
+        {%- set _fallback_icon = 'users.svg' -%}
+      {%- elif 'resources' in _feature_heading -%}
+        {%- set _fallback_icon = 'file.svg' -%}
+      {%- elif 'certification' in _feature_heading -%}
+        {%- set _fallback_icon = 'shield.svg' -%}
+      {%- endif -%}
+      <div class="wa-icon-grid__item">
+
+        <div class="wa-icon-grid__icon-wrap wa-icon-grid__icon-wrap--{{ feature.accent_color | default('gold') }}" aria-hidden="true">
+          <img
+            src="{{ get_asset_url('../../assets/img/icons/' ~ _fallback_icon) }}"
+            alt=""
+            class="wa-icon-grid__icon"
+            loading="lazy"
+          >
+        </div>
+
+        <div class="wa-icon-grid__text">
+          <h3 class="wa-icon-grid__item-heading">{{ feature.heading }}</h3>
+          {% if feature.body_text %}
+          <p class="wa-icon-grid__item-body">{{ feature.body_text }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ── CTA ───────────────────────────────────────────────────────────────── #}
+    {% if module.cta_label and module.cta_link and module.cta_link.url and module.cta_link.url.href %}
+    <div class="wa-icon-grid__cta wa-icon-grid__cta--{{ module.cta_align | default('center') }}">
+        <a
+        href="{{ module.cta_link.url.href }}"
+        class="btn btn-{% if _dark or _is_why_join %}gold{% else %}primary{% endif %}"
+        {% if module.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >
+        <span>{{ module.cta_label }}</span>
+        <svg class="wa-btn__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}{# end members_only gate #}

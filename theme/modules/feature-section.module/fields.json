@@ -1,0 +1,152 @@
+[
+  {
+    "name": "anchor_id",
+    "label": "Anchor ID",
+    "type": "text",
+    "required": true,
+    "help_text": "Used to link this section from the sticky sub-nav. Lower-case, hyphenated.",
+    "default": ""
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "required": true,
+    "default": ""
+  },
+  {
+    "name": "body_text",
+    "label": "Body",
+    "type": "richtext"
+  },
+  {
+    "name": "image",
+    "label": "Image",
+    "type": "image"
+  },
+  {
+    "name": "video_url",
+    "label": "Or video URL",
+    "type": "text",
+    "help_text": "YouTube or Vimeo URL. If set, takes precedence over Image."
+  },
+  {
+    "name": "image_position",
+    "label": "Media position",
+    "type": "choice",
+    "choices": [
+      [
+        "left",
+        "Left"
+      ],
+      [
+        "right",
+        "Right"
+      ]
+    ],
+    "default": "right"
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA label",
+    "type": "text"
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA link",
+    "type": "link"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Override for in-page anchor. Defaults to the Anchor ID field above.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

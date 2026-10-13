@@ -1,0 +1,66 @@
+[
+  {
+    "name": "form",
+    "label": "Subscription form",
+    "type": "form",
+    "required": false,
+    "help_text": "The HubSpot form this block submits to. Chosen from the dropdown - the module never asks for a raw GUID. Use an email-only form: this block collects just the email address, so a form with other required fields or a consent checkbox will be rejected. Point those at the /subscribe page instead. The form's confirmation message is shown inline on success. Leave blank to show a link to /subscribe rather than a signup field.",
+    "default": {
+      "form_id": "de2473b6-2afa-4799-80f2-36ff9ad026ec",
+      "response_type": "inline",
+      "message": "Thanks - you're subscribed to Weld Connect."
+    }
+  },
+  {
+    "name": "layout",
+    "label": "Layout",
+    "type": "choice",
+    "required": true,
+    "display": "select",
+    "help_text": "Full-width banner (news listing and the foot of an article) or the narrow card used in the article sidebar.",
+    "choices": [
+      ["banner", "Full-width banner"],
+      ["sidebar_card", "Sidebar card"]
+    ],
+    "default": "banner"
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "help_text": "Banner layout only.",
+    "default": "Stay connected"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Industry news, delivered monthly"
+  },
+  {
+    "name": "body_text",
+    "label": "Body text",
+    "type": "text",
+    "default": "Subscribe to Weld Connect for practical updates on welding standards, technical resources, training, events and industry policy."
+  },
+  {
+    "name": "submit_label",
+    "label": "Submit button label",
+    "type": "text",
+    "help_text": "Text on the signup button.",
+    "default": "Subscribe to Weld Connect"
+  },
+  {
+    "name": "error_message",
+    "label": "Error message",
+    "type": "text",
+    "help_text": "Shown under the signup if the subscription cannot be recorded. A link to the /subscribe page is appended automatically.",
+    "default": "Something went wrong. Please try again, or subscribe from our subscribe page."
+  },
+  {
+    "name": "note",
+    "label": "Footnote",
+    "type": "text",
+    "default": "Free · monthly · unsubscribe anytime"
+  }
+]

@@ -1,0 +1,1001 @@
+{# header.module/module.html Global site header: utility bar + primary nav bar + mobile overlay.
+Design reference: bundle-2/site/wa-chrome.jsx WAHeader. Fields (see fields.json): module.primary_nav
+- primary navigation menu (HubSpot Menu) module.phone_number - phone number (utility bar)
+module.email - email address (utility bar) module.find_a_member_link - "Find a member" URL (utility
+bar) module.login_label_logged_out - CTA label when logged out module.login_label_logged_in - CTA
+label when logged in module.show_search - boolean: show search icon module.login_url - login page
+URL module.dashboard_url - member dashboard URL HubL globals used: request_contact.is_logged_in -
+member authentication state #} {# ── Resolve menu
+─────────────────────────────────────────────────────────── #} {% set primary_nav_id =
+module.primary_nav.id|default(module.primary_nav.name, true)|default(module.primary_nav, true) %} {%
+set primary_nav = primary_nav_id ? menu(primary_nav_id) : null %} {% if not primary_nav or not
+primary_nav.children or primary_nav.children|length == 0 %} {% set primary_nav = menu('For the Weld
+Australia') %} {% endif %} {% set has_primary_nav = primary_nav and primary_nav.children and
+primary_nav.children|length > 0 %} {# ── Resolve CTA label + URL
+─────────────────────────────────────────────── #}
+{%- set _member_login_url = module.login_url | default('/login/', true) -%}
+{%- if _member_login_url == '/login/' or _member_login_url == '/login' -%}
+  {%- set _member_login_url = '/portal/' -%}
+{%- endif -%}
+{%- set _member_dashboard_url_raw = module.dashboard_url | default('/portal/', true) -%}
+{%- set _request_path = request.path | default('', true) | lower -%}
+{%- set _request_full_url = request.full_url | default('', true) | lower -%}
+{%- set _is_member_logout_route = '/_hcms/mem/logout' in _request_path or '/_hcms/mem/logout' in _request_full_url -%}
+{%- set _member_is_logged_in = request_contact.is_logged_in and not _is_member_logout_route -%}
+{%- if _member_dashboard_url_raw == '/member-preview-1' or _member_dashboard_url_raw == '/member-preview-1/' or _member_dashboard_url_raw == '/membership/' or _member_dashboard_url_raw == '/membership' -%}
+  {%- set _member_dashboard_url = '/portal/' -%}
+{%- else -%}
+  {%- set _member_dashboard_url = _member_dashboard_url_raw -%}
+{%- endif -%}
+{%- set _member_profile_url = '/portal#portal-profile' -%}
+{%- set _member_first_name = request_contact.firstname | default(request_contact.first_name, true) | default(contact.firstname, true) | default(contact.first_name, true) | default('', true) | trim -%}
+{%- set _member_last_name = request_contact.lastname | default(request_contact.last_name, true) | default(contact.lastname, true) | default(contact.last_name, true) | default('', true) | trim -%}
+{%- set _member_full_name = (_member_first_name ~ ' ' ~ _member_last_name) | trim -%}
+{%- set _member_initials = ((_member_first_name | first | default('', true)) ~ (_member_last_name | first | default('', true))) | upper -%}
+{%- set _logged_in_label_raw = module.login_label_logged_in | default('', true) -%}
+{%- if not _logged_in_label_raw or _logged_in_label_raw == 'My Dashboard' -%}
+  {%- set _logged_in_label = 'Member Profile' -%}
+{%- else -%}
+  {%- set _logged_in_label = _logged_in_label_raw -%}
+{%- endif -%}
+{%- set _logged_out_label = 'Member Login' -%}
+{% if _member_is_logged_in %}
+  {%- if _member_first_name -%}
+    {%- set _cta_label = _member_first_name -%}
+  {%- elif _member_full_name -%}
+    {%- set _cta_label = _member_full_name -%}
+  {%- else -%}
+    {%- set _cta_label = _logged_in_label -%}
+  {%- endif -%}
+{%- else -%}
+  {%- set _cta_label = _logged_out_label -%}
+{%- endif -%}
+{%- set _find_a_member_url = module.find_a_member_link.url.href | default('/find-a-member/', true) -%}
+{# Skip link intentionally removed here - the single canonical bypass-blocks
+   link now lives in base.html targeting #main-content (WCAG 2.4.1). #}
+
+{% if '/courses/' in request.path %}
+<style>
+  .wa-hero-video,
+  .wa-stat-tiles,
+  #why,
+  #outcomes,
+  #syllabus,
+  #audience,
+  #trainer,
+  .wa-team,
+  .wa-testimonials,
+  .wa-logo-strip,
+  #faq,
+  .wa-cta-banner {
+    display: none !important;
+  }
+</style>
+{% endif %}
+
+{% if 'about' in request.path %}
+<script>
+  (function () {
+    var anchorOffset = 130
+
+    function sectionContains(section, text) {
+      return section && section.textContent && section.textContent.toLowerCase().indexOf(text) !== -1
+    }
+
+    function findSection(selector, text) {
+      var sections = document.querySelectorAll(selector)
+      for (var i = 0; i < sections.length; i += 1) {
+        if (sectionContains(sections[i], text)) {
+          return sections[i]
+        }
+      }
+      return sections[0] || null
+    }
+
+    function ensureAboutAnchors() {
+      var teamSection = document.getElementById('our-team') || findSection('.wa-team', 'our team')
+      var contactSection =
+        document.getElementById('get-in-touch') || findSection('.wa-contact-cards', 'get in touch')
+
+      if (teamSection && !teamSection.id) {
+        teamSection.id = 'our-team'
+      }
+
+      if (contactSection && !contactSection.id) {
+        contactSection.id = 'get-in-touch'
+      }
+    }
+
+    function scrollToAboutHash() {
+      var targetId = window.location.hash ? window.location.hash.substring(1) : ''
+      if (targetId !== 'our-team' && targetId !== 'get-in-touch') {
+        return
+      }
+
+      ensureAboutAnchors()
+
+      var target = document.getElementById(targetId)
+      if (!target) {
+        return
+      }
+
+      window.setTimeout(function () {
+        var top = target.getBoundingClientRect().top + window.pageYOffset - anchorOffset
+        window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' })
+      }, 0)
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      ensureAboutAnchors()
+      scrollToAboutHash()
+    })
+
+    window.addEventListener('hashchange', scrollToAboutHash)
+  })()
+</script>
+{% endif %}
+
+<header class="wa-site-header" id="wa-site-header" role="banner">
+  {# ── Utility bar (hidden on tablet/mobile) ─────────────────────────────── #}
+  <div class="wa-utility-bar" aria-label="Utility navigation">
+    <div class="wa-utility-bar__inner">
+      <div class="wa-utility-bar__contact">
+        {% if module.phone_number %}
+        <a href="tel:{{ module.phone_number | replace(' ', '') }}" class="wa-utility-bar__link">
+          {{ module.phone_number }}
+        </a>
+        {% endif %} {% if module.email %}
+        <a href="mailto:{{ module.email }}" class="wa-utility-bar__link"> {{ module.email }} </a>
+        {% endif %}
+      </div>
+      <div class="wa-utility-bar__actions">
+        <span class="wa-utility-bar__sep" aria-hidden="true"></span>
+        <a
+          href="{{ _find_a_member_url }}"
+          class="wa-utility-bar__link wa-utility-bar__link--bold"
+        >
+          Find a member
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {# ── Main nav bar ─────────────────────────────────────────────────────── #}
+  <div class="wa-nav-bar">
+    <div class="wa-nav-bar__inner">
+      {# Logo #}
+      <a href="/" class="wa-nav-bar__logo" aria-label="Weld Australia - home">
+        <svg
+          style="display: block; height: 34px; width: auto; flex-shrink: 0; overflow: visible"
+          viewBox="0 0 595.28 197.92"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <defs>
+            <clipPath id="wl-clip-wmark">
+              <path
+                d="M27.1,104.97l1.08-.42,32.56-12.77,8.18,20.52.14.36-16.29,56.66c-8.55-21.45-17.11-42.9-25.67-64.34M84.28,83.06l20.7,51.6-4.31,14.95c-13.35,5.23-26.7,10.49-40.05,15.73l23.65-82.28ZM90.97,79.89l33.69-13.22,18.35,45.75-16.28,56.64-35.76-89.16ZM167.91,49.76l40.62-15.92-33.75,118.45-40.71,15.99,33.83-118.52ZM162.24,44.77l-15.89,56.19-17.33-43.23-49.78,19.52-6.86,23.86-7.26-18.27-47.18,18.56,30.26,76.07,58.86-23.15,2.15-9.2,13.9,34.68c19.08-7.5,38.16-15,57.23-22.51L218.78,22.59l-56.54,22.17Z"
+              />
+            </clipPath>
+            <linearGradient
+              id="wl-grad"
+              x1="-3.37"
+              y1="522.99"
+              x2="-1.04"
+              y2="522.99"
+              gradientTransform="translate(308.35 45224.02) scale(86.28 -86.28)"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0" stop-color="#ed2290" />
+              <stop offset=".26" stop-color="#ee2439" />
+              <stop offset=".44" stop-color="#eb4031" />
+              <stop offset=".74" stop-color="#e87924" />
+              <stop offset=".93" stop-color="#fed401" />
+              <stop offset="1" stop-color="#fed401" />
+            </linearGradient>
+            <clipPath id="wl-clip-text">
+              <rect x="17.94" y="15.8" width="556.25" height="168.26" />
+            </clipPath>
+          </defs>
+          <g clip-path="url(#wl-clip-wmark)">
+            <rect x="17.94" y="22.59" width="200.84" height="157.21" fill="url(#wl-grad)" />
+          </g>
+          <g clip-path="url(#wl-clip-text)" fill="#ffffff">
+            <polygon
+              points="308.3 22.62 294.38 77.99 283.4 77.97 271.79 35.1 260.01 77.92 249.03 77.9 235.32 22.48 245.13 22.5 254.62 67.56 266.87 22.54 276.75 22.56 288.83 67.62 298.49 22.6 308.3 22.62"
+            />
+            <path
+              d="M352.17,58.25l-33.27-.07c.15,4.45,1.37,7.74,3.67,9.9,2.3,2.15,5.15,3.23,8.55,3.23,2.98,0,5.51-.75,7.58-2.26,2.07-1.51,3.34-3.52,3.82-6.03l9.57.02c-.58,3.03-1.79,5.72-3.63,8.08-1.84,2.35-4.22,4.19-7.15,5.52-2.93,1.33-6.2,1.99-9.81,1.98-4.19,0-7.88-.91-11.1-2.69-3.21-1.79-5.73-4.35-7.56-7.7-1.83-3.35-2.73-7.3-2.73-11.85,0-4.5.93-8.42,2.77-11.76,1.84-3.35,4.36-5.9,7.59-7.67,3.22-1.77,6.92-2.66,11.11-2.65,4.24,0,7.94.89,11.1,2.65,3.16,1.76,5.59,4.17,7.28,7.23,1.69,3.06,2.54,6.48,2.53,10.25,0,1.46-.11,2.74-.32,3.84M342.03,47.05c-1.07-1.91-2.53-3.33-4.39-4.25-1.86-.92-3.88-1.38-6.08-1.39-3.5,0-6.44,1.06-8.79,3.2-2.36,2.14-3.65,5.3-3.86,9.49l24.56.05c.11-2.82-.37-5.19-1.44-7.1"
+            />
+            <rect
+              x="336.57"
+              y="44.62"
+              width="58.06"
+              height="8.95"
+              transform="translate(315.8 414.6) rotate(-89.89)"
+            />
+            <path
+              d="M408.31,37.33c2.77,1.94,4.7,4.51,5.79,7.7l.05-24.87,9.02.02-.11,58.06-9.02-.02.02-10.04c-1.11,3.19-3.05,5.75-5.82,7.68-2.78,1.93-6.13,2.89-10.05,2.88-3.77,0-7.13-.9-10.08-2.69-2.95-1.79-5.26-4.35-6.93-7.7-1.67-3.35-2.5-7.3-2.49-11.85,0-4.5.85-8.42,2.53-11.76,1.68-3.34,4-5.9,6.96-7.67,2.96-1.77,6.32-2.66,10.09-2.65,3.92,0,7.27.98,10.04,2.92M391.46,46.05c-2.39,2.53-3.58,6.02-3.59,10.47,0,4.45,1.17,7.94,3.55,10.48,2.37,2.54,5.55,3.82,9.53,3.82,2.51,0,4.76-.58,6.75-1.75,1.99-1.17,3.56-2.83,4.72-4.97,1.15-2.14,1.74-4.65,1.74-7.53,0-2.83-.57-5.32-1.71-7.5-1.15-2.17-2.71-3.85-4.7-5.03-1.99-1.18-4.23-1.77-6.75-1.78-3.98,0-7.16,1.25-9.54,3.79"
+            />
+            <path
+              d="M270.95,144.83l-23.38-.05-4.26,12-9.57-.02,20.51-54.49,10.28.02,20.22,54.57-9.57-.02-4.21-12.01ZM268.45,137.92l-9.13-25.91-9.23,25.88,18.36.03Z"
+            />
+            <path
+              d="M329.78,113.71l-.08,43.23-9.02-.02.02-9.42c-1.1,3.19-3.02,5.66-5.74,7.4-2.73,1.75-5.89,2.62-9.5,2.61-5.02-.01-9.05-1.64-12.07-4.89-3.03-3.25-4.53-7.88-4.52-13.9l.05-25.11,8.95.02-.05,24.17c0,3.92.98,6.95,2.97,9.07,1.98,2.12,4.7,3.19,8.15,3.19,3.56,0,6.41-1.14,8.56-3.44,2.15-2.3,3.23-5.64,3.24-10.04l.04-22.91,9.02.02Z"
+            />
+            <path
+              d="M366.14,117.11c3.05,2.6,4.92,6.06,5.59,10.41l-8.47-.02c-.36-2.36-1.37-4.25-3.01-5.7-1.65-1.44-3.83-2.16-6.55-2.17-2.25,0-3.99.53-5.22,1.6-1.23,1.07-1.85,2.52-1.85,4.35,0,1.36.44,2.46,1.33,3.3.89.84,2,1.49,3.33,1.97,1.33.47,3.23,1,5.68,1.58,3.24.74,5.87,1.5,7.88,2.29,2.01.79,3.74,2.03,5.17,3.74,1.43,1.7,2.15,4.02,2.14,6.95,0,3.61-1.39,6.54-4.14,8.78-2.75,2.25-6.45,3.36-11.11,3.35-5.39-.01-9.74-1.28-13.06-3.79-3.32-2.52-5.31-6.02-5.98-10.53l8.71.02c.26,2.36,1.3,4.27,3.13,5.73,1.83,1.47,4.23,2.21,7.22,2.21,2.14,0,3.83-.55,5.06-1.68,1.23-1.12,1.85-2.55,1.85-4.27,0-1.52-.47-2.72-1.41-3.61-.94-.89-2.12-1.59-3.53-2.09-1.41-.5-3.35-1.01-5.8-1.54-3.14-.74-5.69-1.47-7.65-2.21-1.96-.74-3.63-1.93-5.01-3.58-1.39-1.65-2.07-3.89-2.07-6.72,0-3.66,1.39-6.63,4.14-8.9,2.75-2.27,6.56-3.4,11.42-3.39,5.07,0,9.14,1.31,12.2,3.91"
+            />
+            <path
+              d="M402.05,149.31v7.77s-5.51,0-5.51,0c-4.6,0-8.09-1.13-10.47-3.36-2.38-2.23-3.56-5.93-3.55-11.11l.04-21.19h-6.2s.01-7.62.01-7.62h6.2s.02-10.74.02-10.74l9.02.02-.02,10.75,10.44.02v7.61s-10.45-.02-10.45-.02l-.04,21.34c0,2.46.45,4.16,1.36,5.1.91.94,2.52,1.42,4.82,1.42h4.32Z"
+            />
+            <path
+              d="M425.74,115.66c2.72-1.64,5.86-2.46,9.42-2.45l-.02,9.73h-2.67c-3.92-.01-7.08.94-9.46,2.84-2.39,1.91-3.58,5.05-3.59,9.45l-.04,21.89-8.95-.02.08-43.23,8.95.02-.02,8.48c1.47-2.82,3.57-5.05,6.29-6.7"
+            />
+            <path
+              d="M469.21,116.33c2.77,1.94,4.72,4.51,5.87,7.7l.02-10.04,8.95.02-.08,43.23-8.95-.02.02-10.04c-1.16,3.19-3.13,5.75-5.9,7.68-2.78,1.93-6.13,2.89-10.05,2.88-3.77,0-7.13-.9-10.08-2.69-2.95-1.78-5.26-4.35-6.93-7.7-1.67-3.35-2.5-7.3-2.49-11.85,0-4.5.85-8.42,2.53-11.76,1.68-3.34,4-5.9,6.96-7.68,2.96-1.77,6.32-2.65,10.09-2.65,3.92,0,7.27.98,10.04,2.92M452.36,125.05c-2.39,2.53-3.58,6.02-3.59,10.47,0,4.45,1.17,7.94,3.55,10.48,2.37,2.54,5.55,3.82,9.53,3.82,2.51,0,4.76-.58,6.75-1.75,1.99-1.17,3.56-2.83,4.72-4.97,1.15-2.14,1.74-4.65,1.74-7.53,0-2.83-.57-5.32-1.71-7.5-1.15-2.17-2.71-3.85-4.7-5.03-1.99-1.18-4.23-1.77-6.74-1.78-3.98,0-7.16,1.25-9.54,3.79"
+            />
+            <rect
+              x="469.42"
+              y="123.76"
+              width="58.06"
+              height="8.95"
+              transform="translate(369.25 626.44) rotate(-89.89)"
+            />
+            <path
+              d="M513.34,97.74c1.05-.99,2.43-1.49,4.16-1.48,1.73,0,3.12.5,4.19,1.5,1.07,1,1.61,2.25,1.6,3.77,0,1.52-.54,2.74-1.62,3.68-1.07.94-2.47,1.41-4.2,1.4-1.73,0-3.11-.48-4.16-1.42-1.05-.95-1.56-2.17-1.56-3.69,0-1.52.53-2.77,1.58-3.76M521.94,114.08l-.08,43.23-8.95-.02.08-43.23,8.95.02Z"
+            />
+            <path
+              d="M559.36,116.51c2.77,1.94,4.72,4.51,5.87,7.7l.02-10.04,8.95.02-.08,43.23-8.95-.02.02-10.04c-1.16,3.19-3.12,5.75-5.9,7.68-2.78,1.93-6.13,2.89-10.05,2.88-3.77,0-7.13-.9-10.08-2.69-2.95-1.78-5.26-4.35-6.93-7.7-1.67-3.35-2.5-7.3-2.49-11.85,0-4.5.85-8.42,2.53-11.76,1.68-3.34,4-5.9,6.96-7.68,2.96-1.77,6.32-2.65,10.09-2.65,3.92,0,7.27.98,10.04,2.92M542.51,125.22c-2.39,2.53-3.58,6.02-3.59,10.47,0,4.45,1.17,7.94,3.55,10.48,2.37,2.54,5.55,3.82,9.53,3.82,2.51,0,4.76-.58,6.75-1.75,1.99-1.17,3.56-2.83,4.72-4.97,1.15-2.14,1.74-4.65,1.74-7.53,0-2.83-.57-5.32-1.71-7.5-1.15-2.17-2.71-3.85-4.7-5.03-1.99-1.18-4.23-1.77-6.74-1.78-3.98,0-7.16,1.25-9.54,3.79"
+            />
+          </g>
+        </svg>
+      </a>
+
+      {# Desktop primary navigation #}
+      <nav class="wa-primary-nav" id="wa-primary-nav" aria-label="Primary navigation">
+        <ul class="wa-primary-nav__list" role="list">
+          {% if has_primary_nav %} {% for item in primary_nav.children %}
+          {% set _item_url = item.url | default('#', true) %}
+          {% set _item_url_lower = _item_url | lower %}
+          {% set _item_is_absolute_url = 'http://' in _item_url_lower or 'https://' in _item_url_lower %}
+          {% set _item_is_internal_url = 'staging-441838610.weldaustralia.com' in _item_url_lower or '441838610.hs-sites-ap1.com' in _item_url_lower or 'weldaustralia.com.au' in _item_url_lower %}
+          {% if item.children %}
+          <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+            <button
+              class="wa-primary-nav__link wa-primary-nav__link--parent"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-controls="wa-dropdown-{{ loop.index }}"
+              type="button"
+            >
+              {{ item.label }}
+              <svg
+                class="wa-primary-nav__chevron"
+                xmlns="http://www.w3.org/2000/svg"
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            <ul
+              class="wa-nav-dropdown"
+              id="wa-dropdown-{{ loop.index }}"
+              role="list"
+              aria-label="{{ item.label }} submenu"
+            >
+              {% for child in item.children %}
+              {% set _child_label = child.label %}
+              {% set _child_url = child.url | default('#', true) %}
+              {% set _child_url_lower = _child_url | lower %}
+              {% set _child_is_absolute_url = 'http://' in _child_url_lower or 'https://' in _child_url_lower %}
+              {% set _child_is_internal_url = 'staging-441838610.weldaustralia.com' in _child_url_lower or '441838610.hs-sites-ap1.com' in _child_url_lower or 'weldaustralia.com.au' in _child_url_lower %}
+              <li class="wa-nav-dropdown__item">
+                <a
+                  href="{{ _child_url }}"
+                  class="wa-nav-dropdown__link{% if child.active_node %} is-active{% endif %}"
+                  {% if _child_is_absolute_url and not _child_is_internal_url %}target="_blank" rel="noopener noreferrer"{% endif %}
+                  {%
+                  if
+                  child.active_node
+                  %}aria-current="page"
+                  {%
+                  endif
+                  %}
+                  >{{ _child_label }}</a
+                >
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          {% else %}
+          <li class="wa-primary-nav__item">
+            <a
+              href="{{ _item_url }}"
+              class="wa-primary-nav__link{% if item.active_node %} is-active{% endif %}"
+              {% if _item_is_absolute_url and not _item_is_internal_url %}target="_blank" rel="noopener noreferrer"{% endif %}
+              {%
+              if
+              item.active_node
+              %}aria-current="page"
+              {%
+              endif
+              %}
+              >{{ item.label }}</a
+            >
+          </li>
+          {% endif %} {% endfor %} {% else %} {# @generated-header-menu:desktop:start #}
+          {# Generated by scripts/build.ts from config/header-menu.json. Do not edit directly. #}
+          <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+            <button class="wa-primary-nav__link wa-primary-nav__link--parent" aria-expanded="false" aria-haspopup="true" aria-controls="wa-dropdown-fallback-1" type="button">
+              Membership
+              <svg class="wa-primary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="wa-nav-dropdown" id="wa-dropdown-fallback-1" role="list" aria-label="Membership submenu">
+              <li class="wa-nav-dropdown__item">
+                <a href="/membership" class="wa-nav-dropdown__link wa-nav-dropdown__link--overview">Membership overview</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/membership#membership-individual" class="wa-nav-dropdown__link">Individual membership</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/membership#membership-corporate" class="wa-nav-dropdown__link">Corporate membership</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/membership#membership-supplier" class="wa-nav-dropdown__link">Industry supplier membership</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/membership" class="wa-nav-dropdown__link">Membership Options</a>
+              </li>
+            </ul>
+          </li>
+          <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+            <button class="wa-primary-nav__link wa-primary-nav__link--parent" aria-expanded="false" aria-haspopup="true" aria-controls="wa-dropdown-fallback-2" type="button">
+              Training
+              <svg class="wa-primary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="wa-nav-dropdown" id="wa-dropdown-fallback-2" role="list" aria-label="Training submenu">
+              <li class="wa-nav-dropdown__item">
+                <a href="/training" class="wa-nav-dropdown__link wa-nav-dropdown__link--overview">Training overview</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/courses" class="wa-nav-dropdown__link">Course timetable</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/courses?category=welding-inspection#all-courses" class="wa-nav-dropdown__link">Welding Inspection</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/courses?category=welding-supervision#all-courses" class="wa-nav-dropdown__link">Welding Supervision</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/courses?category=welding-coordination#all-courses" class="wa-nav-dropdown__link">Welding Coordination</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/courses?category=short-courses#all-courses" class="wa-nav-dropdown__link">Short Courses</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/courses/iwi-s" class="wa-nav-dropdown__link">IIW Inspector</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/courses/as1796-cert-10" class="wa-nav-dropdown__link">AS1796 Cert 10</a>
+              </li>
+            </ul>
+          </li>
+          <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+            <button class="wa-primary-nav__link wa-primary-nav__link--parent" aria-expanded="false" aria-haspopup="true" aria-controls="wa-dropdown-fallback-3" type="button">
+              Certification
+              <svg class="wa-primary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="wa-nav-dropdown" id="wa-dropdown-fallback-3" role="list" aria-label="Certification submenu">
+              <li class="wa-nav-dropdown__item">
+                <a href="/certification" class="wa-nav-dropdown__link">Certification Guidance</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/certification?pathway=welders" class="wa-nav-dropdown__link">Welders</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/certification?pathway=welding-supervisor" class="wa-nav-dropdown__link">Welding Supervisors</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/certification?pathway=iwi-s" class="wa-nav-dropdown__link">Welding Inspectors</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/certification?pathway=welding-coordinators" class="wa-nav-dropdown__link">Welding Coordinators</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/certification?pathway=iso-3834" class="wa-nav-dropdown__link">Company Certifications</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="https://aicip.org.au/" class="wa-nav-dropdown__link" target="_blank" rel="noopener noreferrer">AICIP</a>
+              </li>
+            </ul>
+          </li>
+          <li class="wa-primary-nav__item">
+            <a href="/engineering" class="wa-primary-nav__link">Engineering</a>
+          </li>
+          <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+            <button class="wa-primary-nav__link wa-primary-nav__link--parent" aria-expanded="false" aria-haspopup="true" aria-controls="wa-dropdown-fallback-5" type="button">
+              Events
+              <svg class="wa-primary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="wa-nav-dropdown" id="wa-dropdown-fallback-5" role="list" aria-label="Events submenu">
+              <li class="wa-nav-dropdown__item">
+                <a href="/events" class="wa-nav-dropdown__link">All Events</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/404/" class="wa-nav-dropdown__link">National Manufacturing Summit</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/events" class="wa-nav-dropdown__link">Webinars</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/events" class="wa-nav-dropdown__link">Committee events</a>
+              </li>
+            </ul>
+          </li>
+          <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+            <button class="wa-primary-nav__link wa-primary-nav__link--parent" aria-expanded="false" aria-haspopup="true" aria-controls="wa-dropdown-fallback-6" type="button">
+              Resources
+              <svg class="wa-primary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="wa-nav-dropdown" id="wa-dropdown-fallback-6" role="list" aria-label="Resources submenu">
+              <li class="wa-nav-dropdown__item">
+                <a href="/resources" class="wa-nav-dropdown__link">Technical Resources Hub</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/news#latest-articles" class="wa-nav-dropdown__link">News</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/news#magazine-connect" class="wa-nav-dropdown__link">Australian Welding magazine</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/news#magazine-connect" class="wa-nav-dropdown__link">Weld Connect newsletter</a>
+              </li>
+            </ul>
+          </li>
+          <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+            <button class="wa-primary-nav__link wa-primary-nav__link--parent" aria-expanded="false" aria-haspopup="true" aria-controls="wa-dropdown-fallback-7" type="button">
+              About
+              <svg class="wa-primary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="wa-nav-dropdown" id="wa-dropdown-fallback-7" role="list" aria-label="About submenu">
+              <li class="wa-nav-dropdown__item">
+                <a href="/advocacy" class="wa-nav-dropdown__link">Advocacy</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/about" class="wa-nav-dropdown__link">About Weld Australia</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/about#our-team" class="wa-nav-dropdown__link">Our team</a>
+              </li>
+              <li class="wa-nav-dropdown__item">
+                <a href="/contact-us" class="wa-nav-dropdown__link">Contact us</a>
+              </li>
+            </ul>
+          </li>
+{# @generated-header-menu:desktop:end #} {% endif %}
+        </ul>
+      </nav>
+
+      {# Nav bar actions #}
+      <div class="wa-nav-bar__actions">
+        {# Search toggle #} {% if module.show_search %}
+        <button
+          class="wa-nav-bar__action-btn wa-nav-bar__search-toggle"
+          type="button"
+          aria-label="Open site search"
+          aria-expanded="false"
+          aria-controls="wa-header-search"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+        {% endif %} {# Member login / dashboard CTA dropdown - desktop only #}
+        <div class="wa-nav-bar__member-menu">
+          <button
+            class="btn btn-gold wa-nav-bar__cta{% if _member_is_logged_in %} wa-nav-bar__cta--profile{% endif %}"
+            aria-haspopup="true"
+            aria-expanded="false"
+            type="button"
+          >
+            {% if _member_is_logged_in %}
+            <span class="wa-nav-bar__profile-icon" aria-hidden="true">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                focusable="false"
+              >
+                <circle cx="12" cy="7.5" r="3.5" />
+                <path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
+              </svg>
+            </span>
+            <span class="wa-nav-bar__profile-name">{{ _cta_label }}</span>
+            {% else %}
+            <span>{{ _cta_label }}</span>
+            {% endif %}
+            <svg
+              class="wa-nav-bar__cta-chevron"
+              xmlns="http://www.w3.org/2000/svg"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <ul class="wa-member-dropdown" role="list" aria-label="Member account links">
+            {% if _member_is_logged_in %}
+            <li class="wa-member-dropdown__item">
+              <a href="{{ _member_dashboard_url }}" class="wa-member-dropdown__link">Member dashboard</a>
+            </li>
+            <li class="wa-member-dropdown__item">
+              <a href="{{ _member_profile_url }}" class="wa-member-dropdown__link">My profile</a>
+            </li>
+            <li class="wa-member-dropdown__item">
+              <a href="/_hcms/mem/logout" class="wa-member-dropdown__link">Log out</a>
+            </li>
+            {% else %}
+            <li class="wa-member-dropdown__item">
+              <a href="{{ _member_login_url }}" class="wa-member-dropdown__link">Weld Australia Portal</a>
+            </li>
+            <li class="wa-member-dropdown__item">
+              <a href="https://app.weldq.com/student/login" class="wa-member-dropdown__link"
+                >AWCR WeldQ Portal</a
+              >
+            </li>
+            <li class="wa-member-dropdown__item">
+              <a href="https://weldtraining.online/" class="wa-member-dropdown__link"
+                >Training Portal</a
+              >
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+
+        {# Hamburger - tablet/mobile only #}
+        <button
+          class="wa-hamburger"
+          id="wa-hamburger"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+          aria-controls="wa-mobile-nav"
+          type="button"
+        >
+          <span class="wa-hamburger__line" aria-hidden="true"></span>
+          <span class="wa-hamburger__line" aria-hidden="true"></span>
+          <span class="wa-hamburger__line" aria-hidden="true"></span>
+          <span class="sr-only">Menu</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {# ── Mobile nav overlay ───────────────────────────────────────────────── #}
+  {% if module.show_search %}
+  <div
+    class="wa-header-search"
+    id="wa-header-search"
+    aria-label="Site search"
+    hidden
+  >
+    <div class="wa-header-search__inner">
+      <form
+        class="wa-header-search__form"
+        action="/hs-search-results"
+        method="get"
+        role="search"
+        aria-label="Search the Weld Australia website"
+      >
+        <label class="sr-only" for="wa-header-search-input">Search Weld Australia</label>
+        <input
+          class="wa-header-search__input"
+          id="wa-header-search-input"
+          type="search"
+          name="term"
+          placeholder="Search courses, events, membership, resources..."
+          autocomplete="off"
+        >
+        <button class="wa-header-search__submit" type="submit">Search</button>
+        <button
+          class="wa-header-search__close"
+          type="button"
+          aria-label="Close site search"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <div
+    class="wa-mobile-nav"
+    id="wa-mobile-nav"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Navigation menu"
+    hidden
+    inert
+  >
+    {# Full-width login CTA #}
+    <div class="wa-mobile-nav__cta-row">
+      <button
+        class="btn btn-gold wa-mobile-nav__cta{% if _member_is_logged_in %} wa-mobile-nav__cta--profile{% endif %}"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="wa-mobile-member-links"
+        type="button"
+      >
+        {% if _member_is_logged_in %}
+        <span class="wa-nav-bar__profile-icon" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            focusable="false"
+          >
+            <circle cx="12" cy="7.5" r="3.5" />
+            <path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
+          </svg>
+        </span>
+        <span class="wa-nav-bar__profile-name">{{ _cta_label }}</span>
+        {% else %}
+        <span>{{ _cta_label }}</span>
+        {% endif %}
+        <svg
+          class="wa-mobile-nav__cta-chevron"
+          xmlns="http://www.w3.org/2000/svg"
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      <ul
+        class="wa-mobile-nav__member-list"
+        id="wa-mobile-member-links"
+        role="list"
+        aria-label="Member account links"
+        hidden
+      >
+        {% if _member_is_logged_in %}
+        <li>
+          <a href="{{ _member_dashboard_url }}" class="wa-mobile-nav__member-link">Member dashboard</a>
+        </li>
+        <li>
+          <a href="{{ _member_profile_url }}" class="wa-mobile-nav__member-link">My profile</a>
+        </li>
+        <li>
+          <a href="/_hcms/mem/logout" class="wa-mobile-nav__member-link">Log out</a>
+        </li>
+        {% else %}
+        <li>
+          <a href="{{ _member_login_url }}" class="wa-mobile-nav__member-link">Weld Australia Portal</a>
+        </li>
+        <li>
+          <a href="https://app.weldq.com/student/login" class="wa-mobile-nav__member-link"
+            >AWCR WeldQ Portal</a
+          >
+        </li>
+        <li>
+          <a href="https://weldtraining.online/" class="wa-mobile-nav__member-link"
+            >Training Portal</a
+          >
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+
+    {# Nav list #}
+    <nav aria-label="Mobile navigation">
+      <ul class="wa-mobile-nav__list" role="list">
+        {% if has_primary_nav %} {% for item in primary_nav.children %}
+        {% set _item_url = item.url | default('#', true) %}
+        {% set _item_url_lower = _item_url | lower %}
+        {% set _item_is_absolute_url = 'http://' in _item_url_lower or 'https://' in _item_url_lower %}
+        {% set _item_is_internal_url = 'staging-441838610.weldaustralia.com' in _item_url_lower or '441838610.hs-sites-ap1.com' in _item_url_lower or 'weldaustralia.com.au' in _item_url_lower %}
+        {% if item.children %}
+        <li class="wa-mobile-nav__item wa-mobile-nav__item--has-children">
+          <button
+            class="wa-mobile-nav__parent-btn"
+            aria-expanded="false"
+            aria-controls="wa-mobile-sub-{{ loop.index }}"
+            type="button"
+          >
+            {{ item.label }}
+            <svg
+              class="wa-mobile-nav__chevron"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <ul class="wa-mobile-nav__sub" id="wa-mobile-sub-{{ loop.index }}" role="list" hidden>
+            {% for child in item.children %}
+            {% set _child_label = child.label %}
+            {% set _child_url = child.url | default('#', true) %}
+            {% set _child_url_lower = _child_url | lower %}
+            {% set _child_is_absolute_url = 'http://' in _child_url_lower or 'https://' in _child_url_lower %}
+            {% set _child_is_internal_url = 'staging-441838610.weldaustralia.com' in _child_url_lower or '441838610.hs-sites-ap1.com' in _child_url_lower or 'weldaustralia.com.au' in _child_url_lower %}
+            <li>
+              <a
+                href="{{ _child_url }}"
+                class="wa-mobile-nav__sub-link{% if child.active_node %} is-active{% endif %}"
+                {% if _child_is_absolute_url and not _child_is_internal_url %}target="_blank" rel="noopener noreferrer"{% endif %}
+                {%
+                if
+                child.active_node
+                %}aria-current="page"
+                {%
+                endif
+                %}
+                >{{ _child_label }}</a
+              >
+            </li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% else %}
+        <li class="wa-mobile-nav__item">
+          <a
+            href="{{ _item_url }}"
+            class="wa-mobile-nav__link{% if item.active_node %} is-active{% endif %}"
+            {% if _item_is_absolute_url and not _item_is_internal_url %}target="_blank" rel="noopener noreferrer"{% endif %}
+            {%
+            if
+            item.active_node
+            %}aria-current="page"
+            {%
+            endif
+            %}
+            >{{ item.label }}</a
+          >
+        </li>
+        {% endif %} {% endfor %} {% else %} {# @generated-header-menu:mobile:start #}
+        {# Generated by scripts/build.ts from config/header-menu.json. Do not edit directly. #}
+        <li class="wa-mobile-nav__item wa-mobile-nav__item--has-children">
+          <button class="wa-mobile-nav__parent-btn" aria-expanded="false" aria-controls="wa-mobile-sub-fallback-1" type="button">
+            Membership
+            <svg class="wa-mobile-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="wa-mobile-nav__sub" id="wa-mobile-sub-fallback-1" role="list" hidden>
+              <li>
+                <a href="/membership" class="wa-mobile-nav__sub-link wa-mobile-nav__sub-link--overview">Membership overview</a>
+              </li>
+              <li>
+                <a href="/membership#membership-individual" class="wa-mobile-nav__sub-link">Individual membership</a>
+              </li>
+              <li>
+                <a href="/membership#membership-corporate" class="wa-mobile-nav__sub-link">Corporate membership</a>
+              </li>
+              <li>
+                <a href="/membership#membership-supplier" class="wa-mobile-nav__sub-link">Industry supplier membership</a>
+              </li>
+              <li>
+                <a href="/membership" class="wa-mobile-nav__sub-link">Membership Options</a>
+              </li>
+          </ul>
+        </li>
+        <li class="wa-mobile-nav__item wa-mobile-nav__item--has-children">
+          <button class="wa-mobile-nav__parent-btn" aria-expanded="false" aria-controls="wa-mobile-sub-fallback-2" type="button">
+            Training
+            <svg class="wa-mobile-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="wa-mobile-nav__sub" id="wa-mobile-sub-fallback-2" role="list" hidden>
+              <li>
+                <a href="/training" class="wa-mobile-nav__sub-link wa-mobile-nav__sub-link--overview">Training overview</a>
+              </li>
+              <li>
+                <a href="/courses" class="wa-mobile-nav__sub-link">Course timetable</a>
+              </li>
+              <li>
+                <a href="/courses?category=welding-inspection#all-courses" class="wa-mobile-nav__sub-link">Welding Inspection</a>
+              </li>
+              <li>
+                <a href="/courses?category=welding-supervision#all-courses" class="wa-mobile-nav__sub-link">Welding Supervision</a>
+              </li>
+              <li>
+                <a href="/courses?category=welding-coordination#all-courses" class="wa-mobile-nav__sub-link">Welding Coordination</a>
+              </li>
+              <li>
+                <a href="/courses?category=short-courses#all-courses" class="wa-mobile-nav__sub-link">Short Courses</a>
+              </li>
+              <li>
+                <a href="/courses/iwi-s" class="wa-mobile-nav__sub-link">IIW Inspector</a>
+              </li>
+              <li>
+                <a href="/courses/as1796-cert-10" class="wa-mobile-nav__sub-link">AS1796 Cert 10</a>
+              </li>
+          </ul>
+        </li>
+        <li class="wa-mobile-nav__item wa-mobile-nav__item--has-children">
+          <button class="wa-mobile-nav__parent-btn" aria-expanded="false" aria-controls="wa-mobile-sub-fallback-3" type="button">
+            Certification
+            <svg class="wa-mobile-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="wa-mobile-nav__sub" id="wa-mobile-sub-fallback-3" role="list" hidden>
+              <li>
+                <a href="/certification" class="wa-mobile-nav__sub-link">Certification Guidance</a>
+              </li>
+              <li>
+                <a href="/certification?pathway=welders" class="wa-mobile-nav__sub-link">Welders</a>
+              </li>
+              <li>
+                <a href="/certification?pathway=welding-supervisor" class="wa-mobile-nav__sub-link">Welding Supervisors</a>
+              </li>
+              <li>
+                <a href="/certification?pathway=iwi-s" class="wa-mobile-nav__sub-link">Welding Inspectors</a>
+              </li>
+              <li>
+                <a href="/certification?pathway=welding-coordinators" class="wa-mobile-nav__sub-link">Welding Coordinators</a>
+              </li>
+              <li>
+                <a href="/certification?pathway=iso-3834" class="wa-mobile-nav__sub-link">Company Certifications</a>
+              </li>
+              <li>
+                <a href="https://aicip.org.au/" class="wa-mobile-nav__sub-link" target="_blank" rel="noopener noreferrer">AICIP</a>
+              </li>
+          </ul>
+        </li>
+        <li class="wa-mobile-nav__item">
+          <a href="/engineering" class="wa-mobile-nav__link">Engineering</a>
+        </li>
+        <li class="wa-mobile-nav__item wa-mobile-nav__item--has-children">
+          <button class="wa-mobile-nav__parent-btn" aria-expanded="false" aria-controls="wa-mobile-sub-fallback-5" type="button">
+            Events
+            <svg class="wa-mobile-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="wa-mobile-nav__sub" id="wa-mobile-sub-fallback-5" role="list" hidden>
+              <li>
+                <a href="/events" class="wa-mobile-nav__sub-link">All Events</a>
+              </li>
+              <li>
+                <a href="/404/" class="wa-mobile-nav__sub-link">National Manufacturing Summit</a>
+              </li>
+              <li>
+                <a href="/events" class="wa-mobile-nav__sub-link">Webinars</a>
+              </li>
+              <li>
+                <a href="/events" class="wa-mobile-nav__sub-link">Committee events</a>
+              </li>
+          </ul>
+        </li>
+        <li class="wa-mobile-nav__item wa-mobile-nav__item--has-children">
+          <button class="wa-mobile-nav__parent-btn" aria-expanded="false" aria-controls="wa-mobile-sub-fallback-6" type="button">
+            Resources
+            <svg class="wa-mobile-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="wa-mobile-nav__sub" id="wa-mobile-sub-fallback-6" role="list" hidden>
+              <li>
+                <a href="/resources" class="wa-mobile-nav__sub-link">Technical Resources Hub</a>
+              </li>
+              <li>
+                <a href="/news#latest-articles" class="wa-mobile-nav__sub-link">News</a>
+              </li>
+              <li>
+                <a href="/news#magazine-connect" class="wa-mobile-nav__sub-link">Australian Welding magazine</a>
+              </li>
+              <li>
+                <a href="/news#magazine-connect" class="wa-mobile-nav__sub-link">Weld Connect newsletter</a>
+              </li>
+          </ul>
+        </li>
+        <li class="wa-mobile-nav__item wa-mobile-nav__item--has-children">
+          <button class="wa-mobile-nav__parent-btn" aria-expanded="false" aria-controls="wa-mobile-sub-fallback-7" type="button">
+            About
+            <svg class="wa-mobile-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="wa-mobile-nav__sub" id="wa-mobile-sub-fallback-7" role="list" hidden>
+              <li>
+                <a href="/advocacy" class="wa-mobile-nav__sub-link">Advocacy</a>
+              </li>
+              <li>
+                <a href="/about" class="wa-mobile-nav__sub-link">About Weld Australia</a>
+              </li>
+              <li>
+                <a href="/about#our-team" class="wa-mobile-nav__sub-link">Our team</a>
+              </li>
+              <li>
+                <a href="/contact-us" class="wa-mobile-nav__sub-link">Contact us</a>
+              </li>
+          </ul>
+        </li>
+{# @generated-header-menu:mobile:end #} {% endif %}
+      </ul>
+    </nav>
+
+    {# Contact details at bottom of mobile nav #} {% if module.phone_number or module.email %}
+    <div class="wa-mobile-nav__contact">
+      {% if module.phone_number %}
+      <a
+        href="tel:{{ module.phone_number | replace(' ', '') }}"
+        class="wa-mobile-nav__contact-link"
+      >
+        {{ module.phone_number }}
+      </a>
+      {% endif %} {% if module.email %}
+      <a href="mailto:{{ module.email }}" class="wa-mobile-nav__contact-link">
+        {{ module.email }}
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</header>

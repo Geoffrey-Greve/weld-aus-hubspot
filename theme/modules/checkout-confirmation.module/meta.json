@@ -1,0 +1,14 @@
+{
+  "label": "Checkout Confirmation",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Displays the post-payment confirmation receipt. Place on the checkout-confirmation.html page template. Reads receipt data from sessionStorage (written by the Checkout Tunnel island before payment redirect). Shows course summary, calendar download buttons (.ics / Google), Zoom join link, and an editor-configured next-step CTA.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["checkout", "confirmation", "react-island", "portal"]
+}

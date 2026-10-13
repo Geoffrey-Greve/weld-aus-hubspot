@@ -1,0 +1,559 @@
+/*
+ * testimonial-slider.module/module.css
+ * MTestimonials - spotlight (sidebar selector) + grid (card) layouts.
+ * Interaction is handled entirely in module.js.
+ */
+
+/* ── Section header ────────────────────────────────────────────────────────── */
+
+.wa-testimonials__header {
+  margin-bottom: var(--wa-space-10);
+  text-align: left;
+}
+
+.wa-testimonials__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-extrabold);
+  color: var(--wa-color-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.wa-testimonials__heading--light {
+  color: var(--wa-color-on-primary);
+}
+
+/* ── Shared: avatar ────────────────────────────────────────────────────────── */
+
+.wa-testimonials__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.wa-testimonials__avatar--sm {
+  width: 44px;
+  height: 44px;
+}
+
+.wa-testimonials__avatar-init {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--wa-color-primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.wa-testimonials__avatar-init--sm {
+  width: 44px;
+  height: 44px;
+}
+
+/* ── Shared: author row ────────────────────────────────────────────────────── */
+
+.wa-testimonials__author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wa-testimonials__author-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-testimonials__author-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--wa-color-primary);
+  line-height: 1.3;
+}
+
+.wa-testimonials__author-sub {
+  font-size: 13px;
+  color: var(--wa-color-text-muted);
+  line-height: 1.4;
+}
+
+/* ── Shared: quote text ────────────────────────────────────────────────────── */
+
+.wa-testimonials__quote {
+  font-family: var(--wa-font-body);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--wa-color-primary);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  margin: 0 0 24px;
+  quotes: none;
+}
+
+.wa-testimonials__quote p {
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SPOTLIGHT LAYOUT
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.wa-testimonials__trusted-marquee {
+  width: 100%;
+  overflow: hidden;
+  margin: -12px 0 48px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.wa-testimonials__trusted-track {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: max-content;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  animation: wa-testimonials-trusted-marquee 30s linear infinite;
+}
+
+.wa-testimonials__trusted-marquee:hover .wa-testimonials__trusted-track {
+  animation-play-state: paused;
+}
+
+.wa-testimonials__trusted-card {
+  flex: 0 0 auto;
+  min-width: 118px;
+  min-height: 62px;
+  padding: 0 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(15, 16, 48, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  color: rgba(15, 16, 48, 0.72);
+  box-shadow: 0 10px 28px rgba(15, 16, 48, 0.04);
+  font-family: var(--wa-font-body);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+@keyframes wa-testimonials-trusted-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.wa-testimonials--spotlight .wa-testimonials__spotlight {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-6);
+  align-items: start;
+}
+
+/* Desktop: 220px sidebar + flex right panel */
+@media (min-width: 1024px) {
+  .wa-testimonials--spotlight .wa-testimonials__spotlight {
+    grid-template-columns: 220px 1fr;
+    grid-template-rows: auto auto;
+    gap: 0 var(--wa-space-12);
+  }
+
+  /* Dot chips hidden at desktop */
+  .wa-testimonials--spotlight .wa-testimonials__dots {
+    display: none;
+  }
+}
+
+/* Tablet: sidebar renders as horizontal flex-wrap row */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .wa-testimonials--spotlight .wa-testimonials__sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .wa-testimonials--spotlight .wa-testimonials__selector {
+    width: auto;
+    flex: 0 0 auto;
+  }
+}
+
+/* ── Sidebar selector buttons ──────────────────────────────────────────────── */
+
+.wa-testimonials__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wa-testimonials__selector {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 11px 14px;
+  background: transparent;
+  border: 1px solid var(--wa-color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  min-height: var(--wa-touch-min);
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  color: var(--wa-color-text);
+}
+
+.wa-testimonials__selector:hover {
+  background-color: var(--wa-color-surface-alt, #f5f5f5);
+  border-color: var(--wa-color-primary);
+}
+
+.wa-testimonials__selector:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+}
+
+.wa-testimonials__selector.is-active {
+  background-color: var(--wa-color-primary);
+  border-color: var(--wa-color-primary);
+  color: #fff;
+}
+
+.wa-testimonials__sel-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  display: block;
+}
+
+.wa-testimonials__sel-company {
+  font-size: 12px;
+  opacity: 0.75;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Active overrides for text inside active button */
+.wa-testimonials__selector.is-active .wa-testimonials__sel-name,
+.wa-testimonials__selector.is-active .wa-testimonials__sel-company {
+  color: #fff;
+  opacity: 1;
+}
+
+/* ── Panels container ──────────────────────────────────────────────────────── */
+
+.wa-testimonials__panels {
+  position: relative;
+  min-height: 200px;
+  /* Stack all panels in a single grid cell so the wrapper always sizes to the
+     tallest quote. This keeps the section height constant when swapping
+     testimonials, preventing the layout shift (esp. on mobile). */
+  display: grid;
+}
+
+/* ── Individual panels ─────────────────────────────────────────────────────── */
+
+.wa-testimonials__panel {
+  /* Every panel occupies the same cell but stays in flow, so the container
+     height is driven by the tallest panel - not just the active one. */
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.wa-testimonials__panel.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  animation: wa-test-fade 220ms ease both;
+}
+
+@keyframes wa-test-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Decorative quotemark (spotlight) ─────────────────────────────────────── */
+
+.wa-testimonials__quotemark {
+  display: block;
+  width: 48px;
+  height: auto;
+  color: var(--wa-color-accent, #fecf05);
+  opacity: 0.42;
+  margin-bottom: 16px;
+}
+
+/* ── Quote size override for spotlight ────────────────────────────────────── */
+
+.wa-testimonials--spotlight .wa-testimonials__quote {
+  font-size: 17px;
+}
+
+@media (min-width: 1024px) {
+  .wa-testimonials--spotlight .wa-testimonials__quote {
+    font-size: 24px;
+    line-height: 1.45;
+  }
+}
+
+/* ── Dot chips (mobile only for spotlight) ─────────────────────────────────── */
+
+.wa-testimonials__dots {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* Place dots in their own row below the panels on mobile (spanning both columns on desktop is handled by hiding) */
+@media (min-width: 1024px) {
+  .wa-testimonials--spotlight .wa-testimonials__dots {
+    display: none;
+  }
+}
+
+.wa-testimonials__dot {
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  min-height: 10px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--wa-color-border);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+  position: relative;
+}
+
+/* Expand hit area for touch without changing visual size */
+.wa-testimonials__dot::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+}
+
+.wa-testimonials__dot.is-active {
+  background-color: var(--wa-color-primary);
+  border-color: var(--wa-color-primary);
+}
+
+.wa-testimonials__dot:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 3px;
+}
+
+/* ── Mobile: hide sidebar, show only active panel + dots ──────────────────── */
+
+@media (max-width: 767px) {
+  .wa-testimonials--spotlight .wa-testimonials__sidebar {
+    display: none;
+  }
+
+  .wa-testimonials--spotlight .wa-testimonials__spotlight {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   GRID LAYOUT
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.wa-testimonials__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .wa-testimonials__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-testimonials__grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  }
+}
+
+/* ── Grid card ─────────────────────────────────────────────────────────────── */
+
+.wa-testimonials__card {
+  background-color: var(--wa-color-surface, #fff);
+  border: 1px solid var(--wa-color-border);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: var(--wa-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Grid: opening quotemark character ─────────────────────────────────────── */
+
+.wa-testimonials__card-quote-char {
+  display: block;
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--wa-color-tier-gold, #c9a400);
+  margin-bottom: 8px;
+  font-family: var(--wa-font-heading);
+}
+
+/* ── Grid: separator line ──────────────────────────────────────────────────── */
+
+.wa-testimonials__card-rule {
+  border: none;
+  border-top: 1px solid var(--wa-color-border);
+  margin: 20px 0;
+}
+
+/* ── Grid: quote text ──────────────────────────────────────────────────────── */
+
+.wa-testimonials--grid .wa-testimonials__quote {
+  font-size: 15px;
+  font-weight: 800;
+  flex: 1;
+}
+
+/* ── Tier badge ────────────────────────────────────────────────────────────── */
+
+.wa-testimonials__tier-badge {
+  flex-shrink: 0;
+  align-self: center;
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: var(--wa-text-xs); /* 12px - WCAG 1.4.4 (was 11px) */
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.wa-testimonials__tier-badge--gold {
+  background-color: #fffbe6;
+  color: #5c3d00;
+  border-color: #c9a400;
+}
+
+.wa-testimonials__tier-badge--silver {
+  background-color: #f5f5f5;
+  color: #444;
+  border-color: #a0a0a0;
+}
+
+.wa-testimonials__tier-badge--bronze {
+  background-color: #faf0e6;
+  color: #5c2d00;
+  border-color: #b27330;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   DARK BACKGROUND OVERRIDES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Quote text on dark bg */
+.wa-section--bg-primary .wa-testimonials__quote,
+.wa-section--bg-primary_dark .wa-testimonials__quote {
+  color: #fff;
+}
+
+/* Author name on dark bg */
+.wa-section--bg-primary .wa-testimonials__author-name,
+.wa-section--bg-primary_dark .wa-testimonials__author-name {
+  color: #fff;
+}
+
+/* Author sub on dark bg */
+.wa-section--bg-primary .wa-testimonials__author-sub,
+.wa-section--bg-primary_dark .wa-testimonials__author-sub {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Selector buttons on dark bg - active state uses gold instead of navy */
+.wa-section--bg-primary .wa-testimonials__selector,
+.wa-section--bg-primary_dark .wa-testimonials__selector {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.wa-section--bg-primary .wa-testimonials__selector:hover,
+.wa-section--bg-primary_dark .wa-testimonials__selector:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--wa-color-tier-gold, #c9a400);
+}
+
+.wa-section--bg-primary .wa-testimonials__selector.is-active,
+.wa-section--bg-primary_dark .wa-testimonials__selector.is-active {
+  background-color: var(--wa-color-tier-gold, #c9a400);
+  border-color: var(--wa-color-tier-gold, #c9a400);
+  color: #1a1a1a;
+}
+
+.wa-section--bg-primary .wa-testimonials__selector.is-active .wa-testimonials__sel-name,
+.wa-section--bg-primary .wa-testimonials__selector.is-active .wa-testimonials__sel-company,
+.wa-section--bg-primary_dark .wa-testimonials__selector.is-active .wa-testimonials__sel-name,
+.wa-section--bg-primary_dark .wa-testimonials__selector.is-active .wa-testimonials__sel-company {
+  color: #1a1a1a;
+}
+
+/* Dot chips on dark bg */
+.wa-section--bg-primary .wa-testimonials__dot,
+.wa-section--bg-primary_dark .wa-testimonials__dot {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.wa-section--bg-primary .wa-testimonials__dot.is-active,
+.wa-section--bg-primary_dark .wa-testimonials__dot.is-active {
+  background-color: #fff;
+  border-color: #fff;
+}
+
+/* Grid cards on dark bg */
+.wa-section--bg-primary .wa-testimonials__card,
+.wa-section--bg-primary_dark .wa-testimonials__card {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.wa-section--bg-primary .wa-testimonials__card-rule,
+.wa-section--bg-primary_dark .wa-testimonials__card-rule {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Avatar initials on dark bg */
+.wa-section--bg-primary .wa-testimonials__avatar-init,
+.wa-section--bg-primary_dark .wa-testimonials__avatar-init {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}

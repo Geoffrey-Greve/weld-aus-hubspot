@@ -1,0 +1,14 @@
+{
+  "label": "Course Timetable Filter",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "React island - full filterable course timetable for /courses/. Reads all sessions from HubDB Table 1 (courses), then filters by Category, Location, and Date client-side. Shows a sortable table on desktop and stacked cards on mobile. Falls back to an EOI form when no sessions match the active filters.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["course", "timetable", "react-island", "hubdb", "interactive", "filterable"]
+}

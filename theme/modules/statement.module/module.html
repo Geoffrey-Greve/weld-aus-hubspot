@@ -1,0 +1,58 @@
+{#
+  statement.module/module.html
+  Full-bleed background image with overlaid statement/pull-quote text.
+#}
+
+{%- set _sp       = module.spacing         | default('spacious') -%}
+{%- set _pos      = module.overlay_position | default('left') -%}
+{%- set _opacity  = module.overlay_opacity  | default(55) -%}
+{%- set _vis      = module.visibility       | default(['mobile','tablet','desktop']) -%}
+{%- set _has_bg   = module.background_image and module.background_image.src -%}
+
+{%- set _section_classes = 'wa-statement wa-section wa-section--spacing-' ~ _sp -%}
+{%- if 'mobile'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+<section
+  class="{{ _section_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  {% if _has_bg %}style="--_bg-url: url('{{ module.background_image.src }}'); --_overlay: {{ _opacity }}%;"{% endif %}
+>
+  {% if _has_bg %}
+  <img
+    src="{{ module.background_image.src }}"
+    alt=""
+    class="wa-statement__bg-img"
+    aria-hidden="true"
+    loading="lazy"
+    decoding="async"
+    {% if module.background_image.width %}width="{{ module.background_image.width }}"{% endif %}
+    {% if module.background_image.height %}height="{{ module.background_image.height }}"{% endif %}
+  >
+  <div class="wa-statement__overlay" aria-hidden="true"></div>
+  {% endif %}
+
+  <div class="container">
+    <div class="wa-statement__content wa-statement__content--{{ _pos }}">
+
+      {% if module.overline %}
+      <div class="wa-overline wa-overline--light">
+        <span class="wa-overline__text">{{ module.overline }}</span>
+      </div>
+      {% endif %}
+
+      {% if module.statement %}
+      <blockquote class="wa-statement__text">
+        <p>{{ module.statement }}</p>
+        {% if module.attribution %}
+        <footer class="wa-statement__attribution">
+          <cite>{{ module.attribution }}</cite>
+        </footer>
+        {% endif %}
+      </blockquote>
+      {% endif %}
+
+    </div>
+  </div>
+</section>

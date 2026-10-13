@@ -1,0 +1,159 @@
+[
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text"
+  },
+  {
+    "name": "body_text",
+    "label": "Body",
+    "type": "richtext",
+    "required": true,
+    "default": ""
+  },
+  {
+    "name": "image",
+    "label": "Image",
+    "type": "image"
+  },
+  {
+    "name": "image_position",
+    "label": "Image position",
+    "type": "choice",
+    "choices": [
+      [
+        "left",
+        "Left"
+      ],
+      [
+        "right",
+        "Right"
+      ]
+    ],
+    "default": "right"
+  },
+  {
+    "name": "callout",
+    "label": "Callout chip (optional)",
+    "type": "group",
+    "help_text": "A small badge row shown between the body and the CTA - e.g. a partner/accreditation logo with a label.",
+    "children": [
+      {
+        "name": "logo",
+        "label": "Logo",
+        "type": "image"
+      },
+      {
+        "name": "eyebrow",
+        "label": "Eyebrow",
+        "type": "text",
+        "help_text": "Small uppercase line above the title.",
+        "default": ""
+      },
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA label",
+    "type": "text"
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA link",
+    "type": "link"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

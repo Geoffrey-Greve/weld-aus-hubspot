@@ -1,0 +1,387 @@
+<!--
+  templateType: page
+  label: Events
+  isAvailableForNewContent: true
+-->
+{#
+  events.html - Events listing + dynamic event detail router
+  URL: /events/ and /events/{slug}
+
+  When this page is configured as a HubDB dynamic page for the `events` table:
+  - /events/ renders the normal listing
+  - /events/{hs_path} renders the selected event detail
+#}
+{% import "../partials/session-status.html" as wa_status %}
+{% set _event_row = dynamic_page_hubdb_row %}
+{% set _events_listing_title = 'Upcoming Welding Events & Networking' %}
+{% set _events_listing_description = "Find upcoming Weld Australia events - webinars, workshops, industry awards evenings and networking events for Australia's welding community." %}
+{% if _event_row %}
+  {% set page_title = _event_row.event_name | default('Event', true) %}
+  {% if _event_row.event_description %}
+    {% set page_description = _event_row.event_description | striptags | truncate(160) %}
+  {% else %}
+    {% set page_description = 'Register for ' ~ (_event_row.event_name | default('this Weld Australia event', true)) ~ '.' %}
+  {% endif %}
+{% else %}
+  {% set page_title = _events_listing_title %}
+  {% set page_description = _events_listing_description %}
+{% endif %}
+
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+{% if _event_row %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/event-detail.css') }}">
+<style>
+  /* WCAG fallback: overrides stale generated event-detail CSS until HubSpot page cache refreshes. */
+  .wa-event-detail__section-kicker {
+    color: var(--wa-color-magenta-text, #c00d74) !important;
+  }
+</style>
+<link rel="stylesheet" href="{{ get_asset_url('../../modules/hero.module/module.css') }}">
+<script src="{{ get_asset_url('../../assets/js/event-availability.js') }}" defer></script>
+{% if _event_row.event_image and _event_row.event_image.url %}
+<meta property="og:image" content="{{ _event_row.event_image.url }}">
+<meta property="og:image:alt" content="{{ _event_row.event_name | default('') | escape }}">
+{% endif %}
+{% else %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/events-landing.css') }}">
+{% endif %}
+{% endblock %}
+
+{% block body %}
+{% if _event_row %}
+{% set _is_members_only = _event_row.is_members_only | default(false) %}
+{% set _mem_status = request_contact.individual_membership_status | default('') %}
+{% set _contact_is_active = request_contact.is_logged_in and _mem_status != '' and (_mem_status not in ['Pending','Lapsed','Cancelled','Expired','Non-member','Non Member']) %}
+{% set _use_engine = _event_row.use_event_engine | default(false) %}
+{% set _engine_allowed = (not _is_members_only) or _contact_is_active %}
+
+{# Ref 74c Phase 3: the row's own status, through the shared vocabulary. Blank - every row
+   until the column exists - resolves to 'available', so this is inert until then. #}
+{% set _status_key = wa_status.status_of(_event_row.status.name | default('')) | trim %}
+{% set _status_slug = wa_status.status_slug(_status_key) | trim %}
+{% set _status_label = wa_status.status_label(_status_key) | trim %}
+{% set _status_bookable = wa_status.status_is_bookable(_status_key) | trim == 'true' %}
+
+{% set _show_engine = _use_engine and _engine_allowed and _status_bookable %}
+
+{# Event Engine Worker connection for the advisory availability badge. Declared once
+   here (mirrors events-listing.module and event-detail.html) so one surface is one edit.
+   The registration function itself reads its Worker config from the checkout-tunnel
+   module fields on /checkout/ - this only powers the "places left" badge. #}
+{# `event-engine` IS the live Worker. It launched as `event-engine-staging`
+   and was RENAMED, so that hostname no longer resolves: anything still pointing
+   at it takes checkout down. See theme/fields.json -> integrations. #}
+{% set _event_engine_worker_base_url = theme.integrations.event_engine_worker_base_url | default('https://event-engine.refuel-creative.workers.dev', true) %}
+{% set _event_engine_portal_id = hub_id | string %}
+
+{% set _event_type_label = 'Weld Australia event' %}
+{% if _event_row.event_type and _event_row.event_type.name %}
+  {% set _event_type_label = _event_row.event_type.name %}
+{% endif %}
+
+{% set _event_summary = _event_row.tagline | default('', true) %}
+{% if not _event_summary and _event_row.event_description %}
+  {% set _event_summary = _event_row.event_description | striptags | truncate(180) %}
+{% endif %}
+{% if not _event_summary %}
+  {% set _event_summary = 'Connect with Weld Australia and the wider welding industry through this upcoming event.' %}
+{% endif %}
+
+{% set _event_name = _event_row.event_name | default('Event') %}
+{% set _event_summary_html = '<p>' ~ (_event_summary | striptags) ~ '</p>' %}
+{% set _event_primary_label = 'Event details' %}
+{% set _event_primary_href = '#event-details' %}
+{% set _event_primary_new_tab = false %}
+{% if not _status_bookable %}
+  {# Ref 74c Phase 3. Cancelled or closed wins over every booking route AND over the
+     members-only upsell: an event nobody can book is not a reason to sell a membership,
+     and "Explore membership" there reads as a bypass that does not exist. #}
+{% elif _show_engine %}
+  {% set _event_primary_label = 'Register now' %}
+  {% set _event_primary_href = '/checkout/?event_id=' ~ (_event_row.hs_id | string) %}
+{% elif _event_row.registration_url and not (_is_members_only and not _contact_is_active) %}
+  {% set _event_primary_label = 'Register now' %}
+  {% set _event_primary_href = _event_row.registration_url %}
+  {% set _event_primary_new_tab = true %}
+{% elif _is_members_only and not _contact_is_active %}
+  {% set _event_primary_label = 'Explore membership' %}
+  {% set _event_primary_href = '/membership/' %}
+{% endif %}
+{% set _event_primary_cta = {"label_text": "", "link": {"url": {"href": "#event-details", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "gold"} %}
+{% if _event_primary_href != '#event-details' %}
+  {% set _event_primary_cta = {"label_text": _event_primary_label, "link": {"url": {"href": _event_primary_href, "type": "EXTERNAL"}, "open_in_new_tab": _event_primary_new_tab}, "style": "gold"} %}
+{% endif %}
+{% set _event_secondary_cta = {"label_text": "Event details", "link": {"url": {"href": "#event-details", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "white-outline"} %}
+
+{% set _shared_hero_id = 'events-dynamic-detail-hero' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'large' %}
+{% set _shared_hero_spacing = 'default' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = 'none' %}
+{% set _shared_hero_show_breadcrumb = true %}
+{% set _shared_hero_show_breadcrumb_home = false %}
+{% set _shared_hero_breadcrumb_parent_label = 'Events' %}
+{% set _shared_hero_breadcrumb_parent_href = '/events/' %}
+{% set _shared_hero_breadcrumb_current_label = _event_name %}
+{% set _shared_hero_eyebrow = _event_type_label %}
+{% set _shared_hero_headline = _event_name %}
+{% set _shared_hero_subheadline = _event_summary_html %}
+{% if _event_primary_href != '#event-details' %}
+  {% set _shared_hero_primary_label = _event_primary_label %}
+  {% set _shared_hero_primary_href = _event_primary_href %}
+  {% set _shared_hero_primary_new_tab = _event_primary_new_tab %}
+{% else %}
+  {% set _shared_hero_primary_label = '' %}
+  {% set _shared_hero_primary_href = '#event-details' %}
+  {% set _shared_hero_primary_new_tab = false %}
+{% endif %}
+{% set _shared_hero_primary_style = 'gold' %}
+{% set _shared_hero_secondary_label = 'Event details' %}
+{% set _shared_hero_secondary_href = '#event-details' %}
+{% set _shared_hero_secondary_style = 'white-outline' %}
+{% set _shared_hero_secondary_new_tab = false %}
+{% include "../partials/shared-hero.html" %}
+
+{% set _event_image_url = get_asset_url('../../assets/img/weld-australia-event-fallback.svg') %}
+{% set _event_image_alt = _event_row.event_name | default('Weld Australia event') %}
+{% if _event_row.event_image and _event_row.event_image.url %}
+  {% set _event_image_url = _event_row.event_image.url %}
+  {% set _event_image_alt = _event_row.event_image.alt | default(_event_image_alt, true) %}
+{% endif %}
+
+{% set _event_price_label = '' %}
+{% if _event_row.price_from %}
+  {% set _event_price_label = _event_row.price_from %}
+{% elif _event_row.price_type and _event_row.price_type.name %}
+  {% set _event_price_label = _event_row.price_type.name %}
+{% endif %}
+
+<section id="event-details" class="wa-event-detail__body wa-section wa-section--surface wa-section--spacious">
+  <div class="container">
+    <div class="wa-event-detail__layout">
+      <div class="wa-event-detail__description wa-prose">
+        <div class="wa-event-detail__description-header">
+          <p class="wa-event-detail__section-kicker">Event overview</p>
+          <h2 class="wa-event-detail__description-heading">About the event</h2>
+        </div>
+        <div class="wa-event-detail__description-copy">
+        {% if _event_row.event_description %}
+          {{ _event_row.event_description }}
+        {% else %}
+          <p>Full event information will be confirmed soon. Please check the event details card for the latest date, location and registration information.</p>
+        {% endif %}
+        </div>
+      </div>
+
+      <aside class="wa-event-detail__sidebar">
+        <div class="wa-event-detail__sidebar-card wa-event-detail__sidebar-card--media">
+          <div class="wa-event-detail__card-media">
+            <img
+              src="{{ _event_image_url }}"
+              alt="{{ _event_image_alt }}"
+              class="wa-event-detail__card-img"
+              loading="lazy"
+            >
+            <div class="wa-event-detail__card-badges" aria-label="Event labels">
+              {% if _event_row.event_type and _event_row.event_type.name %}
+              <span class="wa-event-detail__card-badge wa-event-detail__card-badge--type">{{ _event_row.event_type.name }}</span>
+              {% endif %}
+              {% if _event_row.event_state and _event_row.event_state.name %}
+              <span class="wa-event-detail__card-badge wa-event-detail__card-badge--state">{{ _event_row.event_state.name }}</span>
+              {% endif %}
+              {% if _is_members_only %}
+              <span class="wa-event-detail__card-badge wa-event-detail__card-badge--members">Members only</span>
+              {% endif %}
+              {% if _event_row.is_featured %}
+              <span class="wa-event-detail__card-badge wa-event-detail__card-badge--featured">Featured</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="wa-event-detail__card-body">
+            <p class="wa-event-detail__card-kicker">Event details</p>
+            <h2 class="wa-event-detail__sidebar-heading">Event details</h2>
+            <dl class="wa-event-detail__sidebar-list">
+              {% if _event_row.event_type and _event_row.event_type.name %}
+              <dt>Type</dt>
+              <dd>{{ _event_row.event_type.name }}</dd>
+              {% endif %}
+              {% if _event_row.event_date %}
+              <dt>Date</dt>
+              <dd>
+                <time datetime="{{ _event_row.event_date | datetimeformat('%Y-%m-%d') }}">
+                  {{ _event_row.event_date | datetimeformat('%d %B %Y') }}
+                </time>
+                {% if _event_row.event_end_date and _event_row.event_end_date != _event_row.event_date %}
+                &ndash;
+                <time datetime="{{ _event_row.event_end_date | datetimeformat('%Y-%m-%d') }}">
+                  {{ _event_row.event_end_date | datetimeformat('%d %B %Y') }}
+                </time>
+                {% endif %}
+              </dd>
+              {% endif %}
+              {% if _event_row.time %}
+              <dt>Time</dt>
+              <dd>{{ _event_row.time }}</dd>
+              {% endif %}
+              {% if _event_row.venue %}
+              <dt>Venue</dt>
+              <dd>{{ _event_row.venue }}</dd>
+              {% endif %}
+              {% if _event_row.event_location %}
+              <dt>Location</dt>
+              <dd>{{ _event_row.event_location }}</dd>
+              {% endif %}
+              {% if _event_row.city %}
+              <dt>City</dt>
+              <dd>{{ _event_row.city }}</dd>
+              {% endif %}
+              {% if _event_row.event_state and _event_row.event_state.name %}
+              <dt>State</dt>
+              <dd>{{ _event_row.event_state.name }}</dd>
+              {% endif %}
+              {% if _event_price_label %}
+              <dt>Pricing</dt>
+              <dd>{{ _event_price_label }}</dd>
+              {% endif %}
+              {% if _event_row.cpd %}
+              <dt>CPD</dt>
+              <dd>{{ _event_row.cpd }}</dd>
+              {% endif %}
+            </dl>
+          </div>
+        </div>
+        <p class="wa-event-detail__sidebar-back">
+          <a href="/events/" class="wa-link">&larr; Back to all events</a>
+        </p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% if _show_engine %}
+<section id="event-register" class="wa-event-detail__register wa-section wa-section--surface wa-section--spacious" aria-labelledby="wa-event-register-heading">
+  <div class="container wa-event-detail__register-inner">
+    <h2 class="wa-event-detail__register-heading" id="wa-event-register-heading">Register for this event</h2>
+    <div class="wa-event-detail__checkout-card">
+      {% if _event_row.worker_event_id %}
+      <div class="wa-event-detail__availability-card">
+        <span
+          class="wa-availability-badge wa-availability-badge--detail"
+          data-wa-availability-badge
+          data-worker-event-id="{{ _event_row.worker_event_id|escape_attr }}"
+          data-hubdb-status="{{ _event_row.status.name|default('')|escape_attr }}"
+          data-worker-base-url="{{ _event_engine_worker_base_url|escape_attr }}"
+          data-portal-id="{{ _event_engine_portal_id|escape_attr }}"
+          data-state="checking"
+          aria-live="polite"
+        >Checking places&hellip;</span>
+        <p>Checkout will hold your place while you complete registration.</p>
+      </div>
+      {% endif %}
+      <p>
+        Continue to Weld Australia’s secure checkout to confirm your details,
+        review pricing and complete registration.
+      </p>
+      <a class="btn btn-primary" href="{{ _event_primary_href }}">Continue to checkout</a>
+    </div>
+  </div>
+</section>
+{% elif _event_row and not _status_bookable %}
+{# Ref 74c Phase 3. Removing the CTA without saying why leaves a visitor hunting for a
+   Register button that is not there. One sentence, the same one every other surface uses. #}
+<section id="event-register" class="wa-event-detail__register wa-section wa-section--surface wa-section--spacious"
+         aria-labelledby="wa-event-register-heading">
+  <div class="container wa-event-detail__register-inner">
+    <h2 class="wa-event-detail__register-heading" id="wa-event-register-heading">Registration</h2>
+    <div class="wa-event-detail__checkout-card">
+      <span class="wa-availability-badge wa-availability-badge--detail"
+            data-state="{{ _status_slug }}">{{ _status_label }}</span>
+      <p>
+        Registrations for this event are not open. Please
+        <a href="/events">browse upcoming events</a>, or contact the events team if you
+        think this is an error.
+      </p>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% else %}
+{# Instance key is deliberately "events_hero" (not "events_landing_hero").
+   The retired events-landing-hero saved body used lead / primary_cta_label /
+   primary_cta_link; hero.module reads subheadline + nested primary_cta groups.
+   Keeping the old key would overlay that incompatible schema and blank the CTAs.
+   Breadcrumb and stat tiles stay off: the retired module rendered both but they
+   were hidden in CSS (events-landing.css `display: none`). #}
+{%- set _events_subscription_form_id = '893aee8f-5079-4f76-8e66-83a586cf15de' if hub_id|string == '443253065' else '36216a2f-7f4c-40ae-a0e3-83f58e4b4310' -%}
+{% module
+  "events_hero"
+  path="../../modules/hero"
+  label="Events landing hero"
+  background="primary"
+  height="medium"
+  spacing="default"
+  alignment="left"
+  accent_bar=true
+  media_type="none"
+  show_breadcrumb=false
+  breadcrumb_parent_label="Home"
+  breadcrumb_parent_link={"url": {"href": "/", "type": "EXTERNAL"}, "open_in_new_tab": false}
+  breadcrumb_current_label="Events"
+  eyebrow="Events & webinars"
+  headline="Weld Australia events"
+  subheadline="<p>Join webinars, workshops, industry awards and networking events designed for Australia's welding community.</p>"
+  primary_cta={"label_text": "View events", "link": {"url": {"href": "#events", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "gold"}
+  secondary_cta={"label_text": "Stay updated", "link": {"url": {"href": "#events-updates", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "white-outline"}
+  show_stats=false
+  stats_placement="below"
+  stats=[
+    {"value": "Webinars", "stat_label": "Technical updates", "dynamic_value": "none"},
+    {"value": "Workshops", "stat_label": "Practical learning", "dynamic_value": "none"},
+    {"value": "Awards", "stat_label": "Industry recognition", "dynamic_value": "none"},
+    {"value": "Networking", "stat_label": "National community", "dynamic_value": "none"}
+  ]
+%}
+
+{% module
+  "events_feature_links"
+  path="../../modules/events-feature-links"
+  label="Events feature links"
+  section_id="signature-events"
+  background="surface_alt"
+  spacing="spacious"
+%}
+
+{% module
+  "events_listing_v2"
+  path="../../modules/events-listing"
+  label="Events listing"
+  section_heading="Upcoming events"
+  section_id="events"
+  default_state_filter="any"
+  default_type_filter="any"
+  page_size=12
+  show_past_events_toggle=true
+  background="surface"
+  spacing="spacious"
+%}
+
+{% module
+  "events_subscription"
+  path="../../modules/subscription-form"
+  label="Subscribe to events updates"
+  heading="Stay up to date"
+  section_id="events-updates"
+  intro="<p>Subscribe to Weld Australia events updates and be the first to know about upcoming webinars, workshops and industry events near you.</p>"
+  form={"form_id": _events_subscription_form_id, "response_type": "inline", "message": "Thanks - you're subscribed to Weld Australia events updates."}
+  subscription_options=["events"]
+  background="primary"
+  spacing="default"
+%}
+{% endif %}
+{% endblock %}

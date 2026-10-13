@@ -1,0 +1,304 @@
+<!--
+  templateType: page
+  isAvailableForNewContent: true
+  label: Welding Fumes
+-->
+{#
+    welding-fumes.html — Weld Australia Welding Fumes page
+    URL: /welding-fumes/
+    Faithful rebuild of the original live page, plus:
+     - hotline line demoted into the hero intro (no standalone pull-quote band)
+     - The Controls image widened so the text column isn't so spread
+     - Welding Safety Resources = single padded column
+    Images: split-feature "image" sections need photos added in the editor.
+    NOTE: "Safety Training Courses" paragraph is verbatim but now out of date
+    (courses are live) — flagged inline.
+  #}
+  {% set page_title_exact = page_meta.html_title | default('Welding Fumes - Weld Australia') %}
+  {% set page_description = page_meta.meta_description | default('Changes to the workplace exposure standard for welding fumes — recommended controls, regulations, and welding safety resources from Weld Australia.') %}
+  {% extends "../layouts/base.html" %}
+  {% block extra_head %}
+  <style>
+    /* Cards: padding + content pinned to the TOP */
+    body.is-fumes-page .wa-card-grid__card { padding: clamp(20px, 2vw, 28px); text-align: left; }
+    body.is-fumes-page .wa-card-grid__card,
+    body.is-fumes-page .wa-card-grid__card > div,
+    body.is-fumes-page .wa-card-grid__card [class*="body"],
+    body.is-fumes-page .wa-card-grid__card [class*="content"],
+    body.is-fumes-page .wa-card-grid__card [class*="inner"] {
+      justify-content: flex-start !important;
+      align-content: flex-start !important;
+    }
+    body.is-fumes-page .wa-card-grid__card > *,
+    body.is-fumes-page .wa-card-grid__card [class*="body"],
+    body.is-fumes-page .wa-card-grid__card [class*="content"],
+    body.is-fumes-page .wa-card-grid__card [class*="inner"] {
+      margin-top: 0 !important;
+      margin-block-start: 0 !important;
+    }
+    /* Welding Safety Resources: single column */
+    body.is-fumes-page #resources [class*="card-grid__grid"],
+    body.is-fumes-page #resources [class*="card-grid__cards"],
+    body.is-fumes-page #resources [class*="card-grid__items"],
+    body.is-fumes-page #resources [class*="card-grid__list"] {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+    }
+    body.is-fumes-page #resources .wa-card-grid__card { width: 100% !important; max-width: 100% !important; flex: 1 1 100% !important; }
+    /* The Controls + WA Initiatives: no image — plain full-width text. */
+    body.is-fumes-page #controls [class*="card-grid__grid"],
+    body.is-fumes-page #controls [class*="card-grid__cards"],
+    body.is-fumes-page #controls [class*="card-grid__items"],
+    body.is-fumes-page #controls [class*="card-grid__list"],
+    body.is-fumes-page #initiatives [class*="card-grid__grid"],
+    body.is-fumes-page #initiatives [class*="card-grid__cards"],
+    body.is-fumes-page #initiatives [class*="card-grid__items"],
+    body.is-fumes-page #initiatives [class*="card-grid__list"] { display: block !important; }
+    body.is-fumes-page #controls .wa-card-grid__card,
+    body.is-fumes-page #initiatives .wa-card-grid__card {
+      display: block !important;
+      grid-column: 1 / -1 !important;   /* span the full grid width — no empty right column */
+      width: 100% !important; max-width: 100% !important;
+      background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important;
+      overflow: visible !important;
+    }
+    /* Flatten every card-grid wrapper in these two sections to a full-width block
+       (removes any leftover grid column / narrow content wrapper). */
+    body.is-fumes-page #controls .wa-card-grid,
+    body.is-fumes-page #controls [class*="card-grid__grid"],
+    body.is-fumes-page #controls [class*="card-grid__cards"],
+    body.is-fumes-page #controls [class*="card-grid__items"],
+    body.is-fumes-page #controls [class*="card-grid__list"],
+    body.is-fumes-page #controls [class*="card-grid__body"],
+    body.is-fumes-page #controls [class*="card-grid__content"],
+    body.is-fumes-page #initiatives .wa-card-grid,
+    body.is-fumes-page #initiatives [class*="card-grid__grid"],
+    body.is-fumes-page #initiatives [class*="card-grid__cards"],
+    body.is-fumes-page #initiatives [class*="card-grid__items"],
+    body.is-fumes-page #initiatives [class*="card-grid__list"],
+    body.is-fumes-page #initiatives [class*="card-grid__body"],
+    body.is-fumes-page #initiatives [class*="card-grid__content"] {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      grid-template-columns: 1fr !important;
+    }
+    /* Kill any max-width on the text itself (e.g. a readable-measure prose wrapper) */
+    body.is-fumes-page #controls .wa-card-grid__card *,
+    body.is-fumes-page #initiatives .wa-card-grid__card * { max-width: 100% !important; }
+    /* Centre the "View the Welding Safety Courses" button under the text */
+    body.is-fumes-page #initiatives [class*="card-grid__cta"],
+    body.is-fumes-page #initiatives [class*="card-grid__footer"],
+    body.is-fumes-page #initiatives [class*="card-grid__actions"] {
+      text-align: center !important;
+      display: block !important;
+      margin-left: auto !important; margin-right: auto !important;
+    }
+    body.is-fumes-page #initiatives [class*="card-grid__cta"] a,
+    body.is-fumes-page #initiatives [class*="card-grid__footer"] a,
+    body.is-fumes-page #initiatives [class*="card-grid__actions"] a {
+      margin-left: auto !important; margin-right: auto !important;
+    }
+    /* (No image in these two sections — text runs full section width.) */
+  </style>
+  {% endblock %}
+  {% block body_class %}is-fumes-page{% endblock %}
+  {% block body %}
+  {% dnd_area "main_content" label="Main content" %}
+  
+    {# ── § 1  HERO (hotline line folded into the intro) ───────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/hero"
+            label="Hero"
+            background="primary"
+            height="tall"
+            alignment="left"
+            accent_bar=true
+            eyebrow="Welder safety"
+            headline="Changes to the Workplace Exposure Standard for Welding Fumes"
+            subheadline="<p>Safe Work Australia recently announced that Work Health and Safety Ministers have agreed to an immediate reduction in the workplace exposure standard for welding fumes, from an 8-hour time weighted average (TWA) of 5 mg/m3 to 1 mg/m3.</p><p>As the exposure standard for welding fumes has been reduced, all necessary controls must be implemented to meet this higher standard.</p><p>Weld Australia has established a dedicated hotline to help Australian welders and fabricators who need advice on the changes to the workplace exposure standard for welding fumes. This can be reached via: <a href='tel:1800212988'>1800 212 988</a>.</p>"
+            primary_cta={"label_text": "Call the fume hotline: 1800 212 988", "link": {"url": {"href": "tel:1800212988", "type": "EXTERNAL"}}, "style": "gold"}
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 2  SPLIT FEATURE — RECOMMENDED ACTIONS ─────────────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/split-feature"
+            label="Recommended Actions"
+            background="surface"
+            media_type="image"
+            media_side="right"
+            heading="Recommended Actions"
+            body_text="<p>Based on the hierarchy of controls, the following actions are recommended:</p><ol><li><strong>At-source fume control</strong> is recommended to maximise the level of fume captured and controlled as it is generated. Suitable methods include local exhaust ventilation (LEV) such as a hooded fume extractor and/or on-gun fume extraction. Captured fume should be filtered and exhausted to atmosphere, preferably outside the workshop.</li><li>Welders also require <strong>personal respiratory protection</strong>, particularly where the welder's head is likely to be in or near the weld plume. For example, the use of Powered Air Purifying Respirators (PAPRs) offer an excellent measure of protection in most welding situations. Externally air-fed helmets may be preferable or be required in some situations, such as confined spaces where oxygen monitoring is required.</li><li><strong>Good overall ventilation throughout the workshop</strong> to protect the general workforce.</li></ol><p><strong>If in doubt, specialist advice should be sought from an occupational hygienist and fume exposure monitoring undertaken.</strong></p>"
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 3  SPLIT FEATURE — THE CHANGES ─────────────────────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/split-feature"
+            label="The Changes"
+            background="surface_alt"
+            media_type="image"
+            media_side="left"
+            heading="The Changes"
+            body_text="<p>The change to the workplace exposure standard for welding fumes becomes mandatory once implemented in the WHS/OHS laws in the Commonwealth, states and territories. All states and territories have already implemented this new exposure limit.</p><p>Under the <a href='https://www.safeworkaustralia.gov.au/law-and-regulation/model-whs-laws'>model WHS laws</a>, persons conducting a business or undertaking (PCBU) – like an employer – must eliminate or minimise the risks to worker health and safety so far as is reasonably practicable, including those associated with chemical exposure.</p><p>A PCBU must also ensure that workers are not exposed to any airborne contaminant above the concentration listed in the <a href='https://www.safeworkaustralia.gov.au/safety-topic/managing-health-and-safety/workplace-exposure-standards'>Workplace exposure standards (WES) for airborne contaminants (WES list)</a>. Welding fumes are a complex mix of hazardous chemicals. Some individual components of welding fumes also have their own WES.</p><p>In addition to ensuring workers' exposure to total welding fumes is below the WES, PCBUs must ensure workers' exposure to individual welding fume components is below those respective WES also.</p><p>Monitoring must be carried out when employers are unsure if a relevant exposure standard is being exceeded, or where there may be a risk to health. Health monitoring may also be required if workers are exposed to certain substances specified by the WHS Regulations that are likely to cause them harm.</p>"
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 4  SPLIT FEATURE — THE CONTROLS (wider image) ──────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/card-grid"
+            label="The Controls"
+            section_id="controls"
+            background="surface"
+            heading="The Controls"
+            card_style="clean_white"
+            columns="1"
+            cards=[
+              {"body_text": "<p>The <a href='https://www.safeworkaustralia.gov.au/doc/model-code-practice-welding-processes'>model Code of Practice: welding processes</a> provides guidance to help manage the risks associated with welding, including exposure to welding fumes.</p><p>According to Safe Work Australia, there are four things PCBUs can do to help protect workers from exposure to welding fumes:</p><ol><li><strong>Identify the hazardous components in welding fumes</strong> at your workplace.<ol type='a'><li>This can come from air monitoring data or from the safety data sheets for the welding rods, if available.</li><li>Arrange for air monitoring if you are uncertain which components are produced and whether the relevant WES would be exceeded.</li></ol></li><li><strong>Assess the risk of welding fumes</strong> at your workplace.<ol type='a'><li>This includes consideration of the processes and work environment, observing the nature of work and consulting with workers about work activities that may lead to fume exposure, as well as reviewing incident reports.</li></ol></li><li><strong>Review the control measures</strong> you have in place to eliminate or minimise your workers' exposure to welding fumes.</li><li><strong>Talk to your workers and any health and safety representatives</strong> (HSRs) about the reduced WES, how it might impact your workplace, including changes to control measures and any training your workers might need.</li></ol>"}
+            ]
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 5  SPLIT FEATURE — THE HISTORY ─────────────────────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/split-feature"
+            label="The History"
+            background="surface_alt"
+            media_type="image"
+            media_side="left"
+            heading="The History"
+            body_text="<p>In recent years, the welding industry has become increasingly aware of the hazards posed by metal fume produced during the welding process. This fume, comprising of microscopic particles of hot metal and gases, poses serious risks when inhaled by welders.</p><p>In March 2017, the International Agency for Research on Cancer (IARC) reclassified welding fume from Group 2B <em>Possibly Carcinogenic to Humans</em> to Group 1 <em>Carcinogenic to Humans</em>. Their assessment was subsequently published in IARC's Monograph 118 in July 2018.</p><p>IARC through Monograph 118 stated that there is evidence for welding fumes causing lung cancer and limited evidence causing renal cell cancer. Ultraviolet radiation from welding was also evaluated and similarly classified as Group 1 Carcinogenic to Humans in Monograph 118.</p>"
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 6  CARD GRID — WELDING SAFETY RESOURCES (one column) ────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/card-grid"
+            label="Welding Safety Resources"
+            section_id="resources"
+            background="surface"
+            overline="Welding safety resources"
+            heading="Welding Safety Resources"
+            card_style="clean_white"
+            columns="1"
+            cards=[
+              {"title": "National", "body_text": "<ul><li><a href='https://www.safeworkaustralia.gov.au/doc/workplace-exposure-standards-airborne-contaminants-2024'>Safe Work Australia Workplace Exposure Standards for Airborne Contaminants 2024</a></li><li><a href='https://www.safeworkaustralia.gov.au/doc/guidance-interpretation-workplace-exposure-standards-airborne-contaminants'>Safe Work Australia Guidance on the Interpretation of Workplace Exposure Standards for Airborne Contaminants</a></li><li><a href='https://www.safeworkaustralia.gov.au/safety-topic/hazards/welding-fumes'>Safe Work Australia Guide on Welding Fumes</a></li><li><a href='https://www.safeworkaustralia.gov.au/doc/model-code-practice-welding-processes'>Safe Work Australia Model Code of Practice: Welding Process</a></li><li><a href='https://www.safeworkaustralia.gov.au/safety-topic/hazards/occupational-lung-diseases'>Safe Work Australia Guide on Occupational Lung Diseases</a></li><li><a href='https://portal.weldaustralia.com.au/resources/product-details/?id=cb4b7919-4325-eb11-a813-000d3ad25b79'>Weld Australia's Fume Minimisation Guidelines: Welding, Cutting, Brazing and Soldering</a></li><li><a href='https://portal.weldaustralia.com.au/resources/product-details/?id=d1bf5473-8e32-eb11-a813-000d3a6aacf5'>Weld Australia's Technical Note 7: Health and Safety in Welding</a></li><li><a href='https://www.aioh.org.au/product/welding-and-thermal-cutting-fume-potential-for-occupational-health-effects-2022/'>AIOH Guide on Welding and Thermal Cutting Fume</a></li><li><a href='http://breathefreelyaustralia.org.au/wp-content/uploads/2019/05/welding-toolbox-talk-final-AIOH-1.pdf'>Breathe Freely Australia Welding Toolbox Talk</a></li><li><a href='https://www.breathefreelyaustralia.org.au/welding/rpe/'>Breathe Freely Australia Respiratory Protective Equipment Guidance</a></li></ul>"},
+              {"title": "New South Wales", "body_text": "<ul><li><a href='https://www.safework.nsw.gov.au/hazards-a-z/welding-fumes'>SafeWork NSW Guide on Welding Fumes</a></li><li><a href='https://www.safework.nsw.gov.au/__data/assets/pdf_file/0014/52160/Code-of-practice_Welding-processes_2022.pdf'>SafeWork NSW Code of Practice for Welding Processes</a></li></ul>"},
+              {"title": "Victoria", "body_text": "<ul><li><a href='https://www.worksafe.vic.gov.au/controlling-exposure-welding-fumes'>WorkSafe Victoria Controlling Exposure to Welding Fumes</a></li><li><a href='https://www.worksafe.vic.gov.au/welding'>WorkSafe Victoria's Guide on Welding</a></li><li><a href='https://www.worksafe.vic.gov.au/resources/exposure-standards-and-atmospheric-monitoring'>WorkSafe Victoria's Guide on Exposure Standards and Atmospheric Monitoring</a></li><li><a href='https://www.worksafe.vic.gov.au/resources/health-monitoring'>WorkSafe Victoria's Guide on Health Monitoring</a></li></ul>"},
+              {"title": "Queensland", "body_text": "<ul><li><a href='https://www.worksafe.qld.gov.au/safety-and-prevention/hazards/hazardous-exposures/welding'>WorkSafe Queensland Guide on Welding</a></li><li><a href='https://www.worksafe.qld.gov.au/__data/assets/pdf_file/0025/72646/welding-processes-cop-2021.pdf'>WorkSafe Queensland Welding Code of Practice</a></li><li><a href='https://www.worksafe.qld.gov.au/__data/assets/pdf_file/0022/72634/how-to-manage-work-health-and-safety-risks-cop-2021.pdf'>WorkSafe Queensland How to Manage Work Health and Safety Risks Code of Practice</a></li></ul>"},
+              {"title": "Western Australia", "body_text": "<ul><li><a href='https://www.commerce.wa.gov.au/sites/default/files/atoms/files/221194_cp_welding.pdf'>WorkSafe WA Code of Practice – Welding Processes</a></li></ul>"},
+              {"title": "South Australia", "body_text": "<ul><li><a href='https://www.safework.sa.gov.au/workplaces/work-tasks-and-projects/welding'>SafeWork SA Guide on Welding</a></li><li><a href='https://www.safework.sa.gov.au/__data/assets/pdf_file/0010/136279/Welding-processes.pdf'>SafeWork SA Welding Processes Code of Practice</a></li><li><a href='https://www.safework.sa.gov.au/__data/assets/pdf_file/0005/136274/Managing-risks-of-hazardous-chemicals.pdf'>SafeWork SA Managing Risks of Hazardous Chemicals in the Workplace – Code of Practice</a></li></ul>"},
+              {"title": "Tasmania", "body_text": "<ul><li><a href='https://worksafe.tas.gov.au/topics/laws-and-compliance/codes-of-practice/cop-folder/welding-processes'>WorkSafe Tasmania Welding Processes: Code of Practice</a></li><li><a href='https://worksafe.tas.gov.au/topics/Health-and-Safety/hazards-and-solutions-a-z/hazards-and-solutions-a-z-pages/f/fumes-vapours-dusts'>WorkSafe Tasmania Guide on Fumes, Vapours and Dust</a></li></ul>"},
+              {"title": "Northern Territory", "body_text": "<ul><li><a href='https://worksafe.nt.gov.au/forms-and-resources/codes-of-practice/welding-processes2'>NTWorkSafe Welding Processes Codes of Practice</a></li></ul>"},
+              {"title": "Australian Capital Territory", "body_text": "<ul><li><a href='https://legislation.act.gov.au/ni/2022-683/'>WorkSafeACT Welding Processes Code of Practice</a></li></ul>"}
+            ]
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 7  SPLIT FEATURE — WELD AUSTRALIA'S INITIATIVES ─────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/card-grid"
+            label="Weld Australia's Initiatives"
+            section_id="initiatives"
+            background="surface_alt"
+            heading="Weld Australia's Initiatives to Improve Welder Safety"
+            card_style="clean_white"
+            columns="1"
+            cards=[
+              {"body_text": "<p><strong>Welding Safety Resources</strong></p><p><a href='https://portal.weldaustralia.com.au/resources/product-details/?id=cb4b7919-4325-eb11-a813-000d3ad25b79'>Fume Minimisation Guidelines: Welding, Cutting, Brazing and Soldering</a>, which includes all the information required to help protect workers from the hazards associated with welding fumes. This has been revised in line with the changes, and a <a href='https://portal.weldaustralia.com.au/resources/product-details/?id=cb4b7919-4325-eb11-a813-000d3ad25b79'>new edition is now available for free download</a>.</p><p><a href='https://portal.weldaustralia.com.au/resources/product-details/?id=d1bf5473-8e32-eb11-a813-000d3a6aacf5'>Technical Note 7: Health and Safety in Welding</a>, which gives guidance on health and safety practices in welding, cutting and allied processes such as brazing, soldering, pre- and post- weld material treatments and metal spraying.</p><p><strong>Welding Safety Council</strong></p><p>Established by Weld Australia in early 2019, the Welding Safety Council provides a forum for industry and legislative safety authorities to discuss issues and work collaboratively to identify solutions. By drawing together key government stakeholders, statutory bodies and industry into a single independent body focused on eradicating welding related injury, the Australian welding industry continues to take a significant steps forward in protecting both the general public and welders.</p><p><strong>Safety Training Courses</strong></p><p>Weld Australia is currently developing two comprehensive online welder safety training courses. One course is tailored for welders, while the other is aimed at welding engineers and supervisors. These courses cover a raft of activities across a range of welding processes, welding fume safety, and welding in confined spaces, at heights, or in hot and humid conditions. These courses are in the final stages of development and will soon be made freely available via the Weld Australia website. <!-- TODO: now out of date — the courses are live. --></p>"}
+            ]
+            cta_label="View the Welding Safety Courses"
+            cta_link={"url": {"href": "/training/welding-safety-courses", "type": "EXTERNAL"}}
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 8  CARD GRID — WELDING EQUIPMENT SUPPLIERS ─────────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/card-grid"
+            label="Welding Equipment Suppliers"
+            background="surface"
+            overline="Suppliers"
+            heading="Welding Equipment Suppliers"
+            card_style="clean_white"
+            columns="3"
+            cards=[
+              {"title": "Aitken Welding Supplies", "body_text": "<a href='https://www.aitkenwelding.com/'>aitkenwelding.com</a><br>1800 248 536<br>online@aitkenwelding.com"},
+              {"title": "Alphaweld Supply Group", "body_text": "<a href='https://www.alphaweld.com.au'>alphaweld.com.au</a><br>Vince Draffin<br>(08) 9456 8000<br>sales@alphaweld.com.au"},
+              {"title": "AWS", "body_text": "<a href='https://www.apexweldingsafety.com.au/'>apexweldingsafety.com.au</a><br>02 9439 0111"},
+              {"title": "BOC", "body_text": "<a href='https://www.boc.com.au/shop/en/au/home'>boc.com.au</a><br>131 262"},
+              {"title": "Cigweld", "body_text": "<a href='https://www.cigweld.com.au/'>cigweld.com.au</a><br>1300 654 674<br>enquiries@cigweld.com.au"},
+              {"title": "Coregas", "body_text": "<a href='https://www.coregas.com.au/'>coregas.com.au</a><br>1800 807 203"},
+              {"title": "Gentronics", "body_text": "<a href='https://www.gentronics.com.au/'>gentronics.com.au</a><br>08 9922 9003<br>sales@gentronics.com.au"},
+              {"title": "Kemppi Australia", "body_text": "<a href='https://www.kemppi.com/'>kemppi.com</a><br>Matthew Clark<br>0409 784 287<br>matthew.clark@kemppi.com"},
+              {"title": "Lincoln Electric", "body_text": "<a href='https://www.lincolnelectric.com/en/?sc_lang=en-AU'>lincolnelectric.com</a>"},
+              {"title": "Novarc Technologies Inc.", "body_text": "<a href='https://www.novarctech.com/'>novarctech.com</a><br>Melissa Bayanzadeh<br>melissa@novarctech.com<br>+1 778 318 5115"},
+              {"title": "One Gas", "body_text": "<a href='https://onegasaustralia.com.au/'>onegasaustralia.com.au</a><br>1300 663 427<br>sales@onegas.com.au"},
+              {"title": "WIA", "body_text": "<a href='https://www.welding.com.au/'>welding.com.au</a><br>1300 300 884"},
+              {"title": "Weldclass", "body_text": "<a href='https://www.weldclass.com.au/'>weldclass.com.au</a><br>1300 787 400<br>support@weldclass.com.au"}
+            ]
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 9  CTA BANNER — WANT TO KNOW MORE? ─────────────────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/cta-banner"
+            label="Want to Know More?"
+            background="primary"
+            align="split"
+            headline="Want to Know More?"
+            body_text="<p>Weld Australia has established a dedicated hotline to help Australian welders and fabricators who need advice on the changes to the workplace exposure standard for welding fumes.</p>"
+            cta_label="Call 1800 212 988"
+            cta_link={"url": {"href": "tel:1800212988", "type": "EXTERNAL"}}
+            secondary_cta_label="Welding Safety Courses"
+            secondary_cta_link={"url": {"href": "/training/welding-safety-courses", "type": "EXTERNAL"}}
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+
+  {% end_dnd_area %}
+  {% endblock %}

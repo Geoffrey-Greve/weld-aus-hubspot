@@ -1,0 +1,13 @@
+{
+  "label": "Member Signup Access",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Editable access instructions for the member signup page.",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["auth", "membership", "signup"]
+}

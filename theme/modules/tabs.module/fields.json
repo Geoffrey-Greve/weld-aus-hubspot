@@ -1,0 +1,85 @@
+[
+  {
+    "name": "section_id",
+    "type": "text",
+    "label": "Section anchor ID",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "type": "choice",
+    "label": "Background",
+    "choices": [
+      [
+        "surface",
+        "White/Light"
+      ],
+      [
+        "surface_alt",
+        "Alt grey"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "type": "choice",
+    "label": "Vertical spacing",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "overline",
+    "type": "text",
+    "label": "Overline",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "type": "text",
+    "label": "Heading"
+  },
+  {
+    "name": "tabs",
+    "label": "Tabs",
+    "type": "group",
+    "occurrence": {
+      "min": 2,
+      "max": 8,
+      "default": 2
+    },
+    "children": [
+      {
+        "name": "label_text",
+        "label": "Tab label",
+        "type": "text"
+      },
+      {
+        "name": "content",
+        "label": "Tab content",
+        "type": "richtext"
+      }
+    ]
+  }
+]

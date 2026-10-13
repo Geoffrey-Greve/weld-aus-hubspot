@@ -1,0 +1,95 @@
+/* sticky-sub-nav.module/module.css */
+
+.wa-sub-nav {
+  position: relative;
+  z-index: 100;
+  border-bottom: 1px solid var(--wa-color-border, #e5e7eb);
+  transition: box-shadow 0.2s ease;
+}
+
+/* Sticky state - applied by module.js */
+.wa-sub-nav.is-sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-shadow: var(--wa-shadow-card, 0 2px 8px rgba(0,0,0,.1));
+}
+
+/* Spacer so page content doesn't jump when the nav goes sticky */
+.wa-sub-nav.is-sticky ~ * {
+  margin-top: var(--wa-sub-nav-placeholder, 0px);
+}
+
+.wa-sub-nav__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-spacing-4, 1rem);
+  min-height: 48px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+}
+
+.wa-sub-nav__inner::-webkit-scrollbar {
+  display: none;
+}
+
+.wa-sub-nav__list {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  overflow-x: auto;
+}
+
+.wa-sub-nav__item {
+  flex: 0 0 auto;
+}
+
+.wa-sub-nav__link {
+  display: flex;
+  align-items: center;
+  height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-spacing-4, 1rem);
+  font-size: var(--wa-text-sm, 0.875rem);
+  font-weight: 500;
+  color: var(--wa-color-text-muted, #6b7280);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.wa-sub-nav__link:hover {
+  color: var(--wa-color-text, #111827);
+  border-bottom-color: var(--wa-color-border, #e5e7eb);
+}
+
+/* Active state - toggled by module.js */
+.wa-sub-nav__link.is-active {
+  color: var(--wa-color-primary, #00529b);
+  border-bottom-color: var(--wa-color-primary, #00529b);
+  font-weight: 600;
+}
+
+.wa-sub-nav__cta-wrap {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-left: var(--wa-spacing-4, 1rem);
+}
+
+/* On dark backgrounds */
+.wa-section--bg-primary .wa-sub-nav__link,
+.wa-section--bg-primary-dark .wa-sub-nav__link {
+  color: rgba(255,255,255,0.7);
+}
+
+.wa-section--bg-primary .wa-sub-nav__link.is-active,
+.wa-section--bg-primary-dark .wa-sub-nav__link.is-active {
+  color: #fff;
+  border-bottom-color: #fff;
+}

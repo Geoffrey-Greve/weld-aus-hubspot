@@ -1,0 +1,15 @@
+{
+  "label": "Find a Member",
+  "css_assets": [],
+  "data_query_path": "../../data-queries/findAMemberCompanies",
+  "external_js": [],
+  "global": false,
+  "help_text": "React island: searchable member directory from HubSpot CRM Company membership fields. Place on find-a-member.html. Shows current members, sorted Gold first.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["members", "react-island", "crm", "directory", "interactive"]
+}

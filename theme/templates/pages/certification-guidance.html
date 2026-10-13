@@ -1,0 +1,80 @@
+<!--
+  templateType: page
+  label: Member Portal - Certification Guidance
+  isAvailableForNewContent: true
+-->
+﻿{#
+  certification-guidance.html - Per-certification guidance page (React island).
+  URL: /portal/certifications/{type}/
+       e.g. /portal/certifications/as1796/
+            /portal/certifications/iiw_inspector/
+            /portal/certifications/iso3834/
+
+  ── HubSpot configuration required ──────────────────────────────────────────
+  • Assign this template to one page per certification type, at:
+      /portal/certifications/as1796/
+      /portal/certifications/iiw_inspector/
+      /portal/certifications/iso3834/
+    (A new cert type = one more page using this same template.)
+  • Private Content audience: "Active Members" list
+  • The portal.html layout provides the auth gate and window.__WELD_MEMBER__
+    injection - the React island reads certifications from there.
+
+  ── How it works ─────────────────────────────────────────────────────────────
+  1. The cert type slug (last URL path segment) is read inside
+     certification-guidance.module/module.html and passed as certType into the
+     React island's data-props.
+  2. The React island looks up that cert from window.__WELD_MEMBER__.certifications
+     to get currentStep, status, expiry, certificateUrl.
+  3. It fetches HubDB certification_guidance rows for (certType, currentStep)
+     and renders the guidance_text and evidence_checklist.
+  4. A visual pipeline progress bar shows where the member is in the certification
+     process.
+
+  ── Acceptance criteria ───────────────────────────────────────────────────────
+  • Visiting /portal/certifications/as1796/ renders AS1796 guidance
+  • The heading is "Your AS 1796 Welder Certification progress"
+  • The pipeline progress bar highlights the currentStep from the contact's cert
+  • Editing a HubDB Table 4 row updates the guidance text on next page load
+  • Empty state (no cert / no guidance row) renders a helpful message
+  • Evidence upload form renders once a form is selected in the module's
+    "Evidence form" dropdown
+#}
+{# The cert type slug (last URL path segment) drives the page title, so it is
+   derived ABOVE the extends: layouts/portal.html renders partials/_head.html,
+   and an assignment made after the extends lands too late for it. #}
+{% set _ns = namespace(cert_type='') %}
+{% for seg in request.path | split('/') %}
+  {% if seg %}{% set _ns.cert_type = seg %}{% endif %}
+{% endfor %}
+{% set _cert_type = _ns.cert_type %}
+{% if _cert_type == 'as1796' %}
+  {% set _cert_title = 'AS 1796 Welder Certification' %}
+{% elif _cert_type == 'iiw_inspector' %}
+  {% set _cert_title = 'IIW Welding Inspector' %}
+{% elif _cert_type == 'iso3834' %}
+  {% set _cert_title = 'ISO 3834 Certification' %}
+{% else %}
+  {% set _cert_title = 'Certification' %}
+{% endif %}
+{% set page_title_exact = _cert_title ~ ' Progress - Weld Australia Member Portal' %}
+{% extends "../layouts/portal.html" %}
+
+{% block extra_head %}
+{{ super() }}
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+
+{% block portal_content %}
+
+  {% module "certification_guidance" path="../../modules/certification-guidance"
+    heading_template="Your {certification_type} progress"
+    show_evidence_upload=true
+    qc_contact_email="qnc@weldaustralia.com.au"
+    qc_contact_phone=""
+    background="surface"
+    spacing="default"
+    members_only=true
+  %}
+
+{% endblock %}

@@ -1,0 +1,96 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "member-testimonials"
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Member testimonials"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "What our members say"
+  },
+  {
+    "name": "testimonials",
+    "label": "Testimonials",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 9,
+      "default": 3
+    },
+    "children": [
+      {
+        "name": "quote",
+        "label": "Quote",
+        "type": "richtext",
+        "required": true
+      },
+      {
+        "name": "name_text",
+        "label": "Name",
+        "type": "text"
+      },
+      {
+        "name": "role",
+        "label": "Role",
+        "type": "text"
+      },
+      {
+        "name": "company",
+        "label": "Company",
+        "type": "text"
+      },
+      {
+        "name": "photo",
+        "label": "Photo",
+        "type": "image"
+      },
+      {
+        "name": "logo",
+        "label": "Company logo",
+        "type": "image",
+        "help_text": "Optional. Shown alongside the company name."
+      },
+      {
+        "name": "tier",
+        "label": "Tier badge",
+        "type": "choice",
+        "choices": [
+          ["", "None"],
+          ["gold", "Gold"],
+          ["silver", "Silver"],
+          ["bronze", "Bronze"],
+          ["individual", "Individual"]
+        ],
+        "default": ""
+      }
+    ]
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

@@ -1,0 +1,42 @@
+{#
+  rich-text.module/module.html
+  Simple rich text content block for body copy sections.
+
+  Fields:
+    module.section_id     - optional anchor id
+    module.section_heading - optional h2 above the body
+    module.content        - richtext body
+    module.max_width      - full | medium | narrow
+    module.background     - bg variant
+    module.spacing        - vertical spacing
+    module.visibility     - device show/hide
+    module.members_only   - member wall gate
+#}
+
+{%- set _vis = module.visibility | default(['mobile','tablet','desktop']) -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{%- set _vis_classes = '' -%}
+{%- if 'mobile'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-mobile'  -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-tablet'  -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+<section
+  class="wa-rich-text wa-section wa-section--{{ module.background | default('surface') }} wa-section--{{ module.spacing | default('default') }}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-rich-text__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    <div class="wa-rich-text__body wa-rich-text__body--{{ module.max_width | default('full') }}">
+      {{ module.content }}
+    </div>
+
+  </div>
+</section>
+
+{% endif %}

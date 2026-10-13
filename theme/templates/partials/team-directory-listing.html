@@ -1,0 +1,79 @@
+{#
+  Shared public Team & Board directory section.
+
+  Used by:
+  - templates/pages/about-team.html (dynamic HubDB parent + profile router)
+  - templates/pages/team.html (plain /team listing page)
+
+  Profile links intentionally point at /about/team/ because that is the current
+  HubDB dynamic parent page for individual team-member profiles.
+#}
+{% set _team_profile_base = team_profile_base | default('/about/team/') %}
+
+{% module "team_directory_hero" path="../../modules/hero"
+  label="Team hero"
+  section_id="team-hero"
+  background="primary"
+  height="medium"
+  spacing="default"
+  alignment="left"
+  accent_bar=true
+  media_type="none"
+  eyebrow="People"
+  headline="Our team & board"
+  subheadline="<p>Weld Australia brings together world-class experts - leaders, innovators and technical specialists who live and breathe welding, fabrication and manufacturing. Select any profile to read more about their background and expertise.</p>"
+  primary_cta={"label_text": "Meet the board", "link": {"url": {"href": "#our-board", "type": "EXTERNAL"}}, "style": "gold"}
+  secondary_cta={"label_text": "Meet the team", "link": {"url": {"href": "#our-team", "type": "EXTERNAL"}}, "style": "white-outline"}
+%}
+
+{% module "team_directory_board" path="../../modules/team-grid"
+  label="Board directory"
+  section_id="our-board"
+  background="surface"
+  overline="Leadership"
+  section_heading="Our Board"
+  intro="<p>Elected by our members, the Board provides strategic direction and strong governance &mdash; bringing together highly respected leaders from across the industry.</p>"
+  highlight_style="cards"
+  highlights=[
+    {"title": "Member-elected leadership", "description": "Elected by Weld Australia members"},
+    {"title": "Industry-wide expertise", "description": "Deep expertise across industry, education, and engineering"},
+    {"title": "Strong governance", "description": "Committed to strong governance and member outcomes"},
+    {"title": "IWEs on staff", "description": "Australia's largest team of International Welding Engineers"},
+    {"title": "Global expertise", "description": "Specialists drawn from industry, academia, and research"},
+    {"title": "Cross-industry experience", "description": "Experience across mining, defence, infrastructure, and manufacturing"}
+  ]
+  columns="4"
+  data_source="hubdb"
+  category_filter="board"
+  category_exclude=""
+  group_by_category=false
+  profile_url_base=_team_profile_base
+%}
+
+{% module "team_directory_people" path="../../modules/team-grid"
+  label="Team directory"
+  section_id="our-team"
+  background="surface_alt"
+  overline="People"
+  section_heading="Our team of welding experts"
+  intro="<p>Our team brings together experts from across the globe, committed to advancing Australia's welding industry on the global stage.</p>"
+  highlight_style="cards"
+  highlights=[]
+  columns="4"
+  data_source="hubdb"
+  category_exclude="board"
+  group_by_category=true
+  profile_url_base=_team_profile_base
+%}
+
+{% module "team_directory_cta" path="../../modules/cta-banner"
+  label="Team CTA"
+  background="primary"
+  align="split"
+  headline="Talk to the Weld Australia team"
+  body_text="<p>Our engineers, trainers and membership specialists are here to help with technical questions, training pathways and membership.</p>"
+  cta_label="Contact us"
+  cta_link={"url": {"href": "/contact-us#enquiry", "type": "EXTERNAL"}}
+  secondary_cta_label="Back to About"
+  secondary_cta_link={"url": {"href": "/about", "type": "EXTERNAL"}}
+%}

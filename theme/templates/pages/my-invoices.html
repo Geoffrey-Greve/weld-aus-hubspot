@@ -1,0 +1,83 @@
+<!--
+  templateType: page
+  label: Member Portal - My Invoices & Receipts
+  isAvailableForNewContent: true
+-->
+{#
+  Member portal invoice page.
+
+  The route is protected by HubSpot Private Content at page level. This page
+  uses the standard base layout directly, then renders the invoice React module
+  inside the page body. This avoids the heavier portal layout render path that
+  can blank logged-in private-content pages.
+#}
+{% set page_title_exact = 'My Invoices &amp; Receipts - Weld Australia Member Portal' %}
+{% set page_description = 'Download your Weld Australia invoices and PDF receipts for training, events, and membership.' %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+{{ super() }}
+<meta name="robots" content="noindex, nofollow">
+<style>
+  body.is-invoices-page #my-invoices-hero.wa-hero {
+    min-height: clamp(460px, 42vw, 540px);
+    padding-block-start: calc(var(--wa-site-header-offset, 112px) + 96px);
+  }
+
+  body.is-invoices-page #my-invoices-hero .wa-hero__content {
+    max-width: 680px;
+  }
+
+  body.is-invoices-page .wa-my-invoices-section {
+    background: linear-gradient(180deg, #f5f7fb 0%, #ffffff 100%);
+    padding-block-start: clamp(48px, 6vw, 72px);
+  }
+
+  @media (max-width: 767px) {
+    body.is-invoices-page #my-invoices-hero.wa-hero {
+      min-height: auto;
+      padding-block-start: calc(var(--wa-site-header-offset, 112px) + 72px);
+      padding-block-end: 56px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body_class %} is-portal is-invoices-page{% endblock %}
+
+{% block portal_nav %}
+  {% include "../partials/portal-nav.html" %}
+{% endblock %}
+
+{% block body %}
+
+  {% module "my_invoices_hero"
+    path="../../modules/hero"
+    label="My invoices hero"
+    section_id="my-invoices-hero"
+    background="primary"
+    spacing="default"
+    height="compact"
+    alignment="left"
+    eyebrow="Member portal"
+    headline="My invoices"
+    subheadline="<p>Review your Weld Australia payment records and download invoice PDFs when they are available.</p>"
+    primary_cta={ "label_text": "View invoices", "link": { "url": { "type": "EXTERNAL", "href": "#invoice-records" } }, "style": "gold" }
+    secondary_cta={ "label_text": "Contact finance", "link": { "url": { "type": "EXTERNAL", "href": "mailto:finance@weldaustralia.com.au" } }, "style": "white-outline" }
+    accent_bar=true
+  %}
+
+  {% module "my_invoices"
+    path="../../modules/my-invoices"
+    label="My Invoices & Receipts"
+    section_id="invoice-records"
+    heading=""
+    intro=""
+    finance_email="finance@weldaustralia.com.au"
+    support_email="office@weldaustralia.com.au"
+    background="surface"
+    spacing="default"
+    members_only=true
+  %}
+
+{% endblock %}

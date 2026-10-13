@@ -1,0 +1,116 @@
+{% if not module.members_only or request_contact.is_logged_in %}
+<section
+  class="wa-engineering-intro wa-engineering-section wa-engineering-section--{{ module.background|default('surface_alt') }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container wa-engineering-intro__inner">
+    <div class="wa-engineering-intro__copy">
+      {% if module.eyebrow %}
+      <div class="wa-overline">
+        <span class="wa-overline__text">{{ module.eyebrow }}</span>
+      </div>
+      {% endif %}
+
+      {% if module.heading %}
+      <h2 class="wa-engineering-heading">{{ module.heading }}</h2>
+      {% endif %}
+
+      {% if module.body_text %}
+      <div class="wa-engineering-richtext">{{ module.body_text }}</div>
+      {% endif %}
+
+      {% if module.industries and module.industries|length %}
+      <div class="wa-engineering-intro__industries">
+        {% if module.industries_label %}
+        <p class="wa-engineering-intro__industries-label">{{ module.industries_label }}</p>
+        {% endif %}
+        <div class="wa-engineering-intro__chips">
+          {% for industry in module.industries %}
+            {% if industry.industry_name %}
+            <span class="wa-engineering-chip">{{ industry.industry_name }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="wa-engineering-intro__media" id="download">
+      {% if module.video_url %}
+      {% set _has_video_thumbnail = module.video_thumbnail and module.video_thumbnail.src %}
+      <div class="wa-engineering-intro__video">
+        {% if _has_video_thumbnail %}
+        <button
+          type="button"
+          class="wa-engineering-intro__video-facade"
+          data-video-src="{{ module.video_url|escape_attr }}"
+          data-video-title="{{ module.video_title|default('Weld Australia Engineering Services')|escape_attr }}"
+          aria-label="Play video: {{ module.video_title|default('Weld Australia Engineering Services')|escape_attr }}"
+        >
+          <img
+            src="{{ module.video_thumbnail.src }}"
+            alt="{{ module.video_thumbnail.alt|default(module.video_title|default('Weld Australia Engineering Services'))|escape_attr }}"
+            class="wa-engineering-intro__video-thumbnail"
+            loading="lazy"
+            decoding="async"
+            {% if module.video_thumbnail.width %}width="{{ module.video_thumbnail.width }}"{% endif %}
+            {% if module.video_thumbnail.height %}height="{{ module.video_thumbnail.height }}"{% endif %}
+          >
+          <span class="wa-engineering-intro__video-scrim" aria-hidden="true"></span>
+          <span class="wa-engineering-intro__video-play" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" focusable="false">
+              <polygon points="7 4 19 12 7 20 7 4"></polygon>
+            </svg>
+          </span>
+          <span class="wa-engineering-intro__video-label">Play video</span>
+        </button>
+        <noscript>
+        {% endif %}
+        <iframe
+          src="{{ module.video_url }}"
+          title="{{ module.video_title|default('Weld Australia Engineering Services')|escape_attr }}"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+        {% if _has_video_thumbnail %}
+        </noscript>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="wa-engineering-download">
+        <div class="wa-engineering-download__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <div class="wa-engineering-download__copy">
+          {% if module.prospectus_title %}
+          <h3>{{ module.prospectus_title }}</h3>
+          {% endif %}
+          {% if module.prospectus_description %}
+          <p>{{ module.prospectus_description }}</p>
+          {% endif %}
+        </div>
+        {% if module.prospectus_label %}
+        {% set _prospectus_href = module.prospectus_link.url.href|default('')|trim %}
+        {% set _prospectus_open_in_new_tab = module.prospectus_link.open_in_new_tab %}
+        {% if _prospectus_href == '' or _prospectus_href == '#' or _prospectus_href == '#download' %}
+          {% set _prospectus_href = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/weld-australia/engineering/prospectus/Weld-Australia-Engineering-Services-Prospectus.pdf' %}
+          {% set _prospectus_open_in_new_tab = true %}
+        {% endif %}
+        <a
+          class="wa-engineering-download__cta"
+          href="{{ _prospectus_href|escape_url }}"
+          {% if _prospectus_open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ module.prospectus_label }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}

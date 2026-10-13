@@ -1,0 +1,54 @@
+<section class="wa-engineering-iwe" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container wa-engineering-iwe__inner">
+    <div class="wa-engineering-iwe__copy">
+      {% if module.eyebrow %}
+      <div class="wa-overline wa-overline--light">
+        <span class="wa-overline__text">{{ module.eyebrow }}</span>
+      </div>
+      {% endif %}
+
+      {% if module.heading %}
+      <h2>{{ module.heading }}</h2>
+      {% endif %}
+
+      {% if module.body_text %}
+      <div class="wa-engineering-iwe__richtext">{{ module.body_text }}</div>
+      {% endif %}
+
+      <div class="wa-engineering-iwe__badge">
+        {% if module.badge_image and module.badge_image.src %}
+        <img src="{{ module.badge_image.src }}" alt="{{ module.badge_image.alt|default('International Institute of Welding')|escape_attr }}" loading="lazy" decoding="async">
+        {% else %}
+        <img src="{{ get_asset_url('../../assets/img/iiw-logo.webp') }}" alt="International Institute of Welding" loading="lazy" decoding="async">
+        {% endif %}
+        <div>
+          {% if module.badge_overline %}
+          <p>{{ module.badge_overline }}</p>
+          {% endif %}
+          {% if module.badge_text %}
+          <strong>{{ module.badge_text }}</strong>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="wa-engineering-iwe__points">
+      {% if module.points_heading %}
+      <p class="wa-engineering-iwe__points-heading">{{ module.points_heading }}</p>
+      {% endif %}
+
+      {% for point in module.points %}
+        {% if point.text %}
+        <div class="wa-engineering-iwe__point">
+          <span aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
+          <p>{{ point.text }}</p>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,132 @@
+{#
+  faq-accordion.module/module.html
+  FAQ accordion with FAQPage JSON-LD structured data.
+  Identical visual layout to accordion.module.
+  Emits <script type="application/ld+json"> when emit_jsonld=true.
+
+  Fields:
+    module.section_id        - optional anchor id
+    module.background        - background variant
+    module.spacing           - vertical spacing variant
+    module.members_only      - gating flag
+    module.section_heading   - optional heading above accordion
+    module.items             - repeater group (title, body, is_open_default)
+    module.emit_jsonld       - whether to emit FAQPage structured data
+    module.contact_cta_label - optional CTA label in the aside (desktop)
+    module.contact_cta_link  - optional CTA link in the aside (desktop)
+#}
+
+{#- QA ref 63: the Contact Us FAQ tells members to email
+    membership@weldaustralia.com.au, and printed it as plain text. An answer the
+    editor has not linked by hand is linkified; see _linkify-emails.html. -#}
+{% import "../../templates/partials/_linkify-emails.html" as wa_email %}
+
+{%- set _dark = module.background in ['primary', 'primary_dark'] -%}
+{%- set _is_contact_page = request.path == '/contact-us' or request.path == '/contact-us/' -%}
+{%- set _items = module.items -%}
+{%- set _contact_placeholder_items = [
+  {"title": "Which team should I contact?", "body_text": "<p>If you are unsure where to start, call 1800 189 900 or send an enquiry through the form and we will direct your message to the right Weld Australia team.</p>", "is_open_default": true},
+  {"title": "Can I speak to someone about training or course enrolment?", "body_text": "<p>Yes. Call 1800 189 900 and select the training option, or submit the enquiry form with the course name, preferred location and any timing requirements.</p>"},
+  {"title": "Can I get help with qualification or certification enquiries?", "body_text": "<p>Yes. Our qualification and certification team can help with exam pathways, certification requirements, renewal questions and application next steps.</p>"},
+  {"title": "Do you provide support for Soldamatic simulators?", "body_text": "<p>Yes. Select Soldamatic support on the enquiry form and include your machine number and a brief description of the issue so our team can follow up efficiently.</p>"},
+  {"title": "Where should postal correspondence be sent?", "body_text": "<p>Please send correspondence to Suite G1, Ground Floor, 25 Ryde Road, Pymble NSW 2073.</p>"},
+  {"title": "Who should members contact for support?", "body_text": "<p>Members can contact the membership team by calling 1800 189 900 or emailing membership@weldaustralia.com.au.</p>"}
+] -%}
+{%- set _contact_faq_ns = namespace(has_placeholders=false) -%}
+{%- if _is_contact_page and _items -%}
+  {%- for item in _items -%}
+    {%- if item.title|default('', true)|lower|trim == 'which team should i contact?' -%}
+      {%- set _contact_faq_ns.has_placeholders = true -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- if _is_contact_page and not _contact_faq_ns.has_placeholders -%}
+  {%- if _items -%}
+    {%- set _items = _contact_placeholder_items + _items -%}
+  {%- else -%}
+    {%- set _items = _contact_placeholder_items -%}
+  {%- endif -%}
+{%- endif -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section
+  class="wa-faq-accordion wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.overline or module.section_heading %}
+    <div class="wa-faq-accordion__head">
+      {% if module.overline %}
+      <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+        <span class="wa-overline__text">{{ module.overline }}</span>
+      </div>
+      {% endif %}
+      {% if module.section_heading %}
+      <h2 class="wa-faq-accordion__heading">{{ module.section_heading }}</h2>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="wa-faq-accordion__list">
+      {% for item in _items %}
+      {%- set _item_title = item.title | default('', true) -%}
+      {%- set _item_body_text = item.body_text -%}
+      {%- set _item_body_plain = _item_body_text | striptags | lower -%}
+      {%- if (_is_contact_page and (_item_title | lower | trim) == 'where should postal correspondence be sent?') or ('po box 197' in _item_body_plain) or ('macquarie park' in _item_body_plain) -%}
+        {%- set _item_body_text = '<p>Please send correspondence to Suite G1, Ground Floor, 25 Ryde Road, Pymble NSW 2073.</p>' -%}
+      {%- endif -%}
+      <details class="wa-faq-accordion__item" {% if item.is_open_default %}open{% endif %}>
+        <summary class="wa-faq-accordion__summary">
+          <span class="wa-faq-accordion__title">{{ _item_title }}</span>
+          <span class="wa-faq-accordion__chevron" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="wa-faq-accordion__body">{{ wa_email.html(_item_body_text) }}</div>
+      </details>
+      {% endfor %}
+    </div>
+
+    {% if module.contact_cta_label and module.contact_cta_link and module.contact_cta_link.url and module.contact_cta_link.url.href %}
+    <div class="wa-faq-accordion__cta">
+      <a href="{{ module.contact_cta_link.url.href }}"
+         class="btn btn-primary"
+         {% if module.contact_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >{{ module.contact_cta_label }}</a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% if module.emit_jsonld and _items %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {% for item in _items %}
+    {%- set _jsonld_title = item.title | default('', true) -%}
+    {%- set _jsonld_body_text = item.body_text -%}
+    {%- set _jsonld_body_plain = _jsonld_body_text | striptags | lower -%}
+    {%- if (_is_contact_page and (_jsonld_title | lower | trim) == 'where should postal correspondence be sent?') or ('po box 197' in _jsonld_body_plain) or ('macquarie park' in _jsonld_body_plain) -%}
+      {%- set _jsonld_body_text = '<p>Please send correspondence to Suite G1, Ground Floor, 25 Ryde Road, Pymble NSW 2073.</p>' -%}
+    {%- endif -%}
+    {
+      "@type": "Question",
+      "name": {{ _jsonld_title | striptags | json_encode }},
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": {{ _jsonld_body_text | striptags | json_encode }}
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
+
+{% endif %}

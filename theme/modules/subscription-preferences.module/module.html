@@ -1,0 +1,100 @@
+{#
+  subscription-preferences.module/module.html
+
+  Communications-preferences card for the member portal profile page.
+
+  Phase 1 approach:
+    HubSpot's native subscription-preferences system page is the single source
+    of truth for email consent (CAN-SPAM / GDPR). This module does NOT edit
+    preferences inline - it renders an explanatory card and a CTA that links the
+    member out to that native page (default /email-subscriptions/).
+
+  System-page dependency (required for the CTA to resolve):
+    The link target is a HubSpot *system page*. It only serves once the
+    theme template theme/templates/system/email-subscriptions.html is assigned
+    as the "Subscription Preferences Page" in
+    HubSpot Settings → Website → Pages → System pages, and published. Until then
+    the URL 404s. If HubSpot serves it at a different slug, update the
+    manage_link default (and email-subscriptions-confirmation.html) to match.
+#}
+
+{% set subs_editor_preview = is_in_editor or (is_in_previewer | default(false)) or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+{% set subs_has_member_context = request_contact.is_logged_in or subs_editor_preview %}
+
+{% if not module.members_only or subs_has_member_context %}
+
+{# ── Visibility classes ────────────────────────────────────────────────────── #}
+{%- set vis_classes = [] -%}
+{%- if 'mobile' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-mobile'] -%}{%- endif -%}
+{%- if 'tablet' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-tablet'] -%}{%- endif -%}
+{%- if 'desktop' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-desktop'] -%}{%- endif -%}
+
+{# ── Resolve CTA target ────────────────────────────────────────────────────── #}
+{%- set manage_href = module.manage_link.url.href | default('/email-subscriptions/', true) -%}
+{%- set manage_new_tab = module.manage_link.open_in_new_tab | default(false) -%}
+
+{# ── Subscription categories (summary only - editable copy) ─────────────────── #}
+{%- set categories = [
+  { 'label': 'Membership updates', 'desc': 'renewal notices, status changes, and member benefits news' },
+  { 'label': 'Training &amp; courses', 'desc': 'new course dates, timetable updates, and early-bird offers' },
+  { 'label': 'Certification news', 'desc': 'certification-step prompts, expiry reminders, and standards updates' },
+  { 'label': 'Advocacy &amp; policy', 'desc': 'submissions, position papers, and government engagement updates' },
+  { 'label': 'Events &amp; webinars', 'desc': 'upcoming events, registration reminders, and post-event resources' },
+  { 'label': 'Industry newsletter', 'desc': 'the monthly Weld Australia newsletter' }
+] -%}
+
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-comms-prefs{{ ' ' ~ vis_classes | join(' ') if vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div class="wa-comms-prefs__inner">
+
+      {# ── Heading + intro ────────────────────────────────────────────────── #}
+      {% if module.heading %}
+      <h2 class="wa-comms-prefs__heading">{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+      <div class="wa-comms-prefs__intro">{{ module.intro }}</div>
+      {% endif %}
+
+      {# ── Card ───────────────────────────────────────────────────────────── #}
+      <div class="wa-comms-prefs__card">
+
+        {% if module.show_categories %}
+        <p class="wa-comms-prefs__categories-label">
+          Our communications are grouped into the following categories:
+        </p>
+        <ul class="wa-comms-prefs__categories" aria-label="Available subscription categories">
+          {% for cat in categories %}
+          <li class="wa-comms-prefs__category">
+            <span class="wa-comms-prefs__category-label">{{ cat.label }}</span>
+            <span class="wa-comms-prefs__category-desc"> - {{ cat.desc }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+
+        {# ── CTA to the native preferences page ───────────────────────────── #}
+        <div class="wa-comms-prefs__actions">
+          <a
+            href="{{ manage_href }}"
+            class="wa-btn wa-btn--primary wa-comms-prefs__cta"
+            {% if manage_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >
+            {{ module.manage_label | default('Manage email preferences', true) }}
+          </a>
+        </div>
+
+        {# ── Transactional-email note ─────────────────────────────────────── #}
+        {% if module.transactional_note %}
+        <div class="wa-comms-prefs__note">{{ module.transactional_note }}</div>
+        {% endif %}
+
+      </div>{# /.wa-comms-prefs__card #}
+
+    </div>
+  </div>
+</section>
+
+{% endif %}

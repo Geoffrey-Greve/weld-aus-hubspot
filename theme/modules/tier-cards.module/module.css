@@ -1,0 +1,211 @@
+/*
+ * tier-cards.module/module.css
+ * Single membership tier card with price block, benefits list, and CTA actions.
+ * Max-width 480px, centred. Each tier variant sets a top border accent colour.
+ */
+
+/* ── Card container ──────────────────────────────────────────────────────── */
+
+.wa-tier-card {
+  position: relative;
+  max-width: 480px;
+  margin-inline: auto;
+  border-radius: var(--wa-radius-lg, 16px);
+  padding: var(--wa-space-8, 2rem);
+  border: 1px solid var(--wa-color-border, #e5e7eb);
+  background-color: var(--wa-color-surface, #fff);
+  box-shadow: var(--wa-shadow-card, 0 1px 3px rgba(0,0,0,0.07));
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-6, 1.5rem);
+}
+
+/* ── Tier top-border accents ─────────────────────────────────────────────── */
+
+.wa-tier-card--gold    { border-top: 4px solid var(--wa-color-accent, #fecf05); }
+.wa-tier-card--silver  { border-top: 4px solid #a0a0a0; }
+.wa-tier-card--bronze  { border-top: 4px solid #b27330; }
+.wa-tier-card--individual  { border-top: 4px solid var(--wa-color-primary, #1c1e4c); }
+.wa-tier-card--corporate   { border-top: 4px solid var(--wa-color-primary, #1c1e4c); }
+.wa-tier-card--apprentice  { border-top: 4px solid var(--wa-color-primary, #1c1e4c); }
+
+/* ── Highlighted / recommended ───────────────────────────────────────────── */
+
+.wa-tier-card--highlighted {
+  border-color: var(--wa-color-primary, #1c1e4c);
+  box-shadow: 0 8px 32px rgba(28, 30, 76, 0.15);
+}
+
+/* ── Recommended badge ───────────────────────────────────────────────────── */
+
+.wa-tier-card__badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--wa-color-primary, #1c1e4c);
+  color: #fff;
+  font-size: var(--wa-text-xs, 0.75rem);
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 999px;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+
+/* ── Header: name + price ────────────────────────────────────────────────── */
+
+.wa-tier-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-2, 0.5rem);
+}
+
+.wa-tier-card__name {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-xl, 1.25rem);
+  font-weight: 800;
+  color: var(--wa-color-primary, #1c1e4c);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.wa-tier-card__price-block {
+  display: flex;
+  align-items: baseline;
+  gap: var(--wa-space-2, 0.5rem);
+  flex-wrap: wrap;
+}
+
+.wa-tier-card__price {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl, 2rem);
+  font-weight: 900;
+  color: var(--wa-color-primary, #1c1e4c);
+  line-height: 1;
+}
+
+.wa-tier-card--gold .wa-tier-card__price {
+  color: var(--wa-color-gold-text, #7a5c00); /* WCAG 1.4.3 on white card */
+}
+
+.wa-tier-card__price-period {
+  font-size: var(--wa-text-xs, 0.75rem);
+  color: var(--wa-color-text-muted);
+  line-height: 1.4;
+}
+
+/* ── Description ─────────────────────────────────────────────────────────── */
+
+.wa-tier-card__description {
+  font-size: var(--wa-text-sm, 0.875rem);
+  color: var(--wa-color-text-muted);
+  line-height: 1.6;
+}
+
+.wa-tier-card__description > *:first-child { margin-top: 0; }
+.wa-tier-card__description > *:last-child  { margin-bottom: 0; }
+
+/* ── Benefits list ───────────────────────────────────────────────────────── */
+
+.wa-tier-card__benefits ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 0.75rem);
+}
+
+.wa-tier-card__benefit {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wa-space-3, 0.75rem);
+  font-size: var(--wa-text-sm, 0.875rem);
+  color: var(--wa-color-text);
+  line-height: 1.5;
+}
+
+.wa-tier-card__benefit--excluded {
+  opacity: 0.5;
+  color: var(--wa-color-text-muted);
+}
+
+.wa-tier-card__benefit-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Actions ─────────────────────────────────────────────────────────────── */
+
+.wa-tier-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 0.75rem);
+  margin-top: var(--wa-space-2, 0.5rem);
+}
+
+.wa-tier-card__actions .btn {
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min, 44px);
+}
+
+.wa-tier-card__secondary-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min, 44px);
+  font-size: var(--wa-text-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--wa-color-primary, #1c1e4c);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(28, 30, 76, 0.35);
+  transition: text-decoration-color 0.15s ease;
+}
+
+.wa-tier-card__secondary-cta:hover {
+  text-decoration-color: var(--wa-color-primary, #1c1e4c);
+}
+
+/* ── Dark background overrides ───────────────────────────────────────────── */
+
+.wa-section--bg-primary .wa-tier-card,
+.wa-section--bg-primary_dark .wa-tier-card {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.wa-section--bg-primary .wa-tier-card--highlighted,
+.wa-section--bg-primary_dark .wa-tier-card--highlighted {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.wa-section--bg-primary .wa-tier-card__name,
+.wa-section--bg-primary_dark .wa-tier-card__name {
+  color: #fff;
+}
+
+.wa-section--bg-primary .wa-tier-card__price,
+.wa-section--bg-primary_dark .wa-tier-card__price {
+  color: #fff;
+}
+
+.wa-section--bg-primary .wa-tier-card--gold .wa-tier-card__price,
+.wa-section--bg-primary_dark .wa-tier-card--gold .wa-tier-card__price {
+  color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-section--bg-primary .wa-tier-card__benefit,
+.wa-section--bg-primary_dark .wa-tier-card__benefit {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.wa-section--bg-primary .wa-tier-card__secondary-cta,
+.wa-section--bg-primary_dark .wa-tier-card__secondary-cta {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration-color: rgba(255, 255, 255, 0.35);
+}

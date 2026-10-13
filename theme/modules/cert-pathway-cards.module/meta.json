@@ -1,0 +1,14 @@
+{
+  "label": "Certification Pathway Cards",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Grid of certification pathway cards with icon, title, summary, audience badge, duration badge, and CTA button.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["content", "cards", "certification"]
+}

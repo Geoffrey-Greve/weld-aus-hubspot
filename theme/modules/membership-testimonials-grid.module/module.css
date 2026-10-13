@@ -1,0 +1,148 @@
+.wa-membership-testimonials {
+  overflow: hidden;
+}
+
+.wa-membership-testimonials__head {
+  margin-bottom: var(--wa-space-10);
+}
+
+.wa-membership-testimonials__head h2 {
+  margin: 0;
+  color: var(--wa-color-primary);
+  font-size: clamp(30px, 3vw, 40px);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.wa-membership-testimonials__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--wa-space-5);
+}
+
+.wa-membership-testimonials__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4);
+  min-height: 100%;
+  margin: 0;
+  padding: var(--wa-space-7, 28px);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  background: #fff;
+  box-shadow: var(--wa-shadow-card);
+}
+
+.wa-membership-testimonials__quote-mark {
+  color: var(--wa-color-gold-text, #7a5c00);
+  font-size: 48px;
+  font-weight: var(--wa-weight-black);
+  line-height: 0.8;
+}
+
+.wa-membership-testimonials__card blockquote {
+  flex: 1;
+  margin: 0;
+  color: var(--wa-color-text);
+  font-size: var(--wa-text-sm);
+  line-height: 1.75;
+}
+
+.wa-membership-testimonials__card blockquote p {
+  margin: 0;
+}
+
+.wa-membership-testimonials__person {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3);
+  padding-top: var(--wa-space-4);
+  border-top: 1px solid var(--wa-color-border);
+}
+
+/* Direct-child selector so the company logo nested inside __bio is NOT
+   forced into the 44px circular avatar crop. */
+.wa-membership-testimonials__person > img,
+.wa-membership-testimonials__avatar {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 2px solid rgba(254, 207, 5, 0.4);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.wa-membership-testimonials__avatar {
+  display: grid;
+  place-items: center;
+  color: var(--wa-color-primary);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-bold);
+  background: var(--wa-color-accent);
+}
+
+.wa-membership-testimonials__bio {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wa-membership-testimonials__bio strong {
+  color: var(--wa-color-primary);
+  font-size: 13px;
+  font-weight: var(--wa-weight-bold);
+}
+
+.wa-membership-testimonials__bio span {
+  color: var(--wa-color-text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.wa-membership-testimonials__logo {
+  width: auto;
+  max-width: 120px;
+  max-height: 28px;
+  margin-top: 6px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.wa-membership-testimonials__tier {
+  margin-left: auto;
+  padding: 2px 9px;
+  color: #5c3d00;
+  font-size: 10px;
+  font-weight: var(--wa-weight-semibold);
+  border: 1px solid var(--wa-color-tier-gold);
+  border-radius: var(--wa-radius-full);
+  background: var(--wa-color-tier-gold-bg);
+}
+
+.wa-membership-testimonials__card--silver .wa-membership-testimonials__tier {
+  color: #555;
+  border-color: var(--wa-color-tier-silver);
+  background: var(--wa-color-tier-silver-bg);
+}
+
+.wa-membership-testimonials__card--bronze .wa-membership-testimonials__tier,
+.wa-membership-testimonials__card--individual .wa-membership-testimonials__tier {
+  color: #5c2d00;
+  border-color: var(--wa-color-tier-bronze);
+  background: var(--wa-color-tier-bronze-bg);
+}
+
+@media (max-width: 980px) {
+  .wa-membership-testimonials__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .wa-membership-testimonials__grid {
+    grid-template-columns: 1fr;
+  }
+}

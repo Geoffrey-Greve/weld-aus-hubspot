@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A11y Test - Find a Member</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/assets/css/components.css" />
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    a.skip-to-content {
+      position: absolute; left: -9999px; top: 0; z-index: 9999;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; min-width: 44px;
+      padding: 0.5rem 1rem; background: #002f5f; color: #fff;
+    }
+    a.skip-to-content:focus { left: 0; }
+  </style>
+</head>
+<body>
+  <a class="skip-to-content" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <div
+      data-wa-module="find-a-member"
+      data-props='{
+        "rows": [
+          {
+            "id": 1,
+            "company_name": "ABC Welding Solutions",
+            "member_tier": "Gold",
+            "tier_order": 1,
+            "company_logo_url": "",
+            "company_logo_alt": "ABC Welding Solutions logo",
+            "company_blurb": "<p>Leading welding solutions provider.</p>",
+            "website_url": "https://example.com/abc",
+            "contact_email": "contact@abcwelding.com.au",
+            "state_operation": ["NSW", "VIC"]
+          },
+          {
+            "id": 2,
+            "company_name": "Delta Fabrication",
+            "member_tier": "Silver",
+            "tier_order": 2,
+            "company_logo_url": "",
+            "company_logo_alt": "",
+            "company_blurb": "<p>Precision steel fabrication.</p>",
+            "website_url": "https://example.com/delta",
+            "contact_email": "info@deltafab.com.au",
+            "state_operation": ["QLD"]
+          },
+          {
+            "id": 3,
+            "company_name": "Western Weld Co",
+            "member_tier": "Bronze",
+            "tier_order": 3,
+            "company_logo_url": "",
+            "company_logo_alt": "",
+            "company_blurb": "",
+            "website_url": "https://example.com/western",
+            "contact_email": "",
+            "state_operation": ["WA"]
+          },
+          {
+            "id": 4,
+            "company_name": "National Reciprocal Inc",
+            "member_tier": "Reciprocal",
+            "tier_order": 4,
+            "company_logo_url": "",
+            "company_logo_alt": "",
+            "company_blurb": "",
+            "website_url": "",
+            "contact_email": "hello@reciprocal.org",
+            "state_operation": ["National"]
+          }
+        ],
+        "section_heading": "Find a Member",
+        "intro": "<p>Search and filter our member directory.</p>",
+        "default_sort": "tier",
+        "tiers_visible": ["gold", "silver", "bronze", "reciprocal", "industry_supplier"],
+        "page_size": 12,
+        "show_state_filter": true,
+        "show_search": true
+      }'
+    ></div>
+  </main>
+  <script type="module" src="/src/modules/find-a-member/index.tsx"></script>
+</body>
+</html>

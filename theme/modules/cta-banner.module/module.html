@@ -1,0 +1,233 @@
+{#
+  cta-banner.module/module.html
+
+  Fields:
+    module.headline              - required heading
+    module.body_text                  - richtext body
+    module.cta_label             - primary CTA label (required)
+    module.cta_link              - primary CTA link (required)
+    module.secondary_cta_label   - secondary CTA label
+    module.secondary_cta_link    - secondary CTA link
+    module.image                 - optional image
+    module.image_position        - "left" | "right" | "none"
+    module.section_id            - standard: anchor ID
+    module.background            - standard: bg style
+    module.spacing               - standard: vertical padding
+    module.visibility            - standard: device show/hide
+    module.members_only          - standard: member wall gate
+#}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{% set _member_status = request_contact.individual_membership_status | default('') %}
+{% set _is_active_member = _member_status in ['Current'] %}
+{% if module.members_only and not _is_active_member %}{% else %}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+{# ── Layout modifiers ───────────────────────────────────────────────────────── #}
+{% set _headline_text = module.headline|striptags|trim %}
+{% set _align = module.align | default('centered') %}
+{% set _body_text = module.body_text %}
+{% if (not _body_text or (_body_text | striptags | trim) == '') and module.sub_headline %}
+  {% set _body_text = '<p>' ~ (module.sub_headline | striptags | trim) ~ '</p>' %}
+{% endif %}
+{% set _is_contact_need_cta = 'find what you need' in (_headline_text | lower) %}
+{% set _is_about_page = request.path == '/about' or request.path == '/about/' %}
+{% set _is_find_member_page = request.path == '/find-a-member' or request.path == '/find-a-member/' %}
+{% set _is_welding_fumes_page = request.path == '/training/welding-fumes' or request.path == '/training/welding-fumes/' %}
+{% set _spacing = module.spacing | default('default') %}
+{% if _headline_text == 'Ready to advance your welding career?' %}
+  {% set _align = 'split' %}
+  {% if not _body_text or 'join Australia' in _body_text %}
+    {% set _body_text = '<p>Find a course, earn a certification, or become a member today.</p>' %}
+  {% endif %}
+{% endif %}
+{% set _bg = module.background | default('primary') %}
+{% if _is_contact_need_cta %}
+  {% set _align = 'split' %}
+  {% set _body_text = '<p>If you are not sure which team to contact, send us an enquiry or call our national team and we will connect you with the right person.</p>' %}
+{% endif %}
+{% if _is_about_page and 'welding' in (_headline_text | lower) and ('community' in (_headline_text | lower) or 'industry' in (_headline_text | lower)) %}
+  {% set _align = 'split' %}
+  {% set _bg = 'primary' %}
+{% endif %}
+{% if _is_find_member_page and 'member directory' in (_headline_text | lower) %}
+  {% set _align = 'split' %}
+  {% set _bg = 'primary' %}
+  {% set _spacing = 'default' %}
+  {% if not _body_text or (_body_text | striptags | trim) == '' %}
+    {% set _body_text = '<p>Membership gives your business visibility, credibility, and access to Australia&rsquo;s leading welding community.</p>' %}
+  {% endif %}
+{% endif %}
+{% if (_headline_text | lower | trim) == 'not sure which course is right for you?' %}
+  {% set _align = 'split' %}
+  {% set _bg = 'primary' %}
+  {% set _spacing = 'default' %}
+{% endif %}
+{% if _is_welding_fumes_page and 'want to know more' in (_headline_text | lower) %}
+  {% set _align = 'split' %}
+  {% set _bg = 'primary' %}
+  {% set _spacing = 'default' %}
+{% endif %}
+{% if (_headline_text | lower | trim) in [
+  'ready to get certified?',
+  'ready to start your certification journey?',
+  'ready to pursue iso 3834 certification?',
+  'find iso 3834 certified welding organisations',
+  'ready to build a stronger future for australian welding?',
+  'ready to bring your organisation into weld australia?',
+  'see your welds in real time with a xiris camera trial',
+  "stand with us. advocate for australia's future.",
+  'enter the 2026 welding excellence awards',
+  'talk to the weld australia team',
+  'start your weld australia membership today',
+  'need help accessing member content?',
+  'speak with a welding engineer',
+  'need help finding something?'
+] %}
+  {% set _align = 'split' %}
+  {% set _bg = 'primary' %}
+  {% set _spacing = 'default' %}
+{% endif %}
+{% set _dark = _bg in ['primary', 'primary_dark'] %}
+{% set _img_mod = '' %}
+{% if module.image and module.image.src and module.image_position != 'none' %}
+  {% set _img_mod = ' wa-cta-banner--has-image wa-cta-banner--image-' ~ module.image_position %}
+{% endif %}
+
+{# Button classes: gold primary + white-outline secondary on dark backgrounds #}
+{% set _btn_primary   = 'btn-gold' %}
+{% set _btn_secondary = 'btn-white-outline' %}
+{% if not _dark %}
+  {% set _btn_primary   = 'btn-primary' %}
+  {% set _btn_secondary = 'btn-navy-outline' %}
+{% endif %}
+{% set _cta_label = module.cta_label | default('', true) %}
+{% set _primary_cta_href = module.cta_link.url.href | default('#') | trim %}
+{% set _primary_cta_open_in_new_tab = module.cta_link.open_in_new_tab %}
+{% if not _cta_label and module.primary_cta_label %}
+  {% set _cta_label = module.primary_cta_label %}
+{% endif %}
+{% set _legacy_primary_cta_href = module.primary_cta_link | default('', true) | string | trim %}
+{% if _primary_cta_href | lower | trim in ['', '#'] and _legacy_primary_cta_href and (_legacy_primary_cta_href[0:1] == '/' or _legacy_primary_cta_href[0:1] == '#' or _legacy_primary_cta_href[0:4] | lower == 'http' or _legacy_primary_cta_href[0:4] | lower == 'tel:' or _legacy_primary_cta_href[0:7] | lower == 'mailto:') %}
+  {% set _primary_cta_href = _legacy_primary_cta_href %}
+  {% set _primary_cta_open_in_new_tab = false %}
+{% endif %}
+{% set _secondary_cta_label_text = module.secondary_cta_label | default('', true) %}
+{% set _secondary_cta_href = module.secondary_cta_link.url.href | default('#') | trim %}
+{% set _secondary_cta_open_in_new_tab = module.secondary_cta_link.open_in_new_tab %}
+{% set _legacy_secondary_cta_href = module.secondary_cta_link | default('', true) | string | trim %}
+{% if _secondary_cta_href | lower | trim in ['', '#'] and _legacy_secondary_cta_href and (_legacy_secondary_cta_href[0:1] == '/' or _legacy_secondary_cta_href[0:1] == '#' or _legacy_secondary_cta_href[0:4] | lower == 'http' or _legacy_secondary_cta_href[0:4] | lower == 'tel:' or _legacy_secondary_cta_href[0:7] | lower == 'mailto:') %}
+  {% set _secondary_cta_href = _legacy_secondary_cta_href %}
+  {% set _secondary_cta_open_in_new_tab = false %}
+{% endif %}
+{% set _secondary_cta_label = _secondary_cta_label_text | lower | trim %}
+{% set _tertiary_cta_label = module.tertiary_cta_label | default('', true) %}
+{% set _tertiary_cta_href = module.tertiary_cta_link.url.href | default('#') | trim %}
+{% set _tertiary_cta_open_in_new_tab = module.tertiary_cta_link.open_in_new_tab %}
+{% if _is_contact_need_cta %}
+  {% set _cta_label = 'Send an enquiry' %}
+  {% set _primary_cta_href = '#enquiry' %}
+  {% set _primary_cta_open_in_new_tab = false %}
+  {% set _secondary_cta_label_text = 'Call 1800 189 900' %}
+  {% set _secondary_cta_label = 'call 1800 189 900' %}
+  {% set _secondary_cta_href = 'tel:1800189900' %}
+  {% set _secondary_cta_open_in_new_tab = false %}
+  {% set _tertiary_cta_label = '' %}
+  {% set _tertiary_cta_href = '#' %}
+  {% set _tertiary_cta_open_in_new_tab = false %}
+{% endif %}
+{% set _is_membership_page = request.path == '/membership' or request.path == '/membership/' %}
+{% set _is_engineering_page = request.path == '/engineering' or request.path == '/engineering/' %}
+{% set _engineering_prospectus_url = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/weld-australia/engineering/prospectus/Weld-Australia-Engineering-Services-Prospectus.pdf' %}
+{% set _training_brochure_url = 'https://weldingtech.sharepoint.com/sites/WeldsPublicDocuments/_layouts/15/download.aspx?share=EepC0EpcRT1OjptEQzolHsQBbBn2MyGah-VoxHDyiznQPg' %}
+{% set _resources_placeholder_hrefs = ['', '#', '#download', '/resources', '/resources/', '/resources?hslang=en', '/resources/?hslang=en'] %}
+{% if _secondary_cta_label == 'find a course' %}
+  {% set _secondary_cta_href = '/courses' %}
+  {% set _secondary_cta_open_in_new_tab = false %}
+{% endif %}
+{# QA 106: /training/ dropped its course list, so its #courses anchor is dead.
+   A "Find a course" CTA still pointing there goes to the course directory. #}
+{% if _cta_label | lower | trim == 'find a course' and _primary_cta_href | lower in ['#courses', '', '#'] %}
+  {% set _primary_cta_href = '/courses' %}
+  {% set _primary_cta_open_in_new_tab = false %}
+{% endif %}
+{# QA 225: "Download brochure" pointed at the Resources hub rather than the
+   brochure. Same asset and treatment as split-feature's QA #46 guard; only
+   fires on a placeholder href so a real brochure link is never overridden. #}
+{% if 'brochure' in _secondary_cta_label and _secondary_cta_href | lower in _resources_placeholder_hrefs %}
+  {% set _secondary_cta_href = _training_brochure_url %}
+  {% set _secondary_cta_open_in_new_tab = true %}
+{% endif %}
+{% if _is_engineering_page and _secondary_cta_label == 'download prospectus' and (_secondary_cta_href == '' or _secondary_cta_href == '#' or _secondary_cta_href == '#download') %}
+  {% set _secondary_cta_href = _engineering_prospectus_url %}
+  {% set _secondary_cta_open_in_new_tab = true %}
+{% endif %}
+{% set _secondary_cta_href_key = _secondary_cta_href | lower %}
+{% if _is_membership_page and (_secondary_cta_label == 'download prospectus' or _secondary_cta_label == 'membership prospectus') and (_secondary_cta_href_key == '' or _secondary_cta_href_key == '#' or _secondary_cta_href_key == '#download' or _secondary_cta_href_key == '/resources' or _secondary_cta_href_key == '/resources/' or _secondary_cta_href_key == '/resources?hslang=en' or _secondary_cta_href_key == '/resources/?hslang=en') %}
+  {% set _secondary_cta_href = 'https://weldaustralia.com.au/wp-content/uploads/2025/10/Weld-Australia-Membership-Prospectus-2025-FINAL.pdf' %}
+  {% set _secondary_cta_open_in_new_tab = true %}
+{% endif %}
+
+{# Primary CTA href - resolve tel:/mailto: safely. HubSpot link fields can empty tel: on save, so rebuild known phone CTAs from the label. #}
+{% set _primary_label_l = _cta_label | default('') | lower | trim %}
+{% if _primary_label_l == 'call 1800 189 900' %}
+  {% set _primary_cta_href = 'tel:1800189900' %}
+{% elif _primary_cta_href | lower | trim == '' or _primary_cta_href | lower | trim == '#' %}
+  {% set _primary_label_digits = _cta_label | default('') | regex_replace('[^0-9]', '') %}
+  {% if _primary_label_digits|length >= 8 and ('call' in _primary_label_l or _primary_label_digits[0:4] == '1800' or _primary_label_digits[0:4] == '1300') %}
+    {% set _primary_cta_href = 'tel:' ~ _primary_label_digits %}
+  {% endif %}
+{% endif %}
+{% set _primary_cta_is_direct = _primary_cta_href[0:4] | lower == 'tel:' or _primary_cta_href[0:7] | lower == 'mailto:' %}
+
+{# Secondary CTA - same tel:/mailto: rules; re-evaluate scheme after any href mutation. #}
+{% set _secondary_label_l = _secondary_cta_label_text | default('') | lower | trim %}
+{% if _secondary_label_l == 'call 1800 189 900' %}
+  {% set _secondary_cta_href = 'tel:1800189900' %}
+{% elif _secondary_cta_href | lower | trim == '' or _secondary_cta_href | lower | trim == '#' %}
+  {% set _secondary_label_digits = _secondary_cta_label_text | default('') | regex_replace('[^0-9]', '') %}
+  {% if _secondary_label_digits|length >= 8 and ('call' in _secondary_label_l or _secondary_label_digits[0:4] == '1800' or _secondary_label_digits[0:4] == '1300') %}
+    {% set _secondary_cta_href = 'tel:' ~ _secondary_label_digits %}
+  {% endif %}
+{% endif %}
+{% set _secondary_cta_is_direct = _secondary_cta_href[0:4] | lower == 'tel:' or _secondary_cta_href[0:7] | lower == 'mailto:' %}
+{% set _tertiary_cta_is_direct = _tertiary_cta_href[0:4] | lower == 'tel:' or _tertiary_cta_href[0:7] | lower == 'mailto:' %}
+
+{# Shared CTA banner renderer. Keep all page-specific URL/body guards above. #}
+{% set _cta_banner_align = _align %}
+{% set _cta_banner_bg = _bg %}
+{% set _cta_banner_spacing = _spacing %}
+{% set _cta_banner_vis_classes = _vis_classes %}
+{% set _cta_banner_img_mod = _img_mod %}
+{% set _cta_banner_extra_classes = '' %}
+{% set _cta_banner_section_id = module.section_id | default('') %}
+{% set _cta_banner_visitor_state = '' %}
+{% set _cta_banner_eyebrow = '' %}
+{% set _cta_banner_headline = module.headline %}
+{% set _cta_banner_body = _body_text %}
+{% set _cta_banner_image = module.image %}
+{% set _cta_banner_image_position = module.image_position | default('right') %}
+{% set _cta_banner_primary_label = _cta_label %}
+{% set _cta_banner_primary_href = _primary_cta_href %}
+{% set _cta_banner_primary_is_direct = _primary_cta_is_direct %}
+{% set _cta_banner_primary_open_in_new_tab = _primary_cta_open_in_new_tab %}
+{% set _cta_banner_primary_class = _btn_primary %}
+{% set _cta_banner_secondary_label = _secondary_cta_label_text %}
+{% set _cta_banner_secondary_href = _secondary_cta_href %}
+{% set _cta_banner_secondary_is_direct = _secondary_cta_is_direct %}
+{% set _cta_banner_secondary_open_in_new_tab = _secondary_cta_open_in_new_tab %}
+{% set _cta_banner_secondary_class = _btn_secondary %}
+{% set _cta_banner_tertiary_label = _tertiary_cta_label %}
+{% set _cta_banner_tertiary_href = _tertiary_cta_href %}
+{% set _cta_banner_tertiary_is_direct = _tertiary_cta_is_direct %}
+{% set _cta_banner_tertiary_open_in_new_tab = _tertiary_cta_open_in_new_tab %}
+
+{% include "../../templates/partials/cta-banner.html" %}
+
+{% endif %}{# end members_only gate #}

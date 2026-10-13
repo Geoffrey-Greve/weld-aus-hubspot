@@ -1,0 +1,180 @@
+[
+  {
+    "name": "step_labels",
+    "label": "Step labels",
+    "type": "group",
+    "children": [
+      {
+        "name": "step_1",
+        "label": "Step 1 label",
+        "type": "text",
+        "default": "Confirm session"
+      },
+      {
+        "name": "step_2",
+        "label": "Step 2 label",
+        "type": "text",
+        "default": "Your details"
+      },
+      {
+        "name": "step_3",
+        "label": "Step 3 label",
+        "type": "text",
+        "default": "Pricing"
+      },
+      {
+        "name": "step_4",
+        "label": "Step 4 label",
+        "type": "text",
+        "default": "Payment"
+      }
+    ]
+  },
+  {
+    "name": "guest_checkout_allowed",
+    "label": "Allow guest checkout",
+    "type": "boolean",
+    "default": true,
+    "help_text": "When enabled, users without a member account can register by providing their name and email."
+  },
+  {
+    "name": "membership_offer_post_purchase",
+    "label": "Offer membership signup post-purchase (guest)",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "membership_offer_message",
+    "label": "Membership offer message",
+    "type": "richtext",
+    "default": "<p>Become a Weld Australia member and save on future registrations.</p>"
+  },
+  {
+    "name": "payment_provider",
+    "label": "Payment provider",
+    "type": "choice",
+    "choices": [
+      ["event_engine", "Event Engine (reserve → HubSpot invoice)"],
+      ["hapily", "event.hapily handoff"],
+      ["stripe", "Stripe (inline)"],
+      ["redirect", "External redirect"]
+    ],
+    "default": "hapily",
+    "help_text": "event_engine reserves a seat in the Event Engine worker and redirects to the HubSpot-hosted invoice (requires the worker base URL below + per-session worker_event_id and ticket type ids in the courses HubDB). hapily and redirect both send the user to registration_url in HubDB. Stripe processes payment inline (requires backend PaymentIntent endpoint)."
+  },
+  {
+    "name": "worker_base_url",
+    "label": "Event Engine worker base URL",
+    "type": "text",
+    "default": "",
+    "visibility": {
+      "controlling_field_path": "payment_provider",
+      "operator": "EQUAL",
+      "controlling_value_regex": "event_engine"
+    },
+    "help_text": "Leave blank to inherit the theme-wide setting at Design Manager → Theme settings → Integrations → Event Engine worker base URL, which selects the Worker. Keep that on `Production`, which is event-engine.refuel-creative.workers.dev. The Worker formerly deployed as event-engine-staging was RENAMED to it and that hostname no longer resolves, so do not put it back. Only set a value here to override that for this one module."
+  },
+  {
+    "name": "worker_portal_id",
+    "label": "Worker portal id override",
+    "type": "text",
+    "default": "",
+    "visibility": {
+      "controlling_field_path": "payment_provider",
+      "operator": "EQUAL",
+      "controlling_value_regex": "event_engine"
+    },
+    "help_text": "Sent to the worker as X-Portal-Id. Defaults to this HubSpot account's Hub ID. Set only if the worker keys tenants on a different id."
+  },
+  {
+    "name": "turnstile_site_key",
+    "label": "Cloudflare Turnstile site key",
+    "type": "text",
+    "default": "0x4AAAAAAEc5Ght-uaiSDdAa",
+    "visibility": {
+      "controlling_field_path": "payment_provider",
+      "operator": "EQUAL",
+      "controlling_value_regex": "event_engine"
+    },
+    "help_text": "Public site key only. Used to show Turnstile for free public Event Engine checkout. Keep the secret key in Cloudflare Worker secrets, never in HubSpot."
+  },
+  {
+    "name": "stripe_publishable_key",
+    "label": "Stripe publishable key",
+    "type": "text",
+    "visibility": {
+      "controlling_field_path": "payment_provider",
+      "operator": "EQUAL",
+      "controlling_value_regex": "stripe"
+    },
+    "help_text": "pk_live_... or pk_test_... - publishable key only, never the secret key."
+  },
+  {
+    "name": "confirmation_redirect",
+    "label": "Confirmation page URL",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "CONTENT",
+        "href": "/checkout/?confirmed=1"
+      }
+    }
+  },
+  {
+    "name": "support_email",
+    "label": "Support email",
+    "type": "text",
+    "default": "training@weldaustralia.com.au"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

@@ -1,0 +1,7 @@
+/* member-dashboard.module/module.css
+   Module-level layout wrapper only.
+   Component styles live in Dashboard.css (compiled into the React bundle). */
+
+.wa-dashboard-section {
+  min-height: 60vh;
+}

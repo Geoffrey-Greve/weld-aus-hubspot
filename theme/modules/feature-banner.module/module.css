@@ -1,0 +1,92 @@
+/*
+ * feature-banner.module/module.css
+ * Navy rounded card inside a neutral outer section.
+ * Mobile: stacked. Desktop: two-column.
+ */
+
+.wa-feature-banner__card {
+  background-color: var(--wa-color-primary);
+  border-radius: var(--wa-radius-xl, 20px);
+  padding: var(--wa-space-10) var(--wa-space-8);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-8);
+  align-items: flex-start;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .wa-feature-banner__card {
+    flex-direction: row;
+    align-items: center;
+    padding: var(--wa-space-12) var(--wa-space-12);
+  }
+}
+
+/* ── Text column ──────────────────────────────────────────────────────────── */
+
+.wa-feature-banner__text {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.wa-feature-banner__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.2;
+  color: #fff;
+  margin: 0 0 var(--wa-space-4) 0;
+}
+
+@media (min-width: 768px) {
+  .wa-feature-banner__heading { font-size: var(--wa-text-4xl); }
+}
+
+.wa-feature-banner__body {
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: var(--wa-space-8);
+}
+
+.wa-feature-banner__body > *:last-child { margin-bottom: 0; }
+
+.wa-feature-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-3);
+  align-items: center;
+}
+
+/* ── Media column ─────────────────────────────────────────────────────────── */
+
+.wa-feature-banner__media {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wa-space-4);
+  flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+  .wa-feature-banner__media {
+    max-width: 340px;
+  }
+}
+
+.wa-feature-banner__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--wa-radius-md);
+  object-fit: cover;
+}
+
+.wa-feature-banner__badge {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: contain;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+}

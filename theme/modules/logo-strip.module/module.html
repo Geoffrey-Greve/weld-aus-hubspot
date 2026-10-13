@@ -1,0 +1,128 @@
+{#
+  logo-strip.module/module.html
+
+  Fields:
+    module.section_heading       - optional heading above logos
+    module.source                - "manual" | "hubdb_members_gold"
+    module.logos                 - group (manual source)
+    module.max_logos_from_hubdb  - number cap for HubDB source
+    module.section_id            - standard: anchor ID
+    module.background            - standard: bg style
+    module.spacing               - standard: vertical padding
+    module.visibility            - standard: device show/hide
+    module.members_only          - standard: member wall gate
+
+  HubDB used (when source = hubdb_members_gold):
+    Table: members  (§ 7.2 in CLAUDE.md)
+    Filters: is_active=true, member_tier=gold
+    Sort: company_name A→Z
+#}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{% set _member_status = request_contact.individual_membership_status | default('') %}
+{% set _is_active_member = _member_status in ['Current'] %}
+{% if module.members_only and not _is_active_member %}{% else %}
+
+{# ── Resolve visibility classes ─────────────────────────────────────────────── #}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+{% set _anim = module.animation | default('static') %}
+{% if module.source == 'hubdb_members_gold' %}
+  {% set _anim = 'marquee' %}
+{% endif %}
+{# Marquee renders the logo set twice so the loop joins seamlessly; the second
+   copy is hidden from assistive tech to avoid duplicate announcements. #}
+{% set _reps = 2 if _anim == 'marquee' else 1 %}
+
+<section
+  class="wa-logo-strip wa-logo-strip--{{ _anim }} wa-section wa-section--bg-{{ module.background | default('surface') }} wa-section--spacing-{{ module.spacing | default('default') }}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  aria-label="{% if module.section_heading %}{{ module.section_heading }}{% else %}Partner and member logos{% endif %}"
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-logo-strip__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    <div class="wa-logo-strip__viewport">
+    <ul class="wa-logo-strip__list" role="list" aria-label="Logos">
+
+      {% for _rep in range(_reps) %}
+      {# ── HubDB source: Gold members ────────────────────────────────────────── #}
+      {% if module.source == 'hubdb_members_gold' %}
+        {% set _limit = module.max_logos_from_hubdb | default(12) %}
+        {% set _gold_members = hubdb_table_rows('members', 'is_active=true&orderBy=company_name&limit=100') %}
+        {% set _shown = namespace(count=0) %}
+        {% for row in _gold_members %}
+          {% if row.member_tier == 'Gold' and _shown.count < _limit %}
+          {% set _shown.count = _shown.count + 1 %}
+          <li class="wa-logo-strip__item"{% if _rep > 0 %} aria-hidden="true"{% endif %}>
+            {% if row.website_url %}
+            <a
+              href="{{ row.website_url }}"
+              class="wa-logo-strip__link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="{{ row.company_name }} (opens in new tab)"
+              {% if _rep > 0 %}tabindex="-1"{% endif %}
+            >
+            {% endif %}
+              {% if row.company_logo and row.company_logo.url %}
+              <img
+                src="{{ row.company_logo.url }}"
+                alt="{{ row.company_name | default('Member logo') }}"
+                class="wa-logo-strip__logo"
+                loading="lazy"
+                width="120"
+                height="60"
+              >
+              {% else %}
+              <span class="wa-logo-strip__text-logo">{{ row.company_name }}</span>
+              {% endif %}
+            {% if row.website_url %}</a>{% endif %}
+          </li>
+          {% endif %}
+        {% else %}
+          {# No Gold members in HubDB yet - render nothing rather than breaking #}
+        {% endfor %}
+
+      {# ── Manual source ─────────────────────────────────────────────────────── #}
+      {% else %}
+        {% for item in module.logos %}
+          {% if item.logo and item.logo.src %}
+          <li class="wa-logo-strip__item"{% if _rep > 0 %} aria-hidden="true"{% endif %}>
+            {% if item.link and item.link.url.href %}
+            <a
+              href="{{ item.link.url.href }}"
+              class="wa-logo-strip__link"
+              {% if item.link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+              {% if item.alt %}aria-label="{{ item.alt }}"{% endif %}
+              {% if _rep > 0 %}tabindex="-1"{% endif %}
+            >
+            {% endif %}
+              <img
+                src="{{ item.logo.src }}"
+                alt="{{ item.alt | default(item.logo.alt) | default('') }}"
+                class="wa-logo-strip__logo"
+                loading="lazy"
+                width="120"
+                height="60"
+              >
+            {% if item.link and item.link.url.href %}</a>{% endif %}
+          </li>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% endfor %}
+
+    </ul>
+    </div>
+  </div>
+</section>
+
+{% endif %}{# end members_only gate #}

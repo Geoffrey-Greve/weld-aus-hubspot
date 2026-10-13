@@ -1,0 +1,428 @@
+{#
+  compare-table.module/module.html
+  Feature comparison table for membership tiers.
+  Collapsible row groups; check/X icons per cell; mobile: horizontal scroll with sticky first column.
+
+  The /membership page has saved module values in HubSpot, so its comparison
+  data is normalised here at render time to keep the page editable while also
+  matching the approved membership benefit tables.
+#}
+
+{%- set _bg = module.background | default('surface') -%}
+{%- set _sp = module.spacing | default('default') -%}
+{%- set _dark = _bg in ['primary', 'primary_dark'] -%}
+{%- set _is_membership_comparison = content.slug == 'membership' and (module.heading == 'Compare corporate membership benefits' or module.heading == 'Compare all corporate membership benefits') -%}
+{%- set _heading = module.heading -%}
+{%- set _row_groups = module.row_groups -%}
+{%- set _compare_sets = [
+  {
+    "key": "default",
+    "heading": _heading,
+    "tier_columns": module.tier_columns,
+    "row_groups": _row_groups
+  }
+] -%}
+
+{% if _is_membership_comparison %}
+  {% set _corporate_columns = [
+    {"label_text": "Gold", "accent_color": "gold", "is_highlighted": true},
+    {"label_text": "Silver", "accent_color": "silver", "is_highlighted": false},
+    {"label_text": "Bronze", "accent_color": "bronze", "is_highlighted": false}
+  ] %}
+
+  {% set _corporate_row_groups = [
+    {
+      "group_label": "Credit voucher (valid for one year, with no accumulation)",
+      "rows": [
+        {"feature_label": "Credit voucher towards Weld Australia's Engineering & Training Services", "values": [{"text": "$3,000"}, {"text": "$2,000"}, {"text": "$750"}]}
+      ]
+    },
+    {
+      "group_label": "Events",
+      "rows": [
+        {"feature_label": "National Manufacturing Summit", "values": [{"text": "1 x Ticket"}, {"text": "20% Discount"}, {"text": "10% Discount"}]},
+        {"feature_label": "Industry Drinks Nights", "values": [{"text": "10 x Tickets Per State"}, {"text": "5 x Tickets Per State"}, {"text": "5 x Tickets Per State"}]},
+        {"feature_label": "Welding Excellence Awards", "values": [{"text": "10 x Tickets"}, {"text": "4 x Tickets"}, {"text": "2 x Tickets"}]},
+        {"feature_label": "Member Events (eg. Tech Nights & Site Visits)", "values": [{"text": "Opportunity to Sponsor"}, {"text": "Opportunity to Sponsor"}, {"text": "Opportunity to Sponsor"}]}
+      ]
+    },
+    {
+      "group_label": "Advocacy & Industry Groups",
+      "rows": [
+        {"feature_label": "Industry Groups Participation", "values": [{"text": "1 x Seat Per Group"}, {"text": "Access to Outcomes"}, {"text": "-"}]},
+        {"feature_label": "Personal Advocacy", "values": [{"text": "Included"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "Roundtable", "values": [{"text": "Invitation"}, {"text": "Invitation"}, {"text": "Invitation"}]},
+        {"feature_label": "Strategy Session with C-Suite", "values": [{"text": "Half Day On-Site"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "Bi-Annual Lunch", "values": [{"text": "2 x Per Year"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "Campfire Session", "values": [{"text": "1 x Per Year"}, {"text": "1 x Per Year"}, {"text": "1 x Per Year"}]}
+      ]
+    },
+    {
+      "group_label": "Training & Technical Seminars",
+      "rows": [
+        {"feature_label": "Training Courses", "values": [{"text": "Member Rates"}, {"text": "Member Rates"}, {"text": "Member Rates"}]},
+        {"feature_label": "MEM Learning Resources Access", "values": [{"text": "20 x Licenses"}, {"text": "10 x Licenses"}, {"text": "5 x Licenses"}]},
+        {"feature_label": "Welding Simulator Usage", "values": [{"text": "5 x Days"}, {"text": "2 x Days"}, {"text": "-"}]},
+        {"feature_label": "Technical Seminars", "values": [{"text": "15% Discount"}, {"text": "10% Discount"}, {"text": "5% Discount"}]}
+      ]
+    },
+    {
+      "group_label": "Engineering Support",
+      "rows": [
+        {"feature_label": "Engineering Services", "values": [{"text": "15% Discount"}, {"text": "12% Discount"}, {"text": "8% Discount"}]},
+        {"feature_label": "Business Consultation (1 x hour)", "values": [{"text": "4 x Per Year"}, {"text": "2 x Per Year"}, {"text": "1 x Per Year"}]}
+      ]
+    },
+    {
+      "group_label": "Certification & Exams",
+      "rows": [
+        {"feature_label": "Company Certification Services (Applies to AS/NZS ISO 3834 and AS/NZS ISO 3834 plus AS/NZS 5131 only. Does not apply to EN 1585 or DIN 2303.)", "values": [{"text": "15% Discount"}, {"text": "12% Discount"}, {"text": "8% Discount"}]},
+        {"feature_label": "Individual Certification Services", "values": [{"text": "Member Rates"}, {"text": "Member Rates"}, {"text": "Member Rates"}]},
+        {"feature_label": "Examinations", "values": [{"text": "Member Rates"}, {"text": "Member Rates"}, {"text": "Member Rates"}]},
+        {"feature_label": "Business Consultation (1 x hour)", "values": [{"text": "4 x Per Year"}, {"text": "2 x Per Year"}, {"text": "1 x Per Year"}]}
+      ]
+    },
+    {
+      "group_label": "Supplier Discounts",
+      "rows": [
+        {"feature_label": "Range of Discounts from Industry Suppliers", "values": [{"text": "Included"}, {"text": "Included"}, {"text": "Included"}]}
+      ]
+    },
+    {
+      "group_label": "Publications, Technical Notes & Website",
+      "rows": [
+        {"feature_label": "Weld Connect (monthly newsletter)", "values": [{"text": "1 x Feature"}, {"text": "Can submit content"}, {"text": "-"}]},
+        {"feature_label": "Australian Welding (bi-annual magazine)", "values": [{"text": "1 x Feature"}, {"text": "Can submit content"}, {"text": "-"}]},
+        {"feature_label": "Weekly Wrap", "values": [{"text": "1 x Spotlight"}, {"text": "Can submit content"}, {"text": "-"}]},
+        {"feature_label": "Social Media", "values": [{"text": "1 x Spotlight"}, {"text": "Can submit content"}, {"text": "-"}]},
+        {"feature_label": "Website", "values": [{"text": "Gold Status Listing"}, {"text": "Silver Status Listing"}, {"text": "Bronze Status Listing"}]},
+        {"feature_label": "Technical Notes", "values": [{"text": "Member Rates"}, {"text": "Member Rates"}, {"text": "Member Rates"}]},
+        {"feature_label": "Technical Guidance Notes", "values": [{"text": "Access Included"}, {"text": "Access Included"}, {"text": "Access Included"}]},
+        {"feature_label": "IIW Commission Papers", "values": [{"text": "Access Included"}, {"text": "Access Included"}, {"text": "Access Included"}]},
+        {"feature_label": "Member Directory Listing", "values": [{"text": "Gold Status"}, {"text": "Silver Status"}, {"text": "Bronze Status"}]},
+        {"feature_label": "Jobs Board Adverts", "values": [{"text": "10 x Adverts"}, {"text": "5 x Adverts"}, {"text": "2 x Adverts"}]},
+        {"feature_label": "Use of Weld Australia logo", "values": [{"text": "Access Included"}, {"text": "Access Included"}, {"text": "Access Included"}]}
+      ]
+    },
+    {
+      "group_label": "Associates, Communications & More",
+      "rows": [
+        {"feature_label": "Employees Listed as Associates", "values": [{"text": "Unlimited"}, {"text": "Unlimited"}, {"text": "Unlimited"}]},
+        {"feature_label": "Associate Invitations to Free Events", "values": [{"text": "Access Included"}, {"text": "Access Included"}, {"text": "Access Included"}]},
+        {"feature_label": "Associates Receive Industry Insights, Magazine, Newsletter & EDMs", "values": [{"text": "Unlimited"}, {"text": "Unlimited"}, {"text": "Unlimited"}]}
+      ]
+    }
+  ] %}
+
+  {% set _supplier_row_groups = [
+    {
+      "group_label": "Event Sponsorship",
+      "rows": [
+        {"feature_label": "In-Person Company Showcase Event", "values": [{"text": "1 x Per Year at Cost"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "Industry Drinks Nights Sponsorship", "values": [{"text": "Priority Rights"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "WorldSkills Partnership Opportunity", "values": [{"text": "Invitation Included"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "Company Showcase Webinar", "values": [{"text": "1 x Per Year"}, {"text": "1 x Per Year"}, {"text": "-"}]},
+        {"feature_label": "Welding Excellence Awards Sponsorship", "values": [{"text": "Gold Sponsor"}, {"text": "Silver Sponsor"}, {"text": "Bronze Sponsor"}]},
+        {"feature_label": "State Technical Events Sponsorship", "values": [{"text": "Invitation Included"}, {"text": "Invitation Included"}, {"text": "Invitation Included"}]}
+      ]
+    },
+    {
+      "group_label": "Advertising & Editorial Opportunities",
+      "rows": [
+        {"feature_label": "Preferred Supplier Status + Member Discounts", "values": [{"text": "Included"}, {"text": "Included"}, {"text": "Included"}]},
+        {"feature_label": "Weld Connect (monthly newsletter)", "values": [{"text": "3 x Advertisements; 1 x Editorial"}, {"text": "2 x Advertisements"}, {"text": "1 x Advertisement"}]},
+        {"feature_label": "Australian Welding (bi-annual magazine)", "values": [{"text": "2 x Advertisements; 1 x Editorial"}, {"text": "2 x Advertisements"}, {"text": "1 x Advertisement"}]},
+        {"feature_label": "Weekly Wrap", "values": [{"text": "3 x Spotlights"}, {"text": "2 x Spotlights"}, {"text": "1 x Spotlight"}]},
+        {"feature_label": "Social Media", "values": [{"text": "3 x Posts"}, {"text": "2 x Posts"}, {"text": "1 x Post"}]},
+        {"feature_label": "Dedicated EDM", "values": [{"text": "3 x Per Year"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "Website", "values": [{"text": "Gold Status Listing"}, {"text": "Silver Status Listing"}, {"text": "Bronze Status Listing"}]}
+      ]
+    },
+    {
+      "group_label": "Event Tickets",
+      "rows": [
+        {"feature_label": "National Manufacturing Summit", "values": [{"text": "1 x Ticket"}, {"text": "20% Discount"}, {"text": "10% Discount"}]},
+        {"feature_label": "Industry Drinks Nights", "values": [{"text": "10 x Tickets Per State"}, {"text": "5 x Tickets Per State"}, {"text": "2 x Tickets Per State"}]},
+        {"feature_label": "Welding Excellence Awards", "values": [{"text": "10 x Tickets"}, {"text": "4 x Tickets"}, {"text": "2 x Tickets"}]}
+      ]
+    },
+    {
+      "group_label": "Advocacy",
+      "rows": [
+        {"feature_label": "Personal Advocacy", "values": [{"text": "Included"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "Roundtable", "values": [{"text": "Invitation"}, {"text": "Invitation"}, {"text": "Invitation"}]},
+        {"feature_label": "Strategy Session with C-Suite", "values": [{"text": "Half Day On-Site"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "Bi-Annual Lunch", "values": [{"text": "2 x Per Year"}, {"text": "-"}, {"text": "-"}]},
+        {"feature_label": "Campfire Session", "values": [{"text": "-"}, {"text": "1 x Per Year"}, {"text": "1 x Per Year"}]}
+      ]
+    },
+    {
+      "group_label": "Training & Technical Seminars",
+      "rows": [
+        {"feature_label": "Training Courses", "values": [{"text": "Member Rates"}, {"text": "Member Rates"}, {"text": "Member Rates"}]},
+        {"feature_label": "MEM Learning Resources Access", "values": [{"text": "20 x Licenses"}, {"text": "10 x Licenses"}, {"text": "5 x Licenses"}]},
+        {"feature_label": "Welding Simulator Usage", "values": [{"text": "5 x Days"}, {"text": "2 x Days"}, {"text": "-"}]},
+        {"feature_label": "Technical Seminars", "values": [{"text": "15% Discount"}, {"text": "10% Discount"}, {"text": "5% Discount"}]}
+      ]
+    },
+    {
+      "group_label": "Engineering Support",
+      "rows": [
+        {"feature_label": "Engineering Services", "values": [{"text": "15% Discount"}, {"text": "12% Discount"}, {"text": "8% Discount"}]},
+        {"feature_label": "Business Consultation (1 x hour)", "values": [{"text": "4 x Per Year"}, {"text": "2 x Per Year"}, {"text": "1 x Per Year"}]}
+      ]
+    },
+    {
+      "group_label": "Certification & Exams",
+      "rows": [
+        {"feature_label": "Company Certification Services (Applies to AS/NZS ISO 3834 and AS/NZS ISO 3834 plus AS/NZS 5131 only. Does not apply to EN 1585 or DIN 2303.)", "values": [{"text": "15% Discount"}, {"text": "12% Discount"}, {"text": "8% Discount"}]},
+        {"feature_label": "Individual Certification Services", "values": [{"text": "Member Rates"}, {"text": "Member Rates"}, {"text": "Member Rates"}]},
+        {"feature_label": "Examinations", "values": [{"text": "Member Rates"}, {"text": "Member Rates"}, {"text": "Member Rates"}]}
+      ]
+    },
+    {
+      "group_label": "Publications, Technical Notes & Website",
+      "rows": [
+        {"feature_label": "Technical Notes", "values": [{"text": "Member Rates"}, {"text": "Member Rates"}, {"text": "Member Rates"}]},
+        {"feature_label": "Technical Guidance Notes", "values": [{"text": "Access Included"}, {"text": "Access Included"}, {"text": "Access Included"}]},
+        {"feature_label": "IIW Commission Papers", "values": [{"text": "Access Included"}, {"text": "Access Included"}, {"text": "Access Included"}]},
+        {"feature_label": "Member Directory Listing", "values": [{"text": "Gold Status"}, {"text": "Silver Status"}, {"text": "Bronze Status"}]},
+        {"feature_label": "Jobs Board Adverts", "values": [{"text": "10 x Adverts"}, {"text": "5 x Adverts"}, {"text": "2 x Adverts"}]},
+        {"feature_label": "Use of Weld Australia logo", "values": [{"text": "Access Included"}, {"text": "Access Included"}, {"text": "Access Included"}]}
+      ]
+    },
+    {
+      "group_label": "Associates, Communications & More",
+      "rows": [
+        {"feature_label": "Employees Listed as Associates", "values": [{"text": "Unlimited"}, {"text": "Unlimited"}, {"text": "Unlimited"}]},
+        {"feature_label": "Associate Invitations to Free Events", "values": [{"text": "Access Included"}, {"text": "Access Included"}, {"text": "Access Included"}]},
+        {"feature_label": "Associates Receive Industry Insights, Magazine, Newsletter & EDMs", "values": [{"text": "Unlimited"}, {"text": "Unlimited"}, {"text": "Unlimited"}]}
+      ]
+    }
+  ] %}
+
+  {% set _individual_columns = [
+    {"label_text": "Individual", "accent_color": "navy", "is_highlighted": true},
+    {"label_text": "Apprentice", "accent_color": "green", "is_highlighted": false},
+    {"label_text": "Reciprocal", "accent_color": "bronze", "is_highlighted": false}
+  ] %}
+
+  {% set _individual_row_groups = [
+    {
+      "group_label": "Member-only pricing on events",
+      "rows": [
+        {"feature_label": "National Manufacturing Summit", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Industry Drinks Nights", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Welding Excellence Awards", "values": [{"included": true}, {"included": true}, {"included": true}]}
+      ]
+    },
+    {
+      "group_label": "Member-only pricing on training & technical seminars",
+      "rows": [
+        {"feature_label": "Training Courses", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Technical Seminars", "values": [{"included": true}, {"included": true}, {"included": true}]}
+      ]
+    },
+    {
+      "group_label": "Member-only pricing on engineering, certification & exams",
+      "rows": [
+        {"feature_label": "Company & Individual Certification Services", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Engineering Services", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Examinations", "values": [{"included": true}, {"included": true}, {"included": true}]}
+      ]
+    },
+    {
+      "group_label": "Supplier Discounts",
+      "rows": [
+        {"feature_label": "Range of Discounts from Industry Suppliers", "values": [{"included": true}, {"included": true}, {"included": true}]}
+      ]
+    },
+    {
+      "group_label": "Publications, Technical Notes & Website",
+      "rows": [
+        {"feature_label": "Ability to Submit Content to Publications", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Member-Only Pricing on Technical Notes", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Free Technical Guidance Notes", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Access to IIW Commission Papers", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Access to the Jobs Board", "values": [{"included": true}, {"included": true}, {"included": true}]}
+      ]
+    },
+    {
+      "group_label": "Industry Insights & More",
+      "rows": [
+        {"feature_label": "Invitations to Free Member-Only Events", "values": [{"included": true}, {"included": true}, {"included": true}]},
+        {"feature_label": "Receive Industry Insights, Magazine, Newsletter & EDMs", "values": [{"included": true}, {"included": true}, {"included": true}]}
+      ]
+    }
+  ] %}
+
+  {% set _free_columns = [
+    {"label_text": "Student & Apprentice", "accent_color": "green", "is_highlighted": true},
+    {"label_text": "TAFE & Government RTO", "accent_color": "navy", "is_highlighted": false}
+  ] %}
+
+  {% set _free_row_groups = [
+    {
+      "group_label": "Eligibility",
+      "rows": [
+        {"feature_label": "Membership fee", "values": [{"text": "Free"}, {"text": "Free"}]},
+        {"feature_label": "Best suited to", "values": [{"text": "Eligible students and apprentices"}, {"text": "Public TAFE and government RTO providers"}]}
+      ]
+    },
+    {
+      "group_label": "Member access",
+      "rows": [
+        {"feature_label": "Member pricing on events, training and seminars", "values": [{"text": "Included"}, {"text": "Included"}]},
+        {"feature_label": "Invitations to free member-only events", "values": [{"text": "Included"}, {"text": "Included"}]},
+        {"feature_label": "Industry insights, magazine and newsletter", "values": [{"text": "Included"}, {"text": "Included"}]},
+        {"feature_label": "Supplier discounts and technical guidance notes", "values": [{"text": "Included"}, {"text": "-"}]}
+      ]
+    },
+    {
+      "group_label": "Training provider support",
+      "rows": [
+        {"feature_label": "Training and industry updates", "values": [{"text": "Included"}, {"text": "Included"}]},
+        {"feature_label": "Connection to Weld Australia's education network", "values": [{"text": "-"}, {"text": "Included"}]},
+        {"feature_label": "Support for welding workforce development", "values": [{"text": "-"}, {"text": "Included"}]}
+      ]
+    }
+  ] %}
+
+  {% set _compare_sets = [
+    {
+      "key": "corporate",
+      "heading": "Compare all corporate membership benefits",
+      "tier_columns": _corporate_columns,
+      "row_groups": _corporate_row_groups
+    },
+    {
+      "key": "supplier",
+      "heading": "Compare all industry supplier membership benefits",
+      "tier_columns": _corporate_columns,
+      "row_groups": _supplier_row_groups
+    },
+    {
+      "key": "individual",
+      "heading": "Compare individual, apprentice and reciprocal membership benefits",
+      "tier_columns": _individual_columns,
+      "row_groups": _individual_row_groups
+    },
+    {
+      "key": "free",
+      "heading": "Compare free membership benefits",
+      "tier_columns": _free_columns,
+      "row_groups": _free_row_groups
+    }
+  ] %}
+{% endif %}
+
+<section
+  class="wa-compare-table-section wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}{% if _is_membership_comparison %} wa-compare-table-section--membership{% endif %}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  {% if _is_membership_comparison %}data-membership-compare-section="true"{% endif %}
+>
+  <div class="container">
+    {% for compare_set in _compare_sets %}
+    {%- set _panel_key = compare_set.key | default('default') -%}
+    {%- set _panel_col_count = compare_set.tier_columns | length -%}
+    {%- set _is_collapsible = true if _is_membership_comparison else module.collapsible -%}
+    <div
+      class="wa-compare-table__panel{% if _is_membership_comparison %} js-membership-compare-panel{% endif %}"
+      {% if _is_membership_comparison %}
+      data-membership-compare-panel="{{ _panel_key }}"
+      {% if not loop.first %}hidden aria-hidden="true"{% else %}aria-hidden="false"{% endif %}
+      {% endif %}
+    >
+      {% if module.overline or compare_set.heading %}
+      <div class="wa-section-head wa-section-head--center">
+        {% if module.overline %}
+        <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+          <span class="wa-overline__text">{{ module.overline }}</span>
+        </div>
+        {% endif %}
+        {% if compare_set.heading %}
+        <h2 class="wa-compare-table-section__heading">{{ compare_set.heading }}</h2>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="wa-compare-table__wrapper">
+        <table
+          class="wa-compare-table{% if _is_collapsible %} wa-compare-table--collapsible{% endif %}"
+          role="table"
+          data-collapsible="{{ _is_collapsible | string | lower }}"
+        >
+          <thead>
+            <tr>
+              <th class="wa-compare-table__feature-col" scope="col">Benefit</th>
+              {% for col in compare_set.tier_columns %}
+              <th
+                class="wa-compare-table__tier-col wa-compare-table__tier-col--{{ col.accent_color | default('navy') }}{% if col.is_highlighted %} wa-compare-table__col--highlighted{% endif %}"
+                scope="col"
+              >{{ col.label_text }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for group in compare_set.row_groups %}
+            {# Capture group index before entering inner loop - HubL nested loop safe pattern #}
+            {%- set _group_index = loop.index -%}
+            <tr class="wa-compare-table__group-row" data-group-index="{{ _panel_key }}-{{ _group_index }}">
+              <td colspan="{{ _panel_col_count + 1 }}">
+                {% if _is_collapsible %}
+                <button
+                  class="wa-compare-table__group-btn"
+                  aria-expanded="true"
+                  aria-controls="{% for row in group.rows %}wa-cmp-{{ _panel_key }}-group-{{ _group_index }}-row-{{ loop.index }}{% if not loop.last %} {% endif %}{% endfor %}"
+                  type="button"
+                >
+                  <span>{{ group.group_label }}</span>
+                  <svg class="wa-compare-table__chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                {% else %}
+                {# Static label: no chevron - a non-interactive heading must not
+                   show a disclosure affordance. #}
+                <div class="wa-compare-table__group-static">
+                  <span>{{ group.group_label }}</span>
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+
+            {% for row in group.rows %}
+            <tr
+              class="wa-compare-table__row"
+              data-group="{{ _panel_key }}-{{ _group_index }}"
+              {% if _is_collapsible %}id="wa-cmp-{{ _panel_key }}-group-{{ _group_index }}-row-{{ loop.index }}"{% endif %}
+            >
+              <td class="wa-compare-table__feature-label">{{ row.feature_label }}</td>
+              {% for val in row.values %}
+              <td class="wa-compare-table__value{% if loop.index <= _panel_col_count and compare_set.tier_columns[loop.index0] and compare_set.tier_columns[loop.index0].is_highlighted %} wa-compare-table__value--highlighted{% endif %}">
+                {% if val.text %}
+                {{ val.text }}
+                {% elif val.included %}
+                <svg class="wa-compare-table__check" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-label="Included">
+                  <circle cx="12" cy="12" r="10" fill="#1c1e4c" opacity="0.1"/>
+                  <polyline points="8 12 11 15 16 9" stroke="#1c1e4c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                {% else %}
+                <svg class="wa-compare-table__cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" aria-label="Not included">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                {% endif %}
+              </td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>

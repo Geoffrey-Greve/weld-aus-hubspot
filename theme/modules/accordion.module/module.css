@@ -1,0 +1,120 @@
+/*
+ * accordion.module/module.css
+ * Native <details>/<summary> accordion.
+ * Chevron rotates on open via CSS. No JS required.
+ */
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+
+.wa-accordion__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-8);
+  text-align: center;
+}
+
+.wa-section--primary .wa-accordion__heading,
+.wa-section--primary-dark .wa-accordion__heading {
+  color: var(--wa-color-on-primary);
+}
+
+/* ── List ────────────────────────────────────────────────────────────────── */
+
+.wa-accordion__list {
+  max-width: 800px;
+  margin: 0 auto;
+  border-top: 1px solid var(--wa-color-border);
+}
+
+/* ── Item ────────────────────────────────────────────────────────────────── */
+
+.wa-accordion__item {
+  border-bottom: 1px solid var(--wa-color-border);
+}
+
+/* Remove default marker in all browsers */
+.wa-accordion__item > summary {
+  list-style: none;
+}
+.wa-accordion__item > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* ── Summary (trigger) ───────────────────────────────────────────────────── */
+
+.wa-accordion__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wa-space-4);
+  padding: var(--wa-space-5) 0;
+  cursor: pointer;
+  min-height: var(--wa-touch-min);
+  user-select: none;
+}
+
+.wa-accordion__summary:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+}
+
+/* ── Title ───────────────────────────────────────────────────────────────── */
+
+.wa-accordion__title {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-lg);
+  font-weight: var(--wa-weight-semibold);
+  color: var(--wa-color-text);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.wa-section--primary .wa-accordion__title,
+.wa-section--primary-dark .wa-accordion__title {
+  color: var(--wa-color-on-primary);
+}
+
+/* ── Chevron ─────────────────────────────────────────────────────────────── */
+
+.wa-accordion__chevron {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wa-color-text-muted);
+  transition: transform 0.2s ease;
+}
+
+.wa-accordion__item[open] .wa-accordion__chevron {
+  transform: rotate(180deg);
+}
+
+.wa-section--primary .wa-accordion__chevron,
+.wa-section--primary-dark .wa-accordion__chevron {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+
+.wa-accordion__body {
+  padding: 0 0 var(--wa-space-5);
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text-muted);
+  line-height: 1.7;
+}
+
+.wa-accordion__body > *:first-child {
+  margin-top: 0;
+}
+
+.wa-accordion__body > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-section--primary .wa-accordion__body,
+.wa-section--primary-dark .wa-accordion__body {
+  color: rgba(255, 255, 255, 0.8);
+}

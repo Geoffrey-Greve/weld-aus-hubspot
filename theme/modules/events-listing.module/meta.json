@@ -1,0 +1,14 @@
+{
+  "label": "Events Listing",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "React island: upcoming and past events from the HubDB events table. Supports state and type filters, pagination, and a past-events toggle.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["events", "react-island", "hubdb", "listing", "interactive"]
+}

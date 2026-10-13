@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A11y Test - Corporate Admin</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/assets/css/components.css" />
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    a.skip-to-content {
+      position: absolute; left: -9999px; top: 0; z-index: 9999;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; min-width: 44px;
+      padding: 0.5rem 1rem; background: #002f5f; color: #fff;
+    }
+    a.skip-to-content:focus { left: 0; }
+  </style>
+</head>
+<body>
+  <a class="skip-to-content" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <div
+      data-wa-module="corporate-admin"
+      data-props='{
+        "portal_id": "441838610",
+        "actor_contact_id": "admin-001",
+        "actor_name": "Dana Admin",
+        "actor_email": "dana@abcwelding.com.au",
+        "worker_base_url": "https://event-engine-staging.example.workers.dev",
+        "company_id": "comp-001",
+        "company_name": "ABC Welding Solutions Pty Ltd",
+        "vouchers_total": 10,
+        "vouchers_used": 3,
+        "employees": [
+          { "id": "emp-001", "name": "Alice Smith", "email": "alice@abcwelding.com.au", "membership_tier": "Corporate Gold" },
+          { "id": "emp-002", "name": "Bob Johnson", "email": "bob@abcwelding.com.au", "membership_tier": "Corporate Gold" },
+          { "id": "emp-003", "name": "Carol Williams", "email": "carol@abcwelding.com.au", "membership_tier": "Corporate Gold" }
+        ],
+        "course_sessions": [
+          {
+            "id": "sess-001",
+            "course_name": "AS1796 Cert 10",
+            "city": "Sydney",
+            "start_date": "2026-08-04",
+            "status": "available",
+            "use_event_engine": true,
+            "worker_event_id": "evt_cert10_syd",
+            "member_ticket_type_id": "tt_member",
+            "non_member_ticket_type_id": "tt_public"
+          },
+          {
+            "id": "sess-002",
+            "course_name": "IIW International Welding Inspector",
+            "city": "Melbourne",
+            "start_date": "2026-09-15",
+            "status": "available"
+          }
+        ],
+        "add_employee_form_url": "/portal/team/add/",
+        "team_page_url": "/portal/team/"
+      }'
+    ></div>
+  </main>
+  <script src="/a11y/_future-dates.js"></script>
+  <script type="module" src="/src/modules/corporate-admin/index.tsx"></script>
+</body>
+</html>

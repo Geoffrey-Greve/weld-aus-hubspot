@@ -1,0 +1,69 @@
+{%- set _vis = module.visibility|default(['mobile','tablet','desktop']) -%}
+{%- set _section_classes = 'wa-membership-testimonials wa-section wa-section--bg-surface_alt wa-section--spacing-spacious' -%}
+{%- if 'mobile' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section class="{{ _section_classes }}" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container">
+    <div class="wa-membership-testimonials__head">
+      {% if module.eyebrow %}
+      <div class="wa-overline">
+        <span class="wa-overline__text">{{ module.eyebrow }}</span>
+      </div>
+      {% endif %}
+      {% if module.heading %}<h2>{{ module.heading }}</h2>{% endif %}
+    </div>
+
+    <div class="wa-membership-testimonials__grid">
+      {% for item in module.testimonials %}
+      {%- set _person_key = (item.name_text|default('', true) ~ ' ' ~ item.company|default('', true))|lower -%}
+      {%- set _photo_src = item.photo.src|default('', true)|trim -%}
+      {%- set _photo_alt = item.photo.alt|default(item.name_text|default('Member testimonial profile image', true), true) -%}
+      {%- if not _photo_src and ('michael' in _person_key or 'acme' in _person_key) -%}
+        {%- set _photo_src = 'https://staging-441838610.weldaustralia.com/hs-fs/hubfs/placeholders/Images%20for%20webpage/Women%20in%20weld%2012.png?width=96&height=96&name=Women%20in%20weld%2012.png' -%}
+        {%- set _photo_alt = item.name_text|default('ACME Welding member testimonial', true) -%}
+      {%- elif not _photo_src and ('james' in _person_key or 'pacific steel' in _person_key) -%}
+        {%- set _photo_src = 'https://staging-441838610.weldaustralia.com/hs-fs/hubfs/placeholders/Stocked%20Images/iStock-595329266.jpg?width=96&height=96&name=iStock-595329266.jpg' -%}
+        {%- set _photo_alt = item.name_text|default('Pacific Steel Fabricators member testimonial', true) -%}
+      {%- elif not _photo_src and ('sarah' in _person_key or 'bhp' in _person_key) -%}
+        {%- set _photo_src = 'https://staging-441838610.weldaustralia.com/hs-fs/hubfs/placeholders/Stocked%20Images/iStock-927902644%20(1)%20copy.jpg?width=96&height=96&name=iStock-927902644%20(1)%20copy.jpg' -%}
+        {%- set _photo_alt = item.name_text|default('BHP Engineering member testimonial', true) -%}
+      {%- endif -%}
+      <figure class="wa-membership-testimonials__card wa-membership-testimonials__card--{{ item.tier|default('') }}">
+        <span class="wa-membership-testimonials__quote-mark" aria-hidden="true">"</span>
+        <blockquote>{{ item.quote }}</blockquote>
+        <figcaption class="wa-membership-testimonials__person">
+          {% if _photo_src %}
+          <img src="{{ _photo_src|escape_url }}" alt="{{ _photo_alt|escape_attr }}" loading="lazy" decoding="async">
+          {% else %}
+          <span class="wa-membership-testimonials__avatar" aria-hidden="true">WA</span>
+          {% endif %}
+          <span class="wa-membership-testimonials__bio">
+            {% if item.name_text %}<strong>{{ item.name_text }}</strong>{% endif %}
+            {% if item.role or item.company %}
+            <span>{{ item.role }}{% if item.role and item.company %}, {% endif %}{{ item.company }}</span>
+            {% endif %}
+            {% if item.logo.src %}
+            <img
+              class="wa-membership-testimonials__logo"
+              src="{{ item.logo.src|escape_url }}"
+              alt="{{ item.company|default('Company', true)|escape_attr }} logo"
+              loading="lazy"
+              decoding="async"
+            >
+            {% endif %}
+          </span>
+          {% if item.tier %}
+          <span class="wa-membership-testimonials__tier">
+            {% if item.tier == 'gold' %}Gold{% elif item.tier == 'silver' %}Silver{% elif item.tier == 'bronze' %}Bronze{% elif item.tier == 'individual' %}Individual{% else %}{{ item.tier }}{% endif %}
+          </span>
+          {% endif %}
+        </figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

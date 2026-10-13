@@ -1,0 +1,14 @@
+{
+  "label": "Course Pathways",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Tabbed qualification pathway explorer - shows career progression steps for each certification track. Tabs driven by vanilla JS.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["training", "pathways", "tabs"]
+}

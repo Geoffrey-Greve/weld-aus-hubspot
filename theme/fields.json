@@ -1,0 +1,124 @@
+[
+  {
+    "id": "colors",
+    "name": "colors",
+    "label": "Brand colours",
+    "type": "group",
+    "help_text": "The Weld Australia brand kit. These feed the theme's --wa-* CSS custom properties, so changing a colour here updates it everywhere on the site.",
+    "expanded": true,
+    "children": [
+      {
+        "id": "primary_color",
+        "name": "primary_color",
+        "label": "Primary (navy)",
+        "type": "color",
+        "default": { "color": "#1c1e4c", "opacity": 100 }
+      },
+      {
+        "id": "primary_dark_color",
+        "name": "primary_dark_color",
+        "label": "Primary dark",
+        "help_text": "Deepest navy - footer, membership band.",
+        "type": "color",
+        "default": { "color": "#0f1030", "opacity": 100 }
+      },
+      {
+        "id": "secondary_color",
+        "name": "secondary_color",
+        "label": "Secondary (industrial blue)",
+        "type": "color",
+        "default": { "color": "#1a5c9e", "opacity": 100 }
+      },
+      {
+        "id": "accent_color",
+        "name": "accent_color",
+        "label": "Accent (brand gold)",
+        "help_text": "Primary CTAs and active states.",
+        "type": "color",
+        "default": { "color": "#fecf05", "opacity": 100 }
+      },
+      {
+        "id": "magenta_color",
+        "name": "magenta_color",
+        "label": "Magenta accent",
+        "help_text": "Overline rules and the start of the brand flame gradient.",
+        "type": "color",
+        "default": { "color": "#ed128d", "opacity": 100 }
+      },
+      {
+        "id": "gradient_mid_color",
+        "name": "gradient_mid_color",
+        "label": "Flame gradient - mid (orange)",
+        "help_text": "Middle stop of the magenta → orange → gold flame gradient.",
+        "type": "color",
+        "default": { "color": "#f04828", "opacity": 100 }
+      },
+      {
+        "id": "success_color",
+        "name": "success_color",
+        "label": "Success (member discount)",
+        "help_text": "Member-pricing/discount green per the UX brief.",
+        "type": "color",
+        "default": { "color": "#1f8a4d", "opacity": 100 }
+      }
+    ]
+  },
+  {
+    "id": "typography",
+    "name": "typography",
+    "label": "Typography",
+    "type": "group",
+    "help_text": "Brand typefaces. Standard Google Fonts are loaded automatically.",
+    "children": [
+      {
+        "id": "heading_font",
+        "name": "heading_font",
+        "label": "Heading font",
+        "type": "font",
+        "load_external_fonts": true,
+        "default": {
+          "font": "Poppins",
+          "font_set": "GOOGLE",
+          "variant": "700",
+          "fallback": "sans-serif"
+        }
+      },
+      {
+        "id": "body_font",
+        "name": "body_font",
+        "label": "Body font",
+        "type": "font",
+        "load_external_fonts": true,
+        "default": {
+          "font": "Poppins",
+          "font_set": "GOOGLE",
+          "variant": "400",
+          "fallback": "sans-serif"
+        }
+      }
+    ]
+  },
+  {
+    "id": "integrations",
+    "name": "integrations",
+    "label": "Integrations",
+    "type": "group",
+    "help_text": "Backend service endpoints. Changing these takes effect immediately without a rebuild or deploy.",
+    "expanded": true,
+    "children": [
+      {
+        "id": "event_engine_worker_base_url",
+        "name": "event_engine_worker_base_url",
+        "label": "Event Engine worker",
+        "help_text": "Which Event Engine Worker serves checkout, registration, availability badges and corporate admin. Theme fields cannot be free-text, so pick one here; individual modules can still override. Production is event-engine.refuel-creative.workers.dev and is correct for the live site. The Worker formerly deployed as event-engine-staging was RENAMED to event-engine and that hostname no longer resolves, so anything still pointing at it takes checkout down - do not put it back. The Dev portal must select Development explicitly.",
+        "type": "choice",
+        "display": "select",
+        "choices": [
+          ["https://event-engine-dev.refuel-creative.workers.dev", "Development"],
+          ["https://event-engine.refuel-creative.workers.dev", "Production (the live worker)"]
+        ],
+        "default": "https://event-engine.refuel-creative.workers.dev"
+      }
+    ]
+  }
+]

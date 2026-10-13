@@ -1,0 +1,186 @@
+/*
+ * Weld Australia - Utility Classes
+ * Layout primitives and helper classes for use in HubL templates and React.
+ * Load order: tokens.css → reset.css → base.css → utilities.css
+ */
+
+/* ── Containers ──────────────────────────────────────────────────────────── */
+
+.container,
+.container-narrow,
+.container-wide {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--wa-space-5);
+}
+
+@media (min-width: 640px) {
+  .container,
+  .container-narrow,
+  .container-wide {
+    padding-inline: var(--wa-space-5);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container,
+  .container-narrow,
+  .container-wide {
+    padding-inline: var(--wa-space-12);
+  }
+}
+
+.container {
+  max-width: var(--wa-container-default);
+}
+
+.container-narrow {
+  max-width: var(--wa-container-narrow);
+}
+
+.container-wide {
+  max-width: var(--wa-container-wide);
+}
+
+/* ── Stack (vertical rhythm) ─────────────────────────────────────────────── */
+
+/*
+ * .stack-* places vertical space between direct children.
+ * Usage: <div class="stack-md"> ... sibling elements ... </div>
+ */
+
+.stack-sm > * + * { margin-top: var(--wa-space-2); }
+.stack-md > * + * { margin-top: var(--wa-space-4); }
+.stack-lg > * + * { margin-top: var(--wa-space-8); }
+.stack-xl > * + * { margin-top: var(--wa-space-16); }
+
+/* ── Cluster (horizontal wrapping group) ─────────────────────────────────── */
+
+/*
+ * .cluster wraps items horizontally, wrapping to new lines as needed.
+ * Usage: filter chips, tag groups, button rows.
+ */
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-2);
+  align-items: center;
+}
+
+.cluster-sm { gap: var(--wa-space-1); }
+.cluster-lg { gap: var(--wa-space-4); }
+
+/* ── Grid helpers ────────────────────────────────────────────────────────── */
+
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: var(--wa-space-6);
+}
+
+/* ── Visually hidden (accessible, not display:none) ─────────────────────── */
+
+.visually-hidden,
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focusable visually-hidden (for skip links etc.) */
+.visually-hidden:focus,
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: var(--wa-space-2) var(--wa-space-4);
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ── Text truncation ─────────────────────────────────────────────────────── */
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+/* ── Flex helpers ────────────────────────────────────────────────────────── */
+
+.flex        { display: flex; }
+.flex-col    { display: flex; flex-direction: column; }
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end   { align-items: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-center  { justify-content: center; }
+.justify-end     { justify-content: flex-end; }
+.flex-1      { flex: 1 1 0%; }
+.flex-none   { flex: none; }
+.gap-2       { gap: var(--wa-space-2); }
+.gap-4       { gap: var(--wa-space-4); }
+.gap-6       { gap: var(--wa-space-6); }
+.gap-8       { gap: var(--wa-space-8); }
+
+/* ── Typography helpers ──────────────────────────────────────────────────── */
+
+.text-xs     { font-size: var(--wa-text-xs); }
+.text-sm     { font-size: var(--wa-text-sm); }
+.text-base   { font-size: var(--wa-text-base); }
+.text-lg     { font-size: var(--wa-text-lg); }
+.text-xl     { font-size: var(--wa-text-xl); }
+
+.text-muted  { color: var(--wa-color-text-muted); }
+.text-muted-on-dark { color: var(--wa-color-text-muted-on-dark); }
+.text-primary { color: var(--wa-color-primary); }
+.text-success { color: var(--wa-color-success); }
+.text-danger  { color: var(--wa-color-danger); }
+.text-warning { color: var(--wa-color-warning); }
+
+.font-medium   { font-weight: var(--wa-weight-medium); }
+.font-semibold { font-weight: var(--wa-weight-semibold); }
+.font-bold     { font-weight: var(--wa-weight-bold); }
+
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+
+/* ── Spacing helpers ─────────────────────────────────────────────────────── */
+
+.mt-4  { margin-top: var(--wa-space-4); }
+.mt-8  { margin-top: var(--wa-space-8); }
+.mb-4  { margin-bottom: var(--wa-space-4); }
+.mb-8  { margin-bottom: var(--wa-space-8); }
+
+/* ── Visibility ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .hide-mobile { display: none !important; }
+}
+
+@media (min-width: 768px) {
+  .hide-desktop { display: none !important; }
+}

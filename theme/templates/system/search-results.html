@@ -1,0 +1,530 @@
+<!--
+  templateType: search_results_page
+  label: Weld Australia Search Results Page
+  isAvailableForNewContent: true
+-->
+{#
+  search-results.html - Themed wrapper around HubSpot's standard Site Search
+  Results module (@hubspot/search_results).
+
+  Assign in: Settings → Website → Pages → System pages → Search Results Page
+
+  Matches the HubSpot CMS theme boilerplate pattern: the native module owns
+  fetching, rendering, empty state, and pagination. We only add brand chrome
+  (hero + refine form).
+#}
+{% set page_title = "Search results" %}
+{% set page_description = "Search results across the Weld Australia website." %}
+{% extends "../layouts/base.html" %}
+
+
+{% if request.query_dict.term %}
+  {% set _search_query = request.query_dict.term %}
+{% elif request.query_dict.q %}
+  {% set _search_query = request.query_dict.q %}
+{% else %}
+  {% set _search_query = search_input|default('', true) %}
+{% endif %}
+
+{% block body_class %}page-search-results{% endblock %}
+
+{% block body %}
+<section class="search-page" aria-labelledby="search-results-heading">
+
+  {% set _search_hero_heading %}
+    {% if _search_query %}
+      Search results for
+      <span class="search-page__query">"{{ _search_query|escape_html }}"</span>
+    {% else %}
+      Search Weld Australia
+    {% endif %}
+  {% endset %}
+
+  {% set _search_hero_extra %}
+    <form
+      class="search-page__form"
+      action="/hs-search-results"
+      method="get"
+      role="search"
+      aria-label="Refine your search"
+      style="margin-top: var(--wa-space-4);"
+    >
+      <label for="search-refine-input" class="visually-hidden">Search</label>
+      <input
+        id="search-refine-input"
+        class="search-page__input"
+        type="search"
+        name="term"
+        value="{{ _search_query|escape_attr }}"
+        placeholder="Search for training, membership, certificationsâ€¦"
+        autocomplete="off"
+        aria-label="Refine search query"
+      >
+      <button class="btn btn-gold" type="submit" aria-label="Submit search">
+        Search
+      </button>
+    </form>
+  {% endset %}
+
+  {% set _shared_hero_id = 'search-results-hero' %}
+  {% set _shared_hero_section_id = 'search-results' %}
+  {% set _shared_hero_background = 'primary' %}
+  {% set _shared_hero_height = 'compact' %}
+  {% set _shared_hero_spacing = 'spacious' %}
+  {% set _shared_hero_alignment = 'left' %}
+  {% set _shared_hero_accent_bar = true %}
+  {% set _shared_hero_media_type = 'none' %}
+  {% set _shared_hero_eyebrow = 'Site search' %}
+  {% set _shared_hero_headline = _search_hero_heading %}
+  {% set _shared_hero_extra = _search_hero_extra %}
+  {% include "../partials/shared-hero.html" %}
+
+  {% if false %}
+  {# Legacy hero markup replaced by shared-hero in Batch 4. #}
+  <div class="search-page__hero">
+    <div class="container">
+
+      <h1 id="search-results-heading" class="search-page__heading">
+        {% if _search_query %}
+          Search results for
+          <span class="search-page__query">"{{ _search_query|escape_html }}"</span>
+        {% else %}
+          Search Weld Australia
+        {% endif %}
+      </h1>
+
+      <form
+        class="search-page__form"
+        action="/hs-search-results"
+        method="get"
+        role="search"
+        aria-label="Refine your search"
+        style="margin-top: var(--wa-space-4);"
+      >
+        <label for="search-refine-input" class="visually-hidden">Search</label>
+        <input
+          id="search-refine-input"
+          class="search-page__input"
+          type="search"
+          name="term"
+          value="{{ _search_query|escape_attr }}"
+          placeholder="Search for training, membership, certifications…"
+          autocomplete="off"
+          aria-label="Refine search query"
+        >
+        <button class="btn btn-gold" type="submit" aria-label="Submit search">
+          Search
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  {% endif %}
+
+  <div class="search-page__body">
+    <div class="container search-page__native-results">
+
+      {%- if get_asset_version("@hubspot/search_results") == 0 -%}
+        {% module "search_results" path="@hubspot/search_results" %}
+      {%- else -%}
+        {% module "search_results"
+          path="@hubspot/search_results",
+          title={
+            "show_title": "false"
+          }
+        %}
+      {%- endif -%}
+
+    </div>
+  </div>
+
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .search-page {
+    background-color: var(--wa-color-surface);
+    min-height: 60vh;
+  }
+
+  .search-page__hero {
+    position: relative;
+    background-color: var(--wa-color-primary-dark);
+    color: var(--wa-color-text-inverse);
+    padding: var(--wa-space-16) var(--wa-space-4) var(--wa-space-12);
+  }
+
+  .search-page__hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 5px;
+    background: var(--wa-gradient-flame, linear-gradient(90deg, #ed128d 0%, #f04828 40%, #fecf05 100%));
+  }
+
+  .search-page__heading {
+    font-family: var(--wa-font-heading);
+    font-size: clamp(var(--wa-text-xl), 3.5vw, var(--wa-text-3xl));
+    font-weight: var(--wa-weight-bold);
+    color: var(--wa-color-text-inverse);
+    margin: 0 0 var(--wa-space-6);
+    line-height: var(--wa-leading-tight);
+  }
+
+  .search-page__query {
+    color: var(--wa-color-accent);
+  }
+
+  .search-page__form {
+    display: flex;
+    gap: var(--wa-space-3);
+    margin-top: var(--wa-space-4);
+    max-width: 600px;
+  }
+
+  .search-page__input {
+    flex: 1;
+    min-width: 0;
+    min-height: var(--wa-touch-min);
+    padding: var(--wa-space-3) var(--wa-space-4);
+    font-family: var(--wa-font-body);
+    font-size: var(--wa-text-base);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: var(--wa-radius-md);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--wa-color-text-inverse);
+    transition: border-color var(--wa-duration-fast) var(--wa-ease-default),
+                background-color var(--wa-duration-fast) var(--wa-ease-default);
+  }
+
+  .search-page__input:focus {
+    outline: none;
+    border-color: var(--wa-color-accent);
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .search-page__input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .search-page__form .btn {
+    background-color: var(--wa-color-accent) !important;
+    border-color: var(--wa-color-accent) !important;
+    color: var(--wa-color-on-accent) !important;
+  }
+
+  .search-page__form .btn:hover,
+  .search-page__form .btn:focus-visible {
+    background-color: var(--wa-color-accent-dark) !important;
+    border-color: var(--wa-color-accent-dark) !important;
+    color: var(--wa-color-on-accent) !important;
+    text-decoration: none;
+  }
+
+  @media (max-width: 767px) {
+    .search-page__form {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .search-page__form .btn {
+      width: 100%;
+    }
+  }
+
+  .search-page__body {
+    padding: var(--wa-space-12) var(--wa-space-4);
+  }
+
+  .search-page__native-results .hs-search-results__listing {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .search-page__native-results .hs-search-results__listing li {
+    border-bottom: 1px solid var(--wa-color-border);
+    padding: var(--wa-space-6) 0;
+  }
+
+  .search-page__native-results .hs-search-results__listing li:first-child {
+    border-top: 1px solid var(--wa-color-border);
+  }
+
+  .search-page__native-results .hs-search-results-title,
+  .search-page__native-results .hs-search-results__title,
+  .search-page__native-results .hs-search-results__title a,
+  .search-page__native-results h2,
+  .search-page__native-results h3 {
+    color: var(--wa-color-primary) !important;
+    font-family: var(--wa-font-heading);
+  }
+
+  .search-page__native-results .hs-search-results-title {
+    font-size: clamp(var(--wa-text-lg), 2vw, var(--wa-text-2xl));
+    font-weight: var(--wa-weight-bold);
+    line-height: var(--wa-leading-tight);
+    margin-bottom: var(--wa-space-3);
+  }
+
+  .search-page__native-results a {
+    color: var(--wa-color-primary);
+    font-weight: var(--wa-weight-semibold);
+    text-decoration: none;
+  }
+
+  .search-page__native-results a:hover,
+  .search-page__native-results a:focus-visible {
+    color: var(--wa-color-primary-dark);
+    text-decoration: underline;
+  }
+
+  .search-page__native-results .hs-search-results__description,
+  .search-page__native-results p {
+    color: var(--wa-color-text-muted);
+    font-size: var(--wa-text-sm);
+    line-height: var(--wa-leading-relaxed);
+  }
+
+  .search-page__native-results .hs-search-results__pagination {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-block-start: 32px;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link {
+    min-width: 42px;
+    min-height: 40px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    border: 1.5px solid #dde0e5 !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    color: #1c1e4c !important;
+    cursor: pointer;
+    font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none !important;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link:hover,
+  .search-page__native-results .hs-search-results__pagination__link:focus-visible {
+    transform: translateY(-1px);
+    border-color: #1c1e4c !important;
+    color: #1c1e4c !important;
+    text-decoration: none !important;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link--active,
+  .search-page__native-results .hs-search-results__pagination__link[aria-current="page"] {
+    border-color: #1c1e4c !important;
+    background: #1c1e4c !important;
+    color: #fff !important;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link--active:hover,
+  .search-page__native-results .hs-search-results__pagination__link--active:focus-visible,
+  .search-page__native-results .hs-search-results__pagination__link[aria-current="page"]:hover,
+  .search-page__native-results .hs-search-results__pagination__link[aria-current="page"]:focus-visible {
+    color: #fff !important;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link--first,
+  .search-page__native-results .hs-search-results__pagination__link--last {
+    display: none !important;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link-icon {
+    display: none !important;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link--prev,
+  .search-page__native-results .hs-search-results__pagination__link--next {
+    min-width: auto;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link.is-disabled,
+  .search-page__native-results .hs-search-results__pagination__link[aria-disabled="true"] {
+    border-color: #dde0e5 !important;
+    background: #fff !important;
+    color: #1c1e4c !important;
+    cursor: not-allowed;
+    opacity: 0.45;
+    transform: none !important;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link.is-disabled:hover,
+  .search-page__native-results .hs-search-results__pagination__link.is-disabled:focus-visible,
+  .search-page__native-results .hs-search-results__pagination__link[aria-disabled="true"]:hover,
+  .search-page__native-results .hs-search-results__pagination__link[aria-disabled="true"]:focus-visible {
+    border-color: #dde0e5 !important;
+    color: #1c1e4c !important;
+    text-decoration: none !important;
+    transform: none !important;
+  }
+
+  .search-page__native-results .hs-search-results__pagination__link--ellipsis {
+    min-width: 28px;
+    padding-inline: 6px;
+    border-color: transparent !important;
+    background: transparent !important;
+    cursor: default;
+  }
+
+  @media (max-width: 520px) {
+    .search-page__native-results .hs-search-results__pagination {
+      gap: 6px;
+    }
+
+    .search-page__native-results .hs-search-results__pagination__link {
+      min-width: 38px;
+      min-height: 38px;
+      padding: 0 12px;
+      font-size: 13px;
+    }
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+<script>
+  (function () {
+    var paginationLinkSelector = ".hs-search-results__pagination__link";
+    var managedDisabledAttr = "data-wa-pagination-disabled";
+
+    function parsePageNumber(value) {
+      var parsed = parseInt(value, 10);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    }
+
+    function getCurrentPage(root) {
+      var activeLink = root.querySelector(
+        ".hs-search-results__pagination__link--active, .hs-search-results__pagination__link[aria-current='page']"
+      );
+      var activePage = activeLink && activeLink.textContent.match(/\d+/);
+
+      if (activePage) {
+        return parsePageNumber(activePage[0]) || 1;
+      }
+
+      var params = new URLSearchParams(window.location.search);
+      return parsePageNumber(params.get("page") || params.get("page_num")) || 1;
+    }
+
+    function getLinkedPage(link) {
+      var href = link && link.getAttribute("href");
+
+      if (!href || href === "#") {
+        return null;
+      }
+
+      try {
+        var url = new URL(href, window.location.href);
+        return parsePageNumber(url.searchParams.get("page") || url.searchParams.get("page_num"));
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function setDisabled(link, shouldDisable) {
+      if (!link) {
+        return;
+      }
+
+      if (shouldDisable) {
+        link.classList.add("is-disabled");
+        link.setAttribute("aria-disabled", "true");
+        link.setAttribute("tabindex", "-1");
+        link.setAttribute(managedDisabledAttr, "true");
+        return;
+      }
+
+      link.classList.remove("is-disabled");
+
+      if (link.getAttribute(managedDisabledAttr) === "true") {
+        link.removeAttribute("aria-disabled");
+        link.removeAttribute("tabindex");
+        link.removeAttribute(managedDisabledAttr);
+      }
+    }
+
+    function syncPaginationBoundaryStates() {
+      var root = document.querySelector(".search-page__native-results");
+
+      if (!root) {
+        return;
+      }
+
+      var currentPage = getCurrentPage(root);
+      var previousLink = root.querySelector(".hs-search-results__pagination__link--prev");
+      var nextLink = root.querySelector(".hs-search-results__pagination__link--next");
+      var previousPage = getLinkedPage(previousLink);
+      var nextPage = getLinkedPage(nextLink);
+
+      setDisabled(previousLink, currentPage <= 1 || (previousPage !== null && previousPage >= currentPage));
+      setDisabled(nextLink, nextLink && (!nextLink.getAttribute("href") || (nextPage !== null && nextPage <= currentPage)));
+    }
+
+    document.addEventListener(
+      "click",
+      function (event) {
+        var disabledLink = event.target.closest(paginationLinkSelector + ".is-disabled");
+
+        if (!disabledLink) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+      },
+      true
+    );
+
+    function startPaginationObserver() {
+      syncPaginationBoundaryStates();
+
+      if (!("MutationObserver" in window)) {
+        return;
+      }
+
+      var observer = new MutationObserver(function () {
+        window.requestAnimationFrame(syncPaginationBoundaryStates);
+      });
+
+      observer.observe(document.querySelector(".search-page__native-results") || document.body, {
+        childList: true,
+        subtree: true
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", startPaginationObserver);
+    } else {
+      startPaginationObserver();
+    }
+  })();
+</script>
+{% endblock %}

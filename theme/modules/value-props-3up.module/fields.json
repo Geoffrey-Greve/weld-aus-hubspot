@@ -1,0 +1,168 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  },
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text"
+  },
+  {
+    "name": "section_intro",
+    "label": "Section intro",
+    "type": "richtext"
+  },
+  {
+    "name": "layout",
+    "label": "Layout",
+    "type": "choice",
+    "choices": [
+      [
+        "stacked",
+        "Stacked (centred header above the cards)"
+      ],
+      [
+        "split",
+        "Split (header beside the cards)"
+      ]
+    ],
+    "default": "stacked",
+    "help_text": "Split places the heading/intro/CTA in a left column beside the card grid - best paired with 4 cards (renders 2×2)."
+  },
+  {
+    "name": "header_cta_label",
+    "label": "Header CTA label (optional)",
+    "type": "text",
+    "help_text": "A button shown beneath the section intro."
+  },
+  {
+    "name": "header_cta_link",
+    "label": "Header CTA link",
+    "type": "link"
+  },
+  {
+    "name": "props",
+    "label": "Value props",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 6,
+      "default": 3
+    },
+    "children": [
+      {
+        "name": "icon",
+        "label": "Icon",
+        "type": "image",
+        "help_text": "SVG recommended."
+      },
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "body_text",
+        "label": "Body",
+        "type": "richtext"
+      },
+      {
+        "name": "cta_label",
+        "label": "CTA label",
+        "type": "text"
+      },
+      {
+        "name": "cta_link",
+        "label": "CTA link",
+        "type": "link"
+      }
+    ]
+  }
+]

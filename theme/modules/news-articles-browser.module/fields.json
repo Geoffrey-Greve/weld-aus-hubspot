@@ -1,0 +1,315 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "latest-articles"
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      ["surface", "Light grey"],
+      ["white", "White"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact"],
+      ["default", "Default"],
+      ["spacious", "Spacious"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "images",
+    "label": "Article images",
+    "type": "group",
+    "help_text": "Each article card uses that blog post's Settings > Featured image. The fallback below is used only when a post has no featured image.",
+    "children": [
+      {
+        "name": "fallback_image",
+        "label": "Fallback article thumbnail",
+        "type": "image",
+        "responsive": false,
+        "help_text": "Shown on the featured article and article cards when a blog post has no Featured image.",
+        "default": {
+          "src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1299734004%20(3).jpg",
+          "alt": "Weld Australia welding and fabrication"
+        }
+      }
+    ]
+  },
+  {
+    "name": "featured",
+    "label": "Featured article",
+    "type": "group",
+    "children": [
+      {
+        "name": "show",
+        "label": "Show featured article",
+        "type": "boolean",
+        "default": true,
+        "help_text": "When on, the first blog post in the listing is shown as the featured card and excluded from the article grid."
+      },
+      {
+        "name": "overline",
+        "label": "Overline",
+        "type": "text",
+        "default": "Featured"
+      },
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text",
+        "default": "This week's read"
+      },
+      {
+        "name": "badge_label",
+        "label": "Image badge label",
+        "type": "text",
+        "default": "Editor's pick"
+      },
+      {
+        "name": "read_label",
+        "label": "Read link label",
+        "type": "text",
+        "default": "Read article"
+      }
+    ]
+  },
+  {
+    "name": "browser",
+    "label": "Latest articles browser",
+    "type": "group",
+    "children": [
+      {
+        "name": "show",
+        "label": "Show latest articles browser",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "name": "overline",
+        "label": "Overline",
+        "type": "text",
+        "default": "Latest articles"
+      },
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text",
+        "default": "News & insights"
+      },
+      {
+        "name": "intro_text",
+        "label": "Intro text",
+        "type": "richtext",
+        "default": ""
+      },
+      {
+        "name": "show_article_count",
+        "label": "Show article count",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "name": "blog_id",
+        "label": "Blog source",
+        "type": "blog",
+        "help_text": "Optional. Leave blank to use the current blog; set this only if the page needs to pull articles from a specific HubSpot blog."
+      },
+      {
+        "name": "max_posts",
+        "label": "Posts to preload for filtering",
+        "type": "number",
+        "default": 24,
+        "help_text": "Recent posts loaded into the page so topic tabs can filter without a page refresh."
+      },
+      {
+        "name": "show_filters",
+        "label": "Show category tabs",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "name": "show_search",
+        "label": "Show search",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "name": "all_label",
+        "label": "All tab label",
+        "type": "text",
+        "default": "All"
+      },
+      {
+        "name": "category_base_path",
+        "label": "Category tag base path",
+        "type": "text",
+        "default": "/news/tag/",
+        "help_text": "Used for category tab links. Leave as /news/tag/ unless the blog URL structure changes."
+      },
+      {
+        "name": "category_tabs",
+        "label": "Custom category tabs",
+        "type": "group",
+        "help_text": "Optional. Leave empty to use the default Weld Australia category tabs.",
+        "occurrence": {
+          "min": 0,
+          "max": 12
+        },
+        "children": [
+          {
+            "name": "tab_label",
+            "label": "Label",
+            "type": "text",
+            "default": ""
+          },
+          {
+            "name": "slug",
+            "label": "Tag slug",
+            "type": "text",
+            "default": ""
+          },
+          {
+            "name": "style",
+            "label": "Colour style",
+            "type": "choice",
+            "choices": [
+              ["industry-news", "Industry News / Blue"],
+              ["technical", "Technical / Navy"],
+              ["standards", "Standards / Gold"],
+              ["technology", "Technology / Orange"],
+              ["training", "Training / Green"],
+              ["advocacy", "Advocacy / Magenta"],
+              ["member-news", "Member News / Purple"],
+              ["partnership", "Partnership / Teal"]
+            ],
+            "default": "industry-news"
+          }
+        ]
+      },
+      {
+        "name": "search_action",
+        "label": "Search action URL",
+        "type": "text",
+        "default": "/hs-search-results"
+      },
+      {
+        "name": "search_placeholder",
+        "label": "Search placeholder",
+        "type": "text",
+        "default": "Search articles"
+      },
+      {
+        "name": "show_view_all",
+        "label": "Show view-all link",
+        "type": "boolean",
+        "default": false,
+        "help_text": "Shows a clear link next to the heading to the full announcements/media archive (e.g. /news/)."
+      },
+      {
+        "name": "view_all_label",
+        "label": "View-all link label",
+        "type": "text",
+        "default": "View all announcements",
+        "visibility": {
+          "controlling_field_path": "browser.show_view_all",
+          "operator": "EQUAL",
+          "controlling_value_regex": "true"
+        }
+      },
+      {
+        "name": "view_all_href",
+        "label": "View-all link URL",
+        "type": "text",
+        "default": "/news/",
+        "visibility": {
+          "controlling_field_path": "browser.show_view_all",
+          "operator": "EQUAL",
+          "controlling_value_regex": "true"
+        }
+      }
+    ]
+  },
+  {
+    "name": "grid",
+    "label": "Article grid",
+    "type": "group",
+    "children": [
+      {
+        "name": "columns",
+        "label": "Desktop columns",
+        "type": "choice",
+        "choices": [
+          ["2", "2 columns"],
+          ["3", "3 columns"]
+        ],
+        "default": "3"
+      },
+      {
+        "name": "show_excerpt",
+        "label": "Show article excerpt",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "name": "show_date",
+        "label": "Show publish date",
+        "type": "boolean",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "empty_state",
+    "label": "Empty state",
+    "type": "group",
+    "children": [
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text",
+        "default": "No articles found"
+      },
+      {
+        "name": "text",
+        "label": "Text",
+        "type": "text",
+        "default": "There are no posts available for this topic yet. Please check back soon."
+      }
+    ]
+  },
+  {
+    "name": "pagination",
+    "label": "Pagination",
+    "type": "group",
+    "children": [
+      {
+        "name": "show",
+        "label": "Show pagination",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "name": "previous_label",
+        "label": "Previous label",
+        "type": "text",
+        "default": "Previous page"
+      },
+      {
+        "name": "next_label",
+        "label": "Next label",
+        "type": "text",
+        "default": "Next page"
+      }
+    ]
+  }
+]

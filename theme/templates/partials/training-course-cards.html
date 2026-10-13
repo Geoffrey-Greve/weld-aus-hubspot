@@ -1,0 +1,570 @@
+<!--
+  templateType: none
+-->
+{#
+  Training-page fallback renderer for saved page-instance versions of the
+  course-timetable-filter module.
+
+  The Training page has an existing saved DnD module instance, so changing the
+  template default does not replace it in the editor. This file renders the same
+  HubDB-driven card directory style used by featured-courses.module specifically
+  when that saved module appears on /training.
+
+  Categories follow the client's four training divisions via the generated
+  taxonomy macros - see theme/templates/partials/course-taxonomy.html. Like
+  featured-courses.module, the filter accepts a ?category= deep link so the
+  Training menu can land on a pre-filtered view.
+#}
+{% import "../partials/course-taxonomy.html" as wa_tax %}
+{% import "../partials/session-status.html" as wa_status %}
+{% import "../partials/_member-pricing.html" as wa_price %}
+
+{# Defect 213: this partial had no tier logic at all - it read price_member
+   directly, so a Gold member saw the generic member rate here while /courses/
+   showed their Gold rate, and an anonymous visitor was shown a "(member)" price
+   they were not entitled to. It is rendered via {% include %} from
+   course-timetable-filter.module, which resolves the visitor's entitlement just
+   above the include, so read those. Defaults keep the partial safe if it is ever
+   included from somewhere that does not set them. #}
+{% set _cards_is_member = _visitor_is_member | default(false, true) %}
+{% set _cards_member_tier = _visitor_member_tier | default('', true) if _cards_is_member else '' %}
+
+{% set directory_ns = namespace(rows=[]) %}
+{% set directory_seen = namespace(keys='|') %}
+{% set requested_card_limit = module.page_size | default(48, true) | int %}
+{% set directory_page_size = 12 %}
+{% if requested_card_limit < 1 %}
+  {% set directory_max = 48 %}
+{% elif requested_card_limit > 100 %}
+  {% set directory_max = 100 %}
+{% else %}
+  {% set directory_max = requested_card_limit %}
+{% endif %}
+{% set all_course_rows = hubdb_table_rows('courses', 'orderBy=course_name') %}
+{# Modules are sessions, not courses - see § 7.7. #}
+{% set _tcc_rows = namespace(rows=[]) %}
+{% import "../partials/_session-priceable.html" as wa_session %}
+{% set _tcc_today_key = local_dt | datetimeformat('%Y%m%d') %}
+{#- Ref 120: finished sessions leave the directory (§ 7.6). -#}
+{% for _r in all_course_rows %}{% if not _r.is_module and not wa_session.has_ended(_r, _tcc_today_key) | trim %}{% set _tcc_rows.rows = _tcc_rows.rows + [_r] %}{% endif %}{% endfor %}
+{% set all_course_rows = _tcc_rows.rows %}
+
+{# Defect 51: taxonomy division order (not a flat A–Z wall), matching
+   featured-courses.module directory mode. #}
+{% set directory_value_order = namespace(labels=[]) %}
+{% for _bucket_slug in wa_tax.slugs_csv('') | trim | split(',') %}
+  {% for _value in wa_tax.bucket_values_csv(_bucket_slug) | trim | split(',') %}
+    {% set _label = _value | trim %}
+    {% if _label %}
+      {% set directory_value_order.labels = directory_value_order.labels + [_label] %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+
+{% for category_label in directory_value_order.labels %}
+  {% for row in all_course_rows %}
+    {% set directory_slug = row.course_slug | default(row.course_id, true) %}
+    {% set directory_key = '|' ~ directory_slug ~ '|' %}
+    {% set category_name = row.category.name | default('', true) | trim %}
+    {% if directory_slug and category_name == category_label and directory_key not in directory_seen.keys and directory_ns.rows | length < directory_max %}
+      {% set directory_ns.rows = directory_ns.rows + [row] %}
+      {% set directory_seen.keys = directory_seen.keys ~ directory_slug ~ '|' %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+{% for row in all_course_rows %}
+  {% set directory_slug = row.course_slug | default(row.course_id, true) %}
+  {% set directory_key = '|' ~ directory_slug ~ '|' %}
+  {% if directory_slug and directory_key not in directory_seen.keys and directory_ns.rows | length < directory_max %}
+    {% set directory_ns.rows = directory_ns.rows + [row] %}
+    {% set directory_seen.keys = directory_seen.keys ~ directory_slug ~ '|' %}
+  {% endif %}
+{% endfor %}
+
+{# One filter chip per training division, in taxonomy order, with live counts.
+   A division with no courses on the page is omitted rather than shown empty. #}
+{% set filter_total = directory_ns.rows | length %}
+{% set tcc_cat_buttons = namespace(items=[]) %}
+{% for _bucket_slug in wa_tax.slugs_csv('') | trim | split(',') %}
+  {% set _bucket_count = namespace(n=0) %}
+  {% for row in directory_ns.rows %}
+    {% set filter_category_row = row.category if row.category else row.course_category %}
+    {% set filter_category_name = filter_category_row.name | default('') %}
+    {% if (wa_tax.bucket_slug(filter_category_name) | trim) == _bucket_slug %}
+      {% set _bucket_count.n = _bucket_count.n + 1 %}
+    {% endif %}
+  {% endfor %}
+  {% if _bucket_count.n > 0 %}
+    {% set tcc_cat_buttons.items = tcc_cat_buttons.items + [{
+      'name':  wa_tax.bucket_label(_bucket_slug) | trim,
+      'slug':  _bucket_slug,
+      'count': _bucket_count.n
+    }] %}
+  {% endif %}
+{% endfor %}
+
+{% set fallback_photo_url = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-598086822%20(1).jpg' %}
+
+<link rel="stylesheet" href="{{ get_asset_url('../../modules/featured-courses.module/module.css') }}">
+
+<section
+  class="wa-section wa-section--{{ module.background | default('surface') }} wa-section--{{ module.spacing | default('spacious') }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  data-wa-fc
+  data-wa-fc-page-size="{{ directory_page_size }}"
+  {# Taxonomy travels to the client so ?category= accepts bucket slugs, legacy
+     slugs and raw HubDB values without a second copy of the map in JS. #}
+  data-wa-fc-category-map="{{ wa_tax.taxonomy_json('') | trim | escape_attr }}"
+>
+  <div class="container">
+    <div class="wa-fc__header">
+      <div class="wa-fc__header-copy">
+        <p class="wa-fc__eyebrow">Our training programs</p>
+        <h2 class="wa-fc__heading">{{ module.section_heading | default('Our welding training courses') }}</h2>
+      </div>
+    </div>
+
+    {% if directory_ns.rows | length > 0 %}
+      <div class="wa-fc__controls wa-fc-filter" aria-label="Search and filter courses">
+        <div class="wa-fc-filter__top" role="group" aria-label="Filter courses by category">
+          <button class="wa-fc__filter wa-fc__filter--all is-active" type="button" data-filter="all" aria-pressed="true">
+            All <span class="wa-fc__filter-count">{{ filter_total }}</span>
+          </button>
+          {% for btn in tcc_cat_buttons.items %}
+            <button class="wa-fc__filter" type="button" data-filter="{{ btn.slug }}" aria-pressed="false">
+              <span class="wa-fc__filter-dot wa-fc__filter-dot--{{ btn.slug }}" aria-hidden="true"></span>{{ btn.name }} <span class="wa-fc__filter-count">{{ btn.count }}</span>
+            </button>
+          {% endfor %}
+        </div>
+
+        <div class="wa-fc-filter__tools">
+          <label class="wa-fc__search" for="{{ name }}-training-search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input id="{{ name }}-training-search" type="search" placeholder="Search courses..." aria-label="Search courses" data-wa-fc-search autocomplete="off">
+          </label>
+
+          {# Defect 51: visitors can reorder cards by name or cost, asc or desc. #}
+          <div class="wa-fc-sort" role="group" aria-label="Sort courses">
+            <label class="wa-fc-sort__field" for="{{ name }}-training-sort-by">
+              <span class="wa-fc-sort__label">Sort by</span>
+              <select id="{{ name }}-training-sort-by" data-wa-fc-sort-by>
+                <option value="name" selected>Name</option>
+                <option value="price">Cost</option>
+              </select>
+            </label>
+            <label class="wa-fc-sort__field" for="{{ name }}-training-sort-dir">
+              <span class="wa-fc-sort__label">Order</span>
+              <select id="{{ name }}-training-sort-dir" data-wa-fc-sort-dir>
+                <option value="asc" selected>Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <ul class="wa-fc__grid" role="list">
+        {% for row in directory_ns.rows %}
+          {% set course_name = row.course_name | default('') %}
+          {% set course_slug = row.course_slug | default('') %}
+          {% set city = row.city.name | default(row.city.label, true) | default('') %}
+          {% set price_member = wa_price.member_price(row, _cards_member_tier) | trim | float %}
+          {% set price_non_member = wa_price.non_member_price(row) | trim | float %}
+          {% set status_name = row.status.name | default('Available') %}
+          {% set seats_left = row.seats_remaining | int | default(0) %}
+          {% set description = row.description | striptags | truncate(150) if row.description else row.meta_description | default('') %}
+          {% set category_row = row.category if row.category else row.course_category %}
+          {% set category_name = category_row.name | default('') %}
+          {% set duration = row.duration | default('') %}
+          {% set delivery_mode = row.delivery_mode.name | default('') %}
+          {% set standards = row.standards | default('') %}
+          {% set is_free = row.is_free | default(false) %}
+          {% set photo_url = row.photo.url | default(row.og_image.url, true) | default(fallback_photo_url, true) %}
+          {% set detail_href = '/courses/' ~ course_slug if course_slug else '' %}
+          {% set register_href = detail_href ~ '#sessions' if detail_href else row.registration_url | default('') %}
+
+          {% set category_slug = wa_tax.bucket_slug(category_name) | trim %}
+          {% set display_category = wa_tax.bucket_label(category_slug) | trim %}
+          {% set filter_slug = category_slug %}
+
+          {% if delivery_mode == 'Face-to-Face' %}
+            {% set delivery_slug = 'face-to-face' %}
+          {% elif delivery_mode == 'Blended' %}
+            {% set delivery_slug = 'blended' %}
+          {% elif delivery_mode == 'In-House' %}
+            {% set delivery_slug = 'in-house' %}
+          {% elif delivery_mode == 'Online' %}
+            {% set delivery_slug = 'online' %}
+          {% else %}
+            {% set delivery_slug = 'other' %}
+          {% endif %}
+
+          {# Status, through the one vocabulary the React islands use (Ref 74c). The ladder
+             that used to sit here knew only 'Sold Out' and 'Cancelled', so a status added
+             to the column - "Closed" - would have rendered as an available session with a
+             working Register button. #}
+          {% set status_key = wa_status.status_of(status_name) | trim %}
+          {% set status_slug = wa_status.status_slug(status_key) | trim %}
+          {% set status_label = wa_status.status_label(status_key) | trim %}
+          {% set status_bookable = wa_status.status_is_bookable(status_key) | trim == 'true' %}
+
+          {# Only anonymous-safe when gated on entitlement: this used to render
+             "(member)" pricing to logged-out visitors.
+
+             Defect 213: _cards_is_member is the ONLY membership test in this
+             partial, and it must stay that way. There used to be a second
+             `visitor_is_member` defined further up that read the contact's
+             individual_membership_* properties directly. The price was computed
+             from _cards_member_tier (company-aware, set by the caller) and then
+             suppressed by that contact-only boolean, so an employee of a
+             Corporate Gold company with no individual membership had a Gold price
+             calculated and thrown away - non-member price here, Gold price in the
+             portal. Company entitlement is resolved by the caller; do not
+             re-derive it from request_contact in this file. #}
+          {% set show_member_price = _cards_is_member and price_member > 0 and price_non_member > price_member %}
+          {% set price_member_label = (price_member | format_currency('AUD')) | replace('.00', '') if price_member > 0 else '' %}
+          {% set price_non_member_label = (price_non_member | format_currency('AUD')) | replace('.00', '') if price_non_member > 0 else '' %}
+          {# Sort key = the price this visitor would pay (member rate when entitled). #}
+          {% if _cards_is_member and price_member > 0 %}
+            {% set sort_price = price_member %}
+          {% elif price_non_member > 0 %}
+            {% set sort_price = price_non_member %}
+          {% else %}
+            {% set sort_price = 0 %}
+          {% endif %}
+
+          <li class="wa-fc__grid-item" data-course-filter="{{ filter_slug }}" data-course-name="{{ course_name|striptags|lower|escape_attr }}" data-course-price="{{ sort_price }}" data-course-search="{{ course_name|striptags|lower|escape_attr }} {{ description|striptags|lower|escape_attr }} {{ standards|striptags|lower|escape_attr }} {{ display_category|lower|escape_attr }} {{ category_name|lower|escape_attr }} {{ delivery_mode|lower|escape_attr }} {{ city|lower|escape_attr }} {{ duration|lower|escape_attr }}">
+            <article class="wa-fc__card wa-fc__card--{{ status_slug }}">
+              <div class="wa-fc__media">
+                <img class="wa-fc__image" src="{{ photo_url }}" alt="{{ course_name|escape_attr }}" loading="lazy">
+                <span class="wa-fc__media-scrim" aria-hidden="true"></span>
+
+                <div class="wa-fc__badges" aria-label="Course labels">
+                  {% if display_category %}
+                    <span class="wa-fc__badge wa-fc__badge--{{ category_slug }}">{{ display_category }}</span>
+                  {% endif %}
+                  {% if is_free %}
+                    <span class="wa-fc__badge wa-fc__badge--free">Free</span>
+                  {% endif %}
+                  {% if not status_bookable %}
+                    <span class="wa-fc__badge wa-fc__badge--status wa-fc__status-badge--{{ status_slug }}">{{ status_label }}</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="wa-fc__body">
+                {% if delivery_mode %}
+                  <span class="wa-fc__delivery wa-fc__delivery--{{ delivery_slug }}">{{ delivery_mode }}</span>
+                {% elif city %}
+                  <span class="wa-fc__delivery wa-fc__delivery--other">{{ city }}</span>
+                {% endif %}
+
+                <h3 class="wa-fc__card-title">
+                  {% if detail_href %}
+                    <a href="{{ detail_href }}" class="wa-fc__card-title-link">{{ course_name }}</a>
+                  {% else %}
+                    {{ course_name }}
+                  {% endif %}
+                </h3>
+
+                {% if duration %}
+                  <span class="wa-fc__date">
+                    <svg class="wa-fc__date-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle cx="12" cy="12" r="9"></circle>
+                      <path d="M12 7v5l3 2"></path>
+                    </svg>
+                    {{ duration }}
+                  </span>
+                {% endif %}
+
+                {% if description %}
+                  <p class="wa-fc__summary">{{ description }}</p>
+                {% endif %}
+
+                {% if standards %}
+                  <p class="wa-fc__standards">{{ standards }}</p>
+                {% endif %}
+
+                {% if seats_left > 0 and seats_left <= 5 %}
+                  <p class="wa-fc__seats">Only {{ seats_left }} spot{% if seats_left != 1 %}s{% endif %} left</p>
+                {% endif %}
+
+                <div class="wa-fc__pricing">
+                  {% if show_member_price %}
+                    <span class="wa-fc__price wa-fc__price--member">
+                      {{ price_member_label }} <span class="wa-fc__price-label">ex GST (member)</span>
+                    </span>
+                    <span class="wa-fc__price wa-fc__price--non-member wa-fc__price--struck">
+                      {{ price_non_member_label }}
+                    </span>
+                  {% elif price_non_member %}
+                    <span class="wa-fc__price wa-fc__price--non-member">
+                      {{ price_non_member_label }} <span class="wa-fc__price-label">ex GST</span>
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="wa-fc__actions">
+                {% if detail_href %}
+                  <a href="{{ detail_href }}" class="wa-fc__action wa-fc__action--outline">View details</a>
+                {% endif %}
+
+                {# Gated on BOOKABLE, not on one status name. The old test named 'Sold Out'
+                   alone, so a Cancelled row - and any status added later - was offered a
+                   working Register button. #}
+                {% if not status_bookable %}
+                  <span class="wa-fc__action wa-fc__action--disabled" aria-disabled="true">{{ status_label }}</span>
+                {% elif register_href %}
+                  <a href="{{ register_href }}" class="wa-fc__action wa-fc__action--primary">Register now</a>
+                {% endif %}
+              </div>
+            </article>
+          </li>
+        {% endfor %}
+      </ul>
+      <nav class="wa-fc__pagination" data-wa-fc-pagination aria-label="Course pagination" hidden></nav>
+      <div class="wa-fc__empty wa-fc__empty--filtered" data-wa-fc-empty hidden>
+        <p>No courses match your search or filters.</p>
+      </div>
+    {% else %}
+      <div class="wa-fc__empty">
+        <p>No courses scheduled currently. Check back soon.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  (function () {
+    var sections = document.querySelectorAll('[data-wa-fc]:not([data-wa-fc-ready])');
+    sections.forEach(function (section) {
+      section.setAttribute('data-wa-fc-ready', 'true');
+      var filters = Array.prototype.slice.call(section.querySelectorAll('.wa-fc__filter'));
+      var grid = section.querySelector('.wa-fc__grid');
+      var cards = Array.prototype.slice.call(section.querySelectorAll('[data-course-filter]'));
+      var searchInput = section.querySelector('[data-wa-fc-search]');
+      var sortBySelect = section.querySelector('[data-wa-fc-sort-by]');
+      var sortDirSelect = section.querySelector('[data-wa-fc-sort-dir]');
+      var pagination = section.querySelector('[data-wa-fc-pagination]');
+      var emptyState = section.querySelector('[data-wa-fc-empty]');
+      var pageSize = parseInt(section.getAttribute('data-wa-fc-page-size'), 10);
+      var activeFilter = 'all';
+      var searchQuery = '';
+      var sortBy = (sortBySelect && sortBySelect.value) || 'name';
+      var sortDir = (sortDirSelect && sortDirSelect.value) || 'asc';
+      var currentPage = 1;
+
+      if (!Number.isFinite(pageSize) || pageSize < 1) {
+        pageSize = cards.length || 12;
+      }
+
+      function normaliseText(value) {
+        return String(value || '')
+          .toLowerCase()
+          .normalize('NFKD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/&/g, ' and ')
+          .replace(/[^a-z0-9]+/g, ' ')
+          .trim();
+      }
+
+      var cardSearchIndex = new Map(cards.map(function (card) {
+        return [card, normaliseText((card.getAttribute('data-course-search') || '') + ' ' + (card.textContent || ''))];
+      }));
+
+      function getMatches() {
+        return cards.filter(function (card) {
+          var filterMatch = activeFilter === 'all' || card.getAttribute('data-course-filter') === activeFilter;
+          var searchMatch = !searchQuery || (cardSearchIndex.get(card) || '').indexOf(searchQuery) !== -1;
+          return filterMatch && searchMatch;
+        });
+      }
+
+      function compareCards(a, b) {
+        var direction = sortDir === 'desc' ? -1 : 1;
+        if (sortBy === 'price') {
+          var priceA = parseFloat(a.getAttribute('data-course-price'));
+          var priceB = parseFloat(b.getAttribute('data-course-price'));
+          if (!Number.isFinite(priceA)) priceA = Number.POSITIVE_INFINITY;
+          if (!Number.isFinite(priceB)) priceB = Number.POSITIVE_INFINITY;
+          if (priceA !== priceB) return (priceA - priceB) * direction;
+        }
+        var nameA = a.getAttribute('data-course-name') || '';
+        var nameB = b.getAttribute('data-course-name') || '';
+        var nameDiff = nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+        if (nameDiff !== 0) {
+          return sortBy === 'name' ? nameDiff * direction : nameDiff;
+        }
+        return 0;
+      }
+
+      function sortMatches(matches) {
+        return matches.slice().sort(compareCards);
+      }
+
+      function createPageButton(label, page, isActive, disabled, ariaLabel) {
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'wa-fc__pagination-btn' + (isActive ? ' is-active' : '');
+        button.textContent = label;
+        button.disabled = !!disabled;
+        if (ariaLabel) button.setAttribute('aria-label', ariaLabel);
+        if (isActive) button.setAttribute('aria-current', 'page');
+        button.addEventListener('click', function () {
+          if (disabled || page === currentPage) return;
+          currentPage = page;
+          render();
+          var grid = section.querySelector('.wa-fc__grid');
+          if (grid && typeof grid.scrollIntoView === 'function') {
+            grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+        return button;
+      }
+
+      function renderPagination(totalPages) {
+        if (!pagination) return;
+        pagination.innerHTML = '';
+        pagination.hidden = totalPages <= 1;
+        if (totalPages <= 1) return;
+
+        pagination.appendChild(createPageButton('Previous', Math.max(1, currentPage - 1), false, currentPage === 1, 'Previous page'));
+        for (var page = 1; page <= totalPages; page += 1) {
+          pagination.appendChild(createPageButton(String(page), page, page === currentPage, false, 'Page ' + page));
+        }
+        pagination.appendChild(createPageButton('Next', Math.min(totalPages, currentPage + 1), false, currentPage === totalPages, 'Next page'));
+      }
+
+      function render() {
+        var matches = sortMatches(getMatches());
+        var totalPages = Math.max(1, Math.ceil(matches.length / pageSize));
+        if (currentPage > totalPages) currentPage = totalPages;
+        var start = (currentPage - 1) * pageSize;
+        var end = start + pageSize;
+        var matchSet = new Set(matches);
+
+        if (grid) {
+          matches.forEach(function (card) {
+            grid.appendChild(card);
+          });
+          cards.forEach(function (card) {
+            if (!matchSet.has(card)) grid.appendChild(card);
+          });
+        }
+
+        cards.forEach(function (card) {
+          card.hidden = true;
+          card.style.display = 'none';
+        });
+
+        matches.forEach(function (card, index) {
+          var isVisible = index >= start && index < end;
+          card.hidden = !isVisible;
+          card.style.display = isVisible ? '' : 'none';
+        });
+
+        if (emptyState) emptyState.hidden = matches.length !== 0;
+        renderPagination(totalPages);
+      }
+
+      function setFilter(filter) {
+        activeFilter = filter || 'all';
+        currentPage = 1;
+        filters.forEach(function (button) {
+          var isActive = button.getAttribute('data-filter') === activeFilter;
+          button.classList.toggle('is-active', isActive);
+          button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+        render();
+      }
+
+      filters.forEach(function (button) {
+        button.addEventListener('click', function () {
+          setFilter(button.getAttribute('data-filter') || 'all');
+        });
+      });
+
+      if (searchInput) {
+        var updateSearch = function () {
+          searchQuery = normaliseText(searchInput.value);
+          currentPage = 1;
+          render();
+        };
+        searchInput.addEventListener('input', updateSearch);
+        searchInput.addEventListener('search', updateSearch);
+      }
+
+      if (sortBySelect) {
+        sortBySelect.addEventListener('change', function () {
+          sortBy = sortBySelect.value || 'name';
+          currentPage = 1;
+          render();
+        });
+      }
+
+      if (sortDirSelect) {
+        sortDirSelect.addEventListener('change', function () {
+          sortDir = sortDirSelect.value || 'asc';
+          currentPage = 1;
+          render();
+        });
+      }
+
+      // Deep-link support: /training?category=<slug> pre-applies a division
+      // filter on load, so the Training menu can point straight at a category.
+      // Mirrors the resolver in featured-courses.module.
+      function normaliseCategoryKey(value) {
+        return String(value == null ? '' : value)
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      }
+
+      var categoryKeyToSlug = (function () {
+        var lookup = {};
+        var raw = section.getAttribute('data-wa-fc-category-map');
+        if (!raw) return lookup;
+        var taxonomy;
+        try {
+          taxonomy = JSON.parse(raw);
+        } catch (error) {
+          return lookup;
+        }
+        (taxonomy.buckets || []).forEach(function (bucket) {
+          (bucket.keys || []).forEach(function (key) {
+            lookup[key] = bucket.slug;
+          });
+        });
+        return lookup;
+      })();
+
+      function resolveInitialFilter() {
+        var params;
+        try {
+          params = new URLSearchParams(window.location.search);
+        } catch (error) {
+          return '';
+        }
+        var requested = normaliseCategoryKey(params.get('category') || params.get('filter'));
+        if (!requested || requested === 'all' || requested === 'any') return '';
+        return categoryKeyToSlug[requested] || requested;
+      }
+
+      var initialFilter = resolveInitialFilter();
+      var hasInitialButton = initialFilter && filters.some(function (button) {
+        return button.getAttribute('data-filter') === initialFilter;
+      });
+
+      if (hasInitialButton) {
+        setFilter(initialFilter);
+      } else {
+        render();
+      }
+    });
+  })();
+</script>

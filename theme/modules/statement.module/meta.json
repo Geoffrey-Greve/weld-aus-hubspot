@@ -1,0 +1,14 @@
+{
+  "label": "Statement (Full-bleed)",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Full-bleed background image with an overlaid statement text block.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["statement", "full-bleed", "image", "quote"]
+}

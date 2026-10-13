@@ -1,0 +1,14 @@
+{
+  "label": "Member Dashboard",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "React island: Member portal Command Centre composed of independently rendered tiles. Each tile wraps its own ErrorBoundary so one failure never crashes the dashboard. Place on dashboard.html (portal layout). Editor controls tile order and visibility.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["portal", "react-island", "member-dashboard", "interactive", "members-only"]
+}

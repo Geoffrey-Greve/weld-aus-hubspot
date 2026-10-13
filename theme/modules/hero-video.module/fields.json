@@ -1,0 +1,171 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  },
+  {
+    "name": "headline",
+    "label": "Headline",
+    "type": "text",
+    "required": true,
+    "default": ""
+  },
+  {
+    "name": "subheadline",
+    "label": "Sub-headline",
+    "type": "richtext"
+  },
+  {
+    "name": "video_source",
+    "label": "Video source",
+    "type": "choice",
+    "choices": [
+      [
+        "hubspot",
+        "HubSpot Video"
+      ],
+      [
+        "youtube",
+        "YouTube"
+      ],
+      [
+        "vimeo",
+        "Vimeo"
+      ]
+    ],
+    "default": "youtube"
+  },
+  {
+    "name": "video_id_or_url",
+    "label": "Video ID or URL",
+    "type": "text",
+    "help_text": "YouTube/Vimeo: paste the video ID (e.g. dQw4w9WgXcQ) or the full watch URL. HubSpot Video: paste the embed URL."
+  },
+  {
+    "name": "poster_image",
+    "label": "Poster image",
+    "type": "image"
+  },
+  {
+    "name": "trust_badges",
+    "label": "Trust badges",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 6
+    },
+    "children": [
+      {
+        "name": "badge_image",
+        "label": "Badge image",
+        "type": "image"
+      },
+      {
+        "name": "badge_label",
+        "label": "Badge label",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "primary_cta",
+    "label": "Primary CTA",
+    "type": "group",
+    "children": [
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text"
+      },
+      {
+        "name": "link",
+        "label": "Link",
+        "type": "link"
+      }
+    ]
+  }
+]

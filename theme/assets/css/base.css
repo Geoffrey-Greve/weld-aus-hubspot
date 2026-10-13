@@ -1,0 +1,310 @@
+/*
+ * Weld Australia - Base Typography & Global Styles
+ * Applies design tokens to html/body, headings, links, and scrollbar.
+ * Load order: tokens.css → reset.css → base.css
+ */
+
+/* ── Root & Body ─────────────────────────────────────────────────────────── */
+
+html {
+  font-size: 100%; /* 1rem = 16px */
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-base);
+  font-weight: var(--wa-weight-normal);
+  line-height: var(--wa-leading-normal);
+  color: var(--wa-color-text);
+  background-color: var(--wa-color-surface);
+}
+
+/*
+ * Backstop against sideways scroll on mobile.
+ *
+ * This is a safety net, NOT the fix - overflow still has to be fixed at source
+ * (see tests/a11y/overflow.spec.ts, which measures element geometry rather than
+ * scrollWidth precisely because this rule would otherwise mask it).
+ *
+ * Must be `clip`, not `hidden`. `overflow-x: hidden` on body makes it a scroll
+ * container, which breaks every `position: sticky` descendant - and this theme
+ * has ~14 of them (sticky sub-nav, compare-table headers, checkout sidebar,
+ * job/event/course detail rails). `clip` doesn't establish a scroll container
+ * and, unlike `hidden`, lets the other axis stay `visible`.
+ */
+html,
+body {
+  overflow-x: clip;
+}
+
+/* ── Headings ────────────────────────────────────────────────────────────── */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--wa-font-heading);
+  font-weight: var(--wa-weight-bold);
+  line-height: var(--wa-leading-tight);
+  color: var(--wa-color-text);
+}
+
+h1 { font-size: var(--wa-text-4xl); }
+h2 { font-size: var(--wa-text-3xl); }
+h3 { font-size: var(--wa-text-2xl); }
+h4 { font-size: var(--wa-text-xl); }
+h5 { font-size: var(--wa-text-lg); }
+h6 { font-size: var(--wa-text-md); }
+
+@media (max-width: 767px) {
+  h1 { font-size: var(--wa-text-3xl); }
+  h2 { font-size: var(--wa-text-2xl); }
+  h3 { font-size: var(--wa-text-xl); }
+}
+
+/* ── Body copy ───────────────────────────────────────────────────────────── */
+
+p {
+  max-width: 72ch;
+}
+
+strong,
+b {
+  font-weight: var(--wa-weight-semibold);
+}
+
+small {
+  font-size: var(--wa-text-sm);
+}
+
+/* ── Rich text ───────────────────────────────────────────────────────────────
+ * Shared styling for editor-authored HTML (`richtext` fields, HubDB rich text).
+ * reset.css zeroes every margin/padding globally, so paragraph spacing and list
+ * indent have to be reinstated here or authored lists render flush and unbulleted.
+ *
+ * Every selector is wrapped in :where() to keep specificity at 0, so the
+ * module-local overrides (split-feature, membership-options, certification-detail,
+ * card-grid) continue to win without !important.
+ */
+
+:where(.wa-richtext) :where(p) {
+  max-width: none;
+  margin-bottom: var(--wa-space-4);
+}
+
+:where(.wa-richtext) :where(ul, ol) {
+  margin-bottom: var(--wa-space-4);
+  padding-left: 1.25em;
+}
+
+/* Default markers, but only when the author has not asked for a specific type.
+   An HTML `type` attribute (e.g. <ol type="a"> for lettered substeps) is a
+   presentational hint in the author origin, so ANY author declaration here
+   silently outranks it — `revert` included. Excluding [type] from the selector
+   is the only way to leave the authored marker intact. */
+:where(.wa-richtext) :where(ul:not([type])) { list-style: disc; }
+:where(.wa-richtext) :where(ol:not([type])) { list-style: decimal; }
+
+:where(.wa-richtext) :where(li) {
+  margin-bottom: var(--wa-space-2);
+  line-height: inherit;
+}
+
+/* Nested lists sit tight against their parent item */
+:where(.wa-richtext) :where(ul ul, ul ol, ol ul, ol ol) {
+  margin-top: var(--wa-space-2);
+  margin-bottom: 0;
+}
+
+/* No trailing gap under the last block */
+:where(.wa-richtext) > :last-child,
+:where(.wa-richtext) :where(li):last-child {
+  margin-bottom: 0;
+}
+
+/* ── Links ───────────────────────────────────────────────────────────────── */
+
+a {
+  color: var(--wa-color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+a:hover {
+  color: var(--wa-color-primary-dark);
+}
+
+a:visited {
+  color: var(--wa-color-primary-dark);
+}
+
+/* Focus ring - WCAG 2.4.11 Focus Appearance (AA) */
+:focus-visible {
+  outline: 3px solid var(--wa-color-primary);
+  outline-offset: 3px;
+  border-radius: var(--wa-radius-sm);
+}
+
+/* ── Skip to content - WCAG 2.4.1 Bypass Blocks ──────────────────────────────
+   Global so every layout (public, portal, checkout, auth) styles the single
+   skip link rendered by base.html. Revealed on both :focus and :focus-visible
+   so it surfaces for keyboard and programmatic focus alike. */
+
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: var(--wa-space-4);
+  z-index: var(--wa-z-modal);
+  background: var(--wa-color-accent);
+  color: var(--wa-color-on-accent);
+  padding: var(--wa-space-3) var(--wa-space-6);
+  border-radius: var(--wa-radius-md);
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: top var(--wa-duration-fast) var(--wa-ease-out);
+}
+
+.skip-to-content:focus,
+.skip-to-content:focus-visible {
+  top: var(--wa-space-4);
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Code ────────────────────────────────────────────────────────────────── */
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--wa-font-mono);
+  font-size: var(--wa-text-sm);
+}
+
+code {
+  background-color: var(--wa-color-surface-2);
+  padding: 2px 5px;
+  border-radius: var(--wa-radius-sm);
+  border: 1px solid var(--wa-color-border);
+}
+
+pre {
+  overflow-x: auto;
+  padding: var(--wa-space-4);
+  background-color: var(--wa-color-surface-2);
+  border-radius: var(--wa-radius-md);
+  border: 1px solid var(--wa-color-border);
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--wa-text-sm);
+}
+
+th {
+  font-weight: var(--wa-weight-semibold);
+  text-align: left;
+  padding: var(--wa-space-3) var(--wa-space-4);
+  background-color: var(--wa-color-surface-2);
+  border-bottom: 2px solid var(--wa-color-border-strong);
+}
+
+td {
+  padding: var(--wa-space-3) var(--wa-space-4);
+  border-bottom: 1px solid var(--wa-color-border);
+  vertical-align: top;
+}
+
+/* Rich text tables: the header row is always the theme's pair.
+   Weld's editors colour header rows in the rich text editor, and the colours
+   arrive as inline styles on the cell, the row, or a <span>/<strong> inside the
+   cell, set independently of each other. A dark blue row with black text on
+   /courses/iwi-b-session-22 (Lara, 23 Sep) is the result, made worse on course
+   pages by course-detail.css, whose `color: inherit !important` on p/span/div
+   and navy <strong> override the editor's own white text but not their
+   background. So the header cell takes BOTH halves from the theme and its
+   contents inherit the cell's text colour.
+   !important is what beats an inline style attribute; that, and the rule above,
+   are the only reasons for it. Covers <thead> and a header row left in <tbody>,
+   which is where the editor puts it. */
+.wa-richtext thead th,
+.wa-richtext tr:first-child > th {
+  background-color: var(--wa-table-head-bg) !important;
+  color: var(--wa-table-head-text) !important;
+  border-color: var(--wa-table-head-bg);
+}
+
+.wa-richtext thead th *,
+.wa-richtext tr:first-child > th * {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+/* ── Selection ───────────────────────────────────────────────────────────── */
+
+::selection {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--wa-color-surface-2);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--wa-color-border-strong);
+    border-radius: var(--wa-radius-full);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--wa-color-text-muted);
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ── Horizontal rule ─────────────────────────────────────────────────────── */
+
+hr {
+  border: none;
+  border-top: 1px solid var(--wa-color-border);
+  margin-block: var(--wa-space-8);
+}

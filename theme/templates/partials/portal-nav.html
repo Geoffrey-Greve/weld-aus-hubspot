@@ -1,0 +1,147 @@
+<!--
+  templateType: none
+-->
+{#
+  portal-nav.html - Secondary navigation for the member portal.
+
+  The profile/member dropdown already contains the logout action, so this
+  sub-navigation intentionally contains only portal sections.
+#}
+{% set is_portal_shell = request.path == '/portal/' or request.path == '/portal' %}
+{% set portal_admin_role_label = request_contact.wa_company_role_label | default('', true) | string | lower | trim %}
+{% set portal_admin_flag = request_contact.is_corporate_admin | default(false, true) | string | lower | trim %}
+{% set portal_admin_ns = namespace(value=false, seen=[]) %}
+{% if portal_admin_role_label in ['primary admin', 'admin'] or portal_admin_flag in ['true', '1', 'yes'] %}
+  {% set portal_admin_ns.value = true %}
+{% endif %}
+{% if request_contact.is_logged_in and not portal_admin_ns.value %}
+  {% set portal_contact_id_candidates = [
+    request_contact.id | default('', true) | string | trim,
+    request_contact.hs_object_id | default('', true) | string | trim,
+    request_contact.vid | default('', true) | string | trim,
+    contact.id | default('', true) | string | trim,
+    contact.hs_object_id | default('', true) | string | trim,
+    contact.vid | default('', true) | string | trim
+  ] %}
+  {% for portal_contact_id in portal_contact_id_candidates %}
+    {% set portal_candidate_id = portal_contact_id | string | trim %}
+    {% if portal_candidate_id and portal_candidate_id != '[object Object]' and portal_candidate_id != '[object object]' and portal_candidate_id not in portal_admin_ns.seen and not portal_admin_ns.value %}
+      {% set portal_admin_ns.seen = portal_admin_ns.seen + [portal_candidate_id] %}
+      {#
+        HubSpot's generic CONTACT_TO_COMPANY helper does not reliably expose
+        custom association labels in private-content renders. Ryan configured
+        the CRM with a custom Contact → Company association label:
+        USER_DEFINED / typeId 7 / "Admin".
+      #}
+      {% set portal_admin_assoc_raw = crm_associations(portal_candidate_id, 'USER_DEFINED', 7, 'limit=50', 'name,hs_object_id', false) %}
+      {% set portal_admin_assoc = portal_admin_assoc_raw.results if portal_admin_assoc_raw.results else portal_admin_assoc_raw %}
+      {% if portal_admin_assoc|length > 0 %}
+        {% set portal_admin_ns.value = true %}
+      {% endif %}
+      {% set portal_company_assocs_raw = crm_associations(portal_candidate_id, 'CONTACT_TO_COMPANY', 50) %}
+      {% set portal_company_assocs = portal_company_assocs_raw.results if portal_company_assocs_raw.results else portal_company_assocs_raw %}
+      {% for portal_company in portal_company_assocs %}
+        {% set portal_labels = portal_company.association_labels | default(portal_company.labels | default([], true), true) %}
+        {% for portal_label in portal_labels %}
+          {% if portal_label | string | lower | trim in ['primary admin', 'admin'] %}
+            {% set portal_admin_ns.value = true %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+{% set portal_is_primary_admin = portal_admin_ns.value %}
+<nav
+  class="wa-portal-nav"
+  aria-label="Member portal navigation"
+  role="navigation"
+>
+  <div class="container">
+    <ul class="wa-portal-nav__list" role="list">
+      <li class="wa-portal-nav__item">
+        <a
+          href="#portal-dashboard"
+          class="wa-portal-nav__link{% if is_portal_shell %} is-active{% endif %}"
+          data-portal-target="dashboard"
+          {% if is_portal_shell %}aria-current="page"{% endif %}
+        >
+          Dashboard
+        </a>
+      </li>
+
+      <li class="wa-portal-nav__item">
+        <a
+          href="#portal-profile"
+          class="wa-portal-nav__link{% if '/portal/profile' in request.path %} is-active{% endif %}"
+          data-portal-target="profile"
+          {% if '/portal/profile' in request.path %}aria-current="page"{% endif %}
+        >
+          My Profile
+        </a>
+      </li>
+
+      <li class="wa-portal-nav__item">
+        <a
+          href="#portal-certifications"
+          class="wa-portal-nav__link"
+          data-portal-target="certifications"
+        >
+          My Certifications
+        </a>
+      </li>
+
+      <li class="wa-portal-nav__item">
+        <a
+          href="#courses-events-near-you"
+          class="wa-portal-nav__link"
+          data-portal-target="courses-events"
+        >
+          My Courses &amp; Events
+        </a>
+      </li>
+
+      <li class="wa-portal-nav__item">
+        <a
+          href="#portal-invoices"
+          class="wa-portal-nav__link{% if '/portal/invoices' in request.path %} is-active{% endif %}"
+          data-portal-target="invoices"
+          {% if '/portal/invoices' in request.path %}aria-current="page"{% endif %}
+        >
+          My Invoices
+        </a>
+      </li>
+
+      {% if portal_is_primary_admin %}
+      <li class="wa-portal-nav__item">
+        <a
+          href="#portal-team"
+          class="wa-portal-nav__link"
+          data-portal-target="team"
+        >
+          Manage My Team
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+<script>
+  (function () {
+    var nav = document.currentScript && document.currentScript.previousElementSibling;
+    if (!nav || !nav.classList || !nav.classList.contains('wa-portal-nav')) return;
+
+    nav.addEventListener('click', function (event) {
+      var link = event.target.closest ? event.target.closest('.wa-portal-nav__link[data-portal-target]') : null;
+      if (!link) return;
+
+      var hash = link.getAttribute('href') || '';
+      if (hash.charAt(0) !== '#') return;
+
+      if (!document.querySelector('[data-portal-tabs]')) {
+        event.preventDefault();
+        window.location.assign('/portal' + hash);
+      }
+    });
+  }());
+</script>

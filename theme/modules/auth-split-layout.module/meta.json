@@ -1,0 +1,14 @@
+{
+  "label": "Auth - Brand panel",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Brand/value-proposition panel for login and password-reset pages. Place in the left column of the auth layout alongside hubspot-membership-login or hubspot-membership-reset.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": false,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["auth", "login", "portal", "brand"]
+}

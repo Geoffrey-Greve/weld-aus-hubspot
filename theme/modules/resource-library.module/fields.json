@@ -1,0 +1,140 @@
+[
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Browse resources"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext",
+    "default": "<p>Explore technical notes, standards guidance, industry reports, webinars and practical tools for Australia’s welding community.</p>"
+  },
+  {
+    "name": "categories_visible",
+    "label": "Categories to show",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["technical", "Technical Papers"],
+      ["standards", "Standards Guidance"],
+      ["case_study", "Case Studies"],
+      ["report", "Reports"],
+      ["webinar", "Webinars"],
+      ["template", "Templates"],
+      ["advocacy", "Advocacy"]
+    ]
+  },
+  {
+    "name": "default_filter_category",
+    "label": "Default filter category",
+    "type": "choice",
+    "choices": [
+      ["all", "All"],
+      ["technical", "Technical"],
+      ["standards", "Standards"],
+      ["case_study", "Case Study"],
+      ["report", "Report"],
+      ["webinar", "Webinar"],
+      ["template", "Template"],
+      ["advocacy", "Advocacy"]
+    ],
+    "default": "all"
+  },
+  {
+    "name": "show_file_type_filter",
+    "label": "Show file type filter",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_member_only_filter",
+    "label": "Show 'Available to me' filter chip",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "page_size",
+    "label": "Results per page",
+    "type": "number",
+    "default": 9
+  },
+  {
+    "name": "locked_overlay_message",
+    "label": "Locked overlay message",
+    "type": "richtext",
+    "default": "<p>Available to Weld Australia members. Become a member to download.</p>"
+  },
+  {
+    "name": "locked_cta_label",
+    "label": "Locked CTA label",
+    "type": "text",
+    "default": "Become a member to access"
+  },
+  {
+    "name": "locked_cta_link",
+    "label": "Locked CTA link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": "/membership/"
+      },
+      "open_in_new_tab": false,
+      "no_follow": false
+    }
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this entire section is only rendered for logged-in active members."
+  }
+]

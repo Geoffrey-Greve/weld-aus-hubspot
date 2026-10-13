@@ -1,0 +1,14 @@
+{
+  "label": "Comparison Table",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Feature comparison table for membership tiers. Collapsible row groups with check/X icons per tier. On mobile the table scrolls horizontally with a sticky first column.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["comparison", "table", "membership", "tiers"]
+}

@@ -1,0 +1,378 @@
+/*
+  Course detail session cards
+
+  This file is intentionally small and loaded after the main course-detail CSS.
+  HubSpot can occasionally keep serving an older generated template stylesheet
+  for a short time after upload; this dedicated asset forces the location/session
+  cards to use the same image-card language as the course listing cards.
+*/
+
+.wa-course-filter-shell .wa-course-filter__sessions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 360px));
+  gap: 1.35rem;
+  justify-content: start;
+}
+
+.wa-course-filter-shell .wa-course-filter__card {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid #dde0e5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  transition:
+    box-shadow 200ms ease,
+    transform 200ms ease,
+    border-color 200ms ease;
+}
+
+.wa-course-filter-shell .wa-course-filter__card::before {
+  content: none;
+}
+
+.wa-course-filter-shell .wa-course-filter__card:not(:has(.wa-course-filter__media))::before {
+  content: '';
+  display: block;
+  height: 175px;
+  min-height: 175px;
+  flex: 0 0 auto;
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 55%),
+    url('https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1266644220%20(2).jpg')
+      center / cover no-repeat,
+    linear-gradient(135deg, #1c1e4c, #0055a4);
+}
+
+.wa-course-filter-shell .wa-course-filter__card:hover,
+.wa-course-filter-shell .wa-course-filter__card:focus-within {
+  border-color: rgba(28, 30, 76, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+}
+
+.wa-course-filter-shell .wa-course-filter__media {
+  position: relative;
+  height: 175px;
+  min-height: 175px;
+  overflow: hidden;
+  flex: 0 0 auto;
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 55%),
+    url('https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1266644220%20(2).jpg')
+      center / cover no-repeat,
+    linear-gradient(135deg, #1c1e4c, #0055a4);
+}
+
+.wa-course-filter-shell .wa-course-filter__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 400ms ease;
+}
+
+.wa-course-filter-shell .wa-course-filter__card:hover .wa-course-filter__image {
+  transform: scale(1.05);
+}
+
+.wa-course-filter-shell .wa-course-filter__image--placeholder {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(237, 18, 141, 0.22), transparent 30%),
+    linear-gradient(135deg, #1c1e4c, #0055a4);
+}
+
+.wa-course-filter-shell .wa-course-filter__media-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 55%);
+}
+
+.wa-course-filter-shell .wa-course-filter__badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wa-course-filter-shell .wa-course-filter__badge {
+  min-height: 20px;
+  padding: 3px 10px;
+  border: 0;
+  border-radius: 9999px;
+  background: #dbeafe;
+  color: #1a5c9e;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.wa-course-filter-shell .wa-course-filter__badge--supervision,
+.wa-course-filter-shell .wa-course-filter__badge--course-session {
+  background: #edf0f4;
+  color: #1c1e4c;
+}
+
+.wa-course-filter-shell .wa-course-filter__badge--welding-processes,
+.wa-course-filter-shell .wa-course-filter__badge--engineering,
+.wa-course-filter-shell .wa-course-filter__badge--management {
+  background: #fff7ed;
+  color: #7a4a00;
+}
+
+.wa-course-filter-shell .wa-course-filter__badge--ndt,
+.wa-course-filter-shell .wa-course-filter__badge--robotic-welding {
+  background: #dcfce7;
+  color: var(--wa-color-success-text, #146c39);
+}
+
+.wa-course-filter-shell .wa-course-filter__badge--cancelled {
+  background: #5b6770;
+  color: #fff;
+}
+
+.wa-course-filter-shell .wa-course-filter__badge--sold-out {
+  background: #dc2626;
+  color: #fff;
+}
+
+.wa-course-filter-shell .wa-course-filter__media .wa-course-filter__dates {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  z-index: 1;
+  display: inline-flex;
+  width: auto;
+  min-height: auto;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.wa-course-filter-shell .wa-course-filter__card > .wa-course-filter__card-header:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 18px 0;
+}
+
+.wa-course-filter-shell
+  .wa-course-filter__card
+  > .wa-course-filter__card-header:first-child
+  .wa-course-filter__dates {
+  position: static;
+  display: inline-flex;
+  width: auto;
+  min-height: 21px;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border: 0;
+  border-radius: 9999px;
+  background: #edf0f4;
+  color: #5b6770;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-shadow: none;
+}
+
+.wa-course-filter-shell .wa-course-filter__dates-icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+}
+
+.wa-course-filter-shell .wa-course-filter__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px 0;
+}
+
+.wa-course-filter-shell .wa-course-filter__media ~ .wa-course-filter__card-header {
+  display: none;
+}
+
+.wa-course-filter-shell .wa-course-filter__delivery {
+  display: inline-flex;
+  min-height: 21px;
+  align-self: flex-start;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+.wa-course-filter-shell .wa-course-filter__delivery--online {
+  background: #dbeafe;
+  color: #0055a4;
+}
+
+.wa-course-filter-shell .wa-course-filter__delivery--face-to-face {
+  background: #dcfce7;
+  color: var(--wa-color-success-text, #146c39);
+}
+
+.wa-course-filter-shell .wa-course-filter__delivery--blended {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.wa-course-filter-shell .wa-course-filter__delivery--in-house {
+  background: #fff7ed;
+  color: #7a4a00;
+}
+
+.wa-course-filter-shell .wa-course-filter__title {
+  margin: 0;
+  color: #1c1e4c;
+  font-family: var(--wa-font-heading, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.38;
+}
+
+.wa-course-filter-shell .wa-course-filter__duration-note {
+  margin: 0;
+  color: #5b6770;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.wa-course-filter-shell .wa-course-filter__session-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 0;
+  color: #5b6770;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.wa-course-filter-shell .wa-course-filter__session-location,
+.wa-course-filter-shell .wa-course-filter__session-date,
+.wa-course-filter-shell .wa-course-filter__session-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wa-course-filter-shell .wa-course-filter__session-duration::before {
+  content: '•';
+  color: #aeb8c5;
+}
+
+.wa-course-filter-shell .wa-course-filter__session-meta-icon {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wa-course-filter-shell .wa-course-filter__pricing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: auto 0 0;
+  padding: 0.65rem 18px 0;
+  border: 0;
+}
+
+.wa-course-filter-shell .wa-course-filter__price::before {
+  content: none;
+  display: none;
+}
+
+.wa-course-filter-shell .wa-course-filter__price {
+  color: #1c1e4c;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.wa-course-filter-shell .wa-course-filter__price--member {
+  color: var(--wa-color-success-text, #146c39);
+}
+
+.wa-course-filter-shell .wa-course-filter__price--struck {
+  color: var(--wa-color-text-muted, #5b6770);
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+.wa-course-filter-shell .wa-course-filter__price-tag {
+  display: inline;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.wa-course-filter-shell .wa-course-filter__seats {
+  margin: 0.45rem 18px 0;
+}
+
+.wa-course-filter-shell .wa-course-filter__cta {
+  width: calc(100% - 36px);
+  min-height: 38px;
+  margin: 14px 18px 16px;
+  padding: 0 12px;
+  border: 1.5px solid #1c1e4c;
+  border-radius: 8px;
+  background: #1c1e4c !important;
+  color: #fff !important;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.wa-course-filter-shell .wa-course-filter__note {
+  margin: 0.5rem 18px 0;
+  font-size: 0.78rem;
+}
+
+/* Cached pages can still hydrate the older bundle, which renders the note
+   after the CTA. Keep the original spacing for that sibling order so the
+   text does not sit flush against the card edge. */
+.wa-course-filter-shell .wa-course-filter__note:last-child {
+  margin: -8px 18px 16px;
+}
+
+@media (max-width: 767px) {
+  .wa-course-filter-shell .wa-course-filter__sessions {
+    grid-template-columns: 1fr;
+  }
+}

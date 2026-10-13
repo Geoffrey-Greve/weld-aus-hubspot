@@ -1,0 +1,14 @@
+{
+  "label": "Locations Map",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Inline SVG outline map of Australia with configurable city markers. No external map API required.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["map", "locations", "australia"]
+}

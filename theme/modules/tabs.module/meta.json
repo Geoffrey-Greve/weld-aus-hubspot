@@ -1,0 +1,10 @@
+{
+  "label": "Tabs",
+  "css_assets": [], "external_js": [],
+  "global": false,
+  "help_text": "Tabbed content panels with vanilla JS tab switching.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "is_available_for_new_content": true,
+  "js_assets": [], "other_assets": [], "smart_objects": [],
+  "tags": ["tabs", "content", "interactive"]
+}

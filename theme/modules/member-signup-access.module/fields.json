@@ -1,0 +1,128 @@
+[
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": "How access works"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Set up your portal access"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext",
+    "default": "<p>If your member portal access has already been approved, use the secure setup/reset page to request a password link for your member email address.</p>"
+  },
+  {
+    "name": "show_setup_form",
+    "label": "Show setup/reset link",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "setup_form_heading",
+    "label": "Setup link heading",
+    "type": "text",
+    "default": "Set up or reset your password"
+  },
+  {
+    "name": "setup_form_intro",
+    "label": "Setup link intro",
+    "type": "richtext",
+    "default": "<p>Enter the email address connected to your Weld Australia membership. If your account is active, you’ll receive a link to set up or reset your password.</p>"
+  },
+  {
+    "name": "setup_email_label",
+    "label": "Setup email label",
+    "type": "text",
+    "default": "Member email address"
+  },
+  {
+    "name": "setup_submit_label",
+    "label": "Setup submit label",
+    "type": "text",
+    "default": "Open setup/reset page"
+  },
+  {
+    "name": "setup_microcopy",
+    "label": "Setup microcopy",
+    "type": "richtext",
+    "default": "<p>This is for existing Weld Australia members with approved portal access. If you’re unsure which email to use, contact our team for support.</p>"
+  },
+  {
+    "name": "steps",
+    "label": "Steps",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 6,
+      "default": 3
+    },
+    "children": [
+      {
+        "name": "heading",
+        "label": "Step heading",
+        "type": "text",
+        "default": "Confirm your membership access"
+      },
+      {
+        "name": "step_text",
+        "label": "Step body",
+        "type": "richtext",
+        "default": "<p>Your membership needs to be active and approved for portal access.</p>"
+      }
+    ],
+    "default": [
+      {
+        "heading": "Confirm your membership access",
+        "step_text": "<p>Your membership needs to be active and approved for portal access.</p>"
+      },
+      {
+        "heading": "Use your registration email",
+        "step_text": "<p>Open the secure setup/reset page below, or use the registration link sent to your member email address, then set your password.</p>"
+      },
+      {
+        "heading": "Sign in to the portal",
+        "step_text": "<p>Return to the login page and use your email address plus the password you created.</p>"
+      }
+    ]
+  },
+  {
+    "name": "primary_cta_label",
+    "label": "Primary CTA label",
+    "type": "text",
+    "default": "Apply for membership"
+  },
+  {
+    "name": "primary_cta_link",
+    "label": "Primary CTA link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": "/membership/"
+      }
+    }
+  },
+  {
+    "name": "secondary_cta_label",
+    "label": "Secondary CTA label",
+    "type": "text",
+    "default": "I already have access"
+  },
+  {
+    "name": "secondary_cta_link",
+    "label": "Secondary CTA link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": "/login/"
+      }
+    }
+  }
+]

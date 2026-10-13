@@ -1,0 +1,77 @@
+{#
+  my-courses.module/module.html
+
+  React island: Member portal My Courses page.
+
+  Data strategy (Phase 1):
+    HubSpot Pro cannot query a contact's associated Deals directly in HubL.
+    Upcoming course data is read from workflow-synced contact properties:
+      • next_upcoming_course_name
+      • next_upcoming_course_date
+      • next_upcoming_course_location
+    These are exposed as a single-item "courses" array so the React island
+    renders immediately without an API round-trip.
+
+    Past courses and completion certificates require Deal-level data not
+    accessible via HubL Pro. The "past" array is empty in Phase 1 and will
+    be populated in a later sprint via additional workflow-synced properties
+    (e.g. last_completed_course_name, last_completed_course_date, etc.) or
+    a lightweight HubSpot Private Content API call from the React side.
+
+    Note: the tab switcher still renders correctly with an empty "past" list -
+    the empty state guides members to contact support.
+
+  Property names (lock with Ollie - CLAUDE.md §13 Q4):
+    next_upcoming_course_name     - text, synced from Won Training Deal
+    next_upcoming_course_date     - date, synced from Won Training Deal
+    next_upcoming_course_location - text, synced from Won Training Deal
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{# ── Build courses array from synced contact properties ───────────────── #}
+{% set ns = namespace(courses=[]) %}
+
+{% if request_contact.next_upcoming_course_name %}
+  {% set ns.courses = ns.courses + [{
+    'deal_id':                    'synced-upcoming-1',
+    'course_name':                request_contact.next_upcoming_course_name | default(''),
+    'course_date':                request_contact.next_upcoming_course_date  | default(null),
+    'course_end_date':            null,
+    'location':                   request_contact.next_upcoming_course_location | default(''),
+    'course_category':            '',
+    'completion_certificate_url': null,
+    'registration_url':           '/courses/'
+  }] %}
+{% endif %}
+
+{# ── Compose props blob ───────────────────────────────────────────────── #}
+{% set island_props = {
+  'courses':             ns.courses,
+  'empty_state_message': module.empty_state_message | default('No upcoming courses booked.'),
+  'browse_url':          module.browse_url.url.href | default('/courses/'),
+  'support_email':       module.support_email | default('training@weldaustralia.com.au')
+} %}
+
+{# ── Section wrapper + React mount point ─────────────────────────────── #}
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-my-courses-section"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    {% if module.heading %}
+      <h1 class="wa-section__heading">{{ module.heading }}</h1>
+    {% endif %}
+    {% if module.intro %}
+      <div class="wa-section__intro">{{ module.intro }}</div>
+    {% endif %}
+    <div
+      data-wa-module="my-courses"
+      data-props="{{ island_props | tojson | escape }}"
+    ></div>
+  </div>
+</section>
+
+<script type="module" src="{{ get_asset_url('../../assets/js/my-courses.standalone.js') }}"></script>
+
+{% endif %}

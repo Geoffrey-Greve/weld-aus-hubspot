@@ -1,0 +1,357 @@
+<!--
+  templateType: "page"
+  isAvailableForNewContent: false
+-->
+﻿{#
+  about.html - Weld Australia About Page
+  URL: /about/
+  Modules: hero → statement-cards → stat-band → statement → split-feature (stat_panel, IIW) →
+           card-grid (photo_overlay, 3-col) → board-grid (board, hubdb) →
+           team-grid (team, hubdb) → locations → contact-methods-grid (feature) →
+           faq-accordion → cta-banner (split)
+
+  Both people grids read the `team_and_board` HubDB table and link each card to
+  that person's profile page at /about/team/{person-name} - see about-team.html.
+
+  NOTE: this page renders through a dnd_area, so the live page's module instances
+  live in HubSpot, not here. Changing these defaults governs newly created pages;
+  the existing /about page needs its two people modules switched to the HubDB data
+  source in the page editor.
+#}
+{% set page_title_exact = 'About Weld Australia | Peak Welding Industry Body in Australia' %}
+{% set page_description = 'Weld Australia is the peak body for the welding industry in Australia, supporting members with training, certification, engineering expertise and advocacy.' %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<style>
+  body.is-about-page .wa-split-feature__heading,
+  body.is-about-page .wa-card-grid__heading,
+  body.is-about-page .wa-board__heading,
+  body.is-about-page .wa-team__heading,
+  body.is-about-page .wa-locations__heading,
+  body.is-about-page .wa-contact-cards__heading,
+  body.is-about-page .wa-faq-accordion__heading,
+  body.is-about-page .wa-stat-band__heading {
+    font-size: clamp(30px, 2.7vw, 36px);
+    line-height: 1.12;
+    letter-spacing: 0;
+    color: var(--wa-color-primary, #1c1e4c);
+  }
+
+  body.is-about-page .wa-section--bg-primary .wa-stat-band__heading,
+  body.is-about-page .wa-section--bg-primary_dark .wa-stat-band__heading {
+    color: #fff;
+  }
+
+  body.is-about-page .wa-statement__content {
+    max-width: var(--wa-container-wide, 1260px);
+  }
+
+  body.is-about-page .wa-statement__text {
+    font-size: clamp(28px, 2.7vw, 38px);
+    line-height: 1.22;
+  }
+
+  body.is-about-page .wa-team > .container-wide {
+    max-width: var(--wa-container-wide, 1260px);
+  }
+
+  body.is-about-page .wa-team--cols-4 .wa-team__name {
+    font-size: 17px;
+    line-height: 1.18;
+  }
+
+  body.is-about-page #our-team,
+  body.is-about-page #get-in-touch {
+    scroll-margin-top: 130px;
+  }
+
+  body.is-about-page .wa-board__name {
+    font-size: 17px;
+    line-height: 1.18;
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}is-about-page{% endblock %}
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ── § 1  HERO ────────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero"
+          background="primary"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+          eyebrow="Peak industry body"
+          headline="About Weld Australia"
+          subheadline="<p>The peak body representing the welding industry in Australia - a not-for-profit, member-driven organisation dedicated to providing a competitive advantage through industry, research, education, and certification.</p>"
+          primary_cta={"label_text": "Become a member", "link": {"url": {"href": "/membership", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "Meet our team", "link": {"url": {"href": "/about/team/", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 2  STATEMENT CARDS - MISSION + VISION ─────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/statement-cards"
+          label="Mission & Vision"
+          background="surface"
+          feature_quote="Our primary goal is to ensure that the Australian welding industry remains both locally and globally competitive."
+          feature_attribution="Weld Australia"
+          cards=[
+            {"overline": "Our mission", "heading": "Facilitating growth of world-class welding in Australia", "body_text": "<p>Connecting industry, education, research, and government to lift capability, quality, and safety across the sector.</p>", "card_style": "navy"},
+            {"overline": "Our vision",  "heading": "Leading edge technology for all joining processes",        "body_text": "<p>Enabling industry to access leading edge technologies for all types of joining processes through technology transfer, education, and certification.</p>", "card_style": "light"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 3  STAT BAND ───────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/stat-band"
+          label="By The Numbers"
+          background="primary"
+          overline="Our impact"
+          heading="Representing welding across every corner of Australia"
+          stats=[
+            {"value_text": "10,000+", "label_text": "Industry members",      "sublabel": "Individuals and organisations across Australia", "accent_color": "gold"},
+            {"value_text": "50+",     "label_text": "Countries in IIW",      "sublabel": "Global welding network spanning 5 continents",   "accent_color": "magenta"},
+            {"value_text": "40,000+", "label_text": "Welders on AWCR",       "sublabel": "Australian Welding Certification Register",      "accent_color": "gold"},
+            {"value_text": "2,000+",  "label_text": "Training attendees/yr", "sublabel": "Professional development across Australia",      "accent_color": "magenta"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 4  STATEMENT BAND ──────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/statement"
+          label="Industry Statement"
+          overlay_opacity=60
+          overlay_position="left"
+          overline="Our commitment"
+          statement="Welding is the invisible backbone of Australian industry - and we exist to ensure it remains strong, skilled and globally competitive."
+          attribution="Weld Australia"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 5  SPLIT FEATURE - IIW NETWORK ────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="IIW International Network"
+          background="surface_alt"
+          media_type="stat_panel"
+          media_side="right"
+          overline="Global welding network"
+          heading="Australia's voice in the global welding community"
+          body_text="<p>Weld Australia is the Australian representative member of the International Institute of Welding (IIW) - the world's leading international body for welding and joining.</p><p>Through our IIW membership, Australian professionals gain access to globally harmonised qualifications, cutting-edge research, technology transfer, and an international network spanning more than 50 countries.</p>"
+          stat_panel_items=[
+            {"value_text": "50+",    "label_text": "Member countries",        "accent_color": "gold"},
+            {"value_text": "1948",   "label_text": "Year established",        "accent_color": "magenta"},
+            {"value_text": "100+",   "label_text": "Technical committees",    "accent_color": "gold"},
+            {"value_text": "Global", "label_text": "Qualification network",   "accent_color": "magenta"}
+          ]
+          buttons=[
+            {"label_text": "Visit iiwelding.org", "url": {"url": {"href": "http://iiwelding.org", "type": "EXTERNAL"}}, "style": "outline"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 6  CARD GRID - IN THE FIELD ────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/card-grid"
+          label="What We Do"
+          background="surface"
+          overline="What we do"
+          heading="Training, certification & industry support"
+          card_style="photo_overlay"
+          columns="3"
+          cards=[
+            {"tag_text": "Training",      "tag_color": "gold",    "title": "Welding Training Courses",       "body_text": "Industry-leading courses and globally recognised qualifications - from welders and inspectors through to engineers and supervisors."},
+            {"tag_text": "Certification", "tag_color": "green",   "title": "Welding Certification",          "body_text": "Australia's leading certification body - internationally recognised for companies and individuals."},
+            {"tag_text": "Engineering",   "tag_color": "magenta", "title": "Welding Engineering Services",   "body_text": "The largest team of IWEs in Australia - high-level technical support across every industry."},
+            {"tag_text": "Resources",     "tag_color": "navy",    "title": "Technical Resources & Publications", "body_text": "Technical notes, guidance documents, and industry publications for professionals."},
+            {"tag_text": "Advocacy",      "tag_color": "grey",    "title": "Industry Advocacy",             "body_text": "Working with government and industry to strengthen sovereign manufacturing and address skills shortages."}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 7  TEAM GRID - BOARD ───────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/board-grid"
+          label="Board of Directors"
+          section_id="our-board"
+          background="surface"
+          overline="Leadership"
+          heading="Our board"
+          columns="3"
+          intro="<p>Elected by our members, the Board provides strategic direction and strong governance - bringing together highly respected leaders from across the industry.</p>"
+          checklist=[
+            {"item_text": "Elected by Weld Australia members"},
+            {"item_text": "Deep expertise across industry, education, and engineering"},
+            {"item_text": "Committed to strong governance and member outcomes"}
+          ]
+          data_source="hubdb"
+          profile_url_base="/about/team/"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 8  TEAM GRID - OUR TEAM ────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/team-grid"
+          label="Our Team"
+          section_id="our-team"
+          background="surface_alt"
+          data_source="hubdb"
+          category_filter="board"
+          category_exclude=""
+          group_by_category=false
+          profile_url_base="/about/team/"
+          view_all_label="View all"
+          view_all_link={"url": {"href": "/about/team", "type": "EXTERNAL"}}
+          overline="People"
+          section_heading="Our team of welding experts"
+          intro="<p>Our team brings together world-class experts from across the globe - leaders, innovators, and technical specialists who live and breathe welding, fabrication, and manufacturing. Driven by a shared passion for excellence, our people are committed to advancing Australia's welding industry on the global stage.</p>"
+          columns="4"
+          highlights=[
+            {"title": "IWEs on staff",    "description": "Australia's largest team of International Welding Engineers"},
+            {"title": "Global expertise", "description": "Specialists drawn from industry, academia, and research"},
+            {"title": "Cross-industry",   "description": "Experience across mining, defence, infrastructure, and manufacturing"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 9  LOCATIONS ───────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/locations"
+          label="Our Offices"
+          background="surface"
+          overline="Our offices"
+          heading="National presence"
+          intro="<p>Weld Australia has offices and representatives across Australia to support members and deliver training wherever they need it.</p>"
+          map_side="right"
+          cities=[
+            {"name": "Sydney (Head Office)", "is_primary": true,  "city_preset": "sydney"},
+            {"name": "Melbourne",            "is_primary": false, "city_preset": "melbourne"},
+            {"name": "Brisbane",             "is_primary": false, "city_preset": "brisbane"},
+            {"name": "Perth",                "is_primary": false, "city_preset": "perth"},
+            {"name": "Adelaide",             "is_primary": false, "city_preset": "adelaide"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 10  CONTACT METHODS GRID ───────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/contact-methods-grid"
+          label="Contact Weld Australia"
+          section_id="get-in-touch"
+          background="surface_alt"
+          style="feature"
+          section_heading="Get in touch"
+          cards=[
+            {"icon_name": "phone",    "heading": "Call us",          "body_text": "<p>Speak directly with our team. Free call within Australia during business hours.</p>", "link_url": "tel:1800189900",             "link_label": "1800 189 900"},
+            {"icon_name": "email",    "heading": "Email us",         "body_text": "<p>Send us an enquiry and our team will respond within 1-2 business days.</p>",          "link_url": "mailto:info@weldaustralia.com.au", "link_label": "info@weldaustralia.com.au"},
+            {"icon_name": "location", "heading": "Head office",      "body_text": "<p>Suite G1, Ground Floor<br>25 Ryde Road<br>Pymble NSW 2073</p>",                 "link_url": "/contact-us#offices",               "link_label": "View all offices"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 11  FAQ ACCORDION ──────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/faq-accordion"
+          label="Frequently Asked Questions"
+          background="surface"
+          overline="Common questions"
+          section_heading="About Weld Australia"
+          emit_jsonld=true
+          items=[
+            {"title": "What is Weld Australia?",                         "body_text": "<p>Weld Australia is the peak industry body representing the welding sector in Australia. As a not-for-profit, membership-based organisation, we provide training, certification, engineering expertise, and advocacy on behalf of our members.</p>"},
+            {"title": "Who can join Weld Australia?",                    "body_text": "<p>Membership is open to individuals, companies, and organisations of all sizes involved in the welding and fabrication industry - from apprentices and welders through to engineering firms and large corporations.</p>"},
+            {"title": "What does Weld Australia do?",                    "body_text": "<p>We deliver industry-leading training programmes, administer certifications including the Australian Welding Certificate Register (AWCR), provide engineering and consulting services, publish technical resources, and advocate on behalf of the industry with government and regulators.</p>"},
+            {"title": "Is Weld Australia part of the IIW?",              "body_text": "<p>Yes. Weld Australia is the Australian representative member of the International Institute of Welding (IIW) - the world's leading welding network spanning more than 50 countries.</p>"},
+            {"title": "How does Weld Australia support my career?",      "body_text": "<p>We offer training programmes and internationally recognised qualifications (IIW/IIS pathways), professional certification for welding supervisors and inspectors, access to a comprehensive technical library, and membership in a strong national industry network.</p>"}
+          ]
+          contact_cta_label="Contact us"
+          contact_cta_link={"url": {"href": "/contact-us#enquiry", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 12  CTA BANNER ─────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA"
+          background="primary"
+          align="split"
+          headline="Become part of Australia's welding industry"
+          body_text="<p>Join our membership network and advance your organisation today.</p>"
+          cta_label="Become a member"
+          cta_link={"url": {"href": "/membership", "type": "EXTERNAL"}}
+          secondary_cta_label="Contact us"
+          secondary_cta_link={"url": {"href": "/contact-us", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

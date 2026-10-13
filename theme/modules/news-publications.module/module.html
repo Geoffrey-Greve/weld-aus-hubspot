@@ -1,0 +1,184 @@
+{#
+  news-publications.module/module.html
+  Editable Publications section for the /news blog listing template.
+
+  The Weld Connect card embeds a HubSpot form selected via the module's
+  "Weld Connect card → Subscription form" picker (module.newsletter.form).
+  Submissions are captured by HubSpot; there is no native form action URL.
+
+  module.js does the embedding (same contract as footer.module) so the form is
+  rendered with HubSpot's own stylesheet suppressed and the theme's .hs-* rules
+  in assets/css/blog.css applied instead. The submit button label comes from
+  "Weld Connect card → Submit button label" (module.newsletter.submit_label),
+  which overrides whatever the HubSpot form itself is set to say.
+#}
+
+{%- set _section_id = module.section_id | default('magazine-connect', true) -%}
+{%- set _bg = module.background | default('white', true) -%}
+{%- set _spacing = module.spacing | default('default', true) -%}
+{%- set _layout = module.layout | default('default', true) -%}
+{%- set _heading_id = (_section_id ~ '-heading') if _section_id else 'wa-publications-heading' -%}
+{%- set _publication = module.publication -%}
+{%- set _newsletter = module.newsletter -%}
+{%- set _news_form_id = _newsletter.form.form_id | default('', true) | string | trim -%}
+{%- set _news_portal_id = hub_id | default('441838610', true) | string | trim -%}
+{%- set _news_btn = _newsletter.submit_label | default('Subscribe to Weld Connect', true) -%}
+{%- set _news_redirect_url = '' -%}
+{%- set _news_inline_message = _newsletter.form.message | default('', true) -%}
+{%- if _newsletter.form.response_type == 'redirect' and _newsletter.form.redirect_url -%}
+  {%- set _news_redirect_url = _newsletter.form.redirect_url -%}
+  {%- set _news_inline_message = '' -%}
+{%- endif -%}
+{%- set _fallback_cover = 'https://images.unsplash.com/photo-1581093458791-9f3c3900df7b?auto=format&fit=crop&w=700&q=70' -%}
+{%- set _cover_src = _publication.cover_image.src | default(_fallback_cover, true) -%}
+{%- set _cover_alt = _publication.cover_image.alt | default(_publication.cover_title | default('Australian Welding publication cover'), true) -%}
+{%- set _cover_opacity = (_publication.cover_image_opacity | default(35, true)) / 100 -%}
+
+<section
+  class="wa-blog-section wa-blog-section--{{ 'surface' if _bg == 'surface' else 'white' }} wa-publications wa-publications--spacing-{{ _spacing }} wa-publications--layout-{{ _layout }}"
+  {% if _section_id %}id="{{ _section_id }}"{% endif %}
+  aria-labelledby="{{ _heading_id }}"
+>
+  <div class="wa-blog-container">
+    <div class="wa-blog-section-head wa-publications__head wa-publications__head--{{ module.header.alignment | default('left', true) }}">
+      {% if module.header.overline %}
+      <p class="wa-blog-overline">{{ module.header.overline }}</p>
+      {% endif %}
+      {% if module.header.heading %}
+      <h2 class="wa-blog-section-head__title" id="{{ _heading_id }}">{{ module.header.heading }}</h2>
+      {% endif %}
+      {% if module.header.intro %}
+      <div class="wa-blog-section-head__intro wa-richtext">{{ module.header.intro }}</div>
+      {% endif %}
+    </div>
+
+    <div class="wa-publications__grid">
+      <article class="wa-publication-card">
+        <div
+          class="wa-publication-cover wa-publication-cover--{{ _publication.cover_tint | default('navy', true) }}"
+          aria-hidden="true"
+          style="--wa-publication-image-opacity: {{ _cover_opacity }};"
+        >
+          <img
+            class="wa-publication-cover__image"
+            src="{{ _cover_src }}"
+            alt="{{ _cover_alt | escape_attr }}"
+            loading="lazy"
+            decoding="async"
+            {% if _publication.cover_image.width %}width="{{ _publication.cover_image.width }}"{% endif %}
+            {% if _publication.cover_image.height %}height="{{ _publication.cover_image.height }}"{% endif %}
+          >
+          <div class="wa-publication-cover__shade"></div>
+          <div class="wa-publication-cover__content">
+            <div>
+              {% if _publication.cover_kicker %}
+              <div class="wa-publication-cover__kicker">{{ _publication.cover_kicker }}</div>
+              {% endif %}
+              {% if _publication.cover_title %}
+              <div class="wa-publication-cover__title">{{ _publication.cover_title }}</div>
+              {% endif %}
+            </div>
+            <div>
+              <div class="wa-publication-cover__rule"></div>
+              {% if _publication.cover_issue %}
+              <div class="wa-publication-cover__issue">{{ _publication.cover_issue }}</div>
+              {% endif %}
+              {% if _publication.cover_subtitle %}
+              <div class="wa-publication-cover__subtitle">{{ _publication.cover_subtitle }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          {% if _publication.title %}
+          <h3 class="wa-publication-card__title">{{ _publication.title }}</h3>
+          {% endif %}
+          {% if _publication.body_text %}
+          <div class="wa-publication-card__copy wa-richtext">{{ _publication.body_text }}</div>
+          {% endif %}
+          <div class="wa-publication-card__actions">
+            {% if _publication.primary_cta_label %}
+            <a
+              class="btn btn-{{ _publication.primary_cta_style | default('navy', true) }}"
+              href="{{ _publication.primary_cta_link.url.href | default('#latest-articles', true) }}"
+              {% if _publication.primary_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ _publication.primary_cta_label }}</a>
+            {% endif %}
+
+            {% if _publication.secondary_cta_label %}
+            <a
+              class="btn btn-{{ _publication.secondary_cta_style | default('navy-outline', true) }}"
+              href="{{ _publication.secondary_cta_link.url.href | default('/news/', true) }}"
+              {% if _publication.secondary_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ _publication.secondary_cta_label }}</a>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+
+      {% if _newsletter.show != false %}
+      <aside
+        class="wa-weld-connect-card wa-weld-connect-card--{{ _newsletter.card_style | default('navy', true) }}"
+        {% if _newsletter.anchor_id %}id="{{ _newsletter.anchor_id }}"{% endif %}
+        aria-labelledby="wa-weld-connect-heading"
+      >
+        <div class="wa-weld-connect-card__head">
+          <span class="wa-icon-tile" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24">
+              <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div>
+            {% if _newsletter.kicker %}
+            <div class="wa-weld-connect-card__kicker">{{ _newsletter.kicker }}</div>
+            {% endif %}
+            {% if _newsletter.title %}
+            <h3 class="wa-weld-connect-card__title" id="wa-weld-connect-heading">{{ _newsletter.title }}</h3>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if _newsletter.body_text %}
+        <div class="wa-weld-connect-card__copy wa-richtext">{{ _newsletter.body_text }}</div>
+        {% endif %}
+
+        {% if _news_form_id %}
+        <div
+          class="wa-mini-subscribe-form wa-mini-subscribe-form--hubspot"
+          data-wa-weld-connect-form
+          data-region="ap1"
+          data-portal-id="{{ _news_portal_id | escape }}"
+          data-form-id="{{ _news_form_id | escape }}"
+          data-submit-text="{{ _news_btn | escape }}"
+          data-redirect-url="{{ _news_redirect_url | escape }}"
+          data-inline-message="{{ _news_inline_message | escape }}"
+        ></div>
+        <p class="wa-weld-connect-card__note wa-weld-connect-card__fallback" hidden>
+          The signup form could not load. Use the subscribe form further down this page,
+          or email <a href="mailto:office@weldaustralia.com.au">office@weldaustralia.com.au</a>.
+        </p>
+        <noscript>
+          <style>
+            .wa-mini-subscribe-form--hubspot { display: none; }
+            .wa-weld-connect-card__fallback[hidden] { display: block; }
+          </style>
+        </noscript>
+        {% elif is_in_editor %}
+        <p class="wa-weld-connect-card__note">
+          Select a HubSpot form in the module settings (Weld Connect card &rarr; &ldquo;Subscription form&rdquo;) to display the signup form here.
+        </p>
+        {% endif %}
+
+        {% if _newsletter.note %}
+        <p class="wa-weld-connect-card__note">
+          <span aria-hidden="true">•</span>
+          {{ _newsletter.note }}
+        </p>
+        {% endif %}
+      </aside>
+      {% endif %}
+    </div>
+  </div>
+</section>

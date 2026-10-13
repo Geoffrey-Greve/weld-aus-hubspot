@@ -1,0 +1,221 @@
+{
+  "name": "resources",
+  "label": "Resources - Resources Hub",
+  "useForPages": true,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "dynamicPageUrlPattern": "/resources/{slug}",
+  "dynamicMetaTags": {
+    "DESCRIPTION": "abstract",
+    "FEATURED_IMAGE_URL": "preview_image"
+  },
+  "columns": [
+    {
+      "name": "title",
+      "label": "Title",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "slug",
+      "label": "URL slug",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "abstract",
+      "label": "Abstract / summary",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "file_url",
+      "label": "File / link URL",
+      "type": "URL"
+    },
+    {
+      "name": "file_type",
+      "label": "File type",
+      "type": "SELECT",
+      "options": [
+        { "name": "pdf", "type": "option" },
+        { "name": "video", "type": "option" },
+        { "name": "link", "type": "option" }
+      ]
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "type": "SELECT",
+      "options": [
+        { "name": "technical", "type": "option" },
+        { "name": "standards", "type": "option" },
+        { "name": "case_study", "type": "option" },
+        { "name": "report", "type": "option" },
+        { "name": "webinar", "type": "option" },
+        { "name": "template", "type": "option" },
+        { "name": "advocacy", "type": "option" }
+      ]
+    },
+    {
+      "name": "required_tier",
+      "label": "Required tier",
+      "type": "SELECT",
+      "options": [
+        { "name": "public", "type": "option" },
+        { "name": "member", "type": "option" },
+        { "name": "bronze", "type": "option" },
+        { "name": "silver", "type": "option" },
+        { "name": "gold", "type": "option" }
+      ]
+    },
+    {
+      "name": "preview_image",
+      "label": "Preview image",
+      "type": "IMAGE"
+    },
+    {
+      "name": "published_date",
+      "label": "Published date",
+      "type": "DATE"
+    },
+    {
+      "name": "is_active",
+      "label": "Active",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "description",
+      "label": "Full description",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "accent_tone",
+      "label": "Card accent colour",
+      "type": "SELECT",
+      "options": [
+        { "name": "navy", "type": "option" },
+        { "name": "gold", "type": "option" },
+        { "name": "magenta", "type": "option" },
+        { "name": "green", "type": "option" },
+        { "name": "amber", "type": "option" }
+      ]
+    },
+    {
+      "name": "members_only",
+      "label": "Members only",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "min_tier",
+      "label": "Minimum member tier required",
+      "type": "SELECT",
+      "options": [
+        { "name": "individual", "type": "option" },
+        { "name": "bronze", "type": "option" },
+        { "name": "silver", "type": "option" },
+        { "name": "gold", "type": "option" }
+      ]
+    },
+    {
+      "name": "member_label",
+      "label": "Member CTA label (e.g. Download PDF)",
+      "type": "TEXT"
+    },
+    {
+      "name": "non_member_label",
+      "label": "Non-member CTA label (e.g. Join to download)",
+      "type": "TEXT"
+    }
+  ],
+  "rows": [
+    {
+      "title": "Australian Welding Standards Overview 2024",
+      "slug": "australian-welding-standards-overview-2024",
+      "abstract": "<p>Comprehensive guide to current AS/NZS welding standards applicable to Australian industry.</p>",
+      "file_url": "#",
+      "file_type": "pdf",
+      "category": "standards",
+      "required_tier": "public",
+      "published_date": "2024-07-01",
+      "is_active": true
+    },
+    {
+      "title": "Weld Australia Industry Advocacy Position Paper",
+      "slug": "industry-advocacy-position-paper",
+      "abstract": "<p>Our formal position on workforce development and trade regulation for the welding industry.</p>",
+      "file_url": "#",
+      "file_type": "pdf",
+      "category": "advocacy",
+      "required_tier": "public",
+      "published_date": "2025-01-15",
+      "is_active": true
+    },
+    {
+      "title": "Members Technical Bulletin - Hydrogen Welding",
+      "slug": "members-technical-bulletin-hydrogen-welding",
+      "abstract": "<p>Technical guidance for welding in hydrogen-rich environments. Available to active members.</p>",
+      "file_url": "#",
+      "file_type": "pdf",
+      "category": "technical",
+      "required_tier": "member",
+      "published_date": "2025-03-10",
+      "is_active": true
+    },
+    {
+      "title": "Infrastructure Welding Case Study - Olympic Dam",
+      "slug": "case-study-olympic-dam",
+      "abstract": "<p>How certified welding teams delivered critical infrastructure upgrades under AS 2980.</p>",
+      "file_url": "#",
+      "file_type": "pdf",
+      "category": "case_study",
+      "required_tier": "public",
+      "published_date": "2024-11-20",
+      "is_active": true
+    },
+    {
+      "title": "State of the Welding Workforce Report 2025",
+      "slug": "welding-workforce-report-2025",
+      "abstract": "<p>Annual survey of welding workforce trends, skills gaps, and training pipeline across Australia.</p>",
+      "file_url": "#",
+      "file_type": "pdf",
+      "category": "report",
+      "required_tier": "public",
+      "published_date": "2025-02-28",
+      "is_active": true
+    },
+    {
+      "title": "Members Research: Robotic Welding Adoption Study",
+      "slug": "robotic-welding-adoption-study",
+      "abstract": "<p>Survey findings on the adoption of robotic and cobot welding among Weld Australia member companies.</p>",
+      "file_url": "#",
+      "file_type": "pdf",
+      "category": "report",
+      "required_tier": "member",
+      "published_date": "2025-04-01",
+      "is_active": true
+    },
+    {
+      "title": "Skills Shortage Submission to the Senate",
+      "slug": "skills-shortage-senate-submission",
+      "abstract": "<p>Weld Australia formal submission on welding trade skills shortages, submitted to the Senate committee.</p>",
+      "file_url": "#",
+      "file_type": "link",
+      "category": "advocacy",
+      "required_tier": "public",
+      "published_date": "2024-09-05",
+      "is_active": true
+    },
+    {
+      "title": "ISO 3834 Implementation Guide for Fabricators",
+      "slug": "iso-3834-implementation-guide",
+      "abstract": "<p>Step-by-step guidance for SME fabricators seeking ISO 3834 certification.</p>",
+      "file_url": "#",
+      "file_type": "pdf",
+      "category": "technical",
+      "required_tier": "member",
+      "published_date": "2025-01-10",
+      "is_active": true
+    }
+  ]
+}

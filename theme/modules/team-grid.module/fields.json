@@ -1,0 +1,395 @@
+[
+  {
+    "name": "overline",
+    "label": "Overline / eyebrow",
+    "type": "text",
+    "default": "People"
+  },
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Our team"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext"
+  },
+  {
+    "name": "highlights",
+    "label": "Highlight cards (right of intro)",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 4,
+      "default": 3
+    },
+    "help_text": "Small cards with a magenta left border shown beside the intro.",
+    "children": [
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "description",
+        "label": "Description",
+        "type": "text",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "name": "highlight_style",
+    "label": "Highlight style",
+    "type": "choice",
+    "choices": [
+      [
+        "cards",
+        "Cards"
+      ],
+      [
+        "checklist",
+        "Checklist"
+      ]
+    ],
+    "default": "cards",
+    "help_text": "Cards show bordered callouts. Checklist shows compact ticked items, useful for Board/leadership summaries."
+  },
+  {
+    "name": "card_style",
+    "label": "Card style",
+    "type": "choice",
+    "choices": [
+      [
+        "full",
+        "Full (headshot + name + role + bio + quals)"
+      ],
+      [
+        "compact",
+        "Compact (headshot + name + role only)"
+      ]
+    ],
+    "default": "full",
+    "help_text": "Full shows bio and qualification pill. Compact is best for large grids."
+  },
+  {
+    "name": "columns",
+    "label": "Columns",
+    "type": "choice",
+    "choices": [
+      [
+        "2",
+        "2 columns"
+      ],
+      [
+        "3",
+        "3 columns"
+      ],
+      [
+        "4",
+        "4 columns"
+      ]
+    ],
+    "default": "3"
+  },
+  {
+    "name": "data_source",
+    "label": "Data source",
+    "type": "choice",
+    "choices": [
+      [
+        "hubdb",
+        "HubDB (team_and_board table)"
+      ],
+      [
+        "module_fields",
+        "Module fields (manual entry)"
+      ]
+    ],
+    "default": "hubdb",
+    "help_text": "HubDB is recommended for reuse across pages. Module fields lets you enter people directly in the editor."
+  },
+  {
+    "name": "people",
+    "label": "People (manual)",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 40,
+      "default": 1
+    },
+    "help_text": "Used when Data source is set to 'Module fields'.",
+    "children": [
+      {
+        "name": "name_text",
+        "label": "Name",
+        "type": "text"
+      },
+      {
+        "name": "role",
+        "label": "Role / title",
+        "type": "text"
+      },
+      {
+        "name": "org",
+        "label": "Organisation (optional sub-line)",
+        "type": "text"
+      },
+      {
+        "name": "quals",
+        "label": "Qualifications (pill text)",
+        "type": "text",
+        "help_text": "e.g. IWE, PhD - shown as a badge"
+      },
+      {
+        "name": "photo",
+        "label": "Headshot",
+        "type": "image"
+      },
+      {
+        "name": "bio",
+        "label": "Bio",
+        "type": "richtext"
+      }
+    ]
+  },
+  {
+    "name": "category_filter",
+    "label": "Filter by category",
+    "type": "choice",
+    "choices": [
+      [
+        "any",
+        "All"
+      ],
+      [
+        "board",
+        "Board"
+      ],
+      [
+        "corporate",
+        "Corporate"
+      ],
+      [
+        "strategicpartnerships",
+        "Strategic Partnerships"
+      ],
+      [
+        "educationtraining",
+        "Education & Training"
+      ],
+      [
+        "qc",
+        "Q&C"
+      ],
+      [
+        "engineering",
+        "Engineering"
+      ],
+      [
+        "corporateservices",
+        "Corporate Services"
+      ]
+    ],
+    "default": "any",
+    "help_text": "HubDB data source only. Accepts a comma-separated list when set via a template, e.g. \"board,corporate\". Ignored when grouping is on."
+  },
+  {
+    "name": "category_exclude",
+    "label": "Exclude categories",
+    "type": "text",
+    "default": "",
+    "help_text": "HubDB data source only. Comma-separated categories to leave out, e.g. \"board\" on a staff-only grid. Applies even when grouping."
+  },
+  {
+    "name": "group_by_category",
+    "label": "Group people by category",
+    "type": "boolean",
+    "default": true,
+    "help_text": "HubDB data source only. Renders each category as its own titled sub-section, ordered by 'Category order' below. When on, 'Filter by category' is ignored. People with no Category appear under the catch-all heading."
+  },
+  {
+    "name": "category_order",
+    "label": "Category order",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 20
+    },
+    "help_text": "Order of the grouped sub-sections. Drag rows to reorder. Each name must match a Category value in the HubDB table exactly (including '&' and capitalisation). Categories present in the data but not listed here appear last.",
+    "default": [
+      {
+        "category_name": "Board"
+      },
+      {
+        "category_name": "Corporate"
+      },
+      {
+        "category_name": "Strategic Partnerships"
+      },
+      {
+        "category_name": "Education & Training"
+      },
+      {
+        "category_name": "Q&C"
+      },
+      {
+        "category_name": "Engineering"
+      },
+      {
+        "category_name": "Corporate Services"
+      }
+    ],
+    "children": [
+      {
+        "name": "category_name",
+        "label": "Category name",
+        "type": "text",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "name": "ungrouped_heading",
+    "label": "Heading for people with no category",
+    "type": "text",
+    "default": "Our team",
+    "help_text": "HubDB data source only, when grouping is on. Rows whose Category is blank are collected under this heading at the end rather than being dropped from the page."
+  },
+  {
+    "name": "show_category_tabs",
+    "label": "Show category tabs",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "max_count",
+    "label": "Max members (0 = no limit)",
+    "type": "number",
+    "default": 0
+  },
+  {
+    "name": "profile_url_base",
+    "label": "Profile page URL base",
+    "type": "text",
+    "default": "/about/team/",
+    "help_text": "HubDB data source only. Each card links to this path plus the person's HubDB page path, e.g. /about/team/geoff-crittenden. Rows without a page path render as non-clickable cards."
+  },
+  {
+    "name": "view_all_label",
+    "label": "View all CTA label",
+    "type": "text",
+    "default": "",
+    "help_text": "Optional button shown below the people grid. The About page board preview defaults this to 'View all' when left blank."
+  },
+  {
+    "name": "view_all_link",
+    "label": "View all CTA link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": ""
+      }
+    },
+    "help_text": "Optional button link shown below the people grid. The About page board preview defaults this to /about/team when left blank."
+  },
+  {
+    "name": "show_bio_modal",
+    "label": "Open bio in modal on click",
+    "type": "boolean",
+    "default": false,
+    "help_text": "Not implemented. With the HubDB data source, clicking a card opens that person's profile page instead - see 'Profile page URL base'."
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

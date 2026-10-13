@@ -1,0 +1,14 @@
+{
+  "label": "Courses Upcoming Sessions",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Dynamic HubDB-powered upcoming sessions section for the Courses listing page. It reads from the courses HubDB table, excludes Cancelled sessions, keeps only sessions dated today/future, sorts by start date soonest first, dedupes by course_slug, then shows the first N cards from the Maximum cards field. Text and CTA are editable.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["courses", "hubdb", "landing"]
+}

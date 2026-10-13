@@ -1,0 +1,1038 @@
+{#
+  Course Modules section.
+
+  A module row is shown only when it has the same Parent Course ID as the
+  current dynamic course and Show on Website has been explicitly enabled.
+
+  ── What a buyer sees ───────────────────────────────────────────────────────
+  Each module renders as one selectable row carrying its real dates, location
+  and the price THIS visitor pays, resolved from the session behind its booking
+  URL (see _module-session-resolve.html). Ticking rows accumulates into a
+  running total in a sticky bar, and one CTA books the selection through
+  /checkout/?session_id=<parent row>&module_session_ids=<selected ids>.
+
+  The whole row is the control - a <label> wrapping the checkbox - which is both
+  the 44x44 touch target CLAUDE.md § 5.4 mandates and the reason there is no
+  longer a second per-module CTA competing with the primary one. The previous
+  layout was a three-child `justify-content: space-between` flex row, so the
+  checkbox landed wherever the module name happened to end: alignment was
+  incidental. It is now a grid column and therefore structural.
+
+  ── WHICH session gets booked ───────────────────────────────────────────────
+  Each tickbox's value IS a session id, resolved from that row's
+  module_booking_url, so the selection names sessions per module and the row
+  shows that session's dates, city and price. The granularity is the ROW: two
+  sittings of one module are two rows, both tickable, and nothing dedupes by
+  name - so a module offered twice and given one row silently sells whichever
+  sitting the editor typed.
+
+  The PARENT is the half nobody picks: dynamic_page_hubdb_row.hs_id, the single
+  `courses` row HubSpot serves this URL from, NOT the session chosen in the
+  CourseFilter island above (the two are not wired together, so changing the city
+  dropdown changes nothing here). The worker only accepts modules whose events
+  hang off that parent, so a row pointing at another sitting's session is a
+  price_mismatch-shaped dead end the page cannot see. Found by
+  `pnpm audit:course-modules`. Full reasoning: CLAUDE.md § 7.7.
+
+  A single module is one row ticked. The worker accepts 1..12 selected modules
+  (packages/worker/src/routes/reserve.ts), so _module_selection_max below is its
+  cap rather than a UI preference - the bar refuses to submit a request it knows
+  would 400 instead of letting the buyer discover it at the payment step.
+
+  "Book this module" survives ONLY as the degraded path: a module whose session
+  row cannot be resolved, or which carries no worker_event_id or price, cannot
+  be priced or reserved as part of a selection, so it keeps its own link rather
+  than becoming a dead tickbox. That is the same place those rows went before. A
+  row with no booking URL either gets the training team `mailto:` instead, so no
+  listed module is ever a name with nothing to act on.
+
+  ── When the selection UI appears ───────────────────────────────────────────
+  The combined flow reserves the selection against the PARENT row's Event Engine
+  event, so the selection UI only appears when all three are true:
+
+    1. the parent course row has use_event_engine ticked (the editorial opt-in
+       - a row can hold a stale worker_event_id while registration is routed
+       somewhere else entirely), AND
+    2. the parent course row has a worker_event_id, AND
+    3. at least one module resolves to a bookable, priced session.
+
+  Without 1 or 2 the buyer would reach the payment step only to be told
+  "Online booking isn't configured for this course yet"; without 3 there is
+  nothing to select. In every one of those cases the per-module link still
+  renders, so a half-configured course degrades to individual booking rather
+  than to a dead end.
+
+  Condition 3 used to require at least TWO booking URLs, because the submit
+  button read "Book selected modules" and needed two to combine. It now needs
+  one: one ticked row is a valid booking, and the old rule meant a course with a
+  single bookable module showed a checkbox that could never submit.
+#}
+{% import "./_member-pricing.html" as wa_price %}
+{% import "./_session-priceable.html" as wa_session %}
+{% import "./session-status.html" as wa_status %}
+
+{# Use the immutable table name so this partial works across Dev and live portals. #}
+{% set _course_module_rows = hubdb_table_rows('course_modules', 'parent_course_id__eq=' ~ dynamic_page_hubdb_row.course_id ~ '&show_on_website__eq=1&orderBy=module_order') %}
+
+{% if _course_module_rows|length %}
+  {% set _module_selection_max = 12 %}
+
+  {# Membership, resolved once for the whole section. This is the shared,
+     company-aware resolver - the same one the Resources gate uses - so a Gold
+     company's employee is quoted their Gold rate here, at the pricing table
+     above and in the checkout below. Resolving it per surface is what produced
+     defect 213. #}
+  {% include "./_resource-member-resolve.html" %}
+  {% set _modules_is_member = resource_member.is_active %}
+  {% set _modules_tier = resource_member.tier if _modules_is_member else '' %}
+
+  {# Resolve every module's session up front: the totals, the savings line and
+     the decision about whether to show checkboxes at all are all needed before
+     the first row is rendered.
+
+     The resolver's input travels on a NAMESPACE rather than a plain {% set %}
+     because this loop is the caller: a namespace attribute set inside a loop is
+     visible to the include by construction, where a loop-local variable relies
+     on include scoping that only fails server-side on upload.
+
+     Capped at 24 so a mis-tagged parent_course_id cannot turn one page render
+     into an unbounded run of HubDB reads. #}
+  {% set module_session_input = namespace(url='', tier='', product_id='') %}
+  {% set _modules_ns = namespace(items=[], bookable=0, member_total=0, public_total=0, resolved=0) %}
+  {% for _module in _course_module_rows %}
+    {% if _modules_ns.resolved < 24 %}
+      {% set _modules_ns.resolved = _modules_ns.resolved + 1 %}
+      {% set module_session_input.url = _module.module_booking_url | default('', true) | string | trim %}
+      {# `hubspot_product_id` is the column production fills; `product_id` is empty on
+         every live row (2026-09-20 export), so reading that one alone resolves nothing. #}
+      {% set module_session_input.product_id = _module.hubspot_product_id | default(_module.product_id, true) | default('', true) | string | trim %}
+      {% set module_session_input.tier = _modules_tier %}
+      {% include "./_module-session-resolve.html" %}
+
+      {# The course_modules row name is what editors curate, so it wins over the
+         session's own name; the session name is the fallback for a blank row. #}
+      {% set _module_label = _module.name | default('', true) | string | trim %}
+      {% if not _module_label %}
+        {% set _module_label = module_session.name %}
+      {% endif %}
+
+      {% set _module_member_price = module_session.member_price | float %}
+      {% set _module_public_price = module_session.non_member_price | float %}
+
+      {# The ticket THIS visitor would be booked on, resolved exactly as
+         ticketTypeForSession() does in CheckoutTunnel.tsx. A guest looking at a
+         row whose only ticket is member-only resolves to nothing, and the
+         checkout's `isConfigured` requires a ticket id per selected module - so
+         without this the row was selectable and the whole basket dead-ended at
+         the payment step with "not configured". That is the audit's
+         `guest_ticket_missing` error (CLAUDE.md § 11.5) reaching a buyer. #}
+      {% if _modules_is_member %}
+        {% set _module_ticket_id = module_session.member_ticket_type_id | default(module_session.non_member_ticket_type_id, true) | string | trim %}
+      {% else %}
+        {% set _module_ticket_id = module_session.non_member_ticket_type_id | string | trim %}
+      {% endif %}
+      {% if _modules_is_member and _module_member_price > 0 %}
+        {% set _module_display_price = _module_member_price %}
+      {% elif _module_public_price > 0 %}
+        {% set _module_display_price = _module_public_price %}
+      {% else %}
+        {% set _module_display_price = _module_member_price %}
+      {% endif %}
+
+      {# `selectable` is a booking rule, not a display detail. Each condition is
+         something the checkout requires of every selected module, so a row
+         failing any of them would take the whole basket to a dead end:
+           - a worker event id, or there is nothing to reserve against;
+           - a price above zero, because the checkout sends the displayed price
+             as `expectedUnitCents` and the worker's guard refuses a price that
+             resolves ABOVE it - so an unpriced tickbox, being below every real
+             price, still 409s on `price_mismatch`;
+           - a ticket type this visitor may buy (see above);
+           - a session that is actually on sale. `off_sale` is the resolved row's
+             own Cancelled / Sold Out status - which CLAUDE.md § 7.6 makes an
+             editorial decision nothing here may reverse - or its start date
+             having passed. Every other surface that offers a session honours the
+             first already; this one honoured neither, so a cancelled module kept
+             its tickbox and joined the basket beside live ones, and four IWI-S
+             modules pointing at one August session were still on sale in
+             September (Ref 46 round 2).
+         A row failing any of them keeps its own booking link instead. #}
+      {% set _modules_ns.items = _modules_ns.items + [{
+        'label':        _module_label,
+        'booking_url':  module_session_input.url,
+        'session_id':   module_session.id,
+        'location':     module_session.location,
+        'date_label':   module_session.date_label,
+        'member_price': _module_member_price,
+        'public_price': _module_public_price,
+        'price':        _module_display_price,
+        'members_only': module_session.members_only,
+        'ticket_id':    _module_ticket_id,
+        'status':       module_session.status,
+        'off_sale':     module_session.off_sale,
+        'off_sale_label': module_session.off_sale_label,
+        'selectable':   module_session.bookable and not module_session.off_sale and _module_display_price > 0 and _module_ticket_id
+      }] %}
+
+      {% if module_session.bookable and not module_session.off_sale and _module_display_price > 0 and _module_ticket_id %}
+        {% set _modules_ns.bookable = _modules_ns.bookable + 1 %}
+        {% set _modules_ns.member_total = _modules_ns.member_total + _module_display_price %}
+        {% set _modules_ns.public_total = _modules_ns.public_total + _module_public_price %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {% set _parent_worker_event_id = dynamic_page_hubdb_row.worker_event_id | default('', true) | string | trim %}
+
+  {# The PARENT must be ON SALE, not merely wired up.
+
+     `/reserve-selected-modules` checks the parent course's own sales window BEFORE it
+     looks at a single selected module (packages/worker/src/routes/reserve.ts), and
+     migration 0038 closes registration at `starts_at` when nothing else is set. This
+     page is served by ONE `courses` row - whichever owns the dynamic path, § 11.6 - so
+     a course whose page row ran in August rendered tickboxes, priced a basket, accepted
+     a selection and was refused at reserve with "Registrations for this course have
+     closed". On 2026-09-20 that was EIGHT of Weld's nine module-bearing course pages:
+     iwi-b, iwi-s and iws are served by rows that started in August or February while a
+     2027 session sits unserved in the same table, and iwe, iwt and wte-b have no
+     unstarted row at all.
+
+     The same rule the fees panel and the directory card already share
+     (`_session-priceable.html`), minus its registration-URL clause: a module selection
+     can only ever go to the Event Engine checkout, so a legacy URL is not a way to buy
+     this and must not keep the selector alive.
+
+     It gates `_complete_course_available` too, through `_parent_engine_ready` - that CTA
+     reserves against the same parent event and fails the same way. #}
+  {% set _modules_today_key = local_dt | datetimeformat('%Y%m%d') %}
+  {# Off sale through the shared vocabulary (Ref 74c), so a parent staff marked Closed
+     stops the selector and the complete-course CTA as Cancelled and Sold Out always did,
+     rather than rendering a basket the checkout then refuses at step 1. #}
+  {% set _parent_off_sale = wa_status.is_off_sale(dynamic_page_hubdb_row.status.name) | trim %}
+  {% set _parent_has_started = wa_session.has_started(dynamic_page_hubdb_row, _modules_today_key) | trim %}
+  {% set _parent_on_sale = (not _parent_has_started) and (not _parent_off_sale) %}
+
+  {% set _parent_engine_ready = dynamic_page_hubdb_row.use_event_engine and _parent_worker_event_id and _parent_on_sale %}
+  {% set _combined_booking_enabled = _parent_engine_ready and _modules_ns.bookable > 0 %}
+
+  {# The complete course leads, because it is the higher-value path and the one
+     the worker models properly (parent charged once, modules as $0 entitlement
+     seats) - but only when the parent row can actually be sold AND carries a
+     price. A $0 "complete course" card is worse than no card. #}
+  {% set _parent_member_price = wa_price.member_price(dynamic_page_hubdb_row, _modules_tier) | trim | float %}
+  {% set _parent_public_price = wa_price.non_member_price(dynamic_page_hubdb_row) | trim | float %}
+  {% if _modules_is_member and _parent_member_price > 0 %}
+    {% set _parent_display_price = _parent_member_price %}
+  {% elif _parent_public_price > 0 %}
+    {% set _parent_display_price = _parent_public_price %}
+  {% else %}
+    {% set _parent_display_price = _parent_member_price %}
+  {% endif %}
+  {% set _complete_course_available = _parent_engine_ready and _parent_display_price > 0 %}
+  {% if _complete_course_available and _modules_ns.bookable > 1 and _modules_ns.member_total > _parent_display_price %}
+    {% set _complete_course_saving = _modules_ns.member_total - _parent_display_price %}
+  {% else %}
+    {% set _complete_course_saving = 0 %}
+  {% endif %}
+
+  {% require_css %}
+    <style>
+      .wa-course-modules {
+        background: var(--wa-color-surface-2, #f5f7f9);
+      }
+
+      /* When this section is present, preserve the alternating section rhythm. */
+      #sessions.wa-section--surface_alt {
+        background-color: var(--wa-color-surface, #fff);
+      }
+
+      .wa-course-modules__inner {
+        width: 100%;
+        max-width: 920px;
+      }
+
+      .wa-course-modules__header {
+        margin-bottom: clamp(16px, 2vw, 22px);
+      }
+
+      .wa-course-modules__intro {
+        max-width: 62ch;
+        margin: 0 0 clamp(20px, 2.6vw, 30px);
+        color: var(--wa-color-text-muted, #5f6673);
+      }
+
+      /* ── Complete course (primary path) ───────────────────────────────── */
+
+      .wa-course-modules__complete {
+        display: grid;
+        gap: 0.65rem;
+        padding: clamp(1.25rem, 2.4vw, 1.75rem);
+        border: 1px solid var(--wa-color-primary, #1c1e4c);
+        border-radius: var(--wa-radius-lg, 0.75rem);
+        background: var(--wa-color-surface, #fff);
+        box-shadow: 0 2px 12px rgb(15 16 48 / 9%);
+      }
+
+      .wa-course-modules__complete-kicker {
+        margin: 0;
+        color: var(--wa-color-magenta-text, #c00d74);
+        font-size: var(--wa-text-xs, 0.75rem);
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+
+      .wa-course-modules__complete-title {
+        margin: 0;
+        color: var(--wa-color-primary-dark, #0f1030);
+        font-family: var(--wa-font-heading, "Poppins", system-ui, sans-serif);
+        font-size: clamp(1.25rem, 2.6vw, 1.625rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+      }
+
+      .wa-course-modules__complete-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.5rem;
+        max-width: none;
+        margin: 0;
+        color: var(--wa-color-text-muted, #5f6673);
+        font-size: 0.9375rem;
+      }
+
+      /* base.css sets `p { max-width: 72ch }`, which is right for prose and
+         wrong for a row of figures - it cut the savings line short of the card. */
+      .wa-course-modules__price-line {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0.45rem 0.75rem;
+        max-width: none;
+        margin: 0;
+      }
+
+      .wa-course-modules__amount {
+        color: var(--wa-color-primary-dark, #0f1030);
+        font-size: clamp(1.5rem, 3.2vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+
+      .wa-course-modules__gst {
+        color: var(--wa-color-text-muted, #5f6673);
+        font-size: 0.875rem;
+      }
+
+      .wa-course-modules__saving {
+        color: var(--wa-color-success, #1f8a4d);
+        font-size: 0.9375rem;
+        font-weight: 700;
+      }
+
+      .wa-course-modules__complete .wa-btn {
+        justify-self: start;
+        min-height: var(--wa-touch-min, 44px);
+        margin-block-start: 0.35rem;
+      }
+
+      .wa-course-modules__divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        max-width: none;
+        margin-block: clamp(22px, 3vw, 30px);
+        color: var(--wa-color-text-muted, #5f6673);
+        font-size: 0.9375rem;
+      }
+
+      .wa-course-modules__divider::before,
+      .wa-course-modules__divider::after {
+        flex: 1 1 auto;
+        height: 1px;
+        background: var(--wa-color-border, #d8dde3);
+        content: "";
+      }
+
+      /* ── Module rows ──────────────────────────────────────────────────── */
+
+      .wa-course-modules__list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .wa-course-modules__item {
+        display: block;
+      }
+
+      /*
+       * Three fixed columns - checkbox | content | price - so every tickbox in
+       * the list lines up regardless of how long the module name is. The old
+       * layout flexed three children with `space-between`, which is why the
+       * boxes appeared at random horizontal positions down the list.
+       */
+      .wa-course-modules__row {
+        display: grid;
+        grid-template-columns: var(--wa-touch-min, 44px) minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 0.35rem 1rem;
+        min-height: var(--wa-touch-min, 44px);
+        padding: 1rem 1.25rem;
+        border: 1px solid var(--wa-color-border, #d8dde3);
+        border-left: 4px solid var(--wa-color-accent-magenta, #c00d74);
+        border-radius: var(--wa-radius-lg, 0.75rem);
+        background: var(--wa-color-surface, #fff);
+        box-shadow: 0 1px 2px rgb(15 16 48 / 6%);
+        transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      /* No checkbox anywhere in this list - drop the gutter rather than leave
+         an empty column indenting every name. */
+      .wa-course-modules__list--static .wa-course-modules__row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      label.wa-course-modules__row {
+        cursor: pointer;
+      }
+
+      label.wa-course-modules__row:hover {
+        border-color: var(--wa-color-primary, #1c1e4c);
+      }
+
+      .wa-course-modules__row:focus-within {
+        outline: 2px solid var(--wa-color-primary, #1c1e4c);
+        outline-offset: 2px;
+      }
+
+      .wa-course-modules__row.is-selected {
+        border-color: var(--wa-color-accent-magenta, #c00d74);
+        background: rgb(192 13 116 / 4%);
+        box-shadow: 0 2px 10px rgb(192 13 116 / 14%);
+      }
+
+      .wa-course-modules__check {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+
+      .wa-course-modules__check input {
+        width: 1.375rem;
+        height: 1.375rem;
+        margin: 0;
+        accent-color: var(--wa-color-accent-magenta, #c00d74);
+        cursor: pointer;
+      }
+
+      .wa-course-modules__body {
+        display: grid;
+        gap: 0.2rem;
+        min-width: 0;
+      }
+
+      .wa-course-modules__name {
+        color: var(--wa-color-primary-dark, #0f1030);
+        font-weight: var(--wa-weight-semibold, 600);
+        line-height: 1.4;
+      }
+
+      .wa-course-modules__meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.2rem 0.5rem;
+        color: var(--wa-color-text-muted, #5f6673);
+        font-size: 0.875rem;
+      }
+
+      .wa-course-modules__meta-sep {
+        color: var(--wa-color-border, #d8dde3);
+      }
+
+      .wa-course-modules__badge {
+        padding: 0.1rem 0.45rem;
+        border: 1px solid var(--wa-color-border, #d8dde3);
+        border-radius: 999px;
+        color: var(--wa-color-primary-dark, #0f1030);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      /* An off-sale module keeps its dates and price - it is a real session the
+         buyer may still want to ask about - so the badge carries the whole
+         signal and has to read as a stop, not as another label. */
+      .wa-course-modules__badge--off-sale {
+        border-color: var(--wa-color-danger, #b3261e);
+        color: var(--wa-color-danger, #b3261e);
+      }
+
+      /* Column 3 holds the price, the fallback link, or both. */
+      .wa-course-modules__aside {
+        display: grid;
+        justify-items: end;
+        gap: 0.5rem;
+      }
+
+      .wa-course-modules__price {
+        display: grid;
+        justify-items: end;
+        gap: 0.1rem;
+        text-align: end;
+      }
+
+      .wa-course-modules__price-now {
+        color: var(--wa-color-primary-dark, #0f1030);
+        font-size: 1.0625rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .wa-course-modules__price-now--member {
+        color: var(--wa-color-success, #1f8a4d);
+      }
+
+      .wa-course-modules__price-was {
+        color: var(--wa-color-text-muted, #5f6673);
+        font-size: 0.8125rem;
+        text-decoration: line-through;
+        white-space: nowrap;
+      }
+
+      .wa-course-modules__price-member-teaser {
+        color: var(--wa-color-success, #1f8a4d);
+        font-size: 0.8125rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .wa-course-modules__price-note {
+        color: var(--wa-color-text-muted, #5f6673);
+        font-size: 0.75rem;
+        white-space: nowrap;
+      }
+
+      .wa-course-modules__row-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: var(--wa-touch-min, 44px);
+        padding-inline: 1rem;
+        white-space: nowrap;
+      }
+
+      /* ── Sticky running total ─────────────────────────────────────────── */
+
+      /*
+       * In flow until something is ticked, then it lifts to the bottom of the
+       * viewport. Sticking from the start cost ~14% of a phone screen to hold a
+       * prompt and a disabled button, before the visitor had done anything.
+       */
+      .wa-course-modules__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-block-start: 1.25rem;
+        padding: 0.875rem 1.25rem;
+        border: 1px solid var(--wa-color-border, #d8dde3);
+        border-radius: var(--wa-radius-lg, 0.75rem);
+        background: var(--wa-color-surface, #fff);
+      }
+
+      .wa-course-modules__bar.is-active {
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        border-color: var(--wa-color-primary, #1c1e4c);
+        box-shadow: 0 -2px 16px rgb(15 16 48 / 14%);
+      }
+
+      .wa-course-modules__bar-summary {
+        display: grid;
+        gap: 0.1rem;
+        max-width: none;
+        margin: 0;
+        min-width: 0;
+      }
+
+      .wa-course-modules__bar-count {
+        color: var(--wa-color-text-muted, #5f6673);
+        font-size: 0.875rem;
+      }
+
+      .wa-course-modules__bar-total {
+        color: var(--wa-color-primary-dark, #0f1030);
+        font-size: 1.125rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+
+      .wa-course-modules__bar-saving {
+        color: var(--wa-color-success, #1f8a4d);
+        font-size: 0.875rem;
+        font-weight: 700;
+      }
+
+      .wa-course-modules__submit {
+        flex: 0 0 auto;
+        min-height: var(--wa-touch-min, 44px);
+      }
+
+      .wa-course-modules__submit:disabled {
+        cursor: not-allowed;
+        opacity: 0.56;
+      }
+
+      /* ── Phone ────────────────────────────────────────────────────────── */
+
+      @media (max-width: 599px) {
+        .wa-course-modules__row {
+          grid-template-columns: var(--wa-touch-min, 44px) minmax(0, 1fr);
+          padding: 0.875rem 1rem;
+        }
+
+        .wa-course-modules__list--static .wa-course-modules__row {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .wa-course-modules__aside {
+          grid-column: 2;
+          justify-items: start;
+        }
+
+        .wa-course-modules__list--static .wa-course-modules__aside {
+          grid-column: 1;
+        }
+
+        .wa-course-modules__price {
+          justify-items: start;
+          text-align: start;
+        }
+
+        .wa-course-modules__bar {
+          padding: 0.75rem 1rem;
+        }
+
+        .wa-course-modules__submit {
+          width: 100%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .wa-course-modules__row {
+          transition: none;
+        }
+      }
+
+      .wa-pricing-table .wa-pricing-table__heading,
+      .wa-course-filter-shell .wa-course-filter-shell__header h2 {
+        margin: 0;
+        color: var(--wa-color-primary, #1c1e4c);
+        font-family: var(--wa-font-heading, "Poppins", system-ui, sans-serif);
+        font-size: clamp(2rem, 4.2vw, 3.25rem);
+        font-weight: 800;
+        line-height: 1.08;
+        letter-spacing: -0.035em;
+        text-align: start;
+      }
+
+      #pricing .container::before,
+      .wa-course-filter-shell .wa-course-filter-shell__eyebrow {
+        margin-bottom: 14px;
+        color: var(--wa-color-magenta-text, #c00d74);
+        font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+        font-size: var(--wa-text-xs, 0.75rem);
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+    </style>
+  {% end_require_css %}
+
+  <section class="wa-course-modules wa-section wa-section--surface_alt wa-section--spacious" aria-labelledby="course-modules-heading">
+    <div class="container">
+      <div class="wa-course-modules__inner">
+        <div class="wa-course-overview__header wa-course-modules__header">
+          <div class="wa-overline">
+            <span class="wa-overline__text">Course structure</span>
+          </div>
+          <h2 class="wa-course-overview__heading" id="course-modules-heading">Course modules</h2>
+        </div>
+
+        {% if _combined_booking_enabled %}
+          <p class="wa-course-modules__intro">
+            Book the complete course, or choose only the modules you need and pay for those.
+          </p>
+        {% endif %}
+
+        {#
+          Both checkout navigations below carry a pricing handoff, for the reason
+          CourseFilter already does (saveCheckoutPricingHandoff): the checkout
+          page resolves membership from its own HubL context, and when that
+          context is lost the tunnel falls back to public pricing. Without the
+          handoff a member ticks $9,100 worth of modules here and is quoted
+          $9,900 one page later - the page quoting a number the checkout
+          disagrees with, which is the whole failure this section exists to end.
+          The values ride data attributes so the inline script does not need the
+          HubL scope.
+        #}
+        {% set _modules_handoff_session_id = dynamic_page_hubdb_row.hs_id | string %}
+        {% set _modules_handoff_tier = _modules_tier if _modules_is_member else '' %}
+
+        {% if _complete_course_available %}
+          <div class="wa-course-modules__complete">
+            <p class="wa-course-modules__complete-kicker">Best value</p>
+            <h3 class="wa-course-modules__complete-title">Book the complete course</h3>
+            <p class="wa-course-modules__complete-meta">
+              <span>All {{ _course_module_rows|length }} modules</span>
+              {% if dynamic_page_hubdb_row.city and dynamic_page_hubdb_row.city.name %}
+                <span class="wa-course-modules__meta-sep" aria-hidden="true">&middot;</span>
+                <span>{{ dynamic_page_hubdb_row.city.name | escape }}</span>
+              {% endif %}
+              {% if dynamic_page_hubdb_row.start_date %}
+                <span class="wa-course-modules__meta-sep" aria-hidden="true">&middot;</span>
+                <span>From {{ dynamic_page_hubdb_row.start_date | datetimeformat('%d %b %Y') }}</span>
+              {% endif %}
+            </p>
+            <p class="wa-course-modules__price-line">
+              <span class="wa-course-modules__amount">{{ (_parent_display_price | format_currency('AUD')) | replace('.00', '') }}</span>
+              <span class="wa-course-modules__gst">ex GST</span>
+              {% if _complete_course_saving > 0 %}
+                <span class="wa-course-modules__saving">
+                  Save {{ (_complete_course_saving | format_currency('AUD')) | replace('.00', '') }} against booking modules separately
+                </span>
+              {% endif %}
+            </p>
+            <a
+              class="wa-btn wa-btn--primary"
+              href="/checkout/?session_id={{ dynamic_page_hubdb_row.hs_id | escape_attr }}"
+              data-wa-checkout-handoff
+              data-handoff-session-id="{{ _modules_handoff_session_id | escape_attr }}"
+              data-handoff-is-member="{{ 'true' if _modules_is_member else 'false' }}"
+              data-handoff-member-tier="{{ _modules_handoff_tier | escape_attr }}"
+            >
+              Book the complete course
+            </a>
+          </div>
+
+          {% if _combined_booking_enabled %}
+            <p class="wa-course-modules__divider"><span>or choose individual modules</span></p>
+          {% endif %}
+        {% endif %}
+
+        {% if _combined_booking_enabled %}
+        <form
+          class="wa-course-modules__selector"
+          data-wa-course-module-selector
+          data-checkout-base="/checkout/?session_id={{ dynamic_page_hubdb_row.hs_id | escape_attr }}"
+          data-max-modules="{{ _module_selection_max }}"
+          data-handoff-session-id="{{ _modules_handoff_session_id | escape_attr }}"
+          data-handoff-is-member="{{ 'true' if _modules_is_member else 'false' }}"
+          data-handoff-member-tier="{{ _modules_handoff_tier | escape_attr }}"
+        >
+        {% else %}
+        <div class="wa-course-modules__selector">
+        {% endif %}
+          <ul class="wa-course-modules__list{% if not _combined_booking_enabled %} wa-course-modules__list--static{% endif %}">
+            {% for _module_item in _modules_ns.items %}
+              {% set _is_selectable = _combined_booking_enabled and _module_item.selectable %}
+              {% set _show_was_price = _modules_is_member and _module_item.public_price > _module_item.price %}
+              {% set _show_member_teaser = (not _modules_is_member) and _module_item.member_price > 0 and _module_item.price > _module_item.member_price %}
+              <li class="wa-course-modules__item">
+                {% if _is_selectable %}<label class="wa-course-modules__row">{% else %}<div class="wa-course-modules__row">{% endif %}
+                  {% if _combined_booking_enabled %}
+                    <span class="wa-course-modules__check"{% if not _is_selectable %} aria-hidden="true"{% endif %}>
+                      {% if _is_selectable %}
+                        <input
+                          type="checkbox"
+                          name="module_session_id"
+                          value="{{ _module_item.session_id | escape_attr }}"
+                          data-wa-module-choice
+                          data-price="{{ _module_item.price }}"
+                          data-public-price="{{ _module_item.public_price }}"
+                        >
+                      {% endif %}
+                    </span>
+                  {% endif %}
+
+                  <span class="wa-course-modules__body">
+                    <span class="wa-course-modules__name">{{ _module_item.label | escape }}</span>
+                    {% if _module_item.location or _module_item.date_label or _module_item.members_only or _module_item.off_sale %}
+                      <span class="wa-course-modules__meta">
+                        {% if _module_item.date_label %}<span>{{ _module_item.date_label }}</span>{% endif %}
+                        {% if _module_item.date_label and _module_item.location %}
+                          <span class="wa-course-modules__meta-sep" aria-hidden="true">&middot;</span>
+                        {% endif %}
+                        {% if _module_item.location %}<span>{{ _module_item.location | escape }}</span>{% endif %}
+                        {% if _module_item.members_only %}
+                          <span class="wa-course-modules__badge">Members only</span>
+                        {% endif %}
+                        {% if _module_item.off_sale %}
+                          {# Says WHICH kind of off sale, per CLAUDE.md § 7.6's
+                             "five states, five sentences": "Sold out" invites a
+                             waitlist enquiry, "Cancelled" and a session that has
+                             already run do not. #}
+                          <span class="wa-course-modules__badge wa-course-modules__badge--off-sale">{{ _module_item.off_sale_label | escape }}</span>
+                        {% endif %}
+                      </span>
+                    {% endif %}
+                  </span>
+
+                  {# Price and link are NOT alternatives. A module can resolve a
+                     perfectly good price and still not be selectable - most
+                     often because the PARENT row is not Event Engine configured,
+                     which turns off every checkbox on the page - and showing it a
+                     price with nothing to click is the dead end the old
+                     per-module link existed to prevent. So the link renders
+                     whenever the row is not selectable and has a URL, price or
+                     no price - EXCEPT when the row is off sale, where sending a
+                     buyer to the booking page of a session that was cancelled or
+                     has already run is the dead end, not the cure for one.
+
+                     A row with NO booking URL at all gets the training team
+                     instead, the same `mailto:` fallback `CourseFilter` gives a
+                     session with no usable registration URL. Ref 46 round 2
+                     item 1 found a module listed with no CTA of any kind, so it
+                     "cannot be booked by any path": a name on a page with
+                     nothing to act on is the one outcome this whole section
+                     exists to prevent. Every listed module now ends in a
+                     checkbox, a link, or a badge saying why not. #}
+                  {% if _module_item.price > 0 or (not _is_selectable and not _module_item.off_sale) %}
+                    <span class="wa-course-modules__aside">
+                      {% if _module_item.price > 0 %}
+                        <span class="wa-course-modules__price">
+                          <span class="wa-course-modules__price-now{% if _show_was_price %} wa-course-modules__price-now--member{% endif %}">
+                            {{ (_module_item.price | format_currency('AUD')) | replace('.00', '') }}
+                          </span>
+                          {% if _show_was_price %}
+                            <span class="wa-course-modules__price-was">{{ (_module_item.public_price | format_currency('AUD')) | replace('.00', '') }}</span>
+                            <span class="wa-course-modules__price-note">ex GST, member rate</span>
+                          {% elif _show_member_teaser %}
+                            {# Ref 32: the member rate is shown to EVERY visitor,
+                               not just logged-in members, so a non-member can see
+                               what membership would save them on this module. #}
+                            <span class="wa-course-modules__price-member-teaser">
+                              Members {{ (_module_item.member_price | format_currency('AUD')) | replace('.00', '') }}
+                            </span>
+                            <span class="wa-course-modules__price-note">ex GST</span>
+                          {% else %}
+                            <span class="wa-course-modules__price-note">ex GST</span>
+                          {% endif %}
+                        </span>
+                      {% endif %}
+                      {% if not _is_selectable and not _module_item.off_sale %}
+                        {% if _module_item.booking_url %}
+                          <a class="wa-btn wa-btn--secondary wa-course-modules__row-link" href="{{ _module_item.booking_url | escape_attr }}">
+                            Book this module
+                          </a>
+                        {% else %}
+                          <a class="wa-btn wa-btn--secondary wa-course-modules__row-link" href="mailto:training@weldaustralia.com.au?subject={{ ('Module booking enquiry: ' ~ _module_item.label) | urlencode }}">
+                            Contact to book
+                          </a>
+                        {% endif %}
+                      {% endif %}
+                    </span>
+                  {% endif %}
+                {% if _is_selectable %}</label>{% else %}</div>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
+          {% if _combined_booking_enabled %}
+            <div class="wa-course-modules__bar" data-wa-module-bar>
+              <p class="wa-course-modules__bar-summary" data-wa-module-summary aria-live="polite">
+                <span class="wa-course-modules__bar-count" data-wa-module-count>Select the modules you need</span>
+                <span class="wa-course-modules__bar-total" data-wa-module-total hidden></span>
+                <span class="wa-course-modules__bar-saving" data-wa-module-saving hidden></span>
+              </p>
+              <button
+                type="submit"
+                class="wa-btn wa-btn--primary wa-course-modules__submit"
+                disabled
+                data-wa-module-submit
+              >
+                Book selected modules
+              </button>
+            </div>
+          {% endif %}
+        {% if _combined_booking_enabled %}
+        </form>
+        {% else %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  {#
+    The script has two jobs and neither exists on a page that renders no
+    interactive control: the pricing handoff belongs to the complete-course CTA,
+    and the running total belongs to the tickboxes. On a course where both are
+    off - which is what EVERY production course page was during Ref 46, with no
+    module booking URLs to resolve - it shipped anyway, found 0 checkboxes and
+    did nothing, so the page carried the module-selection JavaScript without the
+    markup it operates on. Inert rather than broken, but it is the half-deployed
+    look that made a data fault read as a missing deploy.
+  #}
+  {% if _combined_booking_enabled or _complete_course_available %}
+  {% require_js %}
+    <script>
+      (function () {
+        /*
+         * Mirrors saveCheckoutPricingHandoff() in
+         * src/shared/utils/checkoutPricingHandoff.ts - same sessionStorage key,
+         * same 15-minute TTL, same payload shape - because the checkout tunnel
+         * reads it with readCheckoutPricingHandoff(session.id). This is HubL, so
+         * it cannot import the module; course-modules-combined-booking.test.ts
+         * fails the build if the key or the TTL drift apart.
+         *
+         * A convenience only: the Event Engine stays authoritative on price, and
+         * a browser that refuses sessionStorage just falls back to whatever
+         * membership the checkout resolves for itself.
+         */
+        var HANDOFF_KEY = 'wa_checkout_pricing_handoff';
+        var HANDOFF_TTL_MS = 15 * 60 * 1000;
+
+        function saveHandoff(el) {
+          var sessionId = el.getAttribute('data-handoff-session-id') || '';
+          if (!sessionId) return;
+          try {
+            window.sessionStorage.setItem(HANDOFF_KEY, JSON.stringify({
+              sessionId: String(sessionId),
+              isMember: el.getAttribute('data-handoff-is-member') === 'true',
+              memberTier: el.getAttribute('data-handoff-member-tier') || '',
+              expiresAt: Date.now() + HANDOFF_TTL_MS
+            }));
+          } catch (err) {
+            /* Private mode, blocked site data - the checkout still works. */
+          }
+        }
+
+        document.querySelectorAll('[data-wa-checkout-handoff]').forEach(function (link) {
+          link.addEventListener('click', function () { saveHandoff(link); });
+        });
+
+        var formatter = new Intl.NumberFormat('en-AU', {
+          style: 'currency',
+          currency: 'AUD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+
+        /*
+         * Must render exactly as the rows above it, which HubL prints with
+         * `format_currency('AUD') | replace('.00', '')`: a non-breaking space
+         * after the sign, and no cents on a whole dollar amount. Intl gives
+         * "$9,100.00", so both transforms are applied here.
+         */
+        function money(value) {
+          var text;
+          try {
+            text = formatter.format(value);
+          } catch (err) {
+            text = '$' + value.toFixed(2);
+          }
+          return text.replace('.00', '').replace('$', '$\u00a0');
+        }
+
+        function numberFrom(el, attr) {
+          var raw = parseFloat(el.getAttribute(attr) || '0');
+          return isFinite(raw) ? raw : 0;
+        }
+
+        document.querySelectorAll('[data-wa-course-module-selector]').forEach(function (form) {
+          var bar = form.querySelector('[data-wa-module-bar]');
+          var submit = form.querySelector('[data-wa-module-submit]');
+          var countEl = form.querySelector('[data-wa-module-count]');
+          var totalEl = form.querySelector('[data-wa-module-total]');
+          var savingEl = form.querySelector('[data-wa-module-saving]');
+          var choices = Array.prototype.slice.call(form.querySelectorAll('[data-wa-module-choice]'));
+          if (!submit || choices.length === 0) return;
+
+          var maxModules = parseInt(form.getAttribute('data-max-modules') || '12', 10);
+          if (!isFinite(maxModules) || maxModules < 1) maxModules = 12;
+
+          function update() {
+            var selected = choices.filter(function (choice) { return choice.checked; });
+            var total = 0;
+            var publicTotal = 0;
+
+            choices.forEach(function (choice) {
+              var row = choice.closest('.wa-course-modules__row');
+              if (row) row.classList.toggle('is-selected', choice.checked);
+              if (!choice.checked) return;
+              total += numberFrom(choice, 'data-price');
+              publicTotal += numberFrom(choice, 'data-public-price');
+            });
+
+            var overLimit = selected.length > maxModules;
+            if (bar) bar.classList.toggle('is-active', selected.length > 0);
+            submit.disabled = selected.length === 0 || overLimit;
+            submit.textContent = selected.length === 1
+              ? 'Book 1 module'
+              : selected.length > 1
+                ? 'Book ' + selected.length + ' modules'
+                : 'Book selected modules';
+
+            if (countEl) {
+              if (overLimit) {
+                countEl.textContent = 'Up to ' + maxModules + ' modules can be booked in one checkout. Deselect ' +
+                  (selected.length - maxModules) + ' to continue.';
+              } else if (selected.length === 0) {
+                countEl.textContent = 'Select the modules you need';
+              } else {
+                countEl.textContent = selected.length === 1
+                  ? '1 module selected'
+                  : selected.length + ' modules selected';
+              }
+            }
+
+            if (totalEl) {
+              totalEl.hidden = selected.length === 0;
+              totalEl.textContent = selected.length === 0 ? '' : money(total) + ' ex GST';
+            }
+
+            if (savingEl) {
+              var saving = publicTotal - total;
+              var show = selected.length > 0 && saving > 0.005;
+              savingEl.hidden = !show;
+              savingEl.textContent = show ? 'You save ' + money(saving) + ' as a member' : '';
+            }
+          }
+
+          choices.forEach(function (choice) {
+            choice.addEventListener('change', update);
+          });
+
+          form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            var ids = choices
+              .filter(function (choice) { return choice.checked; })
+              .map(function (choice) { return (choice.value || '').trim(); })
+              .filter(Boolean);
+            if (ids.length === 0 || ids.length > maxModules) return;
+            saveHandoff(form);
+            var base = form.getAttribute('data-checkout-base') || '/checkout/';
+            var joiner = base.indexOf('?') === -1 ? '?' : '&';
+            window.location.href = base + joiner + 'module_session_ids=' + encodeURIComponent(ids.join(','));
+          });
+
+          update();
+        });
+      }());
+    </script>
+  {% end_require_js %}
+  {% endif %}
+{% endif %}

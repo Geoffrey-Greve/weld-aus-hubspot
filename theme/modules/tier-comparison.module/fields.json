@@ -1,0 +1,209 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  },
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Membership tiers"
+  },
+  {
+    "name": "tiers",
+    "label": "Tiers",
+    "type": "group",
+    "occurrence": {
+      "min": 2,
+      "max": 6,
+      "default": 5
+    },
+    "children": [
+      {
+        "name": "tier_name",
+        "label": "Tier name",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "tier_label_color",
+        "label": "Tier accent colour",
+        "type": "choice",
+        "choices": [
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "silver",
+            "Silver"
+          ],
+          [
+            "bronze",
+            "Bronze"
+          ],
+          [
+            "primary",
+            "Primary"
+          ],
+          [
+            "neutral",
+            "Neutral"
+          ]
+        ],
+        "default": "neutral"
+      },
+      {
+        "name": "price_intro",
+        "label": "Price intro (e.g. From)",
+        "type": "text"
+      },
+      {
+        "name": "price",
+        "label": "Price (display)",
+        "type": "text"
+      },
+      {
+        "name": "price_period",
+        "label": "Price period (e.g. /year)",
+        "type": "text"
+      },
+      {
+        "name": "summary",
+        "label": "Summary line",
+        "type": "text"
+      },
+      {
+        "name": "cta_label",
+        "label": "CTA label",
+        "type": "text",
+        "default": "Join now"
+      },
+      {
+        "name": "cta_link",
+        "label": "CTA link",
+        "type": "link"
+      },
+      {
+        "name": "is_featured",
+        "label": "Featured tier",
+        "type": "boolean",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "feature_rows",
+    "label": "Comparison rows",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "default": 1
+    },
+    "children": [
+      {
+        "name": "feature_label",
+        "label": "Feature",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "feature_help",
+        "label": "Help text (tooltip)",
+        "type": "text"
+      },
+      {
+        "name": "tier_values",
+        "label": "Per-tier values (JSON, ✓/✗ or text)",
+        "type": "text",
+        "help_text": "JSON array matching tier order, e.g. [\"✓\",\"✓\",\"Limited\",\"✗\"]"
+      }
+    ]
+  }
+]

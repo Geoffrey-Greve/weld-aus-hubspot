@@ -1,0 +1,262 @@
+<!--
+  templateType: none
+-->
+{#
+  portal.html - Gated member portal layout.
+
+  Extends base.html and adds:
+    • HubSpot Private Content auth gate with login redirect
+    • window.__WELD_MEMBER__ context injection (React islands read this)
+    • Portal sub-nav (portal-nav.html partial)
+    • .portal-content wrapper div
+
+  All portal page templates extend this layout:
+    {% extends "./layouts/portal.html" %}
+    {% block portal_content %}…{% endblock %}
+
+  Auth model:
+    Primary gate - HubSpot Private Content audience setting (page-level configuration).
+    Secondary gate - the client-side redirect fallback below catches
+    cases where the page-level setting is absent or misconfigured.
+
+  window.__WELD_MEMBER__ shape (TypeScript: WeldMemberContext in src/shared/api/memberContext.ts):
+    {
+      contact:        { id, firstName, lastName, email, membershipTier, membershipStatus,
+                        membershipExpiry, nextCourse: { name, date, location } }
+      associations:   [{ companyId, companyName, roleLabel, tier }]
+      activeContext:  string - cookie('wa_active_context') or 'personal'
+      certifications: [{ type, status, expiry, certificateUrl, currentStep }]
+      entitlements:   { canDownloadResources, isPrimaryAdmin }
+    }
+
+  Custom property names (confirm with Ollie - CLAUDE.md §13 Q4):
+    individual_membership_status, individual_membership_type_2, individual_membership_expiry_date_2
+    is_corporate_admin
+    next_upcoming_course_name, next_upcoming_course_date, next_upcoming_course_location
+    wa_company_role_label        - workflow-synced from primary associated company
+    wa_company_membership_tier   - workflow-synced from primary associated company
+    as1796_cert_status, as1796_cert_expiry, as1796_cert_url, as1796_cert_step
+    iiw_cert_status,    iiw_cert_expiry,    iiw_cert_url,    iiw_cert_step
+    iso3834_cert_status, iso3834_cert_expiry, iso3834_cert_url, iso3834_cert_step
+
+  Context switching:
+    The ProfileSwitcher component sets the wa_active_context cookie and triggers a page
+    reload, so the next render reflects the new active context in activeContext below.
+    window.__WELD_MEMBER__ is read-only from the React side - never mutate it.
+#}
+{% extends "./base.html" %}
+
+{# ── Body class ───────────────────────────────────────────────────────────── #}
+{% block body_class %} is-portal{% endblock %}
+
+{# ── Inject window.__WELD_MEMBER__ into <head> ────────────────────────────── #}
+{% block extra_head %}
+{% set _portal_preview = is_in_editor or (is_in_previewer | default(false)) or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+{% if not request_contact.is_logged_in %}
+{% if _portal_preview %}
+{# Safe mock context for page-editor / staging preview / anonymous redirect fallback.
+   This never reads or exposes CRM data. It keeps the HubSpot page builder from
+   receiving a blank portal body when editor preview flags are unavailable. #}
+<script>
+window.__WELD_MEMBER__ = {
+  contact: {
+    id: "preview-member",
+    firstName: "Member",
+    lastName: "Preview",
+    email: "preview@example.com",
+    membershipTier: "corporate_silver",
+    membershipStatus: "active",
+    membershipExpiry: "2027-06-30",
+    nextCourse: {
+      name: "Welding Supervisor - AS1796 Cert 10",
+      date: "2026-08-20",
+      location: "Online"
+    }
+  },
+  associations: [
+    {
+      companyId: "preview-company",
+      companyName: "Weld Australia Preview Company",
+      roleLabel: "Primary Admin",
+      tier: "corporate_silver"
+    }
+  ],
+  activeContext: "personal",
+  certifications: [],
+  entitlements: {
+    canDownloadResources: true,
+    isPrimaryAdmin: false
+  }
+};
+</script>
+{% else %}
+{# Anonymous non-preview visitors are handled by the visible sign-in gate in
+   the body block. Do not redirect here: HubSpot's template builder/preview
+   can render without exposing preview flags, and head redirects blank the
+   builder iframe. Page-level Private Content remains the primary protection. #}
+{% endif %}
+{% else %}
+{# Pre-compute derived values outside the script block so the JS is clean. #}
+{#
+  QA personas are deliberately isolated from CRM membership Deals. Only
+  Refuel plus-addresses containing one of the active HubDB profile codes can
+  enter this branch; every real member continues to use the CRM values below.
+#}
+{%- set _portal_contact_email = request_contact.email | default(request_contact.hs_content_membership_email, true) | default('', true) | string | lower | trim -%}
+{%- set _qa_persona_rows = hubdb_table_rows('portal_test_profiles', 'is_active__eq=true&limit=50') -%}
+{%- set _qa_persona_ns = namespace(row=none) -%}
+{%- for qa_row in _qa_persona_rows -%}
+  {%- set _qa_profile_code = qa_row.profile_code | default('', true) | string | lower | trim -%}
+  {%- if not _qa_persona_ns.row and _qa_profile_code and ('+' ~ _qa_profile_code ~ '@') in _portal_contact_email -%}
+    {%- set _qa_persona_ns.row = qa_row -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- set _qa_persona = _qa_persona_ns.row -%}
+
+{%- set _status_source = request_contact.individual_membership_status | default('never_member', true) -%}
+{%- set _tier_source = request_contact.individual_membership_type_2 | default('', true) -%}
+{%- set _membership_expiry = request_contact.individual_membership_expiry_date_2 | default(none, true) -%}
+{%- if _qa_persona -%}
+  {%- set _status_source = _qa_persona.status_key | default('never_member', true) -%}
+  {%- set _tier_source = _qa_persona.tier_key | default('', true) -%}
+  {%- set _membership_expiry = _qa_persona.renewal_date | default(none, true) -%}
+{%- endif -%}
+
+{%- set _status_raw = _status_source | string | lower | replace(' ', '_') -%}
+{%- if _status_raw in ['honorary', 'honorary_member', 'honorary_membership'] -%}
+  {%- set _status = 'honorary' -%}
+{%- elif _status_raw in ['current', 'active'] -%}
+  {%- set _status = 'active' -%}
+{%- elif _status_raw in ['grace_period', 'grace'] -%}
+  {%- set _status = 'grace_period' -%}
+{%- elif _status_raw in ['lapsed', 'expired', 'inactive'] -%}
+  {%- set _status = 'lapsed' -%}
+{%- else -%}
+  {%- set _status = 'never_member' -%}
+{%- endif -%}
+{%- set _tier_raw = _tier_source | string | lower | replace(' ', '_') -%}
+{%- if _tier_raw in ['honorary', 'honorary_member', 'honorary_membership'] -%}
+  {%- set _tier = 'honorary' -%}
+{%- else -%}
+  {%- set _tier = _tier_raw -%}
+{%- endif -%}
+{%- set _is_active = _status in ['active', 'grace_period', 'honorary'] or _tier == 'honorary' -%}
+{%- set _is_admin = (_qa_persona.is_primary_admin == true) if _qa_persona else request_contact.is_corporate_admin == true -%}
+{%- set _ctx = request.cookies.wa_active_context | default('personal', true) -%}
+<script>
+window.__WELD_MEMBER__ = (function () {
+  var contact = {
+    id:               {{ request_contact.vid | default(0) | string | tojson }},
+    firstName:        {{ request_contact.firstname | default('', true) | tojson }},
+    lastName:         {{ request_contact.lastname | default('', true) | tojson }},
+    email:            {{ request_contact.email | default('', true) | tojson }},
+    membershipTier:   {{ (_tier if _tier else none) | tojson }},
+    membershipStatus: {{ _status | tojson }},
+    membershipExpiry: {{ _membership_expiry | default(none, true) | tojson }},
+    nextCourse: {
+      name:     {{ request_contact.next_upcoming_course_name | default(none, true) | tojson }},
+      date:     {{ request_contact.next_upcoming_course_date | default(none, true) | tojson }},
+      location: {{ request_contact.next_upcoming_course_location | default(none, true) | tojson }}
+    }
+  };
+
+  var associations = [
+    {%- if _qa_persona and _qa_persona.company_name -%}
+    {
+      companyId:   {{ ('qa-' ~ _qa_persona.profile_code) | tojson }},
+      companyName: {{ _qa_persona.company_name | tojson }},
+      roleLabel:   {{ _qa_persona.role_label | default('QA test member', true) | tojson }},
+      tier:        {{ (_tier if _tier else none) | tojson }}
+    }
+    {%- elif request_contact.associatedcompanyid -%}
+    {
+      companyId:   {{ request_contact.associatedcompanyid | string | tojson }},
+      companyName: {{ request_contact.associatedcompanyname | default('', true) | tojson }},
+      roleLabel:   {{ request_contact.wa_company_role_label | default('Employee', true) | tojson }},
+      tier:        {{ request_contact.wa_company_membership_tier | default(none, true) | tojson }}
+    }
+    {%- endif -%}
+  ];
+
+  var certifications = [
+    {%- if request_contact.as1796_cert_status -%}
+    {
+      type:           "as1796",
+      status:         {{ request_contact.as1796_cert_status | tojson }},
+      expiry:         {{ request_contact.as1796_cert_expiry | default(none, true) | tojson }},
+      certificateUrl: {{ request_contact.as1796_cert_url | default(none, true) | tojson }},
+      currentStep:    {{ request_contact.as1796_cert_step | default(none, true) | tojson }}
+    },
+    {%- endif -%}
+    {%- if request_contact.iiw_cert_status -%}
+    {
+      type:           "iiw_inspector",
+      status:         {{ request_contact.iiw_cert_status | tojson }},
+      expiry:         {{ request_contact.iiw_cert_expiry | default(none, true) | tojson }},
+      certificateUrl: {{ request_contact.iiw_cert_url | default(none, true) | tojson }},
+      currentStep:    {{ request_contact.iiw_cert_step | default(none, true) | tojson }}
+    },
+    {%- endif -%}
+    {%- if request_contact.iso3834_cert_status -%}
+    {
+      type:           "iso3834",
+      status:         {{ request_contact.iso3834_cert_status | tojson }},
+      expiry:         {{ request_contact.iso3834_cert_expiry | default(none, true) | tojson }},
+      certificateUrl: {{ request_contact.iso3834_cert_url | default(none, true) | tojson }},
+      currentStep:    {{ request_contact.iso3834_cert_step | default(none, true) | tojson }}
+    }
+    {%- endif -%}
+  ];
+
+  var entitlements = {
+    canDownloadResources: {% if _is_active %}true{% else %}false{% endif %},
+    isPrimaryAdmin:       {% if _is_admin %}true{% else %}false{% endif %}
+  };
+
+  return {
+    contact:        contact,
+    associations:   associations,
+    activeContext:  {{ _ctx | tojson }},
+    certifications: certifications,
+    entitlements:   entitlements
+  };
+})();
+</script>
+{% endif %}
+{% endblock %}
+
+{# ── Portal sub-nav ───────────────────────────────────────────────────────── #}
+{% block portal_nav %}
+  {% set _portal_preview = is_in_editor or (is_in_previewer | default(false)) or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+  {% if request_contact.is_logged_in or _portal_preview %}
+    {% include "../partials/portal-nav.html" %}
+  {% endif %}
+{% endblock %}
+
+{# ── Portal body ──────────────────────────────────────────────────────────── #}
+{% block body %}
+  {% set _portal_preview = is_in_editor or (is_in_previewer | default(false)) or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+  {% if not request_contact.is_logged_in and not _portal_preview %}
+  <section class="wa-section wa-section--surface wa-section--spacious">
+    <div class="container">
+      <div class="portal-auth-gate" role="status" aria-live="polite">
+        <p class="portal-auth-gate__eyebrow">Member portal</p>
+        <h1 class="portal-auth-gate__heading">Sign in to view your member portal</h1>
+        <p class="portal-auth-gate__body">
+          This member area is private. Please
+          <a href="/login/?redirect={{ request.path | urlencode }}">sign in to continue</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+  {% else %}
+  <div
+    class="portal-content"
+    data-portal-context="{% if _portal_preview %}personal{% else %}{{ request.cookies.wa_active_context | default('personal', true) }}{% endif %}"
+    data-member-tier="{% if _portal_preview %}Corporate Silver{% else %}{{ request_contact.individual_membership_type_2 | default('') }}{% endif %}"
+    data-member-status="{% if _portal_preview %}Current{% else %}{{ request_contact.individual_membership_status | default('') }}{% endif %}"
+  >
+    {% block portal_content %}{% endblock %}
+  </div>
+  {% endif %}
+{% endblock %}

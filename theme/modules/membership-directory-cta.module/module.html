@@ -1,0 +1,54 @@
+{%- set _bg = module.background|default('surface_alt') -%}
+{%- set _vis = module.visibility|default(['mobile','tablet','desktop']) -%}
+{%- set _section_classes = 'wa-membership-directory wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-spacious' -%}
+{%- if 'mobile' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section class="{{ _section_classes }}" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container">
+    <div class="wa-membership-directory__card">
+      {% if module.background_image and module.background_image.src %}
+      <img class="wa-membership-directory__bg" src="{{ module.background_image.src }}" alt="" loading="lazy" decoding="async">
+      {% else %}
+      <img class="wa-membership-directory__bg" src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&w=1000&q=80" alt="" loading="lazy" decoding="async">
+      {% endif %}
+
+      <div class="wa-membership-directory__copy">
+        {% if module.eyebrow %}
+        <div class="wa-overline wa-overline--light">
+          <span class="wa-overline__text">{{ module.eyebrow }}</span>
+        </div>
+        {% endif %}
+        {% if module.heading %}<h2>{{ module.heading }}</h2>{% endif %}
+        {% if module.body_text %}<div class="wa-richtext">{{ module.body_text }}</div>{% endif %}
+        {% if module.cta_label %}
+        <a class="btn btn-gold btn-lg" href="{{ module.cta_link.url.href|default('/find-a-member/') }}" {% if module.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
+          <span>{{ module.cta_label }}</span>
+          <svg class="wa-btn__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="color:#1a1a1a;stroke:#1a1a1a;">
+            <line x1="5" y1="12" x2="19" y2="12" stroke="#1a1a1a" style="stroke:#1a1a1a;"></line>
+            <polyline points="12 5 19 12 12 19" stroke="#1a1a1a" style="stroke:#1a1a1a;"></polyline>
+          </svg>
+        </a>
+        {% endif %}
+      </div>
+
+      <div class="wa-membership-directory__badges" aria-label="Membership tiers">
+        {% if module.logos %}
+          {% for logo in module.logos %}
+            {% if logo.image and logo.image.src %}
+            <img src="{{ logo.image.src }}" alt="{{ logo.image_label|default(logo.image.alt)|default('Weld Australia member badge') }}" loading="lazy" decoding="async">
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <img src="{{ get_asset_url('../../assets/img/member-logo-gold.png') }}" alt="Gold member" loading="lazy" decoding="async">
+          <img src="{{ get_asset_url('../../assets/img/member-logo-silver.png') }}" alt="Silver member" loading="lazy" decoding="async">
+          <img src="{{ get_asset_url('../../assets/img/member-logo-bronze.png') }}" alt="Bronze member" loading="lazy" decoding="async">
+          <img src="{{ get_asset_url('../../assets/img/member-logo-individual.png') }}" alt="Individual member" loading="lazy" decoding="async">
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}

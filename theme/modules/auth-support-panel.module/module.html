@@ -1,0 +1,42 @@
+{#
+  auth-support-panel.module/module.html
+  Editable support panel used beside member login/signup content.
+#}
+
+<div class="auth-support">
+  {% if module.overline %}
+  <p class="auth-support__label">{{ module.overline }}</p>
+  {% endif %}
+
+  {% if module.heading %}
+  <h2>{{ module.heading }}</h2>
+  {% endif %}
+
+  {% if module.panel_body %}
+  <div class="auth-support__body">{{ module.panel_body }}</div>
+  {% endif %}
+
+  {% if module.primary_link_label or module.secondary_link_label %}
+  <div class="auth-support__actions">
+    {% if module.primary_link_label %}
+    <a
+      class="{% if module.primary_link_style == 'button' %}btn btn-secondary{% else %}auth-support__text-link{% endif %}"
+      href="{{ module.primary_link.url.href | default('/signup/') }}"
+      {% if module.primary_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >
+      {{ module.primary_link_label }}
+    </a>
+    {% endif %}
+
+    {% if module.secondary_link_label %}
+    <a
+      class="{% if module.secondary_link_style == 'button' %}btn btn-secondary{% else %}auth-support__text-link{% endif %}"
+      href="{{ module.secondary_link.url.href | default('/membership/') }}"
+      {% if module.secondary_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >
+      {{ module.secondary_link_label }}
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>

@@ -1,0 +1,94 @@
+[
+  {
+    "name": "heading_template",
+    "label": "Heading template",
+    "type": "text",
+    "default": "Your {certification_type} progress",
+    "help_text": "Use {certification_type} as a placeholder - it is replaced at runtime with the cert display name."
+  },
+  {
+    "name": "show_evidence_upload",
+    "label": "Show evidence upload form",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "evidence_form",
+    "label": "Evidence upload form",
+    "type": "form",
+    "help_text": "Select the HubSpot form for the evidence upload form. Only shown when 'Show evidence upload form' is enabled.",
+    "default": {
+      "form_id": "",
+      "response_type": "inline",
+      "message": "Evidence submitted."
+    },
+    "visibility": {
+      "controlling_field_path": "show_evidence_upload",
+      "operator": "EQUAL",
+      "controlling_value_regex": "true"
+    }
+  },
+  {
+    "name": "qc_contact_email",
+    "label": "Q&C contact email",
+    "type": "text",
+    "default": "qnc@weldaustralia.com.au"
+  },
+  {
+    "name": "qc_contact_phone",
+    "label": "Q&C contact phone",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": true,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

@@ -1,0 +1,55 @@
+[
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Reset your password"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext",
+    "default": "<p>Enter your email address and we’ll send you a link to reset your password.</p>"
+  },
+  {
+    "name": "email_label",
+    "label": "Email field label",
+    "type": "text",
+    "default": "Email address"
+  },
+  {
+    "name": "submit_label",
+    "label": "Submit label",
+    "type": "text",
+    "default": "Send reset link"
+  },
+  {
+    "name": "back_to_login_label",
+    "label": "Back to sign in label",
+    "type": "text",
+    "default": "Back to sign in"
+  },
+  {
+    "name": "back_to_login_link",
+    "label": "Back to sign in link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "CONTENT",
+        "href": "/login/"
+      }
+    }
+  },
+  {
+    "name": "success_heading",
+    "label": "Success heading",
+    "type": "text",
+    "default": "Check your inbox"
+  },
+  {
+    "name": "success_body",
+    "label": "Success message",
+    "type": "richtext",
+    "default": "<p>If an account exists for that email address, you’ll receive a password reset link shortly. Check your spam folder if you don’t see it within a few minutes.</p>"
+  }
+]

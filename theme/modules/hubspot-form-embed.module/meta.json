@@ -1,0 +1,14 @@
+{
+  "label": "HubSpot Form Embed",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Generic HubSpot form embed. Configure via Form GUID. Supports custom success message and redirect URL on submit.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["form", "embed", "hubspot"]
+}

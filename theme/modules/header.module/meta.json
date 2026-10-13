@@ -1,0 +1,14 @@
+{
+  "label": "Site Header",
+  "css_assets": [],
+  "external_js": [],
+  "global": true,
+  "help_text": "Global site header with logo, primary navigation, utility bar, and member login state.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": false,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["header", "navigation", "global"]
+}

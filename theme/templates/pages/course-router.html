@@ -1,0 +1,159 @@
+<!--
+  templateType: page
+  label: Course Detail (dynamic - Courses HubDB)
+  isAvailableForNewContent: true
+-->
+{#
+  course-router.html â€” HubDB Dynamic Page Router
+  URL pattern: /courses/{course_slug}
+
+  This is the SINGLE template bound to HubDB Table 1 (courses) for dynamic pages.
+  In HubSpot, only one template can be assigned per HubDB table's dynamic pages.
+  This template reads parent_template from the HubDB row and includes either:
+    - course.html        (parent_template.name = "standard" or unset)
+    - course-sales.html  (parent_template.name = "sales")
+
+  Routing logic:
+    dynamic_page_hubdb_row.parent_template is a SELECT column.
+    Its .name property holds the option name: "standard" or "sales".
+
+  SEO:
+    page_title, meta_description, and og_image are read directly from the HubDB row
+    columns of the same name (declared in hubdb/courses.json and used in dynamicMetaTags).
+    They are also repeated here in extra_head to ensure correct rendering.
+
+  HubDB columns used:
+    course_name       â€” fallback page title
+    page_title        â€” SEO title override
+    meta_description  â€” meta description
+    og_image          â€” open graph image (IMAGE column)
+    parent_template   â€” SELECT: "standard" | "sales"
+    course_id         â€” consumed by course-filter.module inside the included partial
+#}
+{% set page_title_exact = dynamic_page_hubdb_row.page_title | default(dynamic_page_hubdb_row.course_name ~ ' â€” Weld Australia') %}
+{% set page_description = dynamic_page_hubdb_row.meta_description | default('') %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/course-detail.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../modules/hero.module/module.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/course-session-cards.css') }}">
+{# SEO from HubDB row â€” overrides page editor defaults.
+   HubSpot also reads dynamicMetaTags from the table definition (courses.json),
+   but explicit meta tags here ensure they're always present. #}
+{% if dynamic_page_hubdb_row.og_image and dynamic_page_hubdb_row.og_image.url %}
+<meta property="og:image" content="{{ dynamic_page_hubdb_row.og_image.url }}">
+<meta property="og:image:alt" content="{{ dynamic_page_hubdb_row.course_name | default('') }}">
+{% endif %}
+
+{# Breadcrumb structured data #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_settings.site_url | default('https://weldaustralia.com.au') }}" },
+    { "@type": "ListItem", "position": 2, "name": "Course Timetable", "item": "{{ site_settings.site_url | default('https://weldaustralia.com.au') }}/courses/" },
+    { "@type": "ListItem", "position": 3, "name": "{{ dynamic_page_hubdb_row.course_name | default('Course') | escape }}" }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block body %}
+{#
+  Route to the appropriate layout partial based on the HubDB row's parent_template field.
+  parent_template is a SELECT column; its .name property holds the option value string.
+  Normalise to lowercase for safe comparison.
+#}
+{% set _template_type = dynamic_page_hubdb_row.parent_template.name | default('standard') | lower %}
+
+{% if _template_type == 'sales' %}
+  {# High-polish sales layout â€” IIW Inspector, AS1796 Cert 10 #}
+  {% include "./course-sales.html" %}
+{% else %}
+  {# Standard course layout â€” all other courses #}
+  {% include "./course.html" %}
+{% endif %}
+
+{# Dynamic pages can retain a saved DnD module snapshot with an older split
+   bundle URL. Load the HubSpot-safe standalone bundle only if the session
+   selector has not hydrated. #}
+{% set _course_engine_ns = namespace(rows=[]) %}
+{% for _course_engine_row in hubdb_table_rows('courses', 'course_id__eq=' ~ dynamic_page_hubdb_row.course_id ~ '&orderBy=start_date') %}
+  {% if _course_engine_row.use_event_engine %}
+    {% set _course_engine_member_price = _course_engine_row.price_member | default(_course_engine_row.price_individual, true) %}
+    {% set _course_engine_price_individual = _course_engine_row.price_individual | float | default(0) %}
+    {% set _course_engine_price_student = _course_engine_row.price_student_aud_ex_gst | float | default(0) %}
+    {% set _course_engine_price_bronze = _course_engine_row.price_bronze_aud_ex_gst | float | default(0) %}
+    {% set _course_engine_price_silver = _course_engine_row.price_silver_aud_ex_gst | float | default(0) %}
+    {% set _course_engine_price_gold = _course_engine_row.price_gold_aud_ex_gst | float | default(0) %}
+    {% set _course_engine_ns.rows = _course_engine_ns.rows + [{
+      'id': _course_engine_row.hs_id | string,
+      'use_event_engine': true,
+      'price_member': _course_engine_member_price | float | default(0),
+      'price_individual': _course_engine_price_individual,
+      'price_student': _course_engine_price_student,
+      'price_bronze': _course_engine_price_bronze,
+      'price_silver': _course_engine_price_silver,
+      'price_gold': _course_engine_price_gold,
+      'price_non_member': _course_engine_row.price_non_member | float | default(0)
+    }] %}
+  {% endif %}
+{% endfor %}
+<script type="module">
+function hideStaleCourseSections() {
+  [
+    '.wa-hero-video',
+    '.wa-stat-tiles',
+    '#why',
+    '#outcomes',
+    '#syllabus',
+    '#audience',
+    '#trainer',
+    '.wa-team',
+    '.wa-testimonials',
+    '.wa-logo-strip',
+    '#faq',
+    '.wa-cta-banner'
+  ].forEach(function (selector) {
+    document.querySelectorAll(selector).forEach(function (el) {
+      el.setAttribute('hidden', 'hidden');
+      el.style.display = 'none';
+    });
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', hideStaleCourseSections);
+} else {
+  hideStaleCourseSections();
+}
+
+window.setTimeout(hideStaleCourseSections, 250);
+window.setTimeout(hideStaleCourseSections, 1000);
+
+window.setTimeout(function () {
+  var mount = document.querySelector('[data-wa-module="course-filter"]');
+  if (mount) {
+    try {
+      var props = JSON.parse(mount.getAttribute('data-props') || '{}');
+      var engineRows = {{ _course_engine_ns.rows | tojson }};
+      var engineById = {};
+      engineRows.forEach(function (row) { engineById[String(row.id)] = row; });
+      props.rows = (props.rows || []).map(function (row) {
+        var engineRow = engineById[String(row.id)];
+        return engineRow ? Object.assign({}, row, engineRow) : row;
+      });
+      var replacement = mount.cloneNode(false);
+      replacement.setAttribute('data-props', JSON.stringify(props));
+      mount.replaceWith(replacement);
+    } catch (error) {
+      console.error('[wa-course-detail] Could not refresh Event Engine rows.', error);
+    }
+    import("{{ get_asset_url('../../assets/js/course-filter.standalone.js') }}?fallback=1");
+  }
+}, 0);
+</script>
+
+{% endblock %}

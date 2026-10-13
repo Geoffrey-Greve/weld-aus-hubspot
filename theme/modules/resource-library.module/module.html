@@ -1,0 +1,115 @@
+{#
+  HubDB-backed Resources Hub listing.
+
+  CRM remains read-only. Logged-in membership fields are hydrated server-side,
+  and locked rows never expose their file_url in anonymous client-side props.
+#}
+
+{% import "../../templates/partials/_sharepoint.html" as sp %}
+{% import "../../templates/partials/_member-tier.html" as wa_tier %}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{% include "../../templates/partials/_resource-member-resolve.html" %}
+
+{% set resource_rows = hubdb_table_rows('resources', 'is_active__eq=true&orderBy=-published_date&limit=1000') %}
+{% set ns = namespace(rows=[]) %}
+
+{% for row in resource_rows %}
+  {% set required_tier = row.required_tier.name | default(row.required_tier.label, true) | default('', true) | string | lower | trim %}
+  {% set minimum_tier = row.min_tier.name | default(row.min_tier.label, true) | default('', true) | string | lower | trim %}
+  {% set row_members_only = row.members_only ? true : false %}
+
+  {# Older imported rows may use members_only/min_tier rather than required_tier. #}
+  {% if row_members_only and (not required_tier or required_tier == 'public') %}
+    {% set required_tier = minimum_tier | default('member', true) %}
+  {% endif %}
+
+  {% if required_tier == 'gold' %}
+    {% set required_rank = 4 %}
+  {% elif required_tier == 'silver' %}
+    {% set required_rank = 3 %}
+  {% elif required_tier == 'bronze' %}
+    {% set required_rank = 2 %}
+  {% elif required_tier in ['member', 'individual'] %}
+    {% set required_rank = 1 %}
+    {% set required_tier = 'member' %}
+  {% else %}
+    {% set required_rank = 0 %}
+    {% set required_tier = 'public' %}
+  {% endif %}
+
+  {% set is_locked = required_rank > 0 and resource_member.tier_rank < required_rank %}
+  {% set file_type_name = row.file_type.name | default(row.file_type.label, true) | default('', true) %}
+  {% set safe_file_url = '' %}
+  {% if not is_locked %}
+    {# QA #46: normalise SharePoint share links so they open on Android without a Microsoft
+       login. Videos keep their original URL (they're opened/played, not downloaded); only
+       downloadable resource types get the direct-download rewrite. #}
+    {% if file_type_name == 'video' %}
+      {% set safe_file_url = row.file_url | default('') %}
+    {% else %}
+      {% set safe_file_url = sp.sharepoint_direct_url(row.file_url | default('')) | trim %}
+    {% endif %}
+  {% endif %}
+
+  {% set image_url = row.preview_image.url | default('') %}
+  {# HubDB Image exposes altText, not alt - accessing .alt triggers upload warnings. #}
+  {% set image_alt = row.preview_image.altText | default(row.title, true) | default('', true) %}
+  {% set category_name = row.category.name | default(row.category.label, true) | default('', true) %}
+  {% set accent_tone = row.accent_tone.name | default(row.accent_tone.label, true) | default('navy', true) %}
+  {# Pass raw labels through - the island decides price vs free/CTA copy (blank != Free). #}
+  {% set member_label = row.member_label | default('', true) %}
+  {% set non_member_label = row.non_member_label | default('', true) %}
+
+  {% set row_data = {
+    'id': row.hs_id,
+    'title': row.title | default(''),
+    'slug': row.slug | default(''),
+    'abstract': row.abstract | default(''),
+    'file_url': safe_file_url,
+    'file_type': file_type_name,
+    'category': category_name,
+    'accent_tone': accent_tone,
+    'required_tier': required_tier,
+    'member_label': member_label,
+    'non_member_label': non_member_label,
+    'preview_image_url': image_url,
+    'preview_image_alt': image_alt,
+    'published_date': row.published_date | default(null),
+    'locked': is_locked
+  } %}
+
+  {% set ns.rows = ns.rows + [row_data] %}
+{% endfor %}
+
+{% set locked_cta_url = module.locked_cta_link.url.href | default('/membership/') %}
+{# QA #220: price tracks *active* membership, not merely logged-in (matches resource-detail). #}
+{% set props_member_tier = resource_member.tier if resource_member.is_active else '' %}
+{% set full_props = {
+  'rows': ns.rows,
+  'section_heading': module.section_heading | default('Browse resources'),
+  'intro': module.intro | default(''),
+  'categories_visible': module.categories_visible | default([]),
+  'default_filter_category': module.default_filter_category | default('all'),
+  'show_file_type_filter': module.show_file_type_filter,
+  'show_member_only_filter': module.show_member_only_filter,
+  'page_size': module.page_size | int | default(9),
+  'locked_overlay_message': module.locked_overlay_message | default(''),
+  'locked_cta_label': module.locked_cta_label | default('Become a member to access'),
+  'locked_cta_url': locked_cta_url,
+  'member_tier': props_member_tier
+} %}
+
+<div
+  class="wa-resource-library-module"
+  {% if module.section_id %}data-section-id="{{ module.section_id }}"{% endif %}
+  data-wa-module="resource-library"
+  data-props="{{ full_props | tojson | escape }}"
+></div>
+
+{# Script references are refreshed by corepack pnpm build. #}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/js/assets/resource-library.standalone.css') }}">
+<script type="module" src="{{ get_asset_url('../../assets/js/resource-library.standalone.js') }}"></script>
+
+{% endif %}

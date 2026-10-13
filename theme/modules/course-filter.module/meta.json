@@ -1,0 +1,14 @@
+{
+  "label": "Course Filter",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "React island that filters course sessions by city. Place on consolidated course pages (course.html / course-sales.html). Reads sessions from HubDB Table 1 (courses) for the current dynamic page's course_id.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["course", "react-island", "hubdb", "interactive"]
+}

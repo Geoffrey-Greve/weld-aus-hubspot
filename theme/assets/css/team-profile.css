@@ -1,0 +1,432 @@
+/* ==========================================================================
+   team-profile.css
+   Team & board member profile pages - /about/team/{person-name}
+
+   Loaded by theme/templates/pages/about-team.html (both the listing and the
+   dynamic profile views) via get_asset_url(). Hand-written; not compiled.
+
+   Scoped to .wa-team-profile__* so it cannot leak into the team-grid /
+   board-grid modules, which own their own module.css.
+   ========================================================================== */
+
+/* ── Breadcrumb ───────────────────────────────────────────────────────────
+   .wa-breadcrumb is otherwise only styled inside the event hero, so the
+   profile hero brings its own rules rather than inheriting nothing. */
+
+.wa-team-profile__hero .wa-breadcrumb {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 1.5rem;
+}
+
+.wa-team-profile__hero .wa-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wa-team-profile__hero .wa-breadcrumb__link,
+.wa-team-profile__hero .wa-breadcrumb__current,
+.wa-team-profile__hero .wa-breadcrumb__sep {
+  color: inherit;
+}
+
+.wa-team-profile__hero .wa-breadcrumb__link:hover,
+.wa-team-profile__hero .wa-breadcrumb__link:focus-visible {
+  color: var(--wa-color-accent, #ffc400);
+}
+
+.wa-team-profile__hero .wa-breadcrumb__current {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+
+#wa-team-profile .wa-hero__breadcrumb {
+  margin-block-end: clamp(1.25rem, 2vw, 1.85rem);
+}
+
+.wa-team-profile__hero-inner {
+  align-items: center;
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+}
+
+.wa-team-profile__photo-wrap {
+  aspect-ratio: 1 / 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 4px solid var(--wa-color-accent, #fecf05);
+  border-radius: var(--wa-radius-lg, 16px);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.26),
+    0 0 0 1px rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+  position: relative;
+  width: min(100%, 260px);
+}
+
+.wa-team-profile__photo {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  width: 100%;
+}
+
+.wa-team-profile__photo-fallback {
+  align-items: center;
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+  display: flex;
+  font-family: var(--wa-font-heading);
+  font-size: 72px;
+  font-weight: 800;
+  inset: 0;
+  justify-content: center;
+  position: absolute;
+}
+
+.wa-team-profile__name {
+  color: #fff;
+  font-family: var(--wa-font-heading);
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 0.5rem;
+}
+
+.wa-team-profile__role {
+  color: var(--wa-color-accent, #fecf05);
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 0.35rem;
+}
+
+.wa-team-profile__org {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin: 0 0 0.75rem;
+}
+
+.wa-team-profile__quals {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  color: #fff;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 4px 14px;
+}
+
+@media (min-width: 768px) {
+  .wa-team-profile__hero-inner {
+    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+/* ── Body: bio + summary sidebar ──────────────────────────────────────── */
+
+.wa-team-profile__grid {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .wa-team-profile__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 24rem);
+  }
+}
+
+.wa-team-profile__content-heading,
+.wa-team-profile__content .wa-richtext :where(h3) {
+  color: var(--wa-color-primary, #1c1e4c);
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-h3-size, var(--wa-text-2xl, 1.875rem));
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 0 0 1rem;
+}
+
+.wa-team-profile__content .wa-richtext :where(h3 strong) {
+  font-weight: inherit;
+}
+
+.wa-team-profile__content .wa-richtext :where(h3) {
+  margin-top: var(--wa-space-7, 2rem);
+}
+
+.wa-team-profile__content .wa-richtext :where(h3) + :where(ul, ol, p) {
+  margin-top: 0;
+}
+
+.wa-team-profile__content-empty {
+  color: var(--wa-color-text-muted, #5a5f7a);
+  line-height: 1.6;
+  margin: 0 0 1.25rem;
+}
+
+.wa-team-profile__card {
+  background: var(--wa-color-white, #fff);
+  border: 1px solid rgba(11, 18, 53, 0.1);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+}
+
+.wa-team-profile__card-heading {
+  color: var(--wa-color-primary, #1c1e4c);
+  font-family: var(--wa-font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0 0 1rem;
+}
+
+.wa-team-profile__facts {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+}
+
+.wa-team-profile__fact dt {
+  color: var(--wa-color-text-muted, #5a5f7a);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.15rem;
+  text-transform: uppercase;
+}
+
+.wa-team-profile__fact dd {
+  color: var(--wa-color-primary, #1c1e4c);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.wa-team-profile__back {
+  margin: 1.25rem 0 0;
+}
+
+.wa-team-profile__back-link {
+  box-shadow: 0 10px 24px rgba(28, 30, 76, 0.12);
+}
+
+.wa-team-profile__back-link:hover,
+.wa-team-profile__back-link:focus-visible {
+  box-shadow: 0 14px 30px rgba(28, 30, 76, 0.18);
+}
+
+/* ── "No longer listed" (inactive row served at a live dynamic-page URL) ── */
+
+.wa-team-profile__missing-heading {
+  color: var(--wa-color-primary, #1c1e4c);
+  font-family: var(--wa-font-heading);
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0 0 1rem;
+}
+
+.wa-team-profile__missing-text {
+  color: var(--wa-color-text-muted, #5a5f7a);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0 0 1.75rem;
+}
+
+.wa-team-profile__missing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+/* ── Related people ───────────────────────────────────────────────────── */
+
+.wa-team-profile__related > .container {
+  align-items: center;
+  column-gap: var(--wa-space-6, 1.5rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  row-gap: var(--wa-space-6, 1.5rem);
+}
+
+.wa-team-profile__related-heading {
+  color: var(--wa-color-primary, #1c1e4c);
+  font-family: var(--wa-font-heading);
+  font-size: clamp(24px, 2.2vw, 30px);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.wa-team-profile__related-all {
+  flex: 0 0 auto;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  margin: 0;
+}
+
+.wa-team-profile__related-grid {
+  display: grid;
+  gap: var(--wa-space-6, 1.5rem);
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+@media (min-width: 600px) {
+  .wa-team-profile__related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .wa-team-profile__related-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* The profile page uses the same card markup/classes as team-grid.module for
+   "More from Board". HubSpot does not always auto-emit module CSS on dynamic
+   pages when the module itself is not present, so this scoped block preserves
+   the shared card look here without leaking beyond the profile related section. */
+.wa-team-profile__related .wa-team__card {
+  width: min(100%, 340px);
+  justify-self: center;
+  background: #fff;
+  border: 2px solid var(--wa-color-border, #e5e7eb);
+  border-radius: var(--wa-radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: var(--wa-shadow-card, 0 12px 30px rgba(28, 30, 76, 0.06));
+  display: flex;
+  flex-direction: column;
+}
+
+.wa-team-profile__related .wa-team__card--linked {
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.wa-team-profile__related .wa-team__card-link {
+  color: inherit;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.wa-team-profile__related .wa-team__card--linked:hover,
+.wa-team-profile__related .wa-team__card--linked:focus-within {
+  border-color: var(--wa-color-accent, #fecf05);
+  box-shadow: 0 1rem 2.5rem rgba(28, 30, 76, 0.14);
+  transform: translateY(-2px);
+}
+
+.wa-team-profile__related .wa-team__card--linked:hover .wa-team__name,
+.wa-team-profile__related .wa-team__card--linked:focus-within .wa-team__name {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.wa-team-profile__related .wa-team__card-link:focus-visible {
+  outline: 3px solid var(--wa-color-accent-magenta, #ed128d);
+  outline-offset: 2px;
+}
+
+.wa-team-profile__related .wa-team__photo-wrap {
+  position: relative;
+  aspect-ratio: 5 / 6;
+  background: var(--wa-color-surface-alt, #eef0f4);
+  overflow: hidden;
+}
+
+.wa-team-profile__related .wa-team__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.wa-team-profile__related .wa-team__photo-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--wa-font-heading);
+  font-size: 48px;
+  font-weight: 800;
+  color: rgba(28, 30, 76, 0.25);
+}
+
+.wa-team-profile__related .wa-team__body {
+  flex: 1;
+  padding: var(--wa-space-5, 1.25rem) var(--wa-space-6, 1.5rem) var(--wa-space-6, 1.5rem);
+}
+
+.wa-team-profile__related .wa-team__name {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-lg, 1.125rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--wa-color-primary);
+  margin: 0 0 4px;
+}
+
+.wa-team-profile__related .wa-team__role {
+  font-size: var(--wa-text-sm, 0.9rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--wa-color-magenta-text, #c00d74);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .wa-team-profile__related > .container {
+    grid-template-columns: 1fr;
+  }
+
+  .wa-team-profile__related-heading,
+  .wa-team-profile__related-all,
+  .wa-team-profile__related-grid {
+    grid-column: 1;
+  }
+
+  .wa-team-profile__related-all {
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .wa-team-profile__related-grid {
+    grid-row: 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-team-profile__related .wa-team__card--linked {
+    transition: none;
+  }
+
+  .wa-team-profile__related .wa-team__card--linked:hover,
+  .wa-team-profile__related .wa-team__card--linked:focus-within {
+    transform: none;
+  }
+}

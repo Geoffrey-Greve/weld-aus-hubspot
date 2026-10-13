@@ -1,0 +1,65 @@
+<!--
+  templateType: none
+-->
+{#
+  checkout-layout.html - Weld Australia checkout layout.
+
+  This layout intentionally keeps the normal public site header and footer from
+  base.html so checkout feels part of the wider Weld Australia site. The
+  checkout-specific progress bar sits in a focused band directly below the
+  global header and is populated by the checkout-tunnel React island.
+#}
+{% extends "./base.html" %}
+
+{% block body_class %} is-checkout{% endblock %}
+
+{% block extra_head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ get_asset_url('../../assets/css/checkout.css') }}">
+{% endblock %}
+
+{% block body %}
+  <section class="checkout-progress-band" aria-label="Checkout progress">
+    <div class="checkout-progress-band__inner container">
+      <div class="checkout-progress-band__copy">
+        <p class="checkout-progress-band__eyebrow">Secure registration</p>
+        <h1 class="checkout-progress-band__title">Complete your checkout</h1>
+      </div>
+
+      <div
+        id="wa-checkout-steps"
+        class="checkout-progress-band__steps"
+        aria-live="polite"
+      ></div>
+
+      <p class="checkout-progress-band__secure">
+        <svg
+          class="checkout-progress-band__secure-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        Encrypted checkout
+      </p>
+    </div>
+
+    {% set _brand_line_context = 'hero' %}
+    {% set _brand_line_class = 'checkout-progress-band__brand-line' %}
+    {% include "../partials/brand-line.html" %}
+  </section>
+
+  <section class="checkout-page-shell">
+    {% block checkout_content %}{% endblock %}
+  </section>
+{% endblock %}

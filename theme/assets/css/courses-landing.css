@@ -1,0 +1,655 @@
+/* ============================================================
+   Courses landing page
+   Route: /courses
+   Keeps broad Weld Australia training content on the listing page,
+   while individual course detail pages stay focused on course data.
+   ============================================================ */
+
+.wa-courses-proof,
+.wa-courses-upcoming,
+.wa-courses-membership {
+  font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+}
+
+.wa-courses-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.wa-courses-btn {
+  min-height: 3.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.78rem 1.9rem;
+  border: 2px solid transparent;
+  border-radius: 0.45rem;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.wa-courses-btn:hover,
+.wa-courses-btn:focus-visible {
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.wa-courses-btn--gold {
+  border-color: #ffcb05;
+  background: #ffcb05;
+  color: #11133a;
+  box-shadow: 0 12px 26px rgba(255, 203, 5, 0.22);
+}
+
+.wa-courses-btn--gold:hover,
+.wa-courses-btn--gold:focus-visible {
+  background: #ffd73d;
+  color: #11133a;
+}
+
+.wa-courses-btn--outline-light {
+  border-color: rgba(255, 255, 255, 0.9);
+  color: #fff;
+  background: transparent;
+}
+
+.wa-courses-btn--outline-light:hover,
+.wa-courses-btn--outline-light:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.wa-courses-btn--outline-dark {
+  border-color: #1c1e4c;
+  color: #1c1e4c;
+  background: transparent;
+}
+
+.wa-courses-btn--outline-dark:hover,
+.wa-courses-btn--outline-dark:focus-visible {
+  background: #1c1e4c;
+  color: #fff;
+}
+
+.wa-courses-proof {
+  padding: clamp(4.5rem, 8vw, 7rem) 0;
+  background: #fff;
+}
+
+.wa-courses-proof__header {
+  max-width: 56rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.wa-courses-eyebrow {
+  color: #0055a4;
+}
+
+.wa-courses-proof .wa-courses-eyebrow {
+  gap: 10px;
+  color: var(--wa-color-magenta-text, #c00d74);
+}
+
+.wa-courses-proof .wa-courses-eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 2px;
+  flex: 0 0 24px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.wa-courses-proof__header h2,
+.wa-courses-section-head h2,
+.wa-courses-membership__header h2 {
+  margin: 0.75rem 0 0;
+  color: #11133a;
+  font-family: var(--wa-font-heading, "Poppins", system-ui, sans-serif);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.wa-courses-proof__header p:not(.wa-courses-eyebrow),
+.wa-courses-membership__header p {
+  max-width: 44rem;
+  margin: 1rem 0 0;
+  color: #586475;
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.wa-courses-proof__intro > *:last-child,
+.wa-courses-membership__intro > *:last-child,
+.wa-courses-empty__body > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-courses-proof__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.wa-courses-proof__card {
+  position: relative;
+  min-height: 100%;
+  padding: clamp(1.45rem, 2.6vw, 1.85rem);
+  border: 1px solid #dfe5ec;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 15px 35px rgba(17, 19, 58, 0.06);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.wa-courses-proof__card span {
+  display: block;
+  width: 42px;
+  height: 3px;
+  margin-bottom: 1.35rem;
+  border-radius: 999px;
+  background: #ffcb05;
+}
+
+.wa-courses-proof__card--magenta span {
+  background: var(--wa-color-magenta-text, #c00d74);
+}
+
+.wa-courses-proof__card:hover,
+.wa-courses-proof__card:focus-within {
+  border-color: rgba(28, 30, 76, 0.18);
+  box-shadow: 0 22px 42px rgba(17, 19, 58, 0.11);
+  transform: translateY(-4px);
+}
+
+.wa-courses-proof__card h3 {
+  margin: 0 0 0.7rem;
+  color: #11133a;
+  font-size: 1.15rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.wa-courses-proof__card p {
+  margin: 0;
+  color: #536172;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.wa-courses-upcoming {
+  padding: clamp(4rem, 8vw, 6.75rem) 0;
+  background: #f4f7fa;
+}
+
+.wa-courses-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.wa-courses-section-head > div,
+.wa-courses-membership__header {
+  max-width: 52rem;
+  text-align: left;
+}
+
+.wa-courses-section-head .wa-courses-eyebrow,
+.wa-courses-membership__header .wa-courses-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin: 0 0 14px;
+  color: var(--wa-color-magenta-text, #c00d74);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.wa-courses-section-head .wa-courses-eyebrow::before,
+.wa-courses-membership__header .wa-courses-eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 2px;
+  flex: 0 0 24px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.wa-courses-section-head h2,
+.wa-courses-membership__header h2 {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.wa-courses-session-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.35rem;
+}
+
+.wa-courses-session-card {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  padding: 1.45rem 1.45rem 1rem;
+  border: 1px solid #dce2eb;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 18px 38px rgba(17, 19, 58, 0.08);
+}
+
+.wa-courses-session-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.wa-courses-pill {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 1.45rem;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid #95cdfc;
+  border-radius: 999px;
+  background: #e6f4ff;
+  color: #0055a4;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.wa-courses-pill--warning {
+  border-color: #f5bf5c;
+  background: #fff6df;
+  color: #7a4a00;
+}
+
+.wa-courses-pill--grey {
+  border-color: #aeb8c5;
+  background: #f3f6f8;
+  color: #11133a;
+}
+
+.wa-courses-pill--gold {
+  border-color: #ffcb05;
+  background: #fff7c7;
+  color: #5c3d00;
+}
+
+.wa-courses-session-card h3 {
+  margin: 0;
+  color: #11133a;
+  font-size: 1.1rem;
+  font-weight: 850;
+  line-height: 1.3;
+}
+
+.wa-courses-session-card__meta,
+.wa-courses-session-card__duration {
+  margin: 0.9rem 0 0;
+  color: #566274;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.wa-courses-session-card__meta span:first-child {
+  color: var(--wa-color-magenta-text, #c00d74);
+  font-size: 1.6rem;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.wa-courses-session-card__duration::before {
+  content: "◷";
+  margin-right: 0.35rem;
+  color: #5b6770;
+}
+
+.wa-courses-session-card__pricing {
+  display: grid;
+  align-items: end;
+  gap: 0.85rem;
+  margin: 1.35rem 0 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e7ee;
+}
+
+.wa-courses-session-card__pricing--member {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.wa-courses-session-card__pricing--public {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.wa-courses-session-card__pricing span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #344256;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wa-courses-session-card__pricing strong {
+  color: #1c1e4c;
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.wa-courses-session-card__pricing--member .wa-courses-session-card__member {
+  color: var(--wa-color-success-text, #146c39);
+}
+
+.wa-courses-session-card__pricing--member .wa-courses-session-card__nonmember {
+  color: #5b6770;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: line-through;
+}
+
+.wa-courses-session-card__pricing p {
+  margin: 0 0 0.15rem;
+  color: var(--wa-color-success-text, #146c39);
+  font-size: 0.86rem;
+  font-weight: 850;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.wa-courses-session-card__cta {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  border-radius: 0.5rem;
+  background: #1c1e4c;
+  color: #fff !important;
+  font-size: 0.96rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.wa-courses-session-card__cta:hover,
+.wa-courses-session-card__cta:focus-visible {
+  background: #11133a;
+  color: #fff !important;
+  text-decoration: none;
+}
+
+.wa-courses-empty {
+  padding: 2rem;
+  border: 1px dashed #c9d3df;
+  border-radius: 1rem;
+  background: #fff;
+  text-align: center;
+}
+
+.wa-courses-empty h3 {
+  margin: 0;
+  color: #11133a;
+}
+
+.wa-courses-empty p {
+  margin: 0.75rem auto 1.25rem;
+  max-width: 36rem;
+  color: #586475;
+}
+
+.wa-courses-membership {
+  padding: clamp(4rem, 8vw, 6.75rem) 0;
+  background: #fff;
+}
+
+.wa-courses-membership__header {
+  margin: 0 0 clamp(2.4rem, 5vw, 3.5rem);
+}
+
+.wa-courses-membership__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.3rem;
+  align-items: stretch;
+}
+
+.wa-courses-membership-card {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  padding: 1.85rem;
+  border: 1px solid #dce2eb;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 16px 32px rgba(17, 19, 58, 0.07);
+}
+
+.wa-courses-membership-card--featured {
+  border: 2px solid #ffcb05;
+  box-shadow: 0 18px 38px rgba(255, 203, 5, 0.2);
+}
+
+.wa-courses-membership-card h3 {
+  margin: 1.2rem 0 1.15rem;
+  color: #11133a;
+  font-size: clamp(1.8rem, 3vw, 2.3rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.wa-courses-membership-card h3 span {
+  color: #586475;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.wa-courses-membership-card ul {
+  display: grid;
+  gap: 0.72rem;
+  margin: 0 0 1.8rem;
+  padding: 0;
+  list-style: none;
+}
+
+.wa-courses-membership-card li {
+  position: relative;
+  padding-left: 1.45rem;
+  color: #141822;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.wa-courses-membership-card li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #118348;
+  font-weight: 900;
+}
+
+.wa-courses-membership-card .wa-courses-btn {
+  width: 100%;
+  margin-top: auto;
+}
+
+#all-courses {
+  scroll-margin-top: calc(var(--wa-site-header-offset, 110px) + 1.5rem);
+}
+
+@media (max-width: 1024px) {
+  .wa-courses-proof__grid,
+  .wa-courses-session-grid,
+  .wa-courses-membership__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  }
+
+@media (max-width: 760px) {
+        .wa-courses-section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .wa-courses-section-head .wa-courses-btn {
+    width: 100%;
+  }
+
+    .wa-courses-proof__grid,
+  .wa-courses-session-grid,
+  .wa-courses-membership__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wa-courses-session-card__pricing {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .wa-courses-session-card__pricing p {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+}
+
+/* ---- Defect 101 / 229 / 230: membership CTA band (single "Join now" button) ----
+   The published /courses page can hold an older saved DnD module instance, so
+   this scoped fallback makes that instance match the shared cta-banner section. */
+.wa-courses-membership--cta {
+  position: relative;
+  overflow: hidden;
+  background: var(--wa-color-primary, #1c1e4c);
+  color: var(--wa-color-on-primary, #fff);
+}
+
+.wa-courses-membership--cta::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--wa-color-magenta, #ed128d),
+    var(--wa-color-accent, #fecf05)
+  );
+}
+
+.wa-courses-membership--cta .wa-courses-membership__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  margin: 0;
+  max-width: none;
+  text-align: left;
+}
+
+.wa-courses-membership--cta .wa-courses-membership__header .wa-courses-eyebrow {
+  justify-content: flex-start;
+  color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-courses-membership--cta .wa-courses-membership__header h2 {
+  margin: 0 0 14px;
+  color: var(--wa-color-on-primary, #fff);
+  font-size: clamp(32px, 3.1vw, 42px);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.28;
+  text-align: left;
+}
+
+.wa-courses-membership--cta .wa-courses-membership__intro {
+  max-width: 560px;
+  text-align: left;
+}
+
+.wa-courses-membership--cta .wa-courses-membership__intro p,
+.wa-courses-membership--cta .wa-courses-membership__header p:not(.wa-courses-eyebrow) {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.wa-courses-membership__cta {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.wa-courses-membership__cta .wa-courses-btn {
+  min-height: var(--wa-touch-min, 46px);
+  display: inline-flex;
+  align-items: center;
+}
+
+.wa-courses-membership--cta .wa-courses-membership__cta .wa-courses-btn {
+  border-color: var(--wa-color-accent, #fecf05);
+  background: var(--wa-color-accent, #fecf05);
+  color: var(--wa-color-on-accent, #11133a);
+  box-shadow: none;
+}
+
+.wa-courses-membership--cta .wa-courses-membership__cta .wa-courses-btn:hover,
+.wa-courses-membership--cta .wa-courses-membership__cta .wa-courses-btn:focus-visible {
+  border-color: var(--wa-color-accent-dark, #eab308);
+  background: var(--wa-color-accent-dark, #eab308);
+  color: var(--wa-color-on-accent, #11133a);
+}
+
+@media (min-width: 768px) {
+  .wa-courses-membership--cta .wa-courses-membership__header {
+    display: grid;
+    grid-template-columns: minmax(0, 560px) auto;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 32px;
+  }
+
+  .wa-courses-membership--cta .wa-courses-membership__header .wa-courses-eyebrow,
+  .wa-courses-membership--cta .wa-courses-membership__header h2,
+  .wa-courses-membership--cta .wa-courses-membership__intro {
+    grid-column: 1;
+  }
+
+  .wa-courses-membership--cta .wa-courses-membership__cta {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    justify-content: flex-end;
+    margin-top: 0;
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "name": "events",
+  "label": "Events",
+  "useForPages": true,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "dynamicPageUrlPattern": "/events/{slug}",
+  "dynamicMetaTags": {
+    "DESCRIPTION": "event_description"
+  },
+  "columns": [
+    {
+      "name": "slug",
+      "label": "URL slug",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "event_name",
+      "label": "Event name",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "event_type",
+      "label": "Event type",
+      "type": "SELECT",
+      "options": [
+        { "name": "Webinar", "label": "Webinar", "type": "option" },
+        { "name": "In-Person", "label": "In-Person", "type": "option" },
+        { "name": "Hybrid", "label": "Hybrid", "type": "option" },
+        { "name": "Awards", "label": "Awards", "type": "option" }
+      ]
+    },
+    {
+      "name": "event_date",
+      "label": "Event date (start)",
+      "type": "DATE"
+    },
+    {
+      "name": "event_end_date",
+      "label": "Event date (end, optional)",
+      "type": "DATE"
+    },
+    {
+      "name": "event_state",
+      "label": "State",
+      "type": "SELECT",
+      "options": [
+        { "name": "NSW", "label": "NSW", "type": "option" },
+        { "name": "VIC", "label": "VIC", "type": "option" },
+        { "name": "QLD", "label": "QLD", "type": "option" },
+        { "name": "WA", "label": "WA", "type": "option" },
+        { "name": "SA", "label": "SA", "type": "option" },
+        { "name": "TAS", "label": "TAS", "type": "option" },
+        { "name": "NT", "label": "NT", "type": "option" },
+        { "name": "ACT", "label": "ACT", "type": "option" },
+        { "name": "National", "label": "National", "type": "option" }
+      ]
+    },
+    {
+      "name": "event_location",
+      "label": "Location (venue name / address)",
+      "type": "TEXT"
+    },
+    {
+      "name": "event_description",
+      "label": "Description",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "event_image",
+      "label": "Event image",
+      "type": "IMAGE"
+    },
+    {
+      "name": "registration_url",
+      "label": "Registration URL",
+      "type": "URL"
+    },
+    {
+      "name": "status",
+      "label": "Status",
+      "type": "SELECT",
+      "options": [
+        { "name": "Available", "type": "option" },
+        { "name": "Sold Out", "type": "option" },
+        { "name": "Cancelled", "type": "option" },
+        { "name": "Closed", "type": "option" }
+      ]
+    },
+    {
+      "name": "is_featured",
+      "label": "Featured",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "is_members_only",
+      "label": "Members only",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "use_event_engine",
+      "label": "Use Event Engine booking",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "worker_event_id",
+      "label": "Event Engine event id (optional, defaults to slug)",
+      "type": "TEXT"
+    },
+    {
+      "name": "ticket_types_json",
+      "label": "Event Engine ticket types (JSON array)",
+      "type": "TEXT"
+    },
+    {
+      "name": "tagline",
+      "label": "Short tagline",
+      "type": "TEXT"
+    },
+    {
+      "name": "time",
+      "label": "Start time (e.g. 9:00am AEST)",
+      "type": "TEXT"
+    },
+    {
+      "name": "city",
+      "label": "City",
+      "type": "TEXT"
+    },
+    {
+      "name": "venue",
+      "label": "Venue name",
+      "type": "TEXT"
+    },
+    {
+      "name": "price_type",
+      "label": "Pricing type",
+      "type": "SELECT",
+      "options": [
+        { "name": "Free", "type": "option" },
+        { "name": "Member Only", "type": "option" },
+        { "name": "Paid", "type": "option" },
+        { "name": "Member Discount", "type": "option" }
+      ]
+    },
+    {
+      "name": "price_from",
+      "label": "Price from (display text, e.g. From $95)",
+      "type": "TEXT"
+    },
+    {
+      "name": "member_price",
+      "label": "Member price (display text)",
+      "type": "TEXT"
+    },
+    {
+      "name": "non_member_price",
+      "label": "Non-member price (display text)",
+      "type": "TEXT"
+    },
+    {
+      "name": "bronze_discount_",
+      "label": "Bronze member discount (% off the non-member price)",
+      "type": "NUMBER"
+    },
+    {
+      "name": "silver_discount_",
+      "label": "Silver member discount (% off the non-member price)",
+      "type": "NUMBER"
+    },
+    {
+      "name": "gold_discount_",
+      "label": "Gold member discount (% off the non-member price)",
+      "type": "NUMBER"
+    },
+    {
+      "name": "cpd",
+      "label": "CPD points (display text)",
+      "type": "TEXT"
+    },
+    {
+      "name": "photo_pos",
+      "label": "Photo focal point",
+      "type": "SELECT",
+      "options": [
+        { "name": "center", "type": "option" },
+        { "name": "top", "type": "option" },
+        { "name": "bottom", "type": "option" }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "slug": "welding-inspection-webinar-jun26",
+      "event_name": "Welding Inspection Fundamentals - Webinar",
+      "event_type": "Webinar",
+      "event_date": "2026-06-10",
+      "event_end_date": "2026-06-10",
+      "event_state": "National",
+      "event_location": "Online (Zoom)",
+      "event_description": "<p>An introductory webinar covering the principles of welding inspection, visual examination techniques, and weld quality standards under AS/NZS 2980.</p>",
+      "registration_url": "https://events.weldaustralia.com.au/inspection-webinar-jun26",
+      "is_featured": true,
+      "is_members_only": false
+    },
+    {
+      "slug": "gala-awards-2026",
+      "event_name": "Weld Australia Gala & Industry Awards 2026",
+      "event_type": "Awards",
+      "event_date": "2026-07-18",
+      "event_end_date": "2026-07-18",
+      "event_state": "NSW",
+      "event_location": "International Convention Centre Sydney, Darling Harbour",
+      "event_description": "<p>Join us for the annual Weld Australia Gala evening celebrating excellence across the welding and fabrication industry. Includes dinner, awards ceremony, and networking.</p>",
+      "registration_url": "https://events.weldaustralia.com.au/gala-2026",
+      "is_featured": true,
+      "is_members_only": false
+    },
+    {
+      "slug": "welding-supervision-workshop-melb-aug26",
+      "event_name": "Advanced Welding Supervision Workshop",
+      "event_type": "In-Person",
+      "event_date": "2026-08-05",
+      "event_end_date": "2026-08-06",
+      "event_state": "VIC",
+      "event_location": "Weld Australia Melbourne Training Centre, Port Melbourne",
+      "event_description": "<p>A two-day practical workshop for experienced supervisors covering complex joint design, distortion control, and production weld quality management.</p>",
+      "registration_url": "https://events.weldaustralia.com.au/supervision-workshop-melb-aug26",
+      "is_featured": false,
+      "is_members_only": true
+    }
+  ]
+}

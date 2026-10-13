@@ -1,0 +1,171 @@
+[
+  {
+    "name": "show_iiw_badge",
+    "label": "Show IIW Australia badge",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "iiw_badge_image",
+    "label": "IIW badge image/logo",
+    "type": "image",
+    "help_text": "This is the only logo image rendered in the footer when the IIW badge is enabled."
+  },
+  {
+    "name": "tagline",
+    "label": "Tagline",
+    "type": "text",
+    "default": "The voice of the welding industry in Australia."
+  },
+  {
+    "name": "menu_columns",
+    "label": "Footer menu columns",
+    "type": "group",
+    "help_text": "Each column renders a HubSpot menu (Settings > Content > Navigation). Edit the links there - no code change needed. If a menu is empty or missing, a built-in default set renders instead.",
+    "occurrence": {
+      "min": 0,
+      "max": 5,
+      "default": 4
+    },
+    "default": [
+      {
+        "heading": "Training",
+        "column_menu": {
+          "name": "Footer Training"
+        }
+      },
+      {
+        "heading": "Membership",
+        "column_menu": {
+          "name": "Footer Membership"
+        }
+      },
+      {
+        "heading": "Certification",
+        "column_menu": {
+          "name": "Footer Certification"
+        }
+      },
+      {
+        "heading": "Company",
+        "column_menu": {
+          "name": "Footer Company"
+        }
+      }
+    ],
+    "children": [
+      {
+        "name": "heading",
+        "label": "Column heading",
+        "type": "text"
+      },
+      {
+        "name": "column_menu",
+        "label": "Column menu",
+        "type": "menu"
+      }
+    ]
+  },
+  {
+    "name": "newsletter_form",
+    "label": "Newsletter form",
+    "type": "form",
+    "help_text": "Select the HubSpot form for the footer newsletter signup. Use an email-only form: the footer collects just the email address, so a form with other required fields or a consent checkbox will be rejected. Point those at the /subscribe page instead. Leave blank to show a link to /subscribe rather than a signup field.",
+    "disable_inline_form_editing": true,
+    "default": {
+      "form_id": "",
+      "response_type": "inline",
+      "message": "Thanks for subscribing."
+    }
+  },
+  {
+    "name": "newsletter_button_text",
+    "label": "Newsletter button text",
+    "type": "text",
+    "help_text": "Overrides the form submit button label in the footer (e.g. Subscribe).",
+    "default": "Subscribe"
+  },
+  {
+    "name": "newsletter_error_message",
+    "label": "Newsletter error message",
+    "type": "text",
+    "help_text": "Shown under the footer signup if the subscription cannot be recorded. A link to the /subscribe page is appended automatically.",
+    "default": "Something went wrong. Please try again, or subscribe from our subscribe page."
+  },
+  {
+    "name": "social_links",
+    "label": "Social links",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 8
+    },
+    "default": [
+      {
+        "platform": "linkedin",
+        "url": {
+          "href": "https://www.linkedin.com/company/weld-australia/"
+        }
+      },
+      {
+        "platform": "facebook",
+        "url": {
+          "href": "https://www.facebook.com/WeldAustralia/"
+        }
+      },
+      {
+        "platform": "instagram",
+        "url": {
+          "href": "https://www.instagram.com/weldaustralia/"
+        }
+      },
+      {
+        "platform": "x",
+        "url": {
+          "href": "https://x.com/weldaustralia"
+        }
+      },
+      {
+        "platform": "youtube",
+        "url": {
+          "href": "https://www.youtube.com/@WeldAustralia"
+        }
+      }
+    ],
+    "children": [
+      {
+        "name": "platform",
+        "label": "Platform",
+        "type": "choice",
+        "choices": [
+          ["linkedin", "LinkedIn"],
+          ["youtube", "YouTube"],
+          ["facebook", "Facebook"],
+          ["x", "X"],
+          ["instagram", "Instagram"]
+        ]
+      },
+      {
+        "name": "url",
+        "label": "URL",
+        "type": "url"
+      }
+    ]
+  },
+  {
+    "name": "copyright_text",
+    "label": "Copyright text",
+    "type": "text",
+    "default": "© Weld Australia. ABN 69 003 696 526."
+  },
+  {
+    "name": "acknowledgement",
+    "label": "Acknowledgement of Country",
+    "type": "richtext"
+  },
+  {
+    "name": "legal_menu",
+    "label": "Legal menu (Privacy, Terms)",
+    "type": "menu"
+  }
+]

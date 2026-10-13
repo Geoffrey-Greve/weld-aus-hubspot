@@ -1,0 +1,203 @@
+{#
+  subscription-form.module/module.html
+  Wraps a HubSpot form for subscription preferences.
+
+  Fields:
+    module.form                 - HubSpot form picker; module.form.form_id holds the GUID
+    module.heading              - optional heading
+    module.intro                - optional intro rich text
+    module.subscription_options - array of option keys to surface
+    module.section_id           - anchor ID
+    module.background           - surface | surface_alt | primary | primary_dark | transparent
+    module.spacing              - compact | default | spacious
+    module.visibility           - array: mobile, tablet, desktop
+    module.members_only         - boolean gate
+
+  Behaviour:
+    • When a form GUID is set, the HubSpot form is embedded (or the compact
+      events-updates email card submits to the Forms API).
+    • After hbspt.forms.create() fires onFormReady, subscription preference
+      fields not in subscription_options are hidden.
+    • Never renders a submit button that does nothing.
+#}
+
+{%- if module.members_only and not request_contact.is_logged_in -%}{%- else -%}
+
+{# ── Selected form GUID (from the form picker) ─────────────────────────────── #}
+{%- set _form_id = module.form.form_id | default(module.form_id, true) | default('', true) | string | trim -%}
+{%- set _portal_id = hub_id | default('441838610', true) | string | trim -%}
+{%- set _is_events_card = module.section_id == 'events-updates' -%}
+{%- set _is_news_card = module.section_id == 'news-updates' -%}
+{%- set _is_cta_card = _is_events_card or _is_news_card -%}
+{%- set _options = module.subscription_options | default(['events'], true) -%}
+{%- set _card_title = 'Never miss an upcoming event.' -%}
+{%- set _card_note = 'Free updates Â· unsubscribe anytime' -%}
+{%- set _card_success = "Thanks â€” you're subscribed to events updates." -%}
+{%- if _is_news_card -%}
+  {%- set _card_title = 'Get Weld Connect in your inbox.' -%}
+  {%- set _card_note = 'Free Â· monthly Â· unsubscribe anytime' -%}
+  {%- set _card_success = "Thanks â€” you're subscribed to Weld Connect." -%}
+{%- endif -%}
+
+{# ── Visibility classes ───────────────────────────────────────────────────── #}
+{%- set vis_classes = [] -%}
+{# Use ASCII punctuation for dynamic compact-card messages to avoid source encoding drift. #}
+{%- if _is_news_card -%}
+  {%- set _card_note = 'Free &#183; monthly &#183; unsubscribe anytime' -%}
+  {%- set _card_success = "Thanks - you're subscribed to Weld Connect." -%}
+{%- else -%}
+  {%- set _card_note = 'Free updates &#183; unsubscribe anytime' -%}
+  {%- set _card_success = "Thanks - you're subscribed to events updates." -%}
+{%- endif -%}
+{%- if 'mobile' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-mobile'] -%}{%- endif -%}
+{%- if 'tablet' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-tablet'] -%}{%- endif -%}
+{%- if 'desktop' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-desktop'] -%}{%- endif -%}
+
+<section
+  class="{% if _is_cta_card %}wa-cta-banner wa-cta-banner--split wa-section wa-section--bg-primary wa-section--spacing-default wa-subscription-form wa-subscription-form--cta{% else %}wa-section wa-subscription-form wa-bg--{{ module.background }} wa-spacing--{{ module.spacing }}{% endif %}{{ ' ' ~ vis_classes | join(' ') if vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  aria-label="{% if module.heading %}{{ module.heading }}{% else %}Subscribe{% endif %}"
+  data-portal-id="{{ _portal_id }}"
+  data-form-id="{{ _form_id }}"
+  data-subscription-options="{{ _options | tojson | escape }}"
+>
+  <div class="{% if _is_cta_card %}container-wide{% else %}container{% endif %}">
+    {% if _is_cta_card %}
+    <div class="wa-cta-banner__inner">
+      <div class="wa-cta-banner__content wa-subscription-form__inner">
+        <div class="wa-cta-banner__text wa-subscription-form__text">
+    {% else %}
+    <div class="wa-subscription-form__inner">
+    {% endif %}
+
+      {# ── Heading + intro ────────────────────────────────────────────────── #}
+      {% if module.heading %}
+      <h2 class="{% if _is_cta_card %}wa-cta-banner__headline {% endif %}wa-subscription-form__heading">{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+      <div class="{% if _is_cta_card %}wa-cta-banner__body {% endif %}wa-subscription-form__intro">{{ module.intro }}</div>
+      {% endif %}
+
+      {% if _is_cta_card %}
+        </div>
+        <div class="wa-cta-banner__actions wa-subscription-form__actions">
+      {% endif %}
+
+      {% if _form_id and _is_cta_card %}
+      {# Compact events card: custom UI, real Forms API submit (module.js) #}
+      <form
+        class="wa-subscription-form__fallback"
+        method="post"
+        action="https://api.hsforms.com/submissions/v3/integration/submit/{{ _portal_id }}/{{ _form_id }}"
+        novalidate
+        aria-label="Subscribe for updates"
+      >
+        <div class="wa-subscription-form__fallback-head">
+          <span class="wa-subscription-form__fallback-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" focusable="false">
+              <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span>
+            <span class="wa-subscription-form__fallback-kicker">Email updates</span>
+            <span class="wa-subscription-form__fallback-title">{{ _card_title }}</span>
+          </span>
+        </div>
+        <div class="wa-subscription-form__fallback-row">
+          <label class="sr-only" for="wa-subscription-email-{{ name }}">Email address</label>
+          <input
+            id="wa-subscription-email-{{ name }}"
+            class="wa-subscription-form__fallback-input"
+            type="email"
+            name="email"
+            placeholder="your@email.com.au"
+            autocomplete="email"
+            required
+          >
+          <button class="btn btn-gold wa-subscription-form__fallback-button" type="submit">
+            <span class="wa-subscription-form__fallback-button-label">Subscribe</span>
+          </button>
+        </div>
+        <p class="wa-subscription-form__fallback-note" data-role="note">
+          {{ _card_note }}
+        </p>
+        <p class="wa-subscription-form__fallback-error" data-role="error" hidden role="alert"></p>
+        <p class="wa-subscription-form__fallback-success" data-role="success" hidden role="status">
+          {{ _card_success }}
+        </p>
+      </form>
+
+      {% elif _form_id %}
+      {# Full HubSpot form embed (subscribe page / general use) #}
+      <div
+        id="wa-subf-{{ name }}"
+        class="wa-subscription-form__form"
+        data-hs-form-mount
+      ></div>
+
+      <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+      <script>
+      (function () {
+        var mount = document.getElementById('wa-subf-{{ name }}');
+        if (!mount || typeof hbspt === 'undefined' || !hbspt.forms) return;
+
+        var allowedOptions = [];
+        try {
+          var section = mount.closest('.wa-subscription-form');
+          allowedOptions = JSON.parse((section && section.getAttribute('data-subscription-options')) || '[]');
+        } catch (e) {}
+
+        hbspt.forms.create({
+          region: 'ap1',
+          portalId: '{{ _portal_id }}',
+          formId: '{{ _form_id }}',
+          target: '#wa-subf-{{ name }}',
+          onFormReady: function ($form) {
+            if (!allowedOptions.length || !$form || !$form[0]) return;
+            var root = $form[0];
+
+            root.querySelectorAll('input[type="checkbox"]').forEach(function (input) {
+              var val = (input.value || '').toLowerCase();
+              if (val && allowedOptions.indexOf(val) === -1) {
+                var label = input.closest('label') || input.parentElement;
+                if (label) label.style.display = 'none';
+              }
+            });
+
+            root.querySelectorAll('.hs-form-field').forEach(function (field) {
+              var input = field.querySelector('input,select,textarea');
+              var name = (input && input.name) || '';
+              if (!name || name.indexOf('subscription_') !== 0) return;
+              var base = name.replace(/^subscription_/, '').toLowerCase();
+              if (base && allowedOptions.indexOf(base) === -1) {
+                field.style.display = 'none';
+              }
+            });
+          }
+        });
+      }());
+      </script>
+
+      {% elif is_in_editor %}
+      <p class="wa-subscription-form__intro">
+        Select a HubSpot form in this module’s <strong>Subscription form</strong> field to enable signup.
+      </p>
+      {% else %}
+      <p class="wa-subscription-form__intro">
+        Subscription signup is temporarily unavailable. Please try again later or email
+        <a href="mailto:office@weldaustralia.com.au">office@weldaustralia.com.au</a>.
+      </p>
+      {% endif %}
+
+    {% if _is_cta_card %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{%- endif -%}

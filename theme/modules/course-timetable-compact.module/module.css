@@ -1,0 +1,106 @@
+/* course-timetable-compact - pure HubL module styles */
+
+.wa-ctc__heading {
+  margin-block-end: var(--wa-space-6, 1.5rem);
+}
+
+/* Vertical list */
+.wa-ctc__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--wa-space-6, 1.5rem);
+  border-block-start: 1px solid var(--wa-color-border, #e5e7eb);
+}
+
+.wa-ctc__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 0;
+  border-block-end: 1px solid var(--wa-color-border, #e5e7eb);
+  min-block-size: var(--wa-touch-min, 44px);
+}
+
+.wa-ctc__item--sold-out,
+.wa-ctc__item--closed {
+  opacity: 0.65;
+}
+
+/* Left: course info */
+.wa-ctc__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-inline-size: 0;
+}
+
+.wa-ctc__course-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--wa-color-text);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+a.wa-ctc__course-name:hover {
+  color: var(--wa-color-primary);
+  text-decoration: underline;
+}
+
+.wa-ctc__meta {
+  font-size: 0.8125rem;
+  color: var(--wa-color-text-muted);
+}
+
+/* Right: action area */
+.wa-ctc__action {
+  flex-shrink: 0;
+}
+
+.wa-ctc__status-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25em 0.6em;
+  border-radius: var(--wa-radius-sm, 4px);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wa-ctc__status-badge--sold-out {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.wa-ctc__status-badge--cancelled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Ref 74c - registrations shut by hand on an upcoming session. */
+.wa-ctc__status-badge--closed {
+  background: #fff7ed;
+  color: #b45309;
+}
+
+.wa-ctc__register-btn {
+  min-block-size: var(--wa-touch-min, 44px);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Empty state */
+.wa-ctc__empty {
+  padding: 2rem 0;
+  color: var(--wa-color-text-muted);
+}
+
+/* View all CTA */
+.wa-ctc__view-all {
+  display: flex;
+  justify-content: flex-start;
+  margin-block-start: var(--wa-space-4, 1rem);
+}

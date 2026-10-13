@@ -1,0 +1,68 @@
+[
+  {
+    "name": "heading",
+    "label": "Page heading",
+    "type": "text",
+    "default": "My Courses"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext",
+    "default": ""
+  },
+  {
+    "name": "empty_state_message",
+    "label": "Empty state message (upcoming)",
+    "type": "text",
+    "default": "No upcoming courses booked."
+  },
+  {
+    "name": "browse_url",
+    "label": "Browse courses URL",
+    "type": "url",
+    "default": { "type": "CONTENT", "href": "/courses/" }
+  },
+  {
+    "name": "support_email",
+    "label": "Support email",
+    "type": "text",
+    "default": "training@weldaustralia.com.au"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": true,
+    "help_text": "Always true for portal modules - keeps module hidden if accessed outside portal context."
+  }
+]

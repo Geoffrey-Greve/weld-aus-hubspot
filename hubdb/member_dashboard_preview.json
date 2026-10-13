@@ -1,0 +1,378 @@
+{
+  "name": "member_dashboard_preview",
+  "label": "Member Dashboard Preview - Fake Test Profiles",
+  "useForPages": false,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "columns": [
+    {
+      "name": "profile_key",
+      "label": "Profile key",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "is_active",
+      "label": "Active in preview",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "first_name",
+      "label": "First name",
+      "type": "TEXT"
+    },
+    {
+      "name": "last_name",
+      "label": "Last name",
+      "type": "TEXT"
+    },
+    {
+      "name": "initials",
+      "label": "Initials",
+      "type": "TEXT"
+    },
+    {
+      "name": "role_title",
+      "label": "Role / title",
+      "type": "TEXT"
+    },
+    {
+      "name": "company_name",
+      "label": "Company name",
+      "type": "TEXT"
+    },
+    {
+      "name": "member_tier",
+      "label": "Member tier",
+      "type": "SELECT",
+      "options": [
+        { "name": "Gold Corporate", "type": "option" },
+        { "name": "Silver Corporate", "type": "option" },
+        { "name": "Bronze Corporate", "type": "option" },
+        { "name": "Individual", "type": "option" },
+        { "name": "Industry Supplier", "type": "option" },
+        { "name": "Apprentice", "type": "option" }
+      ]
+    },
+    {
+      "name": "membership_status",
+      "label": "Membership status",
+      "type": "SELECT",
+      "options": [
+        { "name": "Active", "type": "option" },
+        { "name": "Grace period", "type": "option" },
+        { "name": "Lapsed", "type": "option" }
+      ]
+    },
+    {
+      "name": "is_primary_admin",
+      "label": "Primary company admin",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "member_since",
+      "label": "Member since",
+      "type": "NUMBER"
+    },
+    {
+      "name": "member_id",
+      "label": "Member ID",
+      "type": "TEXT"
+    },
+    {
+      "name": "renewal_date",
+      "label": "Renewal date",
+      "type": "DATE"
+    },
+    {
+      "name": "linked_seats",
+      "label": "Linked seats",
+      "type": "NUMBER"
+    },
+    {
+      "name": "linked_individual_label",
+      "label": "Linked individual membership label",
+      "type": "TEXT"
+    },
+    {
+      "name": "state",
+      "label": "Profile state",
+      "type": "SELECT",
+      "options": [
+        { "name": "NSW", "type": "option" },
+        { "name": "VIC", "type": "option" },
+        { "name": "QLD", "type": "option" },
+        { "name": "WA", "type": "option" },
+        { "name": "SA", "type": "option" },
+        { "name": "TAS", "type": "option" },
+        { "name": "NT", "type": "option" },
+        { "name": "ACT", "type": "option" },
+        { "name": "National", "type": "option" }
+      ]
+    },
+    {
+      "name": "accent",
+      "label": "Accent",
+      "type": "SELECT",
+      "options": [
+        { "name": "gold", "type": "option" },
+        { "name": "magenta", "type": "option" }
+      ]
+    },
+    {
+      "name": "banner_type",
+      "label": "Banner type",
+      "type": "SELECT",
+      "options": [
+        { "name": "cert", "type": "option" },
+        { "name": "invoice", "type": "option" },
+        { "name": "event", "type": "option" },
+        { "name": "none", "type": "option" }
+      ]
+    },
+    {
+      "name": "banner_title",
+      "label": "Banner title",
+      "type": "TEXT"
+    },
+    {
+      "name": "banner_body",
+      "label": "Banner body",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "banner_cta_label",
+      "label": "Banner CTA label",
+      "type": "TEXT"
+    },
+    {
+      "name": "banner_cta_url",
+      "label": "Banner CTA URL",
+      "type": "URL"
+    },
+    {
+      "name": "certification_name",
+      "label": "Certification pathway name",
+      "type": "TEXT"
+    },
+    {
+      "name": "certification_meta",
+      "label": "Certification meta",
+      "type": "TEXT"
+    },
+    {
+      "name": "cert_progress_percent",
+      "label": "Certification progress percent",
+      "type": "NUMBER"
+    },
+    {
+      "name": "cert_steps_json",
+      "label": "Certification steps JSON",
+      "type": "TEXT"
+    },
+    {
+      "name": "next_step_body",
+      "label": "Next step body",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "next_step_cta_label",
+      "label": "Next step CTA label",
+      "type": "TEXT"
+    },
+    {
+      "name": "next_step_cta_url",
+      "label": "Next step CTA URL",
+      "type": "URL"
+    },
+    {
+      "name": "invoice_number",
+      "label": "Latest invoice number",
+      "type": "TEXT"
+    },
+    {
+      "name": "invoice_amount",
+      "label": "Latest invoice amount",
+      "type": "NUMBER"
+    },
+    {
+      "name": "invoice_status",
+      "label": "Latest invoice status",
+      "type": "SELECT",
+      "options": [
+        { "name": "Paid", "type": "option" },
+        { "name": "Due", "type": "option" },
+        { "name": "Overdue", "type": "option" }
+      ]
+    },
+    {
+      "name": "invoice_date",
+      "label": "Latest invoice date",
+      "type": "DATE"
+    },
+    {
+      "name": "invoice_pdf_url",
+      "label": "Invoice PDF URL",
+      "type": "URL"
+    },
+    {
+      "name": "team_linked_employees",
+      "label": "Team linked employees",
+      "type": "NUMBER"
+    },
+    {
+      "name": "team_active_members",
+      "label": "Team active memberships",
+      "type": "NUMBER"
+    },
+    {
+      "name": "training_vouchers_used",
+      "label": "Training vouchers used",
+      "type": "NUMBER"
+    },
+    {
+      "name": "training_vouchers_total",
+      "label": "Training vouchers total",
+      "type": "NUMBER"
+    },
+    {
+      "name": "summit_tickets_used",
+      "label": "Summit tickets used",
+      "type": "NUMBER"
+    },
+    {
+      "name": "summit_tickets_total",
+      "label": "Summit tickets total",
+      "type": "NUMBER"
+    }
+  ],
+  "rows": [
+    {
+      "profile_key": "sarah-gold-admin",
+      "is_active": true,
+      "first_name": "Sarah",
+      "last_name": "Mitchell",
+      "initials": "SM",
+      "role_title": "Senior Welding Inspector",
+      "company_name": "Sentinel Heavy Fabrication",
+      "member_tier": "Gold Corporate",
+      "membership_status": "Active",
+      "is_primary_admin": true,
+      "member_since": 2019,
+      "member_id": "WA-104827",
+      "renewal_date": "2026-09-30",
+      "linked_seats": 14,
+      "linked_individual_label": "Individual - Professional membership (included)",
+      "state": "VIC",
+      "accent": "gold",
+      "banner_type": "cert",
+      "banner_title": "Your IIW Welding Inspector certification expires in 47 days",
+      "banner_body": "<p>Submit your CPD evidence and renewal declaration before 2 August 2026 to keep your credential active.</p>",
+      "banner_cta_label": "Start renewal",
+      "banner_cta_url": "/membership",
+      "certification_name": "IIW International Welding Inspector",
+      "certification_meta": "Pathway IWI-S to IWI-C · 3 of 6 stages complete",
+      "cert_progress_percent": 58,
+      "cert_steps_json": "[{\"label\":\"Application & eligibility\",\"note\":\"Approved 12 Feb 2026\",\"status\":\"done\"},{\"label\":\"Theory modules (online)\",\"note\":\"6 of 6 modules · 88% average\",\"status\":\"done\"},{\"label\":\"Practical training\",\"note\":\"Melbourne · completed 03 Apr 2026\",\"status\":\"done\"},{\"label\":\"Work-evidence logbook\",\"note\":\"7 of 10 witnessed inspection reports submitted\",\"status\":\"current\"},{\"label\":\"Final examination\",\"note\":\"Unlocks once logbook is verified\",\"status\":\"locked\"},{\"label\":\"Certification issued\",\"note\":\"IWI-C credential + verifiable digital badge\",\"status\":\"locked\"}]",
+      "next_step_body": "<p>Submit <strong>3 more witnessed inspection reports</strong> with supervisor sign-off to verify your logbook and unlock final exam booking.</p>",
+      "next_step_cta_label": "Upload work evidence",
+      "next_step_cta_url": "/membership",
+      "invoice_number": "INV-2026-0412",
+      "invoice_amount": 4950,
+      "invoice_status": "Paid",
+      "invoice_date": "2026-04-02",
+      "invoice_pdf_url": "#",
+      "team_linked_employees": 14,
+      "team_active_members": 9,
+      "training_vouchers_used": 8,
+      "training_vouchers_total": 12,
+      "summit_tickets_used": 3,
+      "summit_tickets_total": 5
+    },
+    {
+      "profile_key": "jordan-silver-individual",
+      "is_active": true,
+      "first_name": "Jordan",
+      "last_name": "Lee",
+      "initials": "JL",
+      "role_title": "Welding Supervisor",
+      "company_name": "Harbour Rail Maintenance",
+      "member_tier": "Silver Corporate",
+      "membership_status": "Grace period",
+      "is_primary_admin": false,
+      "member_since": 2021,
+      "member_id": "WA-209611",
+      "renewal_date": "2026-07-31",
+      "linked_seats": 1,
+      "linked_individual_label": "Individual - Supervisor membership",
+      "state": "NSW",
+      "accent": "magenta",
+      "banner_type": "invoice",
+      "banner_title": "Your renewal invoice is ready",
+      "banner_body": "<p>Your Silver membership renewal invoice is due soon. Pay before the grace period ends to keep member pricing and resources active.</p>",
+      "banner_cta_label": "Review invoice",
+      "banner_cta_url": "/membership",
+      "certification_name": "Welding Supervisor pathway",
+      "certification_meta": "AS1796 Cert 10 · 2 of 5 stages complete",
+      "cert_progress_percent": 42,
+      "cert_steps_json": "[{\"label\":\"Application & eligibility\",\"note\":\"Approved 04 Mar 2026\",\"status\":\"done\"},{\"label\":\"Theory modules\",\"note\":\"4 of 6 modules complete\",\"status\":\"current\"},{\"label\":\"Workshop attendance\",\"note\":\"Sydney intake reserved\",\"status\":\"pending\"},{\"label\":\"Assessment evidence\",\"note\":\"Unlocks after workshop\",\"status\":\"locked\"},{\"label\":\"Credential issued\",\"note\":\"Digital badge after final review\",\"status\":\"locked\"}]",
+      "next_step_body": "<p>Complete the remaining theory modules before your Sydney workshop intake opens.</p>",
+      "next_step_cta_label": "Continue modules",
+      "next_step_cta_url": "/courses",
+      "invoice_number": "INV-2026-0513",
+      "invoice_amount": 1320,
+      "invoice_status": "Due",
+      "invoice_date": "2026-07-10",
+      "invoice_pdf_url": "#",
+      "team_linked_employees": 0,
+      "team_active_members": 0,
+      "training_vouchers_used": 0,
+      "training_vouchers_total": 0,
+      "summit_tickets_used": 0,
+      "summit_tickets_total": 0
+    },
+    {
+      "profile_key": "maya-bronze-admin-lapsed",
+      "is_active": true,
+      "first_name": "Maya",
+      "last_name": "Nguyen",
+      "initials": "MN",
+      "role_title": "Operations Manager",
+      "company_name": "Coastal Fabrication Group",
+      "member_tier": "Bronze Corporate",
+      "membership_status": "Lapsed",
+      "is_primary_admin": true,
+      "member_since": 2018,
+      "member_id": "WA-098214",
+      "renewal_date": "2026-06-30",
+      "linked_seats": 7,
+      "linked_individual_label": "Individual - Professional membership (paused)",
+      "state": "QLD",
+      "accent": "gold",
+      "banner_type": "invoice",
+      "banner_title": "Your membership has lapsed - renew to restore full access",
+      "banner_body": "<p>Your renewal is overdue. Renew now to restore gated resources, member pricing, certification tools and company team access.</p>",
+      "banner_cta_label": "Renew membership",
+      "banner_cta_url": "/membership",
+      "certification_name": "ISO 3834 readiness pathway",
+      "certification_meta": "Company certification support · 1 of 5 stages complete",
+      "cert_progress_percent": 24,
+      "cert_steps_json": "[{\"label\":\"Readiness assessment\",\"note\":\"Completed with Weld Australia adviser\",\"status\":\"done\"},{\"label\":\"Gap action plan\",\"note\":\"Pending membership renewal\",\"status\":\"current\"},{\"label\":\"Procedure documentation\",\"note\":\"Locked until renewal\",\"status\":\"locked\"},{\"label\":\"Internal audit\",\"note\":\"Locked until documentation is complete\",\"status\":\"locked\"},{\"label\":\"Certification support\",\"note\":\"Unlocks once audit is complete\",\"status\":\"locked\"}]",
+      "next_step_body": "<p>Renew the company membership to reopen your ISO 3834 action plan and restore team access.</p>",
+      "next_step_cta_label": "Renew membership",
+      "next_step_cta_url": "/membership",
+      "invoice_number": "INV-2026-0602",
+      "invoice_amount": 2420,
+      "invoice_status": "Overdue",
+      "invoice_date": "2026-06-30",
+      "invoice_pdf_url": "#",
+      "team_linked_employees": 7,
+      "team_active_members": 4,
+      "training_vouchers_used": 5,
+      "training_vouchers_total": 6,
+      "summit_tickets_used": 1,
+      "summit_tickets_total": 2
+    }
+  ]
+}

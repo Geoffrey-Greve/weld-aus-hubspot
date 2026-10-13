@@ -1,0 +1,214 @@
+<!--
+  templateType: page
+  label: Engineering
+  isAvailableForNewContent: true
+-->
+{#
+  engineering.html - Weld Australia Engineering Services Page
+  URL: /engineering/
+  Modules: hero → engineering-stat-strip → engineering-intro → engineering-iwe-team →
+           engineering-capabilities → engineering-services → cta-banner
+#}
+{% set page_title_exact = 'Welding Engineering Services Australia | Weld Australia' %}
+{% set page_description = 'Weld Australia provides industry-leading welding engineering services across Australia, supporting businesses with expert consulting, inspection, and technical solutions delivered by International Welding Engineers.' %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<style>
+  body.is-engineering-page .wa-engineering-download__cta,
+  body.is-engineering-page .wa-engineering-download__cta:hover,
+  body.is-engineering-page .wa-engineering-download__cta:focus,
+  body.is-engineering-page .wa-engineering-download__cta:focus-visible,
+  body.is-engineering-page .wa-engineering-download__cta:active,
+  body.is-engineering-page .wa-engineering-download__cta:visited {
+    color: #fff !important;
+    text-decoration: none !important;
+  }
+
+</style>
+{% endblock %}
+
+{% block body_class %}is-engineering-page{% endblock %}
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ── § 1 HERO ────────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero - Engineering"
+          background="primary"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+          eyebrow="Engineering Services"
+          headline="Welding engineering services Australia"
+          subheadline="<p>Weld Australia provides industry-leading welding engineering services across Australia, supporting businesses with expert consulting, inspection, and technical solutions delivered by International Welding Engineers (IWE).</p>"
+          primary_cta={"label_text": "Download prospectus", "link": {"url": {"href": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/weld-australia/engineering/prospectus/Weld-Australia-Engineering-Services-Prospectus.pdf", "type": "EXTERNAL"}, "open_in_new_tab": true}, "style": "gold"}
+          secondary_cta={"label_text": "Contact our team", "link": {"url": {"href": "#contact", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 2 CREDENTIAL STRIP ────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/engineering-stat-strip"
+          label="Engineering Credentials Strip"
+          stats=[
+            {"value_text": "", "label_text": "Largest IWE team", "sublabel": "in Australia"},
+            {"value_text": "6+", "label_text": "Industry sectors", "sublabel": "Defence, rail, mining, power & more"},
+            {"value_text": "", "label_text": "Full asset lifecycle", "sublabel": "Design through to failure remediation"},
+            {"value_text": "", "label_text": "IIW accredited", "sublabel": "International Institute of Welding"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 3 INTRO + PROSPECTUS / VIDEO ─────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/engineering-intro"
+          label="Engineering Intro"
+          section_id="overview"
+          background="surface_alt"
+          eyebrow="About our engineering services"
+          heading="Expert, practical solutions to complex technical challenges"
+          body_text="<p>Weld Australia's Engineering Services provide direct access to some of the country's most experienced welding engineers and materials specialists, delivering expert, practical solutions to complex technical challenges.</p><p>Our engineering consulting services support businesses at every stage of the asset lifecycle - from design and fabrication through to maintenance, repair, and failure analysis. By combining technical excellence with real-world industry experience, we help organisations improve performance, extend asset life, reduce risk, and lower long-term maintenance costs.</p><p>Whether you're tackling a complex welding issue, seeking independent technical advice, or looking to optimise your processes, Weld Australia provides trusted, high-quality engineering support to help you achieve safe, compliant, and commercially effective outcomes.</p>"
+          industries_label="Industries we serve"
+          industries=[
+            {"industry_name": "Defence"},
+            {"industry_name": "Infrastructure"},
+            {"industry_name": "Mining & resources"},
+            {"industry_name": "Power generation"},
+            {"industry_name": "Manufacturing"},
+            {"industry_name": "Rail"}
+          ]
+          video_url="https://www.youtube.com/embed/i4kXnz7cFUM"
+          video_title="Weld Australia Engineering Services"
+          prospectus_title="Engineering Services Prospectus"
+          prospectus_description="Detailed overview of our capabilities and IWE team"
+          prospectus_label="Download PDF"
+          prospectus_link={"url": {"href": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/weld-australia/engineering/prospectus/Weld-Australia-Engineering-Services-Prospectus.pdf", "type": "EXTERNAL"}, "open_in_new_tab": true}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 4 IWE TEAM ────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/engineering-iwe-team"
+          label="Engineering IWE Team"
+          section_id="team"
+          eyebrow="Our team"
+          heading="Australia's largest team of International Welding Engineers"
+          body_text="<p>Weld Australia has the largest team of International Welding Engineers (IWE) in Australia. Issued by the International Institute of Welding (IIW), the IWE qualification is the highest post-graduate professional welding qualification available globally.</p><p>All solutions are reviewed by a Senior Welding Engineer, and for complex assignments, by one of our Principal Welding Engineers - ensuring the highest level of technical rigour and confidence in every deliverable.</p>"
+          badge_overline="Australian Member Body of the"
+          badge_text="International Institute of Welding"
+          points_heading="All IWEs have advanced capability to:"
+          points=[
+            {"text": "Solve complex and unpredictable welding engineering problems"},
+            {"text": "Manage projects related to a wide range of welding applications"},
+            {"text": "Demonstrate mastery and innovation in materials and welding technology"},
+            {"text": "Manage welding coordination activities"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 5 CAPABILITIES ────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/engineering-capabilities"
+          label="Engineering Capabilities"
+          section_id="capabilities"
+          eyebrow="What we can help with"
+          heading="Welding engineering capabilities"
+          intro_text="<p>With expertise across defence, manufacturing, composites, rail and resources, Weld Australia has the uniquely broad and deep capability to solve your most challenging welding problems.</p>"
+          items=[
+            {"text": "Analysis and resolution of complex welding, materials and fabrication problems"},
+            {"text": "Design, development and project management of fabrication solutions"},
+            {"text": "Design and qualification of welded connections"},
+            {"text": "Advice on safety practices pertaining to welding, cutting and joining"},
+            {"text": "Review of requirements and technical assessments"},
+            {"text": "Weld failure investigation"},
+            {"text": "Drafting and review of fabrication specifications"},
+            {"text": "Welding inspection and supervision"},
+            {"text": "Writing and review of welding procedures"},
+            {"text": "Optimisation of maintenance for risk mitigation"},
+            {"text": "Welder qualifications"},
+            {"text": "Supply chain assessment and development"},
+            {"text": "Weld maps and quality documentation"},
+            {"text": "Comprehensive failure investigations and engineering critical assessments"},
+            {"text": "Expert evidence and witnessing services"},
+            {"text": "Pipeline in-service welding, repairs and hot tapping"},
+            {"text": "Burn through calculation"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 6 SERVICES ────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/engineering-services"
+          label="Engineering Services"
+          section_id="services"
+          eyebrow="What we offer"
+          heading="Our welding engineering services"
+          intro_text="<p>From procedure development and inspection through to expert witness services and robotic automation, our IWEs deliver practical, standards-compliant outcomes across every stage of the project lifecycle.</p>"
+          services=[
+            {"icon": "clipboard", "image_url": "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=600&h=300&q=80", "title": "Welding procedure development", "description": "<p>Expert development and qualification of Welding Procedure Specifications (WPS), with direct involvement in Standards Australia and ISO committees ensuring full compliance, practical applicability, and fit-for-purpose outcomes.</p>", "cta_label": "Enquire about this service", "cta_link": {"url": {"href": "#contact", "type": "EXTERNAL"}}},
+            {"icon": "eye", "image_url": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=600&h=300&q=80", "title": "Welding inspection services", "description": "<p>Independent, third-party inspection for new and in-service equipment across all fabrication stages, using both visual and advanced NDT methods including ultrasonic and radiographic inspection.</p>", "cta_label": "Enquire about this service", "cta_link": {"url": {"href": "#contact", "type": "EXTERNAL"}}},
+            {"icon": "shield", "image_url": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=600&h=300&q=80", "title": "Welding supervision services", "description": "<p>Globally qualified supervisors delivering expert oversight to prevent issues before they arise - improving productivity, reducing defects, and minimising costly rework through on-site guidance and mentorship.</p>", "cta_label": "Enquire about this service", "cta_link": {"url": {"href": "#contact", "type": "EXTERNAL"}}},
+            {"icon": "lightbulb", "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&h=300&q=80", "title": "Welding engineering consulting", "description": "<p>Advanced technical expertise across defence, power generation, infrastructure, and construction - covering weld design, metallurgy, fabrication, automation, distortion control, quality assurance, and standards interpretation.</p>", "cta_label": "Enquire about this service", "cta_link": {"url": {"href": "#contact", "type": "EXTERNAL"}}},
+            {"icon": "cpu", "image_url": "https://images.unsplash.com/photo-1537481861866-e702119a3b61?auto=format&fit=crop&w=600&h=300&q=80", "title": "Welding automation and robotics", "description": "<p>End-to-end guidance on automated and robotic welding systems - from feasibility studies and system design through integration of welding and digital technologies, verification, training, and ongoing support.</p>", "cta_label": "Enquire about this service", "cta_link": {"url": {"href": "#contact", "type": "EXTERNAL"}}},
+            {"icon": "scale", "image_url": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=600&h=300&q=80", "title": "Expert witness and technical opinion", "description": "<p>Independent, authoritative expert opinion across procedures, specifications, and standards compliance - including dispute resolution, failure analysis, and highly qualified expert witness testimony in litigation and arbitration.</p>", "cta_label": "Enquire about this service", "cta_link": {"url": {"href": "#contact", "type": "EXTERNAL"}}}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 7 CTA ─────────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA"
+          section_id="contact"
+          background="primary"
+          align="split"
+          headline="Speak with a welding engineer"
+          body_text="<p>Whether you're facing a complex technical challenge or looking to improve quality and reduce risk, our team is ready to help. Contact us to discuss your project requirements.</p>"
+          cta_label="Contact our team"
+          cta_link={"url": {"href": "/contact-us?topic=engineering#enquiry", "type": "EXTERNAL"}}
+          secondary_cta_label="Download prospectus"
+          secondary_cta_link={"url": {"href": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/weld-australia/engineering/prospectus/Weld-Australia-Engineering-Services-Prospectus.pdf", "type": "EXTERNAL"}, "open_in_new_tab": true}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

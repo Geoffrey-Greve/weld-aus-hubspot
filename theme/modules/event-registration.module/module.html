@@ -1,0 +1,306 @@
+{#
+  event-registration.module/module.html - Weld Australia
+
+  Live booking widget for the Event Engine (Cloudflare Worker). Renders the form
+  skeleton and emits a JSON config block that module.js reads. All live behaviour
+  (availability, reserve, polling, redirect) lives in module.js so no seat counts
+  are ever baked into server-rendered HTML.
+
+  Expects to run on the `events` HubDB dynamic page so it can read the current
+  event from dynamic_page_hubdb_row. If rendered off a dynamic page it degrades to
+  a notice rather than erroring.
+
+  Worker contract (3 public endpoints, see events-engine repo):
+    GET  /api/v1/events/{slug}/availability   (X-Portal-Id)
+    POST /api/v1/events/{slug}/reserve        (X-Portal-Id, Idempotency-Key)
+    GET  /api/v1/orders/{id}                  (X-Portal-Id)
+
+  Mapping note: the Worker public endpoints use the Worker event UUID. On dynamic
+  HubDB event pages this comes from the event row's `worker_event_id` column.
+
+  Ticket types - this runs on a DYNAMIC HubDB page (one template shared by every
+  event row), so per-event values must come from the row, not module fields. The
+  module reads the row's `ticket_types_json` column (a JSON array) when present,
+  and falls back to the repeatable module field `ticket_types` for non-dynamic
+  placements (e.g. a single-event landing page). Both sources normalise to the
+  same shape: { id, name, price_dollars, member_only, max_per_order }.
+  The worker URL / portal id are the same for every event, so they stay as module
+  fields (set once on the module instance in the template tag).
+#}
+
+{% import "../../templates/partials/session-status.html" as wa_status %}
+
+{% set event = dynamic_page_hubdb_row %}
+
+{% if not event %}
+  <p class="wa-evt-reg__notice">Registration is available on an event page.</p>
+{% else %}
+
+  {# Worker connection - module field, never hard-coded in markup. Same for all events. #}
+  {% set worker_base_url = module.worker.worker_base_url or "" %}
+  {# X-Portal-Id defaults to this account's Hub ID (Weld = 441838610); override only if the worker keys tenants differently. #}
+  {% set portal_id = module.worker.portal_id or hub_id %}
+  {# Worker event id: HubDB row column first, then a module-field override for
+     single-event landing pages. Do not fall back to the HubDB slug because the
+     Worker expects its own event UUID. #}
+  {% set worker_event_id = event.worker_event_id or module.worker.worker_event_id %}
+
+  {#
+    THE ROW'S OWN PRICE COLUMNS OUTRANK `ticket_types_json` (QA ref 73, events-engine
+    migration 0044).
+
+    The Worker prices a seat on this event off `member_price` / `non_member_price` on
+    this same HubDB row now, and no longer off its own `ticket_types.price_cents` copy
+    - which is what `price_dollars` here mirrors. Leaving this on the JSON would have
+    the form quote one number and the invoice carry another whenever the two columns
+    disagree, and this widget sends no `expectedUnitCents`, so nothing would refuse it:
+    the buyer would simply be billed something they were never shown. Blank columns
+    change nothing - both sides fall back to the ticket type's own price.
+
+    NOT TIER-AWARE, deliberately and for now. A member-only ticket shows the GENERIC
+    member price, not this visitor's Gold/Silver/Bronze rate, because this widget has
+    no membership context at all and giving it one properly means extracting the
+    contact-resolution preamble that five course-pricing surfaces already carry
+    byte-identical (`_member-company-resolve.html` answers the company half only). That
+    extraction is its own change. The understatement is in the buyer's favour, the
+    checkout tunnel is tier-aware, and the Worker is authoritative either way.
+  #}
+  {% import "../../templates/partials/_member-pricing.html" as wa_evt_price %}
+  {% set evt_row_member_price = wa_evt_price.member_price(event, '') | trim | float %}
+  {% set evt_row_public_price = wa_evt_price.non_member_price(event) | trim | float %}
+
+  {# Ref 74c Phase 3. The events row's own status, through the shared vocabulary. Blank -
+     every row until the column exists - resolves to 'available', so this is inert today.
+     This module reads `dynamic_page_hubdb_row`, so it sees the column for free. #}
+  {% set status_key = wa_status.status_of(event.status.name | default('')) | trim %}
+  {% set status_label = wa_status.status_label(status_key) | trim %}
+  {% set status_bookable = wa_status.status_is_bookable(status_key) | trim == 'true' %}
+
+  {# Normalise ticket types from the per-event HubDB JSON column, else module fields. #}
+  {% set tt_ns = namespace(items=[]) %}
+  {% if event.ticket_types_json %}
+    {% set tt_parsed = event.ticket_types_json | fromjson %}
+    {% for t in tt_parsed %}
+      {% if t.worker_ticket_type_id %}
+        {% set t_member_only = t.member_only ? true : false %}
+        {% set t_row_price = evt_row_member_price if t_member_only else evt_row_public_price %}
+        {% set tt_ns.items = tt_ns.items + [{
+          "id": t.worker_ticket_type_id,
+          "name": t.ticket_name or t.name,
+          "price_dollars": t_row_price if t_row_price > 0 else (t.price_dollars | default(0, true)),
+          "member_only": t_member_only,
+          "max_per_order": t.max_per_order | default(10, true)
+        }] %}
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    {% for t in module.ticket_types %}
+      {% if t.worker_ticket_type_id %}
+        {% set tt_ns.items = tt_ns.items + [{
+          "id": t.worker_ticket_type_id,
+          "name": t.ticket_name,
+          "price_dollars": t.price_dollars | default(0, true),
+          "member_only": t.member_only ? true : false,
+          "max_per_order": t.max_per_order | default(10, true)
+        }] %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% set config = {
+    "workerBaseUrl": worker_base_url,
+    "portalId": portal_id ~ "",
+    "workerEventId": worker_event_id,
+    "eventTitle": event.event_name,
+    "allowGroup": module.registration.allow_group ? true : false,
+    "maxAttendees": module.registration.allow_group ? module.registration.max_attendees : 1,
+    "turnstileSiteKey": module.security.turnstile_site_key | default('0x4AAAAAAEc5Ght-uaiSDdAa', true),
+    "copy": {
+      "submit": module.copy.submit_label,
+      "waitlisted": module.copy.waitlist_message,
+      "confirmed": module.copy.confirmed_message
+    },
+    "endpoints": {
+      "availability": "/api/v1/events/{slug}/availability",
+      "reserve": "/api/v1/events/{slug}/reserve",
+      "order": "/api/v1/orders/{id}"
+    },
+    "ticketTypes": []
+  } %}
+
+  {% for t in tt_ns.items %}
+    {% do config.ticketTypes.append({
+      "id": t.id,
+      "name": t.name,
+      "priceCents": (((t.price_dollars | float) * 100) | round) | int,
+      "currency": "AUD",
+      "memberOnly": t.member_only,
+      "maxPerOrder": t.max_per_order
+    }) %}
+  {% endfor %}
+
+  {# Prefill the buyer from the logged-in contact, if any. #}
+  {% set buyer_name_default = (request_contact.firstname ~ ' ' ~ request_contact.lastname) | trim %}
+  {% set buyer_email_default = request_contact.email | default('') %}
+
+  {% if not status_bookable %}
+    {# Registrations shut by hand (or the event cancelled). The form is not rendered at
+       all: the Worker would refuse the reserve anyway, and a form that always fails is
+       worse than a sentence that explains. #}
+    <p class="wa-evt-reg__notice" role="status">
+      {{ status_label }}. Please
+      <a href="/events">browse upcoming events</a>, or contact
+      <a href="mailto:events@weldaustralia.com.au">events@weldaustralia.com.au</a>.
+    </p>
+  {% else %}
+  <form class="wa-evt-reg" data-evt-reg novalidate aria-describedby="wa-evt-reg-status-{{ name }}">
+
+    <script type="application/json" data-evt-config>{{ config | tojson }}</script>
+
+    <div class="wa-evt-reg__intro">
+      <p class="wa-evt-reg__eyebrow">Secure event registration</p>
+      <p class="wa-evt-reg__summary">Choose your ticket, enter your details and we’ll confirm availability through the Event Engine.</p>
+    </div>
+
+    {% if not worker_base_url or not worker_event_id %}
+      <p class="wa-evt-reg__notice" role="alert">
+        Online booking isn’t configured yet. Please contact
+        <a href="mailto:events@weldaustralia.com.au">events@weldaustralia.com.au</a>.
+      </p>
+    {% elif config.ticketTypes | length == 0 %}
+      <p class="wa-evt-reg__notice" role="alert">
+        No tickets have been set up for this event yet.
+      </p>
+    {% endif %}
+
+    {# ---- Ticket selection (quantities). Availability injected live by module.js. ---- #}
+    <fieldset class="wa-evt-reg__fieldset wa-evt-reg__tickets" data-evt-tickets>
+      <legend class="wa-evt-reg__legend">Tickets</legend>
+      {% for t in tt_ns.items %}
+        <label class="wa-evt-reg__ticket" data-ticket-id="{{ t.id }}">
+          <span class="wa-evt-reg__ticket-meta">
+            <span class="wa-evt-reg__ticket-name">
+              {{ t.name }}{% if t.member_only %} <small class="wa-evt-reg__ticket-tag">Members only</small>{% endif %}
+            </span>
+            {#- Every price this widget shows comes from the Event Engine ticket type,
+                which the tenant enters EX tax, exactly like the HubDB course columns
+                (events-engine CLAUDE.md, "Stored prices are TAX-EXCLUSIVE"). HubSpot
+                adds GST on the invoice. This was the one price-rendering surface in
+                the theme with no GST wording at all, so a buyer read a bare figure
+                here and an inc-GST total on the invoice - QA ref 36, "wording needs
+                to be consistent (ex GST) across all modules". A free ticket gets no
+                label: there is no tax on nothing. -#}
+            <span class="wa-evt-reg__ticket-price">
+              {% if t.price_dollars and t.price_dollars > 0 %}
+                {{ t.price_dollars | format_currency('AUD') }}
+                <span class="wa-evt-reg__ticket-price-label">ex GST</span>
+              {% else %}Free{% endif %}
+            </span>
+            <span class="wa-evt-reg__ticket-avail" data-evt-avail aria-live="polite">Checking availability…</span>
+          </span>
+          {#- With group booking OFF there is nowhere on the form to name the other
+              people, so every extra seat could only be submitted carrying the BUYER's
+              own email - and the Worker refuses any email listed twice in one booking.
+              A first-time buyer asking for two seats was told their brand-new address
+              was "already registered for this event", which is true of nothing and
+              impossible to act on. One seat per ticket type is all this form can
+              honestly sell until group booking is on, which is the setting that asks
+              who the other places are for. `validate()` in module.js refuses a total
+              above one here too, because several ticket types each capped at one still
+              add up. -#}
+          {% set _evt_qty_max = module.registration.allow_group ? (t.max_per_order | default(10, true)) : 1 %}
+          <input type="number" name="qty_{{ t.id }}"
+                 class="wa-evt-reg__qty"
+                 min="0" max="{{ _evt_qty_max }}" step="1" value="0"
+                 inputmode="numeric" data-evt-qty aria-label="Quantity for {{ t.name }}" />
+        </label>
+      {% endfor %}
+    </fieldset>
+
+    {# ---- Buyer ---- #}
+    <fieldset class="wa-evt-reg__fieldset wa-evt-reg__buyer">
+      <legend class="wa-evt-reg__legend">Your details</legend>
+      <div class="wa-evt-reg__field-grid">
+      <label class="wa-evt-reg__field">
+        <span class="wa-evt-reg__label">Full name</span>
+        <input type="text" name="buyer_name" class="wa-evt-reg__input"
+               value="{{ buyer_name_default | escape }}" autocomplete="name" required />
+      </label>
+      <label class="wa-evt-reg__field">
+        <span class="wa-evt-reg__label">Email</span>
+        <input type="email" name="buyer_email" class="wa-evt-reg__input"
+               value="{{ buyer_email_default | escape }}" autocomplete="email" required />
+      </label>
+      {% if module.registration.capture_abn %}
+        <label class="wa-evt-reg__field wa-evt-reg__field--full">
+          <span class="wa-evt-reg__label">ABN <small>(optional - for company tax invoices)</small></span>
+          <input type="text" name="buyer_abn" class="wa-evt-reg__input"
+                 inputmode="numeric" autocomplete="off" pattern="[0-9 ]*" />
+        </label>
+      {% endif %}
+      </div>
+    </fieldset>
+
+    {#- ---- Attendee rows, one per seat BEYOND the first ----
+
+        The buyer takes seat one. Every extra seat is a different person and says so.
+
+        These rows used to be `type="hidden"` inputs inside a `hidden aria-hidden`
+        fieldset, so nobody could ever fill them and every seat was submitted carrying
+        the BUYER's own email. The Worker refuses an email listed twice in one booking,
+        so simply choosing two tickets - on the default settings, with a brand-new
+        address - failed with "this attendee email is already registered for this
+        event": true of nothing, and nothing the buyer could do about it. A second seat
+        needs a second person, so the form asks for one.
+
+        `module.js` clones the template, shows the fieldset while it holds rows, and
+        hides it again for a single-seat booking, where the buyer IS the attendee and a
+        second set of name/email fields is only a way to disagree with yourself. -#}
+    {% if module.registration.allow_group %}
+      <fieldset class="wa-evt-reg__fieldset wa-evt-reg__attendees" data-evt-attendees hidden>
+        <legend class="wa-evt-reg__legend">Who else is coming?</legend>
+        <p class="wa-evt-reg__attendees-hint">
+          You have the first place. Please tell us who is taking the others - each place
+          needs its own email address so we can send their ticket.
+        </p>
+        <div data-evt-attendee-list></div>
+        <template data-evt-attendee-template>
+          <div class="wa-evt-reg__attendee" data-evt-attendee>
+            <p class="wa-evt-reg__attendee-heading" data-evt-attendee-heading></p>
+            <div class="wa-evt-reg__field-grid">
+              <label class="wa-evt-reg__field">
+                <span class="wa-evt-reg__label">Full name</span>
+                <input type="text" name="attendee_name" class="wa-evt-reg__input"
+                       autocomplete="off" data-evt-attendee-name required />
+              </label>
+              <label class="wa-evt-reg__field">
+                <span class="wa-evt-reg__label">Email</span>
+                <input type="email" name="attendee_email" class="wa-evt-reg__input"
+                       autocomplete="off" data-evt-attendee-email required />
+              </label>
+            </div>
+            <label class="wa-evt-reg__field wa-evt-reg__field--ticket">
+              <span class="wa-evt-reg__label">Ticket</span>
+              <select name="attendee_ticket" class="wa-evt-reg__input"
+                      data-evt-attendee-ticket></select>
+            </label>
+          </div>
+        </template>
+      </fieldset>
+    {% endif %}
+
+    <div class="wa-evt-reg__turnstile" data-evt-turnstile hidden>
+      <p class="wa-evt-reg__turnstile-label">Security check</p>
+      <div class="wa-evt-reg__turnstile-widget" data-evt-turnstile-widget></div>
+    </div>
+
+    <p class="wa-evt-reg__status" data-evt-status id="wa-evt-reg-status-{{ name }}"
+       role="status" aria-live="polite" hidden></p>
+
+    <button type="submit" class="wa-btn wa-btn--primary wa-btn--full-width wa-evt-reg__button" data-evt-submit>
+      {{ module.copy.submit_label | default("Register", true) }}
+    </button>
+  </form>
+  {% endif %}
+
+{% endif %}

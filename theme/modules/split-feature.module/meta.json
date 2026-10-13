@@ -1,0 +1,14 @@
+{
+  "label": "Split Feature",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Two-column layout: text/copy on one side, configurable media on the other. Replaces two-col-text-image and feature-section.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["split", "two-column", "feature", "content"]
+}

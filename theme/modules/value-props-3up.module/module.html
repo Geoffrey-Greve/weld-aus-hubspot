@@ -1,0 +1,81 @@
+{#
+  value-props-3up.module/module.html
+  Three-column value proposition cards with icon, heading, body, optional CTA.
+
+  Fields:
+    module.section_id        - optional anchor id
+    module.background        - background variant
+    module.spacing           - vertical spacing variant
+    module.members_only      - gating flag
+    module.section_heading   - optional heading above grid
+    module.section_intro     - optional rich text intro
+    module.props             - repeater group (icon, heading, body, cta_label, cta_link)
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+{%- set _layout = module.layout | default('stacked') -%}
+<section
+  class="wa-value-props wa-value-props--{{ _layout }} wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div class="wa-value-props__layout">
+
+    {% if module.section_heading or module.section_intro or (module.header_cta_label and module.header_cta_link) %}
+    <div class="wa-value-props__header">
+      {% if module.section_heading %}
+      <h2 class="wa-value-props__heading">{{ module.section_heading }}</h2>
+      {% endif %}
+      {% if module.section_intro %}
+      <div class="wa-value-props__intro">{{ module.section_intro }}</div>
+      {% endif %}
+      {% if module.header_cta_label and module.header_cta_link %}
+      <a
+        href="{{ module.header_cta_link.url.href | default('#') }}"
+        class="btn btn-primary wa-value-props__header-cta"
+        {% if module.header_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >{{ module.header_cta_label }}</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="wa-value-props__grid">
+      {% for prop in module.props %}
+      <div class="wa-value-props__card">
+
+        {% if prop.icon and prop.icon.src %}
+        <div class="wa-value-props__icon-wrap" aria-hidden="true">
+          <img
+            src="{{ prop.icon.src }}"
+            alt="{{ prop.icon.alt | default('') }}"
+            class="wa-value-props__icon"
+            width="48"
+            height="48"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        {% endif %}
+
+        <h3 class="wa-value-props__card-heading">{{ prop.heading }}</h3>
+
+        {% if prop.body_text %}
+        <div class="wa-value-props__card-body">{{ prop.body_text }}</div>
+        {% endif %}
+
+        {% if prop.cta_label and prop.cta_link %}
+        <a
+          href="{{ prop.cta_link.url.href | default('#') }}"
+          class="wa-value-props__cta"
+          {% if prop.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ prop.cta_label }}</a>
+        {% endif %}
+
+      </div>
+      {% endfor %}
+    </div>
+
+    </div>
+  </div>
+</section>
+{% endif %}

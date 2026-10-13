@@ -1,0 +1,83 @@
+[
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "My Certifications"
+  },
+  {
+    "name": "show_lapsed",
+    "label": "Show lapsed/expired certs",
+    "type": "boolean",
+    "default": true,
+    "help_text": "When disabled, expired and lapsed certifications are hidden from the list."
+  },
+  {
+    "name": "empty_state_message",
+    "label": "Empty state message",
+    "type": "richtext",
+    "default": "<p>You don't have any certifications yet. Explore our pathways to get started.</p>"
+  },
+  {
+    "name": "empty_state_cta_label",
+    "label": "Empty state CTA label",
+    "type": "text",
+    "default": "Explore certification pathways"
+  },
+  {
+    "name": "empty_state_cta_link",
+    "label": "Empty state CTA link",
+    "type": "link"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": true,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

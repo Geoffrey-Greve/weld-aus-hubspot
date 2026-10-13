@@ -1,0 +1,358 @@
+{% import "../../templates/partials/course-taxonomy.html" as wa_tax %}
+{# QA: member-only content is company-aware. See _member-content-gate.html -
+   a corporate employee's membership lives on their employer's record, and
+   `individual_membership_status == 'Current'` cannot see it. (The condition
+   here was also the same test twice, or-ed with itself.) #}
+{% include "../../templates/partials/_member-content-gate.html" %}
+{% set _is_member = wa_member_gate.is_member %}
+{% if not module.members_only or _is_member %}
+
+{% set _bg = module.background | default('surface') %}
+{% set _sp = module.spacing | default('default') %}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _dark = _bg == 'primary' or _bg == 'primary_dark' %}
+{% set _default_feature_image = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1266644220%20(2).jpg' %}
+{% set _default_course_thumb = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-598086822%20(1).jpg' %}
+{% set _legacy_svg_fallback = 'weld-australia-course-fallback.svg' %}
+{% set _fallback_thumb = _default_course_thumb %}
+{% if module.default_card_thumbnail and module.default_card_thumbnail.src and _legacy_svg_fallback not in module.default_card_thumbnail.src %}
+  {% set _fallback_thumb = module.default_card_thumbnail.src %}
+{% endif %}
+{% set _course_cards_source = module.course_cards_source %}
+{% if not _course_cards_source %}
+  {% set _course_cards_source = 'hubdb' %}
+{% endif %}
+{% set _dynamic_max = module.max_dynamic_courses | int %}
+{% if not _dynamic_max or _dynamic_max < 1 %}
+  {% set _dynamic_max = 6 %}
+{% endif %}
+{% set _all_hubdb_courses = [] %}
+{% if _course_cards_source == 'hubdb' %}
+  {% set _all_hubdb_courses = hubdb_table_rows('courses', 'status__neq=Cancelled&orderBy=course_name') %}
+{% endif %}
+
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+<section
+  class="wa-section wa-section--{{ _bg }} wa-section--spacing-{{ _sp }}{{ _vis_classes }} wa-pathways wa-pathways--cards"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  data-wa-module="course-pathways"
+  data-count="{{ module.pathways | length }}"
+>
+  <div class="container">
+
+    <div class="wa-pathways__header">
+      {% if module.overline %}
+        <p class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+          <span class="wa-overline__text">{{ module.overline }}</span>
+        </p>
+      {% endif %}
+      {% if module.heading %}
+        <h2 class="wa-section-head{% if _dark %} wa-section-head--light{% endif %}">{{ module.heading }}</h2>
+      {% endif %}
+    </div>
+
+    {% if module.pathways %}
+
+      <div class="wa-pathways__tabs" role="tablist" aria-label="{{ module.heading | default('Qualification pathways') }}">
+        {% for pathway in module.pathways %}
+          <button
+            class="wa-pathways__tab{% if loop.first %} is-active{% endif %}"
+            role="tab"
+            aria-selected="{{ 'true' if loop.first else 'false' }}"
+            aria-controls="wa-pathways-panel-{{ loop.index0 }}"
+            id="wa-pathways-tab-{{ loop.index0 }}"
+            data-index="{{ loop.index0 }}"
+            type="button"
+          >{{ pathway.label_text }}</button>
+        {% endfor %}
+      </div>
+
+      <div class="wa-pathways__panels">
+        {% for pathway in module.pathways %}
+          {% set _feature_image = _default_feature_image %}
+          {% if pathway.feature_image and pathway.feature_image.src %}
+            {% set _feature_image = pathway.feature_image.src %}
+          {% endif %}
+          {% set _feature_alt = pathway.feature_image.alt | default(pathway.feature_caption | default(pathway.pathway_heading | default(pathway.label_text))) %}
+          {% set _feature_caption = pathway.feature_caption | default(pathway.pathway_heading | default(pathway.label_text ~ ' courses')) %}
+          {% set _course_list_label = pathway.course_list_label | default('View all ' ~ pathway.label_text ~ ' courses', true) %}
+          {% set _pathway_label_key = pathway.label_text | default('', true) | lower %}
+          {% set _pathway_categories = namespace(key='|') %}
+          {% if pathway.hubdb_categories %}
+            {% for category in pathway.hubdb_categories %}
+              {% set _pathway_categories.key = _pathway_categories.key ~ category ~ '|' %}
+            {% endfor %}
+          {% endif %}
+          {% set _pathway_category_key = _pathway_categories.key %}
+          {% set _has_known_pathway_category = '|Welding Inspection|' in _pathway_category_key or '|Supervision|' in _pathway_category_key or '|Engineering|' in _pathway_category_key or '|Welding Processes|' in _pathway_category_key or '|Management|' in _pathway_category_key %}
+          {% if not _has_known_pathway_category %}
+            {% if 'inspector' in _pathway_label_key or 'inspection' in _pathway_label_key %}
+              {% set _pathway_category_key = '|Welding Inspection|' %}
+            {% elif 'supervision' in _pathway_label_key or 'coordination' in _pathway_label_key or 'co-ordination' in _pathway_label_key %}
+              {% set _pathway_category_key = '|Supervision|Engineering|' %}
+            {% elif 'trade' in _pathway_label_key or 'as1796' in _pathway_label_key %}
+              {% set _pathway_category_key = '|Welding Processes|Supervision|' %}
+            {% elif 'certification' in _pathway_label_key or 'welder' in _pathway_label_key %}
+              {% set _pathway_category_key = '|Welding Processes|' %}
+            {% elif 'engineering' in _pathway_label_key %}
+              {% set _pathway_category_key = '|Engineering|' %}
+            {% elif 'appreciation' in _pathway_label_key or 'management' in _pathway_label_key or 'sales' in _pathway_label_key %}
+              {% set _pathway_category_key = '|Management|' %}
+            {% endif %}
+          {% endif %}
+
+          {# Destination for the "View all …" button. Precedence: explicit link >
+             editor's division choice > selected HubDB categories > label keywords.
+             Without this the button fell back to /courses/ for every pathway. #}
+          {% set _division = namespace(slug='') %}
+          {% if pathway.course_list_division and pathway.course_list_division != 'auto' %}
+            {% set _division.slug = pathway.course_list_division %}
+          {% elif pathway.hubdb_categories %}
+            {% for _cat in pathway.hubdb_categories %}
+              {% if not _division.slug %}
+                {% set _division.slug = wa_tax.bucket_slug(_cat) | trim %}
+              {% endif %}
+            {% endfor %}
+          {% elif 'iso 3834' in _pathway_label_key or 'company' in _pathway_label_key or 'organisation' in _pathway_label_key or 'organization' in _pathway_label_key %}
+            {# ISO 3834 is a company certification, not a training division, so keep the
+               generic listing. Label-only inference - an explicit category selection or
+               division choice above already won. #}
+            {% set _division.slug = 'none' %}
+          {% elif 'inspector' in _pathway_label_key or 'inspection' in _pathway_label_key %}
+            {% set _division.slug = 'welding-inspection' %}
+          {% elif 'supervis' in _pathway_label_key or 'as1796' in _pathway_label_key or 'trade' in _pathway_label_key %}
+            {% set _division.slug = 'welding-supervision' %}
+          {% elif 'coordination' in _pathway_label_key or 'co-ordination' in _pathway_label_key or 'engineer' in _pathway_label_key or 'iwe' in _pathway_label_key or 'iwt' in _pathway_label_key %}
+            {% set _division.slug = 'welding-coordination' %}
+          {% elif 'appreciation' in _pathway_label_key or 'short' in _pathway_label_key or 'process' in _pathway_label_key or 'ndt' in _pathway_label_key or 'robotic' in _pathway_label_key %}
+            {% set _division.slug = 'short-courses' %}
+          {% endif %}
+          {% set _course_list_href = '/courses/' %}
+          {% if _division.slug and _division.slug != 'none' and _division.slug != 'uncategorised' %}
+            {% set _course_list_href = wa_tax.bucket_url(_division.slug) | trim %}
+          {% endif %}
+          {% if pathway.course_list_link and pathway.course_list_link.url and pathway.course_list_link.url.href %}
+            {% set _course_list_href = pathway.course_list_link.url.href %}
+          {% endif %}
+
+          {% set _dynamic = namespace(rows=[], seen='|') %}
+          {% if _course_cards_source == 'hubdb' and _pathway_category_key != '|' %}
+            {% for course in _all_hubdb_courses %}
+              {% set _row_category = course.category.name | default('', true) %}
+              {% set _row_slug = course.course_slug | default(course.course_id, true) %}
+              {% set _row_key = '|' ~ _row_slug ~ '|' %}
+              {% set _row_category_key = '|' ~ _row_category ~ '|' %}
+              {% if _row_category_key in _pathway_category_key and _row_slug and _row_key not in _dynamic.seen and _dynamic.rows | length < _dynamic_max %}
+                {% set _dynamic.rows = _dynamic.rows + [course] %}
+                {% set _dynamic.seen = _dynamic.seen ~ _row_slug ~ '|' %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          <div
+            class="wa-pathways__panel{% if loop.first %} is-active{% endif %}"
+            role="tabpanel"
+            id="wa-pathways-panel-{{ loop.index0 }}"
+            aria-labelledby="wa-pathways-tab-{{ loop.index0 }}"
+            aria-hidden="{{ 'false' if loop.first else 'true' }}"
+          >
+            <div class="wa-pathways__layout">
+              <div class="wa-pathways__feature">
+                <figure class="wa-pathways__image-card">
+                  <img
+                    src="{{ _feature_image }}"
+                    alt="{{ _feature_alt }}"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <figcaption>{{ _feature_caption }}</figcaption>
+                </figure>
+
+                {% if pathway.feature_body %}
+                  <div class="wa-pathways__feature-body wa-richtext">{{ pathway.feature_body }}</div>
+                {% elif module.intro %}
+                  <div class="wa-pathways__feature-body wa-richtext">{{ module.intro }}</div>
+                {% elif pathway.summary %}
+                  <div class="wa-pathways__feature-body"><p>{{ pathway.summary }}</p></div>
+                {% endif %}
+              </div>
+
+              <div class="wa-pathways__course-stack">
+                {% if _dynamic.rows | length > 0 %}
+                  <ul class="wa-pathways__course-list" role="list" aria-label="Courses for {{ pathway.label_text }}" data-source="hubdb">
+                    {% for course in _dynamic.rows %}
+                      {% set _course_slug = course.course_slug | default(course.course_id, true) %}
+                      {% set _course_href = '/courses/' ~ _course_slug %}
+                      {% set _thumb = _fallback_thumb %}
+                      {% if course.photo and course.photo.url and _legacy_svg_fallback not in course.photo.url %}
+                        {% set _thumb = course.photo.url %}
+                      {% elif course.og_image and course.og_image.url and _legacy_svg_fallback not in course.og_image.url %}
+                        {% set _thumb = course.og_image.url %}
+                      {% endif %}
+                      {% set _delivery = course.delivery_mode.name | default('Course', true) %}
+                      {% set _delivery_class = _delivery | lower | replace(' ', '-') | replace('/', '-') | replace('&', 'and') %}
+                      {% set _duration = course.duration | default('', true) %}
+
+                      <li class="wa-pathways__course-item">
+                        <a class="wa-pathways__course-card" href="{{ _course_href }}">
+                          <span class="wa-pathways__course-thumb">
+                            <img src="{{ _thumb }}" alt="" loading="lazy" decoding="async">
+                          </span>
+                          <span class="wa-pathways__course-content">
+                            <span class="wa-pathways__course-title">{{ course.course_name }}</span>
+                            <span class="wa-pathways__course-meta">
+                              <span class="wa-pathways__delivery wa-pathways__delivery--{{ _delivery_class }}">{{ _delivery }}</span>
+                              {% if _duration %}
+                                <span class="wa-pathways__duration">{{ _duration }}</span>
+                              {% endif %}
+                            </span>
+                          </span>
+                          <span class="wa-pathways__course-arrow" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                              <line x1="5" y1="12" x2="19" y2="12"></line>
+                              <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                          </span>
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% elif pathway.steps %}
+                  <ul class="wa-pathways__course-list" role="list" aria-label="Courses for {{ pathway.label_text }}">
+                    {% for step in pathway.steps %}
+                      {% set _course_href = _course_list_href %}
+                      {% set _course_external = false %}
+                      {% if step.link_url and step.link_url.url and step.link_url.url.href %}
+                        {% set _course_href = step.link_url.url.href %}
+                        {% if step.link_url.url.type == 'EXTERNAL' %}
+                          {% set _course_external = true %}
+                        {% endif %}
+                      {% endif %}
+
+                      {% set _thumb = _fallback_thumb %}
+                      {% if step.thumbnail and step.thumbnail.src and _legacy_svg_fallback not in step.thumbnail.src %}
+                        {% set _thumb = step.thumbnail.src %}
+                      {% endif %}
+
+                      {% set _delivery = step.delivery_mode | default('', true) %}
+                      {% set _duration_key = step.duration | default('') | lower %}
+                      {% set _desc_key = step.description | default('') | lower %}
+                      {% if not _delivery %}
+                        {% if 'day' in _duration_key %}
+                          {% set _delivery = 'Face-to-face' %}
+                        {% elif 'online' in _desc_key or 'week' in _duration_key or 'month' in _duration_key or 'part-time' in _duration_key %}
+                          {% set _delivery = 'Online' %}
+                        {% else %}
+                          {% set _delivery = 'Blended' %}
+                        {% endif %}
+                      {% endif %}
+                      {% set _delivery_class = _delivery | lower | replace(' ', '-') | replace('/', '-') %}
+
+                      <li class="wa-pathways__course-item">
+                        <a class="wa-pathways__course-card" href="{{ _course_href }}" {% if _course_external %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                          <span class="wa-pathways__course-thumb">
+                            <img src="{{ _thumb }}" alt="" loading="lazy" decoding="async">
+                          </span>
+                          <span class="wa-pathways__course-content">
+                            <span class="wa-pathways__course-title">{{ step.qualification }}</span>
+                            <span class="wa-pathways__course-meta">
+                              <span class="wa-pathways__delivery wa-pathways__delivery--{{ _delivery_class }}">{{ _delivery }}</span>
+                              {% if step.duration %}
+                                <span class="wa-pathways__duration">{{ step.duration }}</span>
+                              {% endif %}
+                            </span>
+                          </span>
+                          <span class="wa-pathways__course-arrow" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                              <line x1="5" y1="12" x2="19" y2="12"></line>
+                              <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                          </span>
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                <a class="wa-pathways__view-all" href="{{ _course_list_href }}" style="color: #fff;">
+                  <span class="wa-pathways__view-all-text" style="color: #fff;">{{ _course_list_label }}</span>
+                  <svg class="wa-pathways__view-all-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="color: #fff; stroke: currentColor;">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+    {% endif %}
+  </div>
+</section>
+
+{% require_js position="footer" %}
+<script>
+(function () {
+  'use strict';
+
+  function initPathways(el) {
+    var tabs = Array.from(el.querySelectorAll('.wa-pathways__tab'));
+    var panels = Array.from(el.querySelectorAll('.wa-pathways__panel'));
+    var current = 0;
+
+    if (tabs.length < 2) return;
+
+    function activate(idx) {
+      if (idx === current || !tabs[idx] || !panels[idx]) return;
+
+      tabs[current].classList.remove('is-active');
+      tabs[current].setAttribute('aria-selected', 'false');
+      panels[current].classList.remove('is-active');
+      panels[current].setAttribute('aria-hidden', 'true');
+
+      current = idx;
+
+      tabs[current].classList.add('is-active');
+      tabs[current].setAttribute('aria-selected', 'true');
+      panels[current].classList.add('is-active');
+      panels[current].setAttribute('aria-hidden', 'false');
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () {
+        activate(i);
+      });
+
+      tab.addEventListener('keydown', function (e) {
+        var next;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          next = (current + 1) % tabs.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          next = (current - 1 + tabs.length) % tabs.length;
+        } else if (e.key === 'Home') {
+          next = 0;
+        } else if (e.key === 'End') {
+          next = tabs.length - 1;
+        } else {
+          return;
+        }
+        e.preventDefault();
+        activate(next);
+        tabs[next].focus();
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-wa-module="course-pathways"]').forEach(initPathways);
+  });
+})();
+</script>
+{% end_require_js %}
+
+{% endif %}

@@ -1,0 +1,210 @@
+<!--
+  templateType: page
+  label: Membership - Corporate
+  isAvailableForNewContent: true
+-->
+﻿{#
+  membership-corporate.html - Weld Australia Corporate Membership Page
+  URL: /membership/corporate/
+  Template type: drag-and-drop page
+
+  Sections (§ 3.5 variant - corporate focus):
+    1. Hero - corporate value-led headline, "Talk to us" + "Join now" CTAs
+    2. Why corporate membership - three-up benefits (training vouchers, team management, visibility)
+    3. Tier comparison - showing only Corporate Bronze / Silver / Gold tiers
+    4. How corporate membership works - three-step Apply / Onboard / Manage
+    5. Corporate admin feature highlight - two-col feature with team management screenshot
+    6. Trusted by these organisations - logo strip (Gold members)
+    7. Testimonials - slider
+    8. FAQ accordion (corporate-specific questions)
+    9. Final CTA - "Talk to our team"
+
+  Modules used:
+    hero, value-props-3up, tier-comparison, step-process,
+    two-col-text-image, logo-strip, testimonial-slider, faq-accordion, cta-banner
+#}
+{% set page_title_exact = page_meta.html_title | default('Corporate Membership - Weld Australia') %}
+{% set page_description = page_meta.meta_description | default('Corporate membership with Weld Australia gives your team access to training vouchers, discounted courses, team management tools, and national directory visibility.') %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 1  HERO - Corporate-focused value statement
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero - Corporate Membership"
+          background="primary_dark"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+          headline="Invest in your team's welding capability"
+          subheadline="<p>Corporate membership with Weld Australia gives your organisation discounted training, team management tools, and profile in the national member directory.</p>"
+          primary_cta={"label_text": "Enquire now", "link": {"url": {"href": "/contact-us?topic=membership#enquiry", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "Compare corporate tiers", "link": {"url": {"href": "#corporate-tiers", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 2  WHY CORPORATE MEMBERSHIP - Three-up benefit cards
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/value-props-3up"
+          label="Why corporate membership"
+          section_heading="Benefits for your organisation"
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 3  CORPORATE TIER COMPARISON - Bronze / Silver / Gold
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/tier-comparison"
+          label="Corporate membership tier comparison"
+          section_heading="Corporate membership tiers"
+          section_id="corporate-tiers"
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 4  HOW IT WORKS - Apply / Onboard / Manage three-step
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/step-process"
+          label="How corporate membership works"
+          section_heading="Getting started is simple"
+          step_count=3
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 5  MANAGE MY TEAM - Two-column feature highlight
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/two-col-text-image"
+          label="Manage My Team feature"
+          heading="Manage your team from one dashboard"
+          body_text="<p>Corporate admins get access to the Manage My Team portal - register employees for courses in bulk, track voucher usage, add or remove team members, and stay on top of certification expiries across your whole organisation.</p>"
+          image_position="right"
+          cta_label="See how it works"
+          cta_link="/membership/corporate/#corporate-tiers"
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 6  TRUSTED BY - Gold member logo strip
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/logo-strip"
+          label="Trusted by - Gold member organisations"
+          section_heading="Trusted by leading Australian organisations"
+          source="hubdb_members_gold"
+          max_logos_from_hubdb=12
+          background="surface"
+          spacing="compact"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 7  TESTIMONIALS - Corporate member quotes
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/testimonial-slider"
+          label="Corporate member testimonials"
+          section_heading="What our corporate members say"
+          autoplay=true
+          interval_seconds=7
+          background="primary"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 8  FAQ - Corporate membership questions
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/faq-accordion"
+          label="Corporate membership FAQ"
+          section_heading="Frequently asked questions"
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 9  FINAL CTA - Talk to our team
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA - Corporate enquiry"
+          headline="Ready to bring your organisation into Weld Australia?"
+          body_text="<p>Talk to our team about the right tier for your business.</p>"
+          cta_label="Enquire now"
+          cta_link={"url": {"href": "/contact-us?topic=membership#enquiry", "type": "EXTERNAL"}}
+          secondary_cta_label="View all membership tiers"
+          secondary_cta_link={"url": {"href": "/membership/", "type": "EXTERNAL"}}
+          background="primary"
+          spacing="default"
+          align="split"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

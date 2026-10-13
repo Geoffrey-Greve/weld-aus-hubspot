@@ -1,0 +1,107 @@
+[
+  {
+    "name": "section_heading",
+    "label": "Section heading (optional)",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "source",
+    "label": "Source",
+    "type": "choice",
+    "choices": [
+      ["manual", "Manually configured"],
+      ["hubdb_members_gold", "HubDB Find a Member - Gold tier"]
+    ],
+    "default": "manual"
+  },
+  {
+    "name": "animation",
+    "label": "Display",
+    "type": "choice",
+    "choices": [
+      ["static", "Static row"],
+      ["marquee", "Animated marquee (auto-scroll)"]
+    ],
+    "default": "static",
+    "help_text": "Marquee continuously scrolls the logos and pauses on hover. Respects the visitor's reduced-motion preference (falls back to a static, wrapped row)."
+  },
+  {
+    "name": "logos",
+    "label": "Logos (manual)",
+    "type": "group",
+    "occurrence": { "min": 0, "max": 30 },
+    "children": [
+      { "name": "logo", "label": "Logo image", "type": "image" },
+      { "name": "alt", "label": "Alt text", "type": "text" },
+      { "name": "link", "label": "Link", "type": "link" }
+    ],
+    "visibility": {
+      "controlling_field_path": "source",
+      "operator": "EQUAL",
+      "controlling_value_regex": "manual"
+    }
+  },
+  {
+    "name": "max_logos_from_hubdb",
+    "label": "Max logos to show from HubDB",
+    "type": "number",
+    "default": 12,
+    "visibility": {
+      "controlling_field_path": "source",
+      "operator": "EQUAL",
+      "controlling_value_regex": "hubdb_members_gold"
+    }
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

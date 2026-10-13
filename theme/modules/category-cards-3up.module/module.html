@@ -1,0 +1,82 @@
+{% import "../../templates/partials/course-taxonomy.html" as wa_tax %}
+{#
+  category-cards-3up.module/module.html
+  Three-column category cards with 16:9 hero image, heading, body, and CTA.
+
+  Fields:
+    module.section_id      - optional anchor id
+    module.background      - background variant
+    module.spacing         - vertical spacing variant
+    module.members_only    - gating flag
+    module.section_heading - optional heading above grid
+    module.cards           - repeater group (image, heading, body, cta_label, cta_link)
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section
+  class="wa-category-cards wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-category-cards__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    {# 4 cards get their own row at desktop rather than orphaning the fourth. #}
+    <div class="wa-category-cards__grid{% if module.cards | length == 4 %} wa-category-cards__grid--4{% endif %}">
+      {% for card in module.cards %}
+      <div class="wa-category-cards__card">
+
+        {% if card.image and card.image.src %}
+        <div class="wa-category-cards__image-wrap">
+          <img
+            src="{{ card.image.src }}"
+            alt="{{ card.image.alt | default(card.heading) }}"
+            {% if card.image.width %}width="{{ card.image.width }}"{% endif %}
+            {% if card.image.height %}height="{{ card.image.height }}"{% endif %}
+            class="wa-category-cards__image"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        {% endif %}
+
+        <div class="wa-category-cards__body">
+          <h3 class="wa-category-cards__card-heading">{{ card.heading }}</h3>
+
+          {% if card.body_text %}
+          <div class="wa-category-cards__card-body">{{ card.body_text }}</div>
+          {% endif %}
+
+          {% if card.cta_label and card.cta_link %}
+          {# QA 226: a card saved in HubSpot can still hold a /training/<division>-courses/
+             href, and those four pages do not exist. Re-resolve any division URL through
+             the taxonomy so a stored card follows config/course-categories.json. #}
+          {%- set _cta_href = card.cta_link.url.href | default('', true) | trim -%}
+          {%- if '/training/' in _cta_href -%}
+            {%- set _cta_division = namespace(slug='') -%}
+            {%- for _slug in wa_tax.slugs_csv('') | trim | split(',') -%}
+              {%- if not _cta_division.slug and _slug in _cta_href -%}
+                {%- set _cta_division.slug = _slug -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if _cta_division.slug -%}
+              {%- set _cta_href = wa_tax.bucket_url(_cta_division.slug) | trim -%}
+            {%- endif -%}
+          {%- endif -%}
+          <a
+            href="{{ _cta_href }}"
+            class="wa-category-cards__cta"
+            {% if card.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ card.cta_label }}</a>
+          {% endif %}
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endif %}

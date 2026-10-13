@@ -1,0 +1,1027 @@
+/* ============================================================
+   featured-courses - mockup-aligned course cards
+   Image-led cards based on Training.zip / Weld Australia - Training Page.html.
+   CSS class prefix: wa-fc
+   ============================================================ */
+
+.wa-fc__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.wa-fc__header-copy {
+  max-width: 52rem;
+}
+
+.wa-fc__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  color: var(--wa-color-magenta-text, #c00d74);
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.wa-fc__eyebrow::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  flex: 0 0 24px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.wa-fc__heading {
+  font-family: var(--wa-font-heading, 'Poppins', system-ui, sans-serif);
+  color: var(--wa-color-primary, #1c1e4c);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-align: left;
+  margin: 0;
+}
+
+.wa-fc__count {
+  margin: 0 0 0.25rem;
+  color: #5b6770;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.wa-fc__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 0 36px;
+}
+
+.wa-fc-filter__top,
+.wa-fc-filter__bottom,
+.wa-fc-filter__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.wa-fc-filter__rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: rgba(28, 30, 76, 0.14);
+}
+
+.wa-fc-filter__separator {
+  width: 1px;
+  height: 30px;
+  background: rgba(28, 30, 76, 0.14);
+}
+
+.wa-fc__search {
+  position: relative;
+  display: block;
+  flex: 1 1 220px;
+  min-width: 0;
+  max-width: 340px;
+}
+
+.wa-fc-filter__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.wa-fc-sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.wa-fc-sort__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.wa-fc-sort__label {
+  color: #344256;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.wa-fc-sort select {
+  min-width: 132px;
+  min-height: 44px;
+  padding: 0 36px 0 14px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 999px;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%231c1e4c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 8px;
+  color: #1a1a1a;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  appearance: none;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.wa-fc__search > .wa-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.wa-fc__search svg {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  color: #5b6770;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.wa-fc__search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px 0 42px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 999px;
+  background: #fff;
+  color: #1a1a1a;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.wa-fc__search input:focus-visible,
+.wa-fc__filter:focus-visible,
+.wa-fc-location__toggle:focus-visible,
+.wa-fc-location__option:focus-visible,
+.wa-fc-sort select:focus-visible {
+  outline: 3px solid color-mix(in srgb, #1c1e4c 32%, transparent);
+  outline-offset: 2px;
+}
+
+.wa-fc__search input::placeholder {
+  color: #5b6770;
+}
+
+/* Legacy class kept for training-course-cards fallback partial. */
+.wa-fc__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+}
+
+/* Promotional callout above the course grid. */
+.wa-fc__promo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 0 28px;
+  padding: 20px 24px;
+  border: 1.5px solid color-mix(in srgb, #1c1e4c 14%, transparent);
+  border-radius: var(--wa-radius-lg, 16px);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, #1c1e4c 6%, #fff),
+    color-mix(in srgb, #ed128d 5%, #fff)
+  );
+}
+
+.wa-fc__promo-eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ed128d;
+}
+
+.wa-fc__promo-text {
+  color: #1a1a1a;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.wa-fc__promo-text > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-fc__promo-link {
+  flex: 0 0 auto;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: #1c1e4c;
+  color: #fff;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.wa-fc__promo-link:hover,
+.wa-fc__promo-link:focus-visible {
+  background: #ed128d;
+  transform: translateY(-1px);
+}
+
+.wa-fc__filter,
+.wa-fc-location__toggle,
+.wa-fc-location__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 9999px;
+  background: #fff;
+  color: #111827;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.wa-fc__filter,
+.wa-fc-location__toggle {
+  min-height: 40px;
+  padding: 0 17px;
+}
+
+.wa-fc__filter--compact {
+  min-height: 40px;
+  padding-inline: 18px;
+}
+
+.wa-fc__filter-count,
+.wa-fc__filter span,
+.wa-fc-location__option span {
+  color: #344256;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 1;
+}
+
+.wa-fc__filter-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* One dot colour per training division (config/course-categories.json). The
+   legacy per-HubDB-category selectors are kept as aliases so a stale slug from
+   an older cached page still renders in the right colour rather than blank. */
+.wa-fc__filter-dot--welding-inspection,
+.wa-fc__filter-dot--inspector {
+  color: #1a5c9e;
+}
+
+.wa-fc__filter-dot--welding-supervision,
+.wa-fc__filter-dot--supervision {
+  color: #1c1e4c;
+}
+
+.wa-fc__filter-dot--welding-coordination,
+.wa-fc__filter-dot--certification,
+.wa-fc__filter-dot--engineering {
+  color: #1f8a4d;
+}
+
+.wa-fc__filter-dot--short-courses,
+.wa-fc__filter-dot--appreciation,
+.wa-fc__filter-dot--welding-processes,
+.wa-fc__filter-dot--ndt,
+.wa-fc__filter-dot--robotic-welding,
+.wa-fc__filter-dot--management {
+  color: #b8860b;
+}
+
+.wa-fc__filter-dot--uncategorised {
+  color: #6b7280;
+}
+
+.wa-fc__filter:hover,
+.wa-fc-location__toggle:hover,
+.wa-fc-location__option:hover {
+  border-color: rgba(28, 30, 76, 0.35);
+  box-shadow: 0 3px 10px rgba(28, 30, 76, 0.08);
+}
+
+.wa-fc__filter.is-active,
+.wa-fc__filter[aria-pressed='true'],
+.wa-fc-location__option[aria-pressed='true'] {
+  border-color: #1c1e4c;
+  background: #1c1e4c;
+  color: #fff;
+}
+
+.wa-fc__filter.is-active .wa-fc__filter-dot,
+.wa-fc__filter[aria-pressed='true'] .wa-fc__filter-dot {
+  color: #fff;
+}
+
+.wa-fc__filter.is-active .wa-fc__filter-count,
+.wa-fc__filter[aria-pressed='true'] .wa-fc__filter-count,
+.wa-fc__filter[aria-pressed='true'] span,
+.wa-fc-location__option[aria-pressed='true'] span {
+  color: #fff;
+}
+
+.wa-fc-location {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.wa-fc-location__toggle {
+  min-width: 154px;
+  justify-content: space-between;
+  color: #111827;
+}
+
+.wa-fc-location__icon,
+.wa-fc-location__chevron {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wa-fc-location__icon {
+  color: #ed128d;
+}
+
+.wa-fc-location__chevron {
+  width: 14px;
+  height: 14px;
+  color: #1c1e4c;
+}
+
+.wa-fc-location__menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  max-height: 300px;
+  overflow: auto;
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid #dde0e5;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 16px 38px rgba(28, 30, 76, 0.14);
+}
+
+.wa-fc-location__menu[hidden] {
+  display: none;
+}
+
+.wa-fc-location__option {
+  width: 100%;
+  min-height: 36px;
+  justify-content: space-between;
+  padding: 0 13px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+@media (max-width: 720px) {
+  .wa-fc__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .wa-fc-filter__tools,
+  .wa-fc__search {
+    max-width: none;
+    width: 100%;
+  }
+
+  .wa-fc-sort,
+  .wa-fc-sort__field {
+    width: 100%;
+  }
+
+  .wa-fc-sort select {
+    width: 100%;
+  }
+}
+
+@media (min-width: 900px) {
+  .wa-fc__controls.wa-fc-filter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+    align-items: start;
+  }
+
+  .wa-fc-filter__top {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .wa-fc-filter__tools {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-end;
+  }
+
+  .wa-fc__search {
+    max-width: none;
+    flex: 1 1 160px;
+  }
+
+  .wa-fc-filter__rule,
+  .wa-fc-filter__bottom {
+    grid-column: 1 / -1;
+  }
+}
+
+.wa-fc__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 700px) {
+  .wa-fc__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .wa-fc__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wa-fc__grid-item {
+  display: flex;
+  min-width: 0;
+}
+
+.wa-fc__grid-item[hidden] {
+  display: none !important;
+}
+
+.wa-fc__card {
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #dde0e5;
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  transition:
+    box-shadow 200ms ease,
+    transform 200ms ease,
+    border-color 200ms ease;
+}
+
+.wa-fc__card:hover {
+  border-color: rgba(28, 30, 76, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+}
+
+.wa-fc__card--sold-out,
+.wa-fc__card--cancelled,
+.wa-fc__card--closed {
+  opacity: 0.78;
+}
+
+.wa-fc__media {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, #1c1e4c, #0055a4);
+}
+
+.wa-fc__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 400ms ease;
+}
+
+.wa-fc__card:hover .wa-fc__image {
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-fc__card,
+  .wa-fc__image {
+    transition: none;
+  }
+
+  .wa-fc__card:hover {
+    transform: none;
+  }
+
+  .wa-fc__card:hover .wa-fc__image {
+    transform: none;
+  }
+}
+
+.wa-fc__image--placeholder {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(237, 18, 141, 0.22), transparent 30%),
+    linear-gradient(135deg, #1c1e4c, #0055a4);
+}
+
+.wa-fc__media-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 55%);
+}
+
+.wa-fc__badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  z-index: 1;
+}
+
+.wa-fc__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #1c1e4c;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-shadow: none;
+}
+
+/* Card badges use the same division colours as the filter dots above. */
+.wa-fc__badge--welding-inspection,
+.wa-fc__badge--inspection {
+  background: #dbeafe;
+  color: #1a5c9e;
+}
+
+.wa-fc__badge--welding-supervision,
+.wa-fc__badge--supervision,
+.wa-fc__badge--general {
+  background: #edf0f4;
+  color: #1c1e4c;
+}
+
+.wa-fc__badge--welding-coordination,
+.wa-fc__badge--certification,
+.wa-fc__badge--engineering {
+  background: #dcfce7;
+  color: #146c39;
+}
+
+.wa-fc__badge--short-courses,
+.wa-fc__badge--appreciation {
+  background: #fff7ed;
+  color: #7a5c00;
+}
+
+.wa-fc__badge--uncategorised {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.wa-fc__badge--welding-processes {
+  background: #d9f4f6;
+  color: #0b6570;
+}
+
+.wa-fc__badge--management {
+  background: #fff7d6;
+  color: #6f5200;
+}
+
+.wa-fc__badge--free {
+  background: #1f8a4d;
+  color: #fff;
+}
+
+.wa-fc__badge--status {
+  color: #fff;
+}
+
+.wa-fc__status-badge--sold-out {
+  background: var(--wa-color-danger, #dc2626);
+}
+
+.wa-fc__status-badge--cancelled {
+  background: #5b6770;
+}
+
+/* Registrations closed. TWO causes, one badge: every session has already started
+   (Ref 46), or staff shut registrations by hand on an upcoming one (Ref 74c). A
+   different sentence from "Sold out", which invites a waitlist enquiry - so a
+   different, quieter treatment. */
+.wa-fc__status-badge--closed {
+  background: var(--wa-color-surface-3, #e6e9ee);
+  color: var(--wa-color-text, #1a1a1a);
+}
+
+.wa-fc__location,
+.wa-fc__date {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -2px 0 0;
+  color: #5b6770;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Duration sits after the start date on the same line, separated by a middot, so a
+   card that has both reads "20 October 2026 - 4 days + exam" and a card that has only
+   a date still leads with the same thing. */
+.wa-fc__date-duration::before {
+  content: '\00B7';
+  margin-right: 6px;
+  color: #98a2b3;
+}
+
+.wa-fc__date-icon {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 1;
+  flex: 0 0 auto;
+}
+
+.wa-fc__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px 0;
+}
+
+.wa-fc__delivery {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 21px;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+.wa-fc__delivery--online {
+  background: #dbeafe;
+  color: #0055a4;
+}
+
+.wa-fc__delivery--face-to-face {
+  background: #dcfce7;
+  color: #146c39;
+}
+
+.wa-fc__delivery--blended {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.wa-fc__delivery--in-house {
+  background: #fff7ed;
+  color: #7a5c00;
+}
+
+.wa-fc__delivery--other {
+  background: #f1f5f9;
+  color: #4b5563;
+}
+
+.wa-fc__card-title {
+  margin: 0;
+  color: #1c1e4c;
+  font-family: var(--wa-font-heading, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.38;
+}
+
+.wa-fc__card-title-link {
+  color: inherit;
+  text-decoration: none !important;
+}
+
+.wa-fc__card-title-link:hover {
+  color: #0055a4;
+  text-decoration: underline;
+}
+
+.wa-fc__summary {
+  margin: 0;
+  color: #5b6770;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 12px;
+  line-height: 1.68;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wa-fc__standards {
+  margin: 0;
+  color: #5b6770;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+.wa-fc__seats {
+  margin: 0;
+  color: #c97e10;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.wa-fc__pricing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.25rem;
+}
+
+.wa-fc__price {
+  color: #1c1e4c;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.wa-fc__price--member,
+.wa-fc__price-note {
+  color: #146c39;
+}
+
+.wa-fc__price--struck {
+  color: #5b6770;
+  font-weight: 500;
+  text-decoration: line-through;
+}
+
+.wa-fc__price-label,
+.wa-fc__price-note {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.wa-fc__actions {
+  display: flex;
+  gap: 8px;
+  padding: 14px 18px 16px;
+}
+
+.wa-fc__action {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.wa-fc__action:hover {
+  transform: translateY(-1px);
+}
+
+.wa-fc__action--outline {
+  background: transparent;
+  color: #1c1e4c;
+  border: 1.5px solid #1c1e4c;
+}
+
+.wa-fc__action--outline:hover {
+  background: rgba(28, 30, 76, 0.06);
+}
+
+.wa-fc__action--primary {
+  background: #1c1e4c;
+  color: #fff !important;
+  border: 1.5px solid #1c1e4c;
+}
+
+.wa-fc__action--primary:hover {
+  background: #101338;
+  color: #fff !important;
+  border-color: #101338;
+}
+
+.wa-fc__action--primary:focus,
+.wa-fc__action--primary:focus-visible,
+.wa-fc__action--primary:active,
+.wa-fc__action--primary:visited {
+  color: #fff !important;
+}
+
+.wa-fc__action--disabled {
+  color: #7a8591;
+  background: #eef1f4;
+  border: 1.5px solid #d8dde3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.wa-fc__action-icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wa-btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.wa-fc__empty {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2rem;
+  border: 1px solid #dde0e5;
+  border-radius: 16px;
+  color: #5b6770;
+  text-align: center;
+  background: #fff;
+}
+
+.wa-fc__empty[hidden] {
+  display: none !important;
+}
+
+.wa-fc__pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-block-start: 32px;
+}
+
+.wa-fc__pagination[hidden] {
+  display: none !important;
+}
+
+.wa-fc__pagination-btn {
+  min-width: 42px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 999px;
+  background: #fff;
+  color: #1c1e4c;
+  cursor: pointer;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.wa-fc__pagination-btn:hover:not(:disabled),
+.wa-fc__pagination-btn:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #1c1e4c;
+}
+
+.wa-fc__pagination-btn.is-active {
+  border-color: #1c1e4c;
+  background: #1c1e4c;
+  color: #fff;
+}
+
+.wa-fc__pagination-btn:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+  color: #5b6770;
+  background: #f3f4f6;
+  border-color: #c7cdd6;
+}
+
+.wa-fc__view-all {
+  display: flex;
+  justify-content: center;
+  margin-block-start: 2rem;
+}
+
+@media (max-width: 390px) {
+  .wa-fc__actions {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,110 @@
+{#
+  two-col-text-image.module/module.html
+
+  Fields:
+    module.heading         - optional heading
+    module.body_text            - richtext body (required)
+    module.image           - image
+    module.image_position  - "left" | "right"
+    module.cta_label       - optional CTA label
+    module.cta_link        - optional CTA link
+    module.section_id      - standard: anchor ID
+    module.background      - standard: bg style
+    module.spacing         - standard: vertical padding
+    module.visibility      - standard: device show/hide
+    module.members_only    - standard: member wall gate
+#}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{# QA: member-only content is company-aware. See _member-content-gate.html -
+   a corporate employee's membership lives on their employer's record, and
+   `individual_membership_status == 'Current'` cannot see it. #}
+{% include "../../templates/partials/_member-content-gate.html" %}
+{% set _is_active_member = wa_member_gate.is_member %}
+{% if module.members_only and not _is_active_member %}{% else %}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+<section
+  class="wa-two-col wa-section wa-section--bg-{{ module.background | default('surface') }} wa-section--spacing-{{ module.spacing | default('default') }}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div class="wa-two-col__inner wa-two-col__inner--image-{{ module.image_position | default('right') }}">
+
+      {# Image - left position #}
+      {% if module.image and module.image.src and module.image_position == 'left' %}
+      <div class="wa-two-col__media">
+        <img
+          src="{{ module.image.src }}"
+          alt="{{ module.image.alt | default('') }}"
+          class="wa-two-col__image"
+          loading="lazy"
+          decoding="async"
+          {% if module.image.width %}width="{{ module.image.width }}"{% endif %}
+          {% if module.image.height %}height="{{ module.image.height }}"{% endif %}
+        >
+      </div>
+      {% endif %}
+
+      {# Text column #}
+      <div class="wa-two-col__content">
+        {% if module.heading %}
+        <h2 class="wa-two-col__heading">{{ module.heading }}</h2>
+        {% endif %}
+
+        <div class="wa-two-col__body">{{ module.body_text }}</div>
+
+        {% if module.callout and (module.callout.title or (module.callout.logo and module.callout.logo.src)) %}
+        <div class="wa-two-col__callout">
+          {% if module.callout.logo and module.callout.logo.src %}
+          <span class="wa-two-col__callout-logo">
+            <img
+              src="{{ module.callout.logo.src }}"
+              alt="{{ module.callout.logo.alt | default('') }}"
+              loading="lazy"
+              decoding="async"
+            >
+          </span>
+          {% endif %}
+          <span class="wa-two-col__callout-text">
+            {% if module.callout.eyebrow %}<span class="wa-two-col__callout-eyebrow">{{ module.callout.eyebrow }}</span>{% endif %}
+            {% if module.callout.title %}<span class="wa-two-col__callout-title">{{ module.callout.title }}</span>{% endif %}
+          </span>
+        </div>
+        {% endif %}
+
+        {% if module.cta_label and module.cta_link %}
+        <a
+          href="{{ module.cta_link.url.href }}"
+          class="btn btn-primary wa-two-col__cta"
+          {% if module.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ module.cta_label }}</a>
+        {% endif %}
+      </div>
+
+      {# Image - right position #}
+      {% if module.image and module.image.src and (module.image_position == 'right' or not module.image_position) %}
+      <div class="wa-two-col__media">
+        <img
+          src="{{ module.image.src }}"
+          alt="{{ module.image.alt | default('') }}"
+          class="wa-two-col__image"
+          loading="lazy"
+          decoding="async"
+          {% if module.image.width %}width="{{ module.image.width }}"{% endif %}
+          {% if module.image.height %}height="{{ module.image.height }}"{% endif %}
+        >
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
+
+{% endif %}{# end members_only gate #}

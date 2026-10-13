@@ -1,0 +1,39 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "stats",
+    "label": "Credential items",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 6,
+      "default": 4
+    },
+    "children": [
+      {
+        "name": "value_text",
+        "label": "Value / number",
+        "type": "text",
+        "help_text": "Optional. Leave blank for text-only cells."
+      },
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "sublabel",
+        "label": "Sub-label",
+        "type": "text",
+        "default": ""
+      }
+    ]
+  }
+]

@@ -1,0 +1,224 @@
+/*
+ * stat-band.module/module.css
+ * Band of statistics/numbers - responsive flex row, 1-8 stat items.
+ * Mobile-first: single column stacked, expands to a flex row from 640px.
+ * Replaces stat-tiles.module in the updated design system.
+ */
+
+/* ── Section heading ─────────────────────────────────────────────────────── */
+
+.wa-stat-band__heading {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--wa-color-primary);
+  margin: 0 0 var(--wa-space-8, 2rem);
+}
+
+.wa-section--bg-primary .wa-stat-band__heading,
+.wa-section--bg-primary_dark .wa-stat-band__heading {
+  color: var(--wa-color-on-primary, #fff);
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+
+.wa-stat-band__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-4, 1rem);
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 640px) {
+  .wa-stat-band__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-stat-band__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ── Individual stat item ────────────────────────────────────────────────── */
+
+.wa-stat-band__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  gap: var(--wa-space-2, 0.5rem);
+  min-height: 124px;
+  padding: 28px 22px;
+  border: 1px solid rgba(28, 30, 76, 0.28);
+  border-radius: var(--wa-radius-lg, 16px);
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(28, 30, 76, 0.06);
+}
+
+.wa-section--bg-surface .wa-stat-band__stat:nth-child(odd),
+.wa-section--bg-surface_alt .wa-stat-band__stat:nth-child(odd),
+.wa-section--surface .wa-stat-band__stat:nth-child(odd),
+.wa-section--surface_alt .wa-stat-band__stat:nth-child(odd) {
+  background: var(--wa-color-primary, #1c1e4c);
+  border-color: var(--wa-color-primary, #1c1e4c);
+  box-shadow: 0 18px 38px rgba(28, 30, 76, 0.16);
+}
+
+/* ── Value (the big number) ──────────────────────────────────────────────── */
+
+.wa-stat-band__value {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(34px, 4vw, 46px);
+  font-weight: 800;
+  line-height: 1;
+  display: block;
+}
+
+.wa-stat-band__value--gold {
+  color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-stat-band__value--magenta {
+  color: var(--wa-color-primary, #1c1e4c);
+}
+
+.wa-stat-band__value--navy {
+  color: var(--wa-color-primary, #1c1e4c);
+}
+
+/* On dark backgrounds, navy value flips to white so it remains readable */
+.wa-section--bg-primary .wa-stat-band__value--navy,
+.wa-section--bg-primary_dark .wa-stat-band__value--navy,
+.wa-section--bg-primary .wa-stat-band__value--magenta,
+.wa-section--bg-primary_dark .wa-stat-band__value--magenta,
+.wa-section--bg-surface .wa-stat-band__stat:nth-child(odd) .wa-stat-band__value--navy,
+.wa-section--bg-surface_alt .wa-stat-band__stat:nth-child(odd) .wa-stat-band__value--navy,
+.wa-section--bg-surface .wa-stat-band__stat:nth-child(odd) .wa-stat-band__value--magenta,
+.wa-section--bg-surface_alt .wa-stat-band__stat:nth-child(odd) .wa-stat-band__value--magenta {
+  color: #fff;
+}
+
+/* ── Label (the caption beneath the value) ───────────────────────────────── */
+
+.wa-stat-band__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wa-color-text-muted);
+  margin-top: var(--wa-space-2, 0.5rem);
+  line-height: 1.4;
+  display: block;
+}
+
+.wa-section--bg-primary .wa-stat-band__label,
+.wa-section--bg-primary_dark .wa-stat-band__label,
+.wa-section--bg-surface .wa-stat-band__stat:nth-child(odd) .wa-stat-band__label,
+.wa-section--bg-surface_alt .wa-stat-band__stat:nth-child(odd) .wa-stat-band__label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── CTA ─────────────────────────────────────────────────────────────────── */
+
+.wa-stat-band__cta {
+  margin-top: var(--wa-space-10, 2.5rem);
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Background-image (media) variant ────────────────────────────────────── */
+
+.wa-stat-band--media {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.wa-stat-band__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+.wa-stat-band__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 19, 43, calc(var(--_overlay, 82%) - 8%)),
+      rgba(0, 19, 43, var(--_overlay, 82%))
+    );
+}
+
+.wa-stat-band--media .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Section head text always light over the image */
+.wa-stat-band--media .wa-stat-band__heading { color: #fff; }
+
+/* Glass tiles */
+.wa-stat-band--media .wa-stat-band__stat {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+/* Number colours hold on the image */
+.wa-stat-band--media .wa-stat-band__value--gold    { color: var(--wa-color-accent, #fecf05); }
+.wa-stat-band--media .wa-stat-band__value--magenta { color: var(--wa-color-accent-magenta, #ed128d); }
+.wa-stat-band--media .wa-stat-band__value--navy     { color: #fff; }
+
+/* Label becomes the bold white caption; sublabel is the muted line */
+.wa-stat-band--media .wa-stat-band__label {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #fff;
+  margin-top: var(--wa-space-3, 0.75rem);
+}
+
+/* ── Sub-label ───────────────────────────────────────────────────────────── */
+
+.wa-stat-band__sublabel {
+  display: block;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--wa-color-text-muted);
+  margin-top: 6px;
+}
+
+/*
+ * Temporary production hide for the Advocacy page's placeholder member-survey
+ * stat band. Keep the module content available in HubSpot so the real survey
+ * figures can be dropped in later.
+ */
+body.is-advocacy-page .dnd-section:has(#hs_cos_wrapper_advocacy_v2-module-4),
+body.is-advocacy-page #hs_cos_wrapper_advocacy_v2-module-4 {
+  display: none !important;
+}
+
+.wa-section--bg-primary .wa-stat-band__sublabel,
+.wa-section--bg-primary_dark .wa-stat-band__sublabel,
+.wa-section--bg-surface .wa-stat-band__stat:nth-child(odd) .wa-stat-band__sublabel,
+.wa-section--bg-surface_alt .wa-stat-band__stat:nth-child(odd) .wa-stat-band__sublabel,
+.wa-section--surface .wa-stat-band__stat:nth-child(odd) .wa-stat-band__sublabel,
+.wa-section--surface_alt .wa-stat-band__stat:nth-child(odd) .wa-stat-band__sublabel,
+.wa-stat-band--media .wa-stat-band__sublabel {
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+}

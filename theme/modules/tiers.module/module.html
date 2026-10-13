@@ -1,0 +1,124 @@
+{#
+  tiers.module/module.html
+  Membership tier overview band with intro content and tier cards.
+  Desktop layout matches the supplied standalone design: copy left, cards right.
+#}
+
+{%- set _bg   = module.background | default('primary_dark') -%}
+{%- set _sp   = module.spacing    | default('default') -%}
+{%- set _dark = _bg in ['primary', 'primary_dark'] -%}
+
+{%- set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) -%}
+{%- set _vis_classes = '' -%}
+{%- if 'mobile'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-mobile'  -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-tablet'  -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+<section
+  class="wa-tiers wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div class="wa-tiers__layout">
+      <div class="wa-tiers__content">
+        {% if module.overline %}
+        <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+          <span class="wa-overline__text">{{ module.overline }}</span>
+        </div>
+        {% endif %}
+
+        {% if module.heading %}
+        <h2 class="wa-tiers__heading">{{ module.heading }}</h2>
+        {% endif %}
+
+        {% if module.intro %}
+        <div class="wa-tiers__intro wa-richtext">{{ module.intro }}</div>
+        {% endif %}
+
+        {% if module.cta_label and module.cta_link and module.cta_link.url and module.cta_link.url.href %}
+        <div class="wa-tiers__cta">
+          <a
+            href="{{ module.cta_link.url.href }}"
+            class="btn btn-gold"
+            {% if module.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >
+            <span>{{ module.cta_label }}</span>
+            <svg class="wa-btn__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if module.tiers %}
+      <div class="wa-tiers__grid">
+        {% for tier in module.tiers %}
+        {%- set _color = tier.badge_color | default('gold') -%}
+        {%- if _color == 'silver' -%}
+          {%- set _default_badge = get_asset_url('../../assets/img/member-logo-silver.png') -%}
+        {%- elif _color == 'bronze' -%}
+          {%- set _default_badge = get_asset_url('../../assets/img/member-logo-bronze.png') -%}
+        {%- elif _color == 'navy' -%}
+          {%- set _default_badge = get_asset_url('../../assets/img/member-logo-individual.png') -%}
+        {%- else -%}
+          {%- set _default_badge = get_asset_url('../../assets/img/member-logo-gold.png') -%}
+        {%- endif -%}
+        {%- set _tier_name = tier.name_text | default(tier.name) -%}
+        <div class="wa-tiers__card wa-tiers__card--{{ _color }}">
+          <img
+            class="wa-tiers__badge-img"
+            src="{{ tier.badge_image.src | default(_default_badge) }}"
+            alt="{{ tier.badge_image.alt | default(_tier_name ~ ' member badge') }}"
+            loading="lazy"
+            decoding="async"
+            {% if tier.badge_image.width %}width="{{ tier.badge_image.width }}"{% endif %}
+            {% if tier.badge_image.height %}height="{{ tier.badge_image.height }}"{% endif %}
+          >
+
+          {% if _tier_name %}
+          <h3 class="wa-tiers__name">{{ _tier_name }}</h3>
+          {% endif %}
+
+          {% if tier.price %}
+          <div class="wa-tiers__price-block">
+            <span class="wa-tiers__price">
+              {{ tier.price }}{% if tier.price_sub %}<span class="wa-tiers__price-sub">{{ tier.price_sub }}</span>{% endif %}
+            </span>
+          </div>
+          {% endif %}
+
+          {% if tier.description %}
+          <p class="wa-tiers__desc">{{ tier.description }}</p>
+          {% endif %}
+
+          {%- set _saved_href = tier.link.url.href | default('', true) -%}
+          {%- set _tier_href = _saved_href if _saved_href else module.cta_link.url.href | default('/membership#membership-options', true) -%}
+          {%- set _tier_href_key = _tier_href | default('') | lower -%}
+          {%- set _is_placeholder_href = (not _tier_href_key) or ('google.com' in _tier_href_key) or ('example.com' in _tier_href_key) or (_tier_href_key == '#') or (_tier_href_key == '/404/') -%}
+          {%- set _is_old_tiers_href = _tier_href_key == '/membership/corporate/#corporate-tiers' -%}
+          {%- if _is_placeholder_href or _is_old_tiers_href -%}
+            {%- set _tier_href = '/membership#membership-options' -%}
+          {%- endif -%}
+          {%- set _tier_name_key = _tier_name | default('') | lower | trim -%}
+          {%- set _tier_href_key = _tier_href | default('') | lower -%}
+          {%- if _tier_name_key == 'individual' and (_tier_href_key == '/membership#membership-options' or _tier_href_key == '/membership/#membership-options') -%}
+            {%- set _tier_href = '/membership#membership-individual' -%}
+          {%- endif -%}
+          {%- set _button_label = tier.button_label | default('Learn more') -%}
+          {%- set _button_style = tier.button_style | default('outline') -%}
+          {% if _tier_href %}
+          <a
+            class="wa-tiers__learn-more wa-tiers__learn-more--{{ _button_style }}"
+            href="{{ _tier_href }}"
+            {% if tier.link.open_in_new_tab and not _is_placeholder_href %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ _button_label }}</a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

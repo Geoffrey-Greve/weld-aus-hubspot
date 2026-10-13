@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A11y Test - Course Filter</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/assets/css/components.css" />
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    a.skip-to-content {
+      position: absolute; left: -9999px; top: 0; z-index: 9999;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; min-width: 44px;
+      padding: 0.5rem 1rem; background: #002f5f; color: #fff;
+    }
+    a.skip-to-content:focus { left: 0; }
+  </style>
+</head>
+<body>
+  <a class="skip-to-content" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h1>Course Filter Island Test</h1>
+
+    <!-- Available sessions -->
+    <section aria-labelledby="filter-heading">
+      <h2 id="filter-heading">Upcoming Sessions</h2>
+      <div
+        data-wa-module="course-filter"
+        data-props='{
+          "rows": [
+            {
+              "id": 1,
+              "course_name": "AS1796 Cert 10",
+              "city": "Sydney",
+              "delivery_mode": "Face-to-Face",
+              "start_date": "2026-08-04",
+              "end_date": "2026-08-06",
+              "price_member": 980,
+              "price_non_member": 1380,
+              "registration_url": "https://hapily.test/event/001",
+              "status": "available",
+              "seats_remaining": 8
+            },
+            {
+              "id": 2,
+              "course_name": "AS1796 Cert 10",
+              "city": "Melbourne",
+              "delivery_mode": "Online",
+              "start_date": "2026-09-01",
+              "end_date": "2026-09-03",
+              "price_member": 980,
+              "price_non_member": 1380,
+              "registration_url": "https://hapily.test/event/002",
+              "status": "sold_out",
+              "seats_remaining": 0
+            },
+            {
+              "id": 3,
+              "course_name": "AS1796 Cert 10",
+              "city": "Brisbane",
+              "delivery_mode": "Blended",
+              "start_date": "2026-10-05",
+              "end_date": "2026-10-07",
+              "price_member": 980,
+              "price_non_member": 1380,
+              "registration_url": "https://hapily.test/event/003",
+              "status": "cancelled",
+              "seats_remaining": 0
+            },
+            {
+              "id": 4,
+              "course_name": "AS1796 Cert 10",
+              "city": "Perth",
+              "delivery_mode": "Face-to-Face",
+              "start_date": "2026-11-10",
+              "end_date": "2026-11-12",
+              "price_member": 980,
+              "price_non_member": 1380,
+              "registration_url": "https://hapily.test/event/004",
+              "status": "available",
+              "seats_remaining": 3
+            }
+          ],
+          "member_tier": "corporate_gold",
+          "default_city": "any",
+          "default_delivery_mode": "any",
+          "show_pricing": true,
+          "show_seats_remaining": true,
+          "register_cta_label": "Register now",
+          "eoi_form_id": "test-eoi-form",
+          "eoi_heading": "Interested in a session near you?",
+          "eoi_message": "<p>Register your interest and we will notify you.</p>",
+          "portal_id": "4538263"
+        }'
+      ></div>
+    </section>
+  </main>
+  <script src="/a11y/_future-dates.js"></script>
+  <script type="module" src="/src/modules/course-filter/index.tsx"></script>
+</body>
+</html>

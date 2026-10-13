@@ -1,0 +1,210 @@
+[
+  {
+    "name": "welcome_message",
+    "label": "Welcome message override",
+    "type": "text",
+    "default": "Welcome back, {firstname}"
+  },
+  {
+    "name": "expiry_warning_days",
+    "label": "Show expiry warning when within N days",
+    "type": "number",
+    "default": 60
+  },
+  {
+    "name": "preview_mode",
+    "label": "Enable mock member preview mode",
+    "type": "boolean",
+    "default": false,
+    "help_text": "Staging-only setting. Uses safe mock member profiles instead of HubSpot CRM contacts."
+  },
+  {
+    "name": "tiles",
+    "label": "Dashboard tiles (in display order)",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 12,
+      "default": 1
+    },
+    "children": [
+      {
+        "name": "tile_type",
+        "label": "Tile type",
+        "type": "choice",
+        "choices": [
+          [
+            "welcome_banner",
+            "Welcome banner"
+          ],
+          [
+            "smart_alerts",
+            "Smart alerts"
+          ],
+          [
+            "membership_status",
+            "Membership status"
+          ],
+          [
+            "certifications",
+            "My certifications"
+          ],
+          [
+            "upcoming_courses",
+            "Upcoming courses"
+          ],
+          [
+            "registered_events",
+            "Registered events"
+          ],
+          [
+            "invoices",
+            "Invoices & receipts"
+          ],
+          [
+            "geo_events",
+            "Geo-localised events"
+          ],
+          [
+            "corporate_admin",
+            "Corporate admin entry"
+          ],
+          [
+            "resources_for_you",
+            "Resources for you"
+          ],
+          [
+            "profile_switcher",
+            "Profile / context switcher"
+          ],
+          [
+            "custom_cta",
+            "Custom CTA"
+          ]
+        ],
+        "required": true,
+        "default": "welcome_banner"
+      },
+      {
+        "name": "tile_heading_override",
+        "label": "Heading override (optional)",
+        "type": "text"
+      },
+      {
+        "name": "tile_visible",
+        "label": "Visible",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "name": "custom_cta_label",
+        "label": "Custom CTA label",
+        "type": "text"
+      },
+      {
+        "name": "custom_cta_link",
+        "label": "Custom CTA link",
+        "type": "link"
+      }
+    ]
+  },
+  {
+    "name": "renewal_link",
+    "label": "Renew membership link",
+    "type": "link"
+  },
+  {
+    "name": "support_email",
+    "label": "Support email",
+    "type": "text",
+    "default": "office@weldaustralia.com.au"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": true,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

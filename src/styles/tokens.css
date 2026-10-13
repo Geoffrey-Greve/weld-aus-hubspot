@@ -1,0 +1,11 @@
+/*
+ * Weld Australia - Design Tokens (development stub)
+ *
+ * The canonical token definitions live in:
+ *   theme/assets/css/tokens.css
+ *
+ * This file re-exports them so Vite's dev server can serve tokens
+ * to React modules during local development via `pnpm dev`.
+ * In production, tokens.css is loaded by the HubSpot head partial.
+ */
+@import '../../theme/assets/css/tokens.css';

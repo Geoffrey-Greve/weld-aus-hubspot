@@ -1,0 +1,64 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "why-weld-australia"
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Why train with Weld Australia"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "The home of welding excellence in Australia"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext",
+    "default": "<p>Weld Australia training is backed by industry-recognised standards, practical delivery and nationally connected course sessions.</p>"
+  },
+  {
+    "name": "cards",
+    "label": "Cards",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 8,
+      "default": 4
+    },
+    "children": [
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text"
+      },
+      {
+        "name": "body_text",
+        "label": "Body",
+        "type": "text"
+      },
+      {
+        "name": "accent",
+        "label": "Accent colour",
+        "type": "choice",
+        "choices": [
+          ["gold", "Gold"],
+          ["magenta", "Magenta"]
+        ],
+        "default": "gold"
+      }
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

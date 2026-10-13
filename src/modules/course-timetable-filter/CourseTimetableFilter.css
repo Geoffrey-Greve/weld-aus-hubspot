@@ -1,0 +1,655 @@
+/* ============================================================
+   course-timetable-filter - React island styles
+   Follows --wa-* design tokens (CLAUDE.md §5.3).
+   Mobile-first: cards below 768px, sortable table at 768px+.
+   ============================================================ */
+
+.wa-ctf {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-6, 24px);
+}
+
+/* ── Filter bar ─────────────────────────────────────────────────
+   Matches the events-listing filter design language:
+   type chips on top, rule, then location menu + compact chips below. */
+
+.wa-ctf__filters {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wa-ctf-filter__top,
+.wa-ctf-filter__bottom,
+.wa-ctf-filter__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.wa-ctf-filter__rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: rgba(28, 30, 76, 0.14);
+}
+
+.wa-ctf-filter__separator {
+  width: 1px;
+  height: 30px;
+  background: rgba(28, 30, 76, 0.14);
+}
+
+.wa-ctf__chip,
+.wa-ctf-location__toggle,
+.wa-ctf-location__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 9999px;
+  background: #fff;
+  color: #111827;
+  font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+
+.wa-ctf__chip,
+.wa-ctf-location__toggle {
+  min-height: 40px;
+  padding: 0 17px;
+}
+
+.wa-ctf__chip--compact {
+  min-height: 40px;
+  padding-inline: 18px;
+}
+
+.wa-ctf__chip:hover,
+.wa-ctf-location__toggle:hover,
+.wa-ctf-location__option:hover {
+  border-color: rgba(28, 30, 76, 0.35);
+  box-shadow: 0 3px 10px rgba(28, 30, 76, 0.08);
+}
+
+.wa-ctf__chip--active,
+.wa-ctf__chip[aria-pressed="true"],
+.wa-ctf-location__option[aria-pressed="true"] {
+  background: #1c1e4c;
+  border-color: #1c1e4c;
+  color: #fff;
+}
+
+.wa-ctf__chip--active:hover,
+.wa-ctf__chip[aria-pressed="true"]:hover {
+  color: #fff;
+  box-shadow: none;
+}
+
+.wa-ctf__chip:focus-visible,
+.wa-ctf-location__toggle:focus-visible,
+.wa-ctf-location__option:focus-visible,
+.wa-ctf__clear-btn:focus-visible,
+.wa-ctf__date-input:focus-visible {
+  outline: 3px solid #1c1e4c;
+  outline-offset: 2px;
+}
+
+.wa-ctf-location {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.wa-ctf-location__toggle {
+  min-width: 154px;
+  justify-content: space-between;
+}
+
+.wa-ctf-location__icon,
+.wa-ctf-location__chevron {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wa-ctf-location__icon {
+  color: #ed128d;
+}
+
+.wa-ctf-location__chevron {
+  width: 14px;
+  height: 14px;
+  color: #1c1e4c;
+}
+
+.wa-ctf-location__menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  max-height: 300px;
+  overflow: auto;
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid #dde0e5;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 16px 38px rgba(28, 30, 76, 0.14);
+}
+
+.wa-ctf-location__option {
+  width: 100%;
+  min-height: 36px;
+  justify-content: space-between;
+  padding: 0 13px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.wa-ctf__clear-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 9999px;
+  background: #fff;
+  color: #1c1e4c;
+  font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+
+.wa-ctf__clear-btn:hover {
+  border-color: rgba(28, 30, 76, 0.35);
+  box-shadow: 0 3px 10px rgba(28, 30, 76, 0.08);
+}
+
+/* ── Custom date range ──────────────────────────────────────── */
+
+.wa-ctf__date-range {
+  display: flex;
+  gap: var(--wa-space-3, 12px);
+  flex-wrap: wrap;
+}
+
+.wa-ctf__filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wa-ctf__filter-label {
+  color: #5b6770;
+  font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wa-ctf__date-input {
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 17px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 9999px;
+  background: #fff;
+  color: #111827;
+  font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+  /* 16px prevents iOS Safari auto-zoom on focus (triggered by font-size < 16px,
+     regardless of viewport width). The 14px design size applies only on
+     mouse/fine-pointer devices, where focus-zoom does not occur. */
+  font-size: 16px;
+  font-weight: 500;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.wa-ctf__date-input:hover {
+  border-color: rgba(28, 30, 76, 0.35);
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .wa-ctf__date-input {
+    font-size: 14px;
+  }
+}
+
+/* ── Desktop table ──────────────────────────────────────────── */
+
+/* Hidden on mobile - shown at 768px+ */
+.wa-ctf__table-wrap {
+  display: none;
+  overflow-x: auto;
+  border-radius: var(--wa-radius-md, 8px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .wa-ctf__table-wrap {
+    display: block;
+  }
+}
+
+.wa-ctf__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.wa-ctf__th {
+  padding: var(--wa-space-3, 12px) var(--wa-space-4, 16px);
+  background: var(--wa-color-surface-alt, #f9fafb);
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+.wa-ctf__th--sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.wa-ctf__th--sortable:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.wa-ctf__th--sortable:focus-visible {
+  outline: 2px solid var(--wa-color-primary, #003087);
+  outline-offset: -2px;
+}
+
+.wa-ctf__th--sorted {
+  color: var(--wa-color-primary, #003087);
+}
+
+.wa-ctf__th--action {
+  width: 120px;
+}
+
+.wa-ctf__th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wa-ctf__sort-icon {
+  font-size: 0.8em;
+  opacity: 0.6;
+}
+
+.wa-ctf__th--sorted .wa-ctf__sort-icon {
+  opacity: 1;
+  color: var(--wa-color-primary, #003087);
+}
+
+.wa-ctf__tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  transition: background 0.1s;
+}
+
+.wa-ctf__tr:last-child {
+  border-bottom: none;
+}
+
+.wa-ctf__tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.wa-ctf__tr--unavailable {
+  opacity: 0.65;
+}
+
+.wa-ctf__td {
+  padding: var(--wa-space-3, 12px) var(--wa-space-4, 16px);
+  vertical-align: middle;
+}
+
+.wa-ctf__td--date {
+  white-space: nowrap;
+}
+
+.wa-ctf__td--price {
+  white-space: nowrap;
+}
+
+.wa-ctf__td--action {
+  white-space: nowrap;
+}
+
+.wa-ctf__course-name {
+  font-weight: 600;
+}
+
+/* ── Status badges (shared, table + cards) ──────────────────── */
+
+.wa-ctf__badge {
+  display: inline-block;
+  margin-left: var(--wa-space-2, 8px);
+  padding: 2px 8px;
+  border-radius: var(--wa-radius-sm, 4px);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.wa-ctf__badge--cancelled {
+  background: #fef3f2;
+  color: #b91c1c;
+}
+
+.wa-ctf__badge--sold-out {
+  background: #fefce8;
+  color: #92400e;
+}
+
+/* Ref 74c - registrations shut by hand on an upcoming session. */
+/* Registrations closed. TWO causes, one badge: the session has already started (Ref 46)
+   or staff shut it by hand (Ref 74c). The amber sold-out treatment rather than the red
+   cancelled one - nothing has gone wrong, the door is simply shut - and the words carry
+   the difference, because "Sold out" invites a waitlist enquiry and this does not. */
+.wa-ctf__badge--closed {
+  background: #fefce8;
+  color: #92400e;
+}
+
+/* ── Pricing (shared, table + cards) ────────────────────────── */
+
+/* Member price - highlighted in --wa-color-success per CLAUDE.md §5.4 rule 4 */
+.wa-ctf__price--member {
+  color: var(--wa-color-success, #1f8a4d);
+  font-weight: 700;
+}
+
+.wa-ctf__price--struck {
+  text-decoration: line-through;
+  color: var(--wa-color-text-muted, #6b7280);
+  font-size: 0.9em;
+}
+
+.wa-ctf__price--public {
+  font-weight: 600;
+}
+
+.wa-ctf__price-tag {
+  font-size: 0.8em;
+  font-weight: 400;
+}
+
+/* ── Seats remaining (shared) ───────────────────────────────── */
+
+.wa-ctf__seats {
+  font-size: 0.8125rem;
+  color: #92400e;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ── Register button in table ───────────────────────────────── */
+
+.wa-ctf__register-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-3, 12px);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--wa-radius-md, 8px);
+  white-space: nowrap;
+}
+
+.wa-ctf__unavailable-label {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  font-style: italic;
+}
+
+/* ── Mobile cards ───────────────────────────────────────────── */
+
+/* Shown on mobile - hidden at 768px+ */
+.wa-ctf__cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4, 16px);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .wa-ctf__cards {
+    display: none;
+  }
+}
+
+.wa-ctf__cards-item {
+  display: contents;
+}
+
+.wa-ctf__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 12px);
+  padding: var(--wa-space-4, 16px);
+  border-radius: var(--wa-radius-md, 8px);
+  background: var(--wa-color-surface, #fff);
+  box-shadow: var(--wa-shadow-card, 0 1px 4px rgba(0, 0, 0, 0.08));
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.wa-ctf__card--cancelled,
+.wa-ctf__card--sold_out {
+  opacity: 0.65;
+}
+
+.wa-ctf__card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--wa-space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.wa-ctf__card-course {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* Override badge margin inside card header */
+.wa-ctf__card-header .wa-ctf__badge {
+  margin-left: 0;
+}
+
+/* Card metadata (dl/dt/dd) */
+.wa-ctf__card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-1, 4px);
+  margin: 0;
+}
+
+.wa-ctf__card-meta-row {
+  display: flex;
+  gap: var(--wa-space-2, 8px);
+  font-size: 0.9rem;
+}
+
+.wa-ctf__card-meta-row dt {
+  font-weight: 600;
+  min-width: 90px;
+  color: var(--wa-color-text-muted, #6b7280);
+}
+
+.wa-ctf__card-meta-row dd {
+  margin: 0;
+}
+
+.wa-ctf__card-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-4, 16px);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--wa-radius-md, 8px);
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* ── Pagination ─────────────────────────────────────────────── */
+
+.wa-ctf__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--wa-space-3, 12px);
+  padding-top: var(--wa-space-4, 16px);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.wa-ctf__pagination-info {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+}
+
+.wa-ctf__pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3, 12px);
+}
+
+.wa-ctf__page-btn {
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-4, 16px);
+  border-radius: var(--wa-radius-md, 8px);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wa-ctf__page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wa-ctf__page-indicator {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  white-space: nowrap;
+}
+
+/* ── EOI form ───────────────────────────────────────────────── */
+
+.wa-ctf__eoi {
+  padding: var(--wa-space-6, 24px);
+  border-radius: var(--wa-radius-lg, 16px);
+  background: var(--wa-color-surface-alt, #f9fafb);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.wa-ctf__eoi--success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #14532d;
+}
+
+.wa-ctf__eoi-heading {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 var(--wa-space-3, 12px);
+}
+
+.wa-ctf__eoi-message {
+  margin-bottom: var(--wa-space-4, 16px);
+}
+
+.wa-ctf__eoi-message p:last-child {
+  margin-bottom: 0;
+}
+
+.wa-ctf__eoi-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 12px);
+  max-width: 480px;
+}
+
+.wa-ctf__eoi-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wa-ctf__eoi-field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.wa-ctf__eoi-field input {
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-3, 12px);
+  border: 1.5px solid rgba(0, 0, 0, 0.2);
+  border-radius: var(--wa-radius-md, 8px);
+  font-size: 1rem;
+  background: var(--wa-color-surface, #fff);
+}
+
+.wa-ctf__eoi-field input:focus {
+  outline: 2px solid var(--wa-color-primary, #003087);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+.wa-ctf__eoi-error {
+  color: #b91c1c;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.wa-ctf__eoi-fallback {
+  margin: 0;
+  color: var(--wa-color-text-muted, #6b7280);
+}
+
+/* ── Screen reader utility ──────────────────────────────────── */
+
+.wa-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

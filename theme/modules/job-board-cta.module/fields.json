@@ -1,0 +1,89 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "job-board-connect",
+    "help_text": "Used by the hero button anchor. Keep as job-board-connect unless the hero link is also updated."
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Get connected"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Whether you're hiring or job hunting"
+  },
+  {
+    "name": "cards",
+    "label": "CTA cards",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 2,
+      "default": 2
+    },
+    "children": [
+      {
+        "name": "icon_style",
+        "label": "Icon style",
+        "type": "choice",
+        "choices": [
+          [
+            "employer",
+            "Employer / gold"
+          ],
+          [
+            "seeker",
+            "Job seeker / magenta"
+          ]
+        ],
+        "default": "employer"
+      },
+      {
+        "name": "kicker",
+        "label": "Kicker",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "title",
+        "label": "Card title",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "body_text",
+        "label": "Card body",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "primary_label",
+        "label": "Primary button label",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "primary_link",
+        "label": "Primary button link",
+        "type": "link"
+      },
+      {
+        "name": "secondary_label",
+        "label": "Secondary button label",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "secondary_link",
+        "label": "Secondary button link",
+        "type": "link"
+      }
+    ]
+  }
+]

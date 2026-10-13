@@ -1,0 +1,208 @@
+<!--
+  templateType: page
+  isAvailableForNewContent: true
+  label: Welding Safety Courses
+-->
+{#
+    welding-safety-courses.html — Weld Australia Welding Safety Courses page
+    URL: /training/welding-safety-courses/
+    Faithful rebuild of the original live page. Page-scoped <style> adds card/panel
+    padding and top-aligned text (see extra_head).
+    Modules: hero → statement → split-feature (image, how to access) →
+             split-feature (image, about) → card-grid (course content) →
+             card-grid (how & why) → split-feature (image, resources) → contact-methods-grid
+    TODO before publish: re-host brochure PDF in HubSpot Files; confirm /welding-fumes slug.
+    If the padding/alignment CSS below doesn't take, the card element class may differ
+    from `.wa-card-grid__card` / `.wa-split-feature__content` — share the rendered class
+    and I'll match it exactly.
+  #}
+  {% set page_title_exact = page_meta.html_title | default('Welding Safety Courses - Weld Australia') %}
+  {% set page_description = page_meta.meta_description | default('Weld Australia has created two free online Welder Safety Training Courses — one for welders, and one for welding engineers and supervisors.') %}
+  {% extends "../layouts/base.html" %}
+  {% block extra_head %}
+  <style>
+    /* Hero: keep the section at the standard container width (same as the sections
+       below), but let the text fill that container instead of a narrow half column. */
+    body.is-safety-page .wa-hero__headline,
+    body.is-safety-page .wa-hero__subheadline { max-width: 100%; }
+  
+    /* Split-feature: top-align the text column and pad the content panel */
+    body.is-safety-page .wa-split-feature { align-items: flex-start; }
+    body.is-safety-page .wa-split-feature__content {
+      padding: clamp(20px, 2.2vw, 36px);
+      align-self: flex-start;
+    }
+    /* Card-grid cards: equal height (stretch) with padding + content pinned to TOP.
+       Target the card and any inner flex/grid wrapper so content doesn't drop to the
+       bottom of the taller card. */
+    body.is-safety-page .wa-card-grid__card {
+      padding: clamp(20px, 2vw, 28px);
+      text-align: left;
+    }
+    /* Force content to the TOP of equal-height cards: override any
+       justify-content:center/end on the card or its inner flex wrappers... */
+    body.is-safety-page .wa-card-grid__card,
+    body.is-safety-page .wa-card-grid__card > div,
+    body.is-safety-page .wa-card-grid__card [class*="body"],
+    body.is-safety-page .wa-card-grid__card [class*="content"],
+    body.is-safety-page .wa-card-grid__card [class*="inner"] {
+      justify-content: flex-start !important;
+      align-content: flex-start !important;
+    }
+    /* ...and, crucially, remove the `margin-top:auto` that pushes the body to the
+       bottom of the card when no image is present. */
+    body.is-safety-page .wa-card-grid__card > *,
+    body.is-safety-page .wa-card-grid__card [class*="body"],
+    body.is-safety-page .wa-card-grid__card [class*="content"],
+    body.is-safety-page .wa-card-grid__card [class*="inner"] {
+      margin-top: 0 !important;
+      margin-block-start: 0 !important;
+    }
+  </style>
+  {% endblock %}
+  {% block body_class %}is-safety-page{% endblock %}
+  {% block body %}
+  {% dnd_area "main_content" label="Main content" %}
+  
+    {# ── § 1  HERO ────────────────────────────────────────────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/hero"
+            label="Hero"
+            background="primary"
+            height="tall"
+            alignment="left"
+            accent_bar=true
+            eyebrow="Welder safety training"
+            headline="Welder Safety Training Courses"
+            subheadline="<p><strong>Weld Australia has created two free online Welder Safety Training Courses – one for welders, and the second for welding engineers and supervisors.</strong></p><p>Welding is a potentially dangerous process, with many hazards and risks to people's health. These risks are compounded by the fact that welding is undertaken across a wide range of locations and situations, from workshops and field work, through to confined spaces, underground mine sites, and more.</p><p>Hazards in each of these situations will be different, and require different controls to keep welders and others in close proximity safe. It is critical to manage these risks and hazards so that people working in the welding industry are kept safe and return home at the end of each day without injury.</p><p>To this end, Weld Australia has developed and released two free online welder safety training courses.</p>"
+            primary_cta={"label_text": "Download the brochure", "link": {"url": {"href": "https://weldaustralia.com.au/wp-content/uploads/2024/03/Weld-Australia-Safety-Courses-Brochure-1.pdf", "type": "EXTERNAL"}, "open_in_new_tab": true}, "style": "gold"}
+            secondary_cta={"label_text": "Access the courses now", "link": {"url": {"href": "https://weldtraining.online/", "type": "EXTERNAL"}, "open_in_new_tab": true}, "style": "white-outline"}
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 2  SPLIT FEATURE — HOW TO ACCESS THE COURSES ───────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/split-feature"
+            label="How to Access the Courses"
+            background="surface"
+            media_type="image"
+            media_side="right"
+            heading="How to Access the Courses"
+            body_text="<p>The courses can be accessed via: <a href='https://weldtraining.online/'>https://weldtraining.online</a>.</p><p>To start the courses, all you need is an account for Weld Australia's online training platform. If you don't already have an account, you can quickly and easily create one via the link in the top right-hand corner of the platform's homepage.</p>"
+            buttons=[
+              {"label_text": "Access the courses now", "url": {"url": {"href": "https://weldtraining.online/", "type": "EXTERNAL"}, "open_in_new_tab": true}, "style": "primary"}
+            ]
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 4  SPLIT FEATURE — ABOUT THE COURSES ───────────────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/split-feature"
+            label="About the Courses"
+            background="surface_alt"
+            media_type="image"
+            media_side="left"
+            heading="About the Courses"
+            body_text="<p>The objective of the Welder Safety training courses is to improve safety awareness, knowledge and outcomes across the welding industry. The courses cover a broad range of subject material across welding processes. They provide details of hazards that may be encountered and how to manage them in the workplace. The hierarchy of controls are discussed, with a particular focus on engineering controls and the correct use of PPE.</p><p>The courses also reinforce procedures that should be used, such as correct set up and use of equipment and the correct handling of gas cylinders and welding machines. Assessment and certification for course participants is also available.</p>"
+            buttons=[
+              {"label_text": "Access the courses now", "url": {"url": {"href": "https://weldtraining.online/", "type": "EXTERNAL"}, "open_in_new_tab": true}, "style": "primary"}
+            ]
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 5  CARD GRID — COURSE CONTENT ──────────────────────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/card-grid"
+            label="Course Content"
+            background="surface"
+            heading="Course Content"
+            card_style="clean_white"
+            columns="2"
+            cards=[
+              {"tag_text": "For Welders", "tag_color": "navy", "title": "For Welders", "body_text": "<ul><li>Principles of Safe Working</li><li>Electrical Safety</li><li>Gas Safety and Cylinder Handling</li><li>Skin and Eye Protection</li><li>Fire and Explosion Protection</li><li>Fumes and Ventilation</li><li>Noise Control</li><li>Protective Equipment for Welding and Allied Processes</li><li>Welding and Cutting in Confined Spaces</li><li>Welding and Cutting in or on Containers</li><li>Welding and Cutting in Hot or Humid Conditions</li><li>Welding and Cutting at Heights or Underneath Construction</li><li>Protection during Weldment Testing</li></ul>"},
+              {"tag_text": "For Welding Supervisors", "tag_color": "gold", "title": "For Welding Supervisors", "body_text": "<ul><li>Principles of Safe Working</li><li>Electrical Safety</li><li>Skin and Eye Protection</li><li>Welding and Cutting at Heights or Underneath Construction</li><li>Protection during Weldment Testing</li><li>WHS Case Studies</li></ul>"}
+            ]
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 6  CARD GRID — HOW AND WHY TO USE THE COURSES ──────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/card-grid"
+            label="How and Why to Use the Courses"
+            background="surface_alt"
+            heading="How and Why to Use the Courses"
+            card_style="clean_white"
+            columns="2"
+            cards=[
+              {"tag_text": "For Companies", "tag_color": "navy", "title": "For Companies", "body_text": "<ul><li><strong>Enhance Staff Inductions</strong>: Incorporating the welding safety courses into your induction process for new hires ensures all employees start with a solid foundation in safety practices. It helps set a company-wide safety standard from day one.</li><li><strong>Regular Employee Refreshers</strong>: The courses can be used as part of an ongoing training program to keep employees up to date with the latest safety techniques. Regular refreshers help maintain safety awareness, reducing risk of accidents.</li><li><strong>Compliance with Regulations</strong>: By leveraging the courses, organisations can help ensure compliance with safety laws and regulations. This helps avoid legal issues and fines and, more importantly, creates a safer working environment.</li><li><strong>Help Reduce Accidents and Insurance</strong>: Educating employees on safety can reduce workplace accidents, leading to lower workers' compensation claims and insurance costs. A well-trained workforce is less likely to engage in unsafe practices.</li></ul>"},
+              {"tag_text": "For Individuals", "tag_color": "gold", "title": "For Individuals", "body_text": "<ul><li><strong>Improve Your Knowledge</strong>: By undertaking these courses, you can gain essential knowledge on how to protect yourself from hazards like burns and harmful fumes. Learning about PPE and emergency procedures can be life-saving. <!-- original source read 'Improve You Knowledge' — typo corrected --></li><li><strong>Improve Your Employability</strong>: Looking to start or advance a career in welding? Completing the courses demonstrates to employers that you're serious about your career and committed to safety, making you stand out in the job market.</li><li><strong>Support for Hobbyists</strong>: If you're a hobbyist welder (or know someone who is), safety education is just as important. Free courses can provide the knowledge to safely enjoy welding at home, protecting yourself, your family, and your property.</li><li><strong>Foster a Culture of Safety</strong>: By educating yourself, you contribute to a culture of safety. Sharing knowledge with peers, and practicing safe welding can influence others to prioritise safety, reducing overall welding-related accidents.</li></ul>"}
+            ]
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 7  SPLIT FEATURE — WELDING SAFETY RESOURCES ────────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/split-feature"
+            label="Welding Safety Resources"
+            background="surface"
+            media_type="image"
+            media_side="right"
+            heading="Welding Safety Resources"
+            body_text="<p>Weld Australia has a range of free Welding Safety resources available:</p><ul><li><a href='https://weldingtech.sharepoint.com/sites/WeldsPublicDocuments/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FWeldsPublicDocuments%2FShared%20Documents%2FProducts%2FShop%2FDocs%2FTechnical%20Guidance%20Notes%2FTGN%2DSW07%2FWeld%20Australia%20Guidance%20Note%20TGN%2DSW07%20%2D%20Health%20and%20Safety%20in%20Welding%20%2D%20Guides%20and%20Forms%20Nov%202021%2Epdf&parent=%2Fsites%2FWeldsPublicDocuments%2FShared%20Documents%2FProducts%2FShop%2FDocs%2FTechnical%20Guidance%20Notes%2FTGN%2DSW07&p=true&ga=1'>Technical Guidance Note: Health and Safety in Welding – Guides and Forms</a></li><li><a href='https://weldingtech.sharepoint.com/sites/WeldsPublicDocuments/_layouts/15/download.aspx?share=EQRxoUTKL5NMl2BQkSZ5J_sBvpJoV3AyJis_QuNNhxfVSQ'>Technical Guidance Note: Fume Minimisation Guidelines: Welding, Cutting, Brazing and Soldering</a></li><li><a href='https://weldingtech.sharepoint.com/sites/WeldsPublicDocuments/_layouts/15/download.aspx?share=EQy9NrT2YxJLkD7TwOxrhmMBLLcNeG_aV9DwIcKeVWg2DQ'>Technical Note: Health and Safety in Welding</a></li><li><a href='https://weldingtech.sharepoint.com/sites/WeldsPublicDocuments/_layouts/15/download.aspx?share=ETMZ1YmPu8dGlpKZBZSU6KYB0RfnY-QtQgnJY2IysJGFzQ'>Technical Guidance Note: Laser Safety</a></li><li><a href='https://weldingtech.sharepoint.com/sites/WeldsPublicDocuments/_layouts/15/download.aspx?share=EfFoNH5OaK1EmDijBf4MftIBPmCkgjwlPSDnwg61RG0Vlg'>Technical Guidance Note: Welding Electrical Safety</a></li></ul><p>Further details on resources from Safe Work Australia and state regulatory bodies <a href='/welding-fumes'>can be accessed here.</a></p>"
+            buttons=[
+              {"label_text": "Access the courses now", "url": {"url": {"href": "https://weldtraining.online/", "type": "EXTERNAL"}, "open_in_new_tab": true}, "style": "primary"}
+            ]
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+    {# ── § 8  CONTACT METHODS GRID — FURTHER INFORMATION ──────────────────── #}
+    {% dnd_section %}
+      {% dnd_column offset=0 width=12 %}
+        {% dnd_row %}
+          {% dnd_module
+            path="../../modules/contact-methods-grid"
+            label="For further information"
+            background="surface_alt"
+            style="feature"
+            section_heading="For further information contact:"
+            cards=[
+              {"heading": "Andrew Davies", "body_text": "<p>Manager, Technical Industry Networks, Weld Australia</p><p><a href='mailto:a.davies@weldaustralia.com.au'>a.davies@weldaustralia.com.au</a><br><a href='tel:0438428966'>0438 428 966</a></p>"}
+            ]
+          %}{% end_dnd_module %}
+        {% end_dnd_row %}
+      {% end_dnd_column %}
+    {% end_dnd_section %}
+  
+  {% end_dnd_area %}
+  {% endblock %}
+  

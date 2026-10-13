@@ -1,0 +1,192 @@
+/*
+ * statement-cards.module/module.css
+ * Optional left feature panel (image + quote) beside a column of statement cards.
+ */
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+
+.wa-statement-cards__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-6);
+}
+
+/* Side-by-side cards (no feature image) */
+@media (min-width: 768px) {
+  .wa-statement-cards__layout:not(.wa-statement-cards__layout--split) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Feature panel left, card column right */
+@media (min-width: 900px) {
+  .wa-statement-cards__layout--split {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: stretch;
+  }
+}
+
+.wa-statement-cards__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-6);
+}
+
+/* ── Feature image + quote panel ─────────────────────────────────────────── */
+
+.wa-statement-cards__feature {
+  position: relative;
+  margin: 0;
+  border-radius: var(--wa-radius-lg);
+  overflow: hidden;
+  min-height: 360px;
+  background: var(--wa-color-primary);
+}
+
+.wa-statement-cards__feature-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wa-statement-cards__feature-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--wa-space-3);
+  padding: var(--wa-space-8);
+  background: linear-gradient(
+    to top,
+    rgba(0, 19, 43, 0.92) 0%,
+    rgba(0, 19, 43, 0.55) 38%,
+    rgba(0, 19, 43, 0) 70%
+  );
+}
+
+.wa-statement-cards__feature-rule {
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--wa-color-accent);
+}
+
+.wa-statement-cards__feature-quote {
+  margin: 0;
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-xl);
+  font-weight: var(--wa-weight-bold);
+  line-height: 1.3;
+  color: #fff;
+}
+
+.wa-statement-cards__feature-attr {
+  font-size: var(--wa-text-sm);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Statement cards ─────────────────────────────────────────────────────── */
+
+.wa-statement-cards__card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--wa-space-8);
+  border-radius: var(--wa-radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4);
+}
+
+/* Flame gradient top border */
+.wa-statement-cards__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--wa-gradient-flame);
+}
+
+/* Faint decorative circle, bottom-right */
+.wa-statement-cards__card-circle {
+  position: absolute;
+  right: -40px;
+  bottom: -40px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.wa-statement-cards__card--navy {
+  background-color: var(--wa-color-primary);
+  color: #fff;
+}
+
+.wa-statement-cards__card--navy .wa-statement-cards__card-circle {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.wa-statement-cards__card--light {
+  background-color: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border, #e5e7eb);
+  box-shadow: var(--wa-shadow-card);
+  color: var(--wa-color-text);
+}
+
+.wa-statement-cards__card--light .wa-statement-cards__card-circle {
+  background: rgba(254, 207, 5, 0.16);
+}
+
+.wa-statement-cards__card > *:not(.wa-statement-cards__card-circle) {
+  position: relative;
+  z-index: 1;
+}
+
+.wa-statement-cards__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.wa-statement-cards__card--navy .wa-statement-cards__heading { color: #fff; }
+.wa-statement-cards__card--light .wa-statement-cards__heading { color: var(--wa-color-primary); }
+
+.wa-statement-cards__body {
+  font-size: var(--wa-text-base);
+  line-height: var(--wa-leading-relaxed);
+}
+
+.wa-statement-cards__card--navy .wa-statement-cards__body { color: rgba(255,255,255,0.8); }
+.wa-statement-cards__card--light .wa-statement-cards__body { color: var(--wa-color-text-muted); }
+
+.wa-statement-cards__photo-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3);
+  margin-top: auto;
+  padding-top: var(--wa-space-4);
+}
+
+.wa-statement-cards__photo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.wa-statement-cards__photo-caption {
+  font-size: var(--wa-text-xs);
+  font-style: italic;
+}
+
+.wa-statement-cards__card--navy .wa-statement-cards__photo-caption { color: rgba(255,255,255,0.6); }
+.wa-statement-cards__card--light .wa-statement-cards__photo-caption { color: var(--wa-color-text-muted); }

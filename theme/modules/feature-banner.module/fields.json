@@ -1,0 +1,157 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Outer section background",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White / Light"
+      ],
+      [
+        "surface_alt",
+        "Alt surface"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface_alt"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text"
+  },
+  {
+    "name": "body_text",
+    "label": "Body copy",
+    "type": "richtext"
+  },
+  {
+    "name": "primary_cta_label",
+    "label": "Primary CTA label",
+    "type": "text"
+  },
+  {
+    "name": "primary_cta_link",
+    "label": "Primary CTA link",
+    "type": "link"
+  },
+  {
+    "name": "primary_cta_style",
+    "label": "Primary CTA style",
+    "type": "choice",
+    "choices": [
+      [
+        "gold",
+        "Gold (default)"
+      ],
+      [
+        "white-outline",
+        "White outline"
+      ],
+      [
+        "primary",
+        "Navy"
+      ]
+    ],
+    "default": "gold"
+  },
+  {
+    "name": "secondary_cta_label",
+    "label": "Secondary CTA label",
+    "type": "text"
+  },
+  {
+    "name": "secondary_cta_link",
+    "label": "Secondary CTA link",
+    "type": "link"
+  },
+  {
+    "name": "media_image",
+    "label": "Media image (right side)",
+    "type": "image"
+  },
+  {
+    "name": "show_iiw_badge",
+    "label": "Show IIW badge",
+    "type": "boolean",
+    "default": false,
+    "help_text": "Shows the IIW Australia badge alongside the media image."
+  },
+  {
+    "name": "badge_image",
+    "label": "Badge image (optional override)",
+    "type": "image"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

@@ -1,0 +1,104 @@
+<!--
+  templateType: page
+  label: About - Team & Board (dynamic - team_and_board HubDB)
+  isAvailableForNewContent: true
+-->
+{#
+  about-team.html - Weld Australia team & board listing + member profile router
+  URL: /about/team/ and /about/team/{person-name}
+
+  ── HubSpot configuration required ──────────────────────────────────────────
+  • Create the page at /about/team/ from this template.
+  • In the page's Settings → Advanced, set it as the dynamic page for the
+    `team_and_board` HubDB table. HubSpot then serves one child page per active
+    row at /about/team/{page path}.
+  • Set the table's dynamic page URL pattern in the HubDB UI - scripts/seed-hubdb.ts
+    pushes useForPages and the SEO meta-tag mapping, but not the URL pattern.
+
+  ── Data ────────────────────────────────────────────────────────────────────
+  Everything comes from HubDB `team_and_board` (name, role, quals, org, category,
+  headshot, bio, is_board_member, display_order, is_active). Page titles, descriptions and og:image
+  are composed from those same columns - there are no separate SEO columns.
+
+  Read-only: no CRM, HubDB, form, deal or workflow writes.
+#}
+{% set _person_row = dynamic_page_hubdb_row %}
+
+{#
+  HubDB serves a child page for every *published* row, whether or not `is_active`
+  is ticked - the column is ours, not HubSpot's. Without this gate, unticking
+  is_active would remove someone from the grids while leaving their profile live
+  and indexable at its existing URL. HubL cannot set a 404 status code, so an
+  inactive row renders a short "no longer listed" page with noindex instead.
+#}
+{% set _person_inactive = _person_row and not _person_row.is_active %}
+{% set _person_visible = _person_row and _person_row.is_active %}
+
+{#
+  Title and description are set here, before the extends, because layouts/base.html
+  includes partials/_head.html - which emits the document's only <title> and meta
+  description from these two variables. Emitting them again from extra_head would
+  produce a duplicate pair with the parent page's title winning.
+#}
+{% if _person_visible %}
+  {% set page_title = _person_row.name | default('Weld Australia team member', true) %}
+  {% if _person_row.role %}
+    {% set page_title = page_title ~ ' - ' ~ _person_row.role %}
+  {% endif %}
+  {% set _person_bio_text = _person_row.bio | default('', true) | striptags | trim %}
+  {% if _person_bio_text %}
+    {% set page_description = _person_bio_text | truncate(160) %}
+  {% elif _person_row.role %}
+    {% set page_description = (_person_row.name | default('This person', true)) ~ ' is ' ~ _person_row.role ~ ' at Weld Australia, the peak body for the Australian welding industry.' %}
+  {% else %}
+    {% set page_description = (_person_row.name | default('This person', true)) ~ ' is part of the team at Weld Australia, the peak body for the Australian welding industry.' %}
+  {% endif %}
+{% elif _person_inactive %}
+  {% set page_title = 'Profile not available' %}
+  {% set page_description = 'This team profile is no longer listed.' %}
+{% else %}
+  {% set page_title = 'Our Team & Board' %}
+  {% set page_description = "Meet the people behind Weld Australia - the Board of Directors and the welding engineers, trainers and specialists who support the Australian welding industry." %}
+{% endif %}
+
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+{% if _person_visible %}
+{% include "../partials/team-profile-head.html" %}
+{% elif _person_inactive %}
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/team-profile.css') }}">
+{% else %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/team-profile.css') }}">
+{% endif %}
+{% endblock %}
+
+{% block body_class %}{% if _person_row %} is-team-profile-page{% else %} is-team-listing-page{% endif %}{% endblock %}
+
+{% block body %}
+{% if _person_visible %}
+{% include "../partials/team-profile-body.html" %}
+{% elif _person_inactive %}
+
+<section class="wa-team-profile__missing wa-section wa-section--bg-surface wa-section--spacing-spacious">
+  <div class="container-narrow">
+    <h1 class="wa-team-profile__missing-heading">This profile is no longer listed</h1>
+    <p class="wa-team-profile__missing-text">
+      The person you're looking for is no longer shown on the Weld Australia website.
+      You can browse our current team and board, or get in touch and we'll point you
+      to the right person.
+    </p>
+    <p class="wa-team-profile__missing-actions">
+      <a href="/about/team/" class="wa-btn wa-btn--primary">View our team &amp; board</a>
+      <a href="/contact-us" class="wa-btn wa-btn--navy-outline">Contact us</a>
+    </p>
+  </div>
+</section>
+
+{% else %}
+
+{% include "../partials/team-directory-listing.html" %}
+
+{% endif %}
+{% endblock %}

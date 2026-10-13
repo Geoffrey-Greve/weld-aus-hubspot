@@ -1,0 +1,70 @@
+<!--
+  templateType: none
+-->
+{#
+  _qa-persona-resolve.html
+
+  Shared lookup for Refuel plus-address QA personas backed by HubDB
+  `portal_test_profiles`. The member portal (command centre + portal layout)
+  already uses these rows so testers can exercise Gold/Silver/Bronze without
+  fake CRM Deals. Checkout and course pricing used to ignore them, so a
+  contact like nick+portal-qa-corporate-silver@… saw Silver rates in /portal
+  and the full non-member rate at /checkout (defect 126 follow-up).
+
+  Usage (must set the email first; include shares the parent scope):
+
+    {% set qa_persona_email = checkout_contact_email %}
+    {% include '../../templates/partials/_qa-persona-resolve.html' %}
+    {% if qa_persona.found and qa_persona.entitled %}
+      {% set member_tier = qa_persona.pricing_tier %}
+    {% endif %}
+
+  Sets `qa_persona` namespace:
+    found, member_type, tier_key, status_key, membership_status,
+    company_name, entitled, pricing_tier, company_tier
+#}
+{% set qa_persona = namespace(
+  found=false,
+  member_type='',
+  tier_key='',
+  status_key='',
+  membership_status='',
+  company_name='',
+  entitled=false,
+  pricing_tier='',
+  company_tier=''
+) %}
+{% set _qa_email = qa_persona_email | default('', true) | string | lower | trim %}
+{% if _qa_email and '@' in _qa_email %}
+  {% set _qa_rows = hubdb_table_rows('portal_test_profiles', 'is_active__eq=true&limit=50') %}
+  {% for qa_row in _qa_rows %}
+    {% set _qa_code = qa_row.profile_code | default('', true) | string | lower | trim %}
+    {% if not qa_persona.found and _qa_code and ('+' ~ _qa_code ~ '@') in _qa_email %}
+      {% set qa_persona.found = true %}
+      {% set qa_persona.member_type = qa_row.member_type | default('', true) | string | trim %}
+      {% set qa_persona.tier_key = qa_row.tier_key | default('', true) | string | trim %}
+      {% set qa_persona.status_key = qa_row.status_key | default('never_member', true) | string | lower | trim %}
+      {% set qa_persona.membership_status = qa_row.membership_status | default('', true) | string | trim %}
+      {% set qa_persona.company_name = qa_row.company_name | default('', true) | string | trim %}
+      {% set _qa_status = qa_persona.status_key | replace(' ', '_') | replace('-', '_') %}
+      {% set _qa_membership_status = qa_persona.membership_status | lower | replace(' ', '_') %}
+      {# Mirror member-command-centre: never_member / lapsed personas are not entitled. #}
+      {% if _qa_status not in ['never_member', 'lapsed', 'expired', 'inactive', 'cancelled', 'canceled'] and _qa_membership_status != 'lapsed' %}
+        {% set qa_persona.entitled = true %}
+      {% endif %}
+      {# Prefer the human label ("Silver Corporate") for pricing - it contains
+         the metal keyword normaliseMemberPriceTier / HubL macros match on.
+         Fall back to tier_key ("corporate_silver") which also works after
+         underscore normalisation. #}
+      {% set _qa_pricing = qa_persona.member_type %}
+      {% if not _qa_pricing %}
+        {% set _qa_pricing = qa_persona.tier_key %}
+      {% endif %}
+      {% set qa_persona.pricing_tier = _qa_pricing %}
+      {% set _qa_metal_key = (_qa_pricing ~ ' ' ~ qa_persona.tier_key) | lower %}
+      {% if 'gold' in _qa_metal_key or 'silver' in _qa_metal_key or 'bronze' in _qa_metal_key %}
+        {% set qa_persona.company_tier = _qa_pricing %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}

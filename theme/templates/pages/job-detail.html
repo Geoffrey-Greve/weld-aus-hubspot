@@ -1,0 +1,43 @@
+﻿<!--
+  templateType: page
+  label: Job Detail (dynamic - Jobs HubDB)
+  isAvailableForNewContent: true
+-->
+{#
+  job-detail.html - Individual job vacancy page (HubDB dynamic)
+  Preferred URL: /job-board/{slug}
+  Dynamic data source: HubDB Table 6 (jobs)
+
+  This standalone template is retained for template-picker compatibility.
+  The live /job-board dynamic parent includes the same partials.
+#}
+{% set _job_row = dynamic_page_hubdb_row %}
+{% set _job_inactive = _job_row and not _job_row.is_active %}
+{% set _job_visible = _job_row and _job_row.is_active %}
+
+{% if _job_inactive %}
+  {% set page_title = 'Job no longer listed' %}
+  {% set page_description = 'This job opportunity is no longer listed on the Weld Australia Jobs Board.' %}
+{% endif %}
+
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+{% if _job_visible %}
+{% include "../partials/job-detail-head.html" %}
+{% elif _job_inactive %}
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/job-board.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/job-detail.css') }}">
+{% endif %}
+{% endblock %}
+
+{% block body_class %}{% if _job_visible %} is-job-detail-page{% elif _job_inactive %} is-job-detail-page is-job-detail-inactive-page{% endif %}{% endblock %}
+
+{% block body %}
+{% if _job_visible %}
+{% include "../partials/job-detail-body.html" %}
+{% elif _job_inactive %}
+{% include "../partials/job-detail-inactive.html" %}
+{% endif %}
+{% endblock %}

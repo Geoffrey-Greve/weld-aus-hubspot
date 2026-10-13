@@ -1,0 +1,193 @@
+/*
+ * cert-pathway-cards.module/module.css
+ * Certification pathway cards. Clean bordered card style.
+ * Mobile-first: 1-col → 2-col at 768px → 3-col at 1024px.
+ */
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+
+.wa-cert-pathway-cards__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-10);
+  text-align: center;
+}
+
+.wa-section--primary .wa-cert-pathway-cards__heading,
+.wa-section--primary-dark .wa-cert-pathway-cards__heading {
+  color: var(--wa-color-on-primary);
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+
+.wa-cert-pathway-cards__grid {
+  display: grid;
+  gap: var(--wa-space-6);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .wa-cert-pathway-cards__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-cert-pathway-cards__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.wa-cert-pathway-cards__card {
+  background-color: var(--wa-color-surface);
+  border: 2px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  padding: var(--wa-space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wa-cert-pathway-cards__card:hover {
+  border-color: var(--wa-color-primary);
+  box-shadow: var(--wa-shadow-md);
+}
+
+.wa-section--primary .wa-cert-pathway-cards__card,
+.wa-section--primary-dark .wa-cert-pathway-cards__card {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Icon ────────────────────────────────────────────────────────────────── */
+
+.wa-cert-pathway-cards__icon-wrap {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--wa-color-surface-2);
+  border-radius: var(--wa-radius-md);
+  flex-shrink: 0;
+}
+
+.wa-section--primary .wa-cert-pathway-cards__icon-wrap,
+.wa-section--primary-dark .wa-cert-pathway-cards__icon-wrap {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.wa-cert-pathway-cards__icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* ── Title ───────────────────────────────────────────────────────────────── */
+
+.wa-cert-pathway-cards__title {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.wa-section--primary .wa-cert-pathway-cards__title,
+.wa-section--primary-dark .wa-cert-pathway-cards__title {
+  color: var(--wa-color-on-primary);
+}
+
+/* ── Summary ─────────────────────────────────────────────────────────────── */
+
+.wa-cert-pathway-cards__summary {
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text-muted);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.wa-cert-pathway-cards__summary > *:first-child { margin-top: 0; }
+.wa-cert-pathway-cards__summary > *:last-child  { margin-bottom: 0; }
+
+.wa-section--primary .wa-cert-pathway-cards__summary,
+.wa-section--primary-dark .wa-cert-pathway-cards__summary {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Badges row ──────────────────────────────────────────────────────────── */
+
+.wa-cert-pathway-cards__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-2);
+}
+
+.wa-cert-pathway-cards__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wa-space-1);
+  font-size: var(--wa-text-xs);
+  font-weight: var(--wa-weight-semibold);
+  padding: var(--wa-space-1) var(--wa-space-3);
+  border-radius: var(--wa-radius-sm);
+  white-space: nowrap;
+}
+
+.wa-cert-pathway-cards__badge--audience {
+  background-color: var(--wa-color-surface-2);
+  color: var(--wa-color-text-muted);
+}
+
+.wa-cert-pathway-cards__badge--duration {
+  background-color: var(--wa-color-surface-2);
+  color: var(--wa-color-text-muted);
+}
+
+.wa-section--primary .wa-cert-pathway-cards__badge,
+.wa-section--primary-dark .wa-cert-pathway-cards__badge {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── CTA button ──────────────────────────────────────────────────────────── */
+
+.wa-cert-pathway-cards__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-3) var(--wa-space-6);
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  text-decoration: none;
+  border-radius: var(--wa-radius-md);
+  align-self: flex-start;
+  margin-top: auto;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wa-cert-pathway-cards__cta:hover {
+  opacity: 0.9;
+  box-shadow: var(--wa-shadow-md);
+}
+
+.wa-cert-pathway-cards__cta:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 3px;
+  border-radius: var(--wa-radius-md);
+}
+
+.wa-section--primary .wa-cert-pathway-cards__cta,
+.wa-section--primary-dark .wa-cert-pathway-cards__cta {
+  background-color: var(--wa-color-on-primary);
+  color: var(--wa-color-primary);
+}

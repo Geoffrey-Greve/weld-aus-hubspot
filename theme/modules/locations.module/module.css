@@ -1,0 +1,188 @@
+/*
+ * locations.module/module.css
+ * Australia map image with interactive, percentage-positioned city pins.
+ */
+
+.wa-locations__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-10);
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .wa-locations__inner {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wa-space-16);
+  }
+
+  .wa-locations__inner--map-left .wa-locations__text { order: 2; }
+  .wa-locations__inner--map-left .wa-locations__map  { order: 1; }
+}
+
+/* ── Text ─────────────────────────────────────────────────────────────────── */
+
+.wa-locations__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.2;
+  margin: 0 0 var(--wa-space-4) 0;
+  color: inherit;
+}
+
+.wa-locations__intro {
+  margin-bottom: var(--wa-space-6);
+  opacity: 0.85;
+}
+
+/* ── City list (clickable buttons) ──────────────────────────────────────── */
+
+.wa-locations__city-list {
+  list-style: none;
+  margin: var(--wa-space-6) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-2);
+}
+
+.wa-locations__city {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3);
+  width: 100%;
+  text-align: left;
+  font-size: var(--wa-text-sm);
+  font-family: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--wa-radius-md, 8px);
+  padding: 10px 12px;
+  cursor: pointer;
+  min-height: var(--wa-touch-min, 44px);
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.wa-locations__city:hover { background: rgba(28, 30, 76, 0.04); }
+
+.wa-locations__city-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--wa-color-accent-magenta, #ed128d);
+  flex-shrink: 0;
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.wa-locations__city.is-active {
+  font-weight: var(--wa-weight-semibold, 600);
+  background: rgba(254, 207, 5, 0.12);
+  border-color: rgba(254, 207, 5, 0.5);
+}
+
+.wa-locations__city.is-active .wa-locations__city-dot {
+  background: var(--wa-color-accent, #fecf05);
+  box-shadow: 0 0 0 3px rgba(254, 207, 5, 0.3);
+}
+
+.wa-section--bg-primary .wa-locations__city:hover,
+.wa-section--bg-primary_dark .wa-locations__city:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Map image + pin layer ──────────────────────────────────────────────── */
+
+.wa-locations__map {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wa-locations__map-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.wa-locations__map-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Pins (percentage-positioned) ───────────────────────────────────────── */
+
+.wa-locations__pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.wa-locations__pin-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--wa-color-accent-magenta, #ed128d);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  transition: background 0.2s ease, transform 0.2s ease;
+  z-index: 2;
+}
+
+/* Continuous radar pulse (pink) */
+.wa-locations__pin-ping {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--wa-color-accent-magenta, #ed128d);
+  opacity: 0.5;
+  z-index: 1;
+  animation: wa-loc-ping 2.4s ease-out infinite;
+}
+
+.wa-locations__pin-ping--delay { animation-delay: 1.2s; }
+
+@keyframes wa-loc-ping {
+  0%   { opacity: 0.5; transform: scale(0.5); }
+  70%  { opacity: 0;   transform: scale(3.2); }
+  100% { opacity: 0;   transform: scale(3.2); }
+}
+
+/* Active pin → yellow + larger dot, pulse turns yellow */
+.wa-locations__pin.is-active { z-index: 3; }
+
+.wa-locations__pin.is-active .wa-locations__pin-dot {
+  background: var(--wa-color-accent, #fecf05);
+  transform: translate(-50%, -50%) scale(1.35);
+}
+
+.wa-locations__pin.is-active .wa-locations__pin-ping {
+  background: var(--wa-color-accent, #fecf05);
+}
+
+/* Slightly larger touch target on coarse pointers (mobile/tablet) */
+@media (pointer: coarse) {
+  .wa-locations__pin { width: 22px; height: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-locations__pin-ping { animation: none; opacity: 0; }
+}

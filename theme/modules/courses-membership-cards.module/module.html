@@ -1,0 +1,102 @@
+{% if not module.members_only or request_contact.is_logged_in %}
+{% set _fallback_cards = [
+  {
+    'label': 'Individual',
+    'accent': 'grey',
+    'featured': false,
+    'price': '$350',
+    'price_suffix': '/year',
+    'features': ['Member pricing on all courses', 'Access to member resources', 'Technical support', 'Industry publications', 'Certificate directory listing'],
+    'cta_label': 'Join as individual',
+    'cta_href': '/membership/'
+  },
+  {
+    'label': 'Corporate',
+    'accent': 'gold',
+    'featured': true,
+    'price': 'From $2,400',
+    'price_suffix': '/year',
+    'features': ['Bulk training vouchers', 'Gold, Silver, or Bronze tier', 'Team management portal', 'Priority support', 'Directory listing with logo'],
+    'cta_label': 'Enquire now',
+    'cta_href': '/membership/corporate/'
+  },
+  {
+    'label': 'Apprentice',
+    'accent': 'blue',
+    'featured': false,
+    'price': '$85',
+    'price_suffix': '/year',
+    'features': ['Discounted course pricing', 'Access to study materials', 'Mentorship connections', 'Career guidance resources', 'Student community'],
+    'cta_label': 'Join as apprentice',
+    'cta_href': '/membership/'
+  }
+] %}
+{% set _cards_ns = namespace(items=[]) %}
+{% for card in module.cards %}
+  {% if card.badge_label or card.price or card.cta_label %}
+    {% set _cards_ns.items = _cards_ns.items + [card] %}
+  {% endif %}
+{% endfor %}
+{% set _use_custom_cards = _cards_ns.items | length > 0 %}
+{% set _cards = _cards_ns.items if _use_custom_cards else _fallback_cards %}
+
+{# Defect 101: default layout is a single CTA band ("Join now" -> Membership page).
+   The legacy per-tier tile grid is retained behind layout="tiles". #}
+{% set _layout = module.layout | default('cta') %}
+
+<section class="wa-courses-membership wa-courses-membership--{{ _layout }}" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container">
+    <div class="wa-courses-membership__header">
+      {% if module.eyebrow %}<p class="wa-courses-eyebrow">{{ module.eyebrow }}</p>{% endif %}
+      {% if module.heading %}<h2>{{ module.heading }}</h2>{% endif %}
+      {% if module.intro %}<div class="wa-courses-membership__intro">{{ module.intro }}</div>{% endif %}
+      {% if _layout == 'cta' and module.cta_label %}
+      {% set _band_href = module.cta_link.url.href | default('/membership/') %}
+      <div class="wa-courses-membership__cta">
+        <a
+          class="wa-courses-btn wa-courses-btn--gold"
+          href="{{ _band_href }}"
+          {% if module.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ module.cta_label }}</a>
+      </div>
+      {% endif %}
+    </div>
+    {% if _layout == 'tiles' and _cards | length > 0 %}
+    <div class="wa-courses-membership__grid">
+      {% for card in _cards %}
+        {% if _use_custom_cards %}
+          {% set _features = [card.feature_1, card.feature_2, card.feature_3, card.feature_4, card.feature_5] %}
+          {% set _cta_href = card.cta_link.url.href | default('#') %}
+          {% set _cta_new_tab = card.cta_link.open_in_new_tab %}
+        {% else %}
+          {% set _features = card.features %}
+          {% set _cta_href = card.cta_href %}
+          {% set _cta_new_tab = false %}
+        {% endif %}
+      <article class="wa-courses-membership-card{% if card.featured %} wa-courses-membership-card--featured{% endif %}">
+        {% set _badge_label = card.badge_label | default(card.label, true) %}
+        {% if _badge_label %}
+        <span class="wa-courses-pill{% if card.accent == 'grey' %} wa-courses-pill--grey{% elif card.accent == 'gold' %} wa-courses-pill--gold{% endif %}">{{ _badge_label }}</span>
+        {% endif %}
+        {% if card.price %}
+        <h3>{{ card.price }} {% if card.price_suffix %}<span>{{ card.price_suffix }}</span>{% endif %}</h3>
+        {% endif %}
+        <ul>
+          {% for feature in _features %}
+            {% if feature %}<li>{{ feature }}</li>{% endif %}
+          {% endfor %}
+        </ul>
+        {% if card.cta_label %}
+        <a
+          class="wa-courses-btn {% if card.featured %}wa-courses-btn--gold{% else %}wa-courses-btn--outline-dark{% endif %}"
+          href="{{ _cta_href }}"
+          {% if _cta_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ card.cta_label }}</a>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}

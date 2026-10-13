@@ -1,0 +1,83 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "What we offer"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Our welding engineering services"
+  },
+  {
+    "name": "intro_text",
+    "label": "Intro text",
+    "type": "richtext"
+  },
+  {
+    "name": "services",
+    "label": "Services",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 9,
+      "default": 6
+    },
+    "children": [
+      {
+        "name": "icon",
+        "label": "Icon",
+        "type": "choice",
+        "choices": [
+          ["clipboard", "Document / procedure"],
+          ["eye", "Inspection"],
+          ["shield", "Supervision / safety"],
+          ["lightbulb", "Consulting"],
+          ["cpu", "Automation"],
+          ["scale", "Expert witness"]
+        ],
+        "default": "clipboard"
+      },
+      {
+        "name": "image",
+        "label": "Image override",
+        "type": "image"
+      },
+      {
+        "name": "image_url",
+        "label": "Fallback image URL",
+        "type": "text",
+        "help_text": "Used if no image is uploaded above."
+      },
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text"
+      },
+      {
+        "name": "description",
+        "label": "Description",
+        "type": "richtext"
+      },
+      {
+        "name": "cta_label",
+        "label": "CTA label",
+        "type": "text",
+        "default": "Enquire about this service"
+      },
+      {
+        "name": "cta_link",
+        "label": "CTA link",
+        "type": "link"
+      }
+    ]
+  }
+]

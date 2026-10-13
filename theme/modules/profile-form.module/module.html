@@ -1,0 +1,793 @@
+{#
+  Profile form module.
+
+  Safe CRM model:
+    - Reads the logged-in contact and primary associated company via HubL CRM reads.
+    - Submits only member-entered contact fields through the configured HubSpot Form.
+    - Does not directly write CRM objects, HubDB, deals, workflows, or company records.
+
+  Editable contact properties currently rendered:
+    firstname, lastname, phone, mobilephone, address, city, state, zip,
+    jobtitle, date_of_birth, job_function.
+
+  Required hidden identifier:
+    email - used by HubSpot Forms to match the submitted update to the contact.
+ #}
+
+{% set profile_form_editor_preview = is_in_editor or (is_in_previewer | default(false)) or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+{% set profile_form_has_member_context = request_contact.is_logged_in or profile_form_editor_preview %}
+{% set profile_form_can_read_crm = request_contact.is_logged_in and not profile_form_editor_preview %}
+
+{% if not module.members_only or profile_form_has_member_context %}
+
+{%- set vis_classes = [] -%}
+{%- if 'mobile' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-mobile'] -%}{%- endif -%}
+{%- if 'tablet' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-tablet'] -%}{%- endif -%}
+{%- if 'desktop' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-desktop'] -%}{%- endif -%}
+
+{# Hydrate the logged-in contact directly so profile prefill is CRM-backed. #}
+{%- set pf_contact_properties = 'firstname,lastname,email,phone,mobilephone,address,city,state,zip,company,jobtitle,job_function,date_of_birth,associatedcompanyid,associatedcompanyname,individual_membership_status,individual_membership_type_2,cams_person_id,cams__imem_person_id,as1796_welding_supervisor_certificate_10__status,as1796_welding_supervisor_certificate_10__expiry_date,hs_object_id' -%}
+{%- set pf_contact_id_candidates = [
+  request_contact.id | default('', true) | string | trim,
+  request_contact.hs_object_id | default('', true) | string | trim,
+  request_contact.vid | default('', true) | string | trim,
+  contact.id | default('', true) | string | trim,
+  contact.hs_object_id | default('', true) | string | trim,
+  contact.vid | default('', true) | string | trim
+] -%}
+{%- set pf_contact_ns = namespace(record={}, props={}, seen=[]) -%}
+{%- if profile_form_can_read_crm -%}
+  {%- for pf_contact_id in pf_contact_id_candidates -%}
+    {%- set pf_candidate_id = pf_contact_id | string | trim -%}
+    {%- if pf_candidate_id and pf_candidate_id != '[object Object]' and pf_candidate_id != '[object object]' and pf_candidate_id not in pf_contact_ns.seen and not pf_contact_ns.record.hs_object_id -%}
+      {%- set pf_contact_ns.seen = pf_contact_ns.seen + [pf_candidate_id] -%}
+      {%- set pf_candidate = crm_object('contact', pf_candidate_id, pf_contact_properties) -%}
+      {%- if pf_candidate -%}
+        {%- set pf_contact_ns.record = pf_candidate -%}
+        {%- set pf_contact_ns.props = pf_candidate.properties | default({}, true) -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{# Fallback when private-content pages expose email but not an object id. #}
+{%- if profile_form_can_read_crm and not pf_contact_ns.record.hs_object_id -%}
+  {%- set pf_email_lookup = request_contact.email | default(request_contact.hs_content_membership_email, true) | default(request_contact.member_email, true) | default(contact.email, true) | default(contact.hs_content_membership_email, true) | default(contact.member_email, true) | default('', true) | string | lower | trim -%}
+  {%- if pf_email_lookup and '@' in pf_email_lookup -%}
+    {%- set pf_contact_query = crm_objects('contact', 'email=' ~ pf_email_lookup ~ '&limit=1', pf_contact_properties) -%}
+    {%- if pf_contact_query.results -%}
+      {%- set pf_contact_matches = pf_contact_query.results -%}
+    {%- else -%}
+      {%- set pf_contact_matches = pf_contact_query -%}
+    {%- endif -%}
+    {%- for pf_contact_match in pf_contact_matches -%}
+      {%- if pf_contact_match and not pf_contact_ns.record.hs_object_id -%}
+        {%- set pf_contact_ns.record = pf_contact_match -%}
+        {%- set pf_contact_ns.props = pf_contact_match.properties | default({}, true) -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- set pf_contact = pf_contact_ns.record -%}
+{%- set pf_props = pf_contact_ns.props -%}
+
+{%- set pf_firstname = pf_contact.firstname | default(pf_props.firstname, true) | default(request_contact.firstname, true) | default(contact.firstname, true) | default('', true) | string | trim -%}
+{%- set pf_lastname  = pf_contact.lastname | default(pf_props.lastname, true) | default(request_contact.lastname, true) | default(contact.lastname, true) | default('', true) | string | trim -%}
+{%- set pf_email     = pf_contact.email | default(pf_props.email, true) | default(request_contact.email, true) | default(contact.email, true) | default('', true) | string | trim -%}
+{%- set pf_phone     = pf_contact.phone | default(pf_props.phone, true) | default(request_contact.phone, true) | default(contact.phone, true) | default('', true) | string | trim -%}
+{%- set pf_mobile    = pf_contact.mobilephone | default(pf_props.mobilephone, true) | default(request_contact.mobilephone, true) | default(contact.mobilephone, true) | default('', true) | string | trim -%}
+{%- set pf_address   = pf_contact.address | default(pf_props.address, true) | default(request_contact.address, true) | default(contact.address, true) | default('', true) | string | trim -%}
+{%- set pf_city      = pf_contact.city | default(pf_props.city, true) | default(request_contact.city, true) | default(contact.city, true) | default('', true) | string | trim -%}
+{%- set pf_state     = pf_contact.state | default(pf_props.state, true) | default(request_contact.state, true) | default(contact.state, true) | default('', true) | string | trim -%}
+{%- set pf_zip       = pf_contact.zip | default(pf_props.zip, true) | default(request_contact.zip, true) | default(contact.zip, true) | default('', true) | string | trim -%}
+{%- set pf_jobtitle  = pf_contact.jobtitle | default(pf_props.jobtitle, true) | default(request_contact.jobtitle, true) | default(contact.jobtitle, true) | default('', true) | string | trim -%}
+{%- set pf_job_function = pf_contact.job_function | default(pf_props.job_function, true) | default(request_contact.job_function, true) | default(contact.job_function, true) | default('', true) | string | trim -%}
+{%- set pf_date_of_birth = pf_contact.date_of_birth | default(pf_props.date_of_birth, true) | default(request_contact.date_of_birth, true) | default(contact.date_of_birth, true) | default('', true) | string | trim -%}
+
+{# Company display. The actual company association remains CRM-managed/read-only. #}
+{%- set pf_company_id_raw = pf_contact.associatedcompanyid | default(pf_props.associatedcompanyid, true) | default(request_contact.associatedcompanyid, true) | default(contact.associatedcompanyid, true) | default('', true) | string | trim -%}
+{%- set pf_company_id = pf_company_id_raw | int | default(0) -%}
+{%- set pf_company_record = {} -%}
+{%- set pf_company_props = {} -%}
+{%- if profile_form_can_read_crm and pf_company_id -%}
+  {%- set pf_company_record = crm_object('company', pf_company_id, 'name,corporate_membership_level_2,corporate_membership_status,corporate_membership_expiry_date_2,industry_supplier_membership_level_2,industry_supplier_membership_status,industry_supplier_membership_expiry_date,membership_number,cams__imem_organisation_number,cams__member_type,num_associated_contacts,numberofemployees,hs_object_id') -%}
+  {%- if pf_company_record -%}
+    {%- set pf_company_props = pf_company_record.properties | default({}, true) -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- set pf_company_text_candidates = [
+  pf_contact.company | default('', true),
+  pf_props.company | default('', true),
+  request_contact.company | default('', true),
+  contact.company | default('', true)
+] -%}
+{%- set pf_company_text_ns = namespace(value='') -%}
+{%- for pf_company_text_candidate in pf_company_text_candidates -%}
+  {%- set pf_company_candidate = pf_company_text_candidate | default('', true) | string | trim -%}
+  {%- if not pf_company_text_ns.value and pf_company_candidate and pf_company_candidate != '[object Object]' and pf_company_candidate != '[object object]' and '{' not in pf_company_candidate and '=' not in pf_company_candidate -%}
+    {%- set pf_company_text_ns.value = pf_company_candidate -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- set pf_company_text = pf_company_text_ns.value -%}
+{%- set pf_company_assoc = pf_company_record.name | default(pf_company_props.name, true) | default(request_contact.company.name, true) | default(request_contact.company.properties.name, true) | default(contact.company.name, true) | default(contact.company.properties.name, true) | default(pf_contact.company.name, true) | default(pf_contact.company.properties.name, true) | default(pf_props.company.name, true) | default(pf_props.company.properties.name, true) | default(pf_contact.associatedcompanyname, true) | default(pf_props.associatedcompanyname, true) | default(request_contact.associatedcompanyname, true) | default(contact.associatedcompanyname, true) | default('', true) | string | trim -%}
+{%- set pf_company = pf_company_text | default(pf_company_assoc, true) -%}
+
+{%- set pf_initials = 'WA' -%}
+{%- set pf_full_name = (pf_firstname ~ ' ' ~ pf_lastname) | trim -%}
+{%- if not pf_full_name -%}{%- set pf_full_name = pf_email | default('Member', true) -%}{%- endif -%}
+
+{%- set pf_company_membership_tier = pf_company_record.corporate_membership_level_2 | default(pf_company_props.corporate_membership_level_2, true) | default(pf_company_record.industry_supplier_membership_level_2, true) | default(pf_company_props.industry_supplier_membership_level_2, true) | default('', true) | string | trim -%}
+{%- set pf_contact_membership_tier = pf_contact.individual_membership_type_2 | default(pf_props.individual_membership_type_2, true) | default(request_contact.individual_membership_type_2, true) | default(contact.individual_membership_type_2, true) | default('', true) | string | trim -%}
+{%- set pf_membership_tier = pf_company_membership_tier | default(pf_contact_membership_tier, true) | default('Member', true) -%}
+{%- set pf_company_member_type = pf_company_record.cams__member_type | default(pf_company_props.cams__member_type, true) | default('', true) | string | trim -%}
+{%- set pf_membership_label = pf_membership_tier -%}
+{%- if pf_company_member_type and pf_company_member_type not in pf_membership_label -%}
+  {%- set pf_membership_label = pf_membership_label ~ ' - ' ~ pf_company_member_type -%}
+{%- elif pf_company_membership_tier -%}
+  {%- set pf_membership_label = pf_membership_label ~ ' - Corporate' -%}
+{%- endif -%}
+{%- set pf_member_id = pf_company_record.membership_number | default(pf_company_props.membership_number, true) | default(pf_company_record.cams__imem_organisation_number, true) | default(pf_company_props.cams__imem_organisation_number, true) | default(pf_contact.cams_person_id, true) | default(pf_props.cams_person_id, true) | default(pf_contact.cams__imem_person_id, true) | default(pf_props.cams__imem_person_id, true) | default('', true) | string | trim -%}
+{%- set pf_cert_status = pf_contact.as1796_welding_supervisor_certificate_10__status | default(pf_props.as1796_welding_supervisor_certificate_10__status, true) | default('', true) | string | trim -%}
+{%- set pf_cert_expiry = pf_contact.as1796_welding_supervisor_certificate_10__expiry_date | default(pf_props.as1796_welding_supervisor_certificate_10__expiry_date, true) | default('', true) | string | trim -%}
+{#- The form picker wins. module.profile_update_form_id is only a legacy GUID
+    param on pre-existing instances, and must not override an editor's choice. -#}
+{%- set pf_profile_update_form_id = module.profile_update_form.form_id | default('', true) | string | trim -%}
+{%- if not pf_profile_update_form_id -%}
+  {%- set pf_profile_update_form_id = module.profile_update_form_id | default('', true) | string | trim -%}
+{%- endif -%}
+{%- if hub_id|string == '443253065' and pf_profile_update_form_id == '809fa5de-e922-45c5-8ec3-f43eabfd1e2f' -%}
+  {%- set pf_profile_update_form_id = '10aaa4fb-1f8e-4941-af78-0545a4d75251' -%}
+{%- endif -%}
+{%- set pf_password_change_href = module.password_change_url | default('', true) | string | trim -%}
+{%- if not pf_password_change_href -%}
+  {%- set pf_password_change_href = module.password_change_link.url.href | default('/_hcms/mem/reset/request?redirect_url=/portal/profile/', true) | string | trim -%}
+{%- endif -%}
+{#- Email preferences destination. Defaults to /email-subscriptions/, which only
+    resolves once the Subscription Preferences Page is assigned + published in
+    HubSpot Settings -> Website -> Pages -> System pages. The default() keeps the
+    anchor from ever rendering empty if an editor clears the picker. -#}
+{%- set pf_preferences_href = module.preferences_link.url.href | default('/email-subscriptions/', true) | string | trim -%}
+
+{#- Issue 30 - "portal users must be able to input a Company ID to automatically
+    apply membership discounts to training/events".
+
+    Deliberately opt-in. The submit handler below posts EVERY named input to the
+    Forms API, and HubSpot rejects a submission carrying a field the form does
+    not define - so shipping this on by default would break profile saving for
+    everyone until the property and the form field both exist. Set
+    company_link_property (and add the matching field to the form) to enable it. -#}
+{%- set pf_company_link_property = module.company_link_property | default('', true) | string | trim -%}
+
+{%- set _js_config = {
+  'portalId': module.portal_id | default(hub_id, true),
+  'formId': pf_profile_update_form_id,
+  'successMsg': module.save_success_message | default('Profile updated.', true),
+  'companyLinkProperty': pf_company_link_property
+} -%}
+
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-profile-form{{ ' ' ~ vis_classes | join(' ') if vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div class="wa-profile-form__page">
+      <div class="wa-profile-form__layout">
+      <aside class="wa-profile-form__side" aria-label="Profile sections">
+        <nav class="wa-profile-form__nav">
+          <a class="wa-profile-form__nav-link is-active" href="#profile-personal" data-profile-section-link="profile-personal">
+            <span class="wa-profile-form__nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <span>Personal details</span>
+          </a>
+          <a class="wa-profile-form__nav-link" href="#profile-contact" data-profile-section-link="profile-contact">
+            <span class="wa-profile-form__nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M12 21s7-5.2 7-12a7 7 0 0 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            </span>
+            <span>Contact &amp; address</span>
+          </a>
+          <a class="wa-profile-form__nav-link" href="#profile-membership" data-profile-section-link="profile-membership">
+            <span class="wa-profile-form__nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M9 6V5a3 3 0 0 1 6 0v1"/><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 12h16M9 6v14M15 6v14"/></svg>
+            </span>
+            <span>Membership &amp; role</span>
+          </a>
+          {% if module.show_preferences_link %}
+          <a class="wa-profile-form__nav-link" href="#profile-notifications" data-profile-section-link="profile-notifications">
+            <span class="wa-profile-form__nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+            </span>
+            <span>Communications preferences</span>
+          </a>
+          {% endif %}
+          <a class="wa-profile-form__nav-link" href="#profile-security" data-profile-section-link="profile-security">
+            <span class="wa-profile-form__nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            </span>
+            <span>Security</span>
+          </a>
+        </nav>
+      </aside>
+
+      <div class="wa-profile-form__main">
+        <div class="wa-profile-form__summary-card">
+          <div
+            class="wa-profile-form__avatar"
+            data-first-name="{{ pf_firstname | escape_attr }}"
+            data-last-name="{{ pf_lastname | escape_attr }}"
+            aria-hidden="true"
+          >{{ pf_initials }}</div>
+          <div class="wa-profile-form__summary-text">
+            <strong>{{ pf_full_name | escape }}</strong>
+            <span>
+              {{ pf_jobtitle | default('Member', true) | escape }}
+              {% if pf_member_id %} · Member {{ pf_member_id | escape }}{% endif %}
+            </span>
+          </div>
+          {% if module.show_password_change_link %}
+          <a
+            href="{{ pf_password_change_href }}"
+            class="wa-profile-form__summary-action"
+            {% if module.password_change_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >
+            {{ module.password_change_label | default('Change password') }}
+          </a>
+          {% endif %}
+        </div>
+
+        <form
+          id="wa-profile-form"
+          class="wa-profile-form__form"
+          novalidate
+          aria-label="{{ module.heading | default('Profile & details') }}"
+          data-config="{{ _js_config | tojson | escape }}"
+        >
+          <input type="hidden" name="email" value="{{ pf_email | escape }}">
+
+          <section class="wa-profile-card" id="profile-personal">
+            <div class="wa-profile-card__heading">
+              <span class="wa-profile-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <h2>Personal details</h2>
+            </div>
+            <div class="wa-profile-form__grid wa-profile-form__grid--two">
+              {% if 'firstname' in module.editable_fields %}
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-firstname">First name <span class="wa-form-field__required" aria-hidden="true">*</span></label>
+                <input class="wa-form-field__input" type="text" id="pf-firstname" name="firstname" autocomplete="given-name" value="{{ pf_firstname | escape }}" required aria-required="true">
+                <p class="wa-form-field__error" role="alert" aria-live="polite" hidden></p>
+              </div>
+              {% endif %}
+              {% if 'lastname' in module.editable_fields %}
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-lastname">Last name <span class="wa-form-field__required" aria-hidden="true">*</span></label>
+                <input class="wa-form-field__input" type="text" id="pf-lastname" name="lastname" autocomplete="family-name" value="{{ pf_lastname | escape }}" required aria-required="true">
+                <p class="wa-form-field__error" role="alert" aria-live="polite" hidden></p>
+              </div>
+              {% endif %}
+              {% if 'date_of_birth' in module.editable_fields %}
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-date-of-birth">Date of birth</label>
+                <input class="wa-form-field__input" type="text" id="pf-date-of-birth" name="date_of_birth" inputmode="numeric" placeholder="dd/mm/yyyy" value="{{ pf_date_of_birth | escape }}">
+                <p class="wa-form-field__hint">Used to verify apprentice and student eligibility.</p>
+                <p class="wa-form-field__error" role="alert" aria-live="polite" hidden></p>
+              </div>
+              {% endif %}
+            </div>
+          </section>
+
+          <section class="wa-profile-card" id="profile-contact">
+            <div class="wa-profile-card__heading">
+              <span class="wa-profile-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M12 21s7-5.2 7-12a7 7 0 0 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              </span>
+              <h2>Contact &amp; address</h2>
+            </div>
+            <div class="wa-profile-form__grid">
+              <div class="wa-form-field wa-profile-form__span-2">
+                <label class="wa-form-field__label" for="pf-email-display">Email address</label>
+                <input class="wa-form-field__input" type="email" id="pf-email-display" value="{{ pf_email | escape }}" disabled>
+                <p class="wa-form-field__hint">This is your account email. Contact Weld Australia if it needs to change.</p>
+              </div>
+              {% if 'mobile' in module.editable_fields %}
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-mobile">Mobile</label>
+                <input class="wa-form-field__input" type="tel" id="pf-mobile" name="mobilephone" autocomplete="tel" value="{{ pf_mobile | escape }}">
+                <p class="wa-form-field__error" role="alert" aria-live="polite" hidden></p>
+              </div>
+              {% endif %}
+              {% if 'phone' in module.editable_fields %}
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-phone">Work phone</label>
+                <input class="wa-form-field__input" type="tel" id="pf-phone" name="phone" autocomplete="tel" value="{{ pf_phone | escape }}">
+                <p class="wa-form-field__error" role="alert" aria-live="polite" hidden></p>
+              </div>
+              {% endif %}
+              {% if 'address' in module.editable_fields %}
+              <div class="wa-form-field wa-profile-form__span-2">
+                <label class="wa-form-field__label" for="pf-address">Street address</label>
+                <input class="wa-form-field__input" type="text" id="pf-address" name="address" autocomplete="street-address" value="{{ pf_address | escape }}">
+              </div>
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-city">Suburb</label>
+                <input class="wa-form-field__input" type="text" id="pf-city" name="city" autocomplete="address-level2" value="{{ pf_city | escape }}">
+              </div>
+              <div class="wa-form-field-row wa-form-field-row--compact">
+                <div class="wa-form-field">
+                  <label class="wa-form-field__label" for="pf-state">State</label>
+                  <select class="wa-form-field__input" id="pf-state" name="state" autocomplete="address-level1">
+                    <option value="">Select</option>
+                    {% for st in ['ACT', 'NSW', 'NT', 'QLD', 'SA', 'TAS', 'VIC', 'WA'] %}
+                    <option value="{{ st }}"{% if pf_state == st or (pf_state == 'South Australia' and st == 'SA') %} selected{% endif %}>{{ st }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="wa-form-field">
+                  <label class="wa-form-field__label" for="pf-zip">Postcode</label>
+                  <input class="wa-form-field__input" type="text" id="pf-zip" name="zip" autocomplete="postal-code" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" value="{{ pf_zip | escape }}">
+                  <p class="wa-form-field__error" role="alert" aria-live="polite" hidden></p>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </section>
+
+          <section class="wa-profile-card" id="profile-membership">
+            <div class="wa-profile-card__heading">
+              <span class="wa-profile-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M9 6V5a3 3 0 0 1 6 0v1"/><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 12h16M9 6v14M15 6v14"/></svg>
+              </span>
+              <div>
+                <h2>Membership &amp; role</h2>
+                <p>These details are linked to your Weld Australia membership. Contact us if anything looks incorrect.</p>
+              </div>
+            </div>
+            <div class="wa-profile-form__grid wa-profile-form__grid--two">
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-linked-company">Linked company</label>
+                <input class="wa-form-field__input" type="text" id="pf-linked-company" value="{{ pf_company | escape }}" disabled>
+              </div>
+              {% if pf_company_link_property %}
+              {#- Issue 30. The verified ID is written to a HIDDEN input that only
+                  gets a name once a lookup succeeds, so an unverified or empty
+                  box never reaches the Forms API. The company association itself
+                  stays CRM-managed - this records the member company the contact
+                  claims, and the binding check remains server-side at payment
+                  (see the risk note in src/shared/api/members.ts). -#}
+              <div class="wa-form-field wa-profile-form__span-2" data-company-link>
+                <label class="wa-form-field__label" for="pf-company-id">Member company ID</label>
+                <div class="wa-profile-form__company-link">
+                  <input
+                    class="wa-form-field__input"
+                    type="text"
+                    id="pf-company-id"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="e.g. 1024"
+                    aria-describedby="pf-company-id-help pf-company-id-status"
+                  >
+                  <button class="wa-profile-form__company-verify" type="button" data-company-verify>Verify</button>
+                </div>
+                <p class="wa-form-field__hint" id="pf-company-id-help">{{ module.company_link_help | escape }}</p>
+                <p class="wa-profile-form__company-status" id="pf-company-id-status" role="status" aria-live="polite" hidden></p>
+                <input type="hidden" data-company-value>
+              </div>
+              {% endif %}
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-membership-tier">Membership tier</label>
+                <input class="wa-form-field__input" type="text" id="pf-membership-tier" value="{{ pf_membership_label | escape }}" disabled>
+              </div>
+              {% if 'job_title' in module.editable_fields %}
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-jobtitle">Job title</label>
+                <input class="wa-form-field__input" type="text" id="pf-jobtitle" name="jobtitle" autocomplete="organization-title" value="{{ pf_jobtitle | escape }}">
+                <p class="wa-form-field__error" role="alert" aria-live="polite" hidden></p>
+              </div>
+              {% endif %}
+              {% if 'primary_discipline' in module.editable_fields %}
+              <div class="wa-form-field">
+                <label class="wa-form-field__label" for="pf-job-function">Primary discipline</label>
+                <input class="wa-form-field__input" type="text" id="pf-job-function" name="job_function" value="{{ pf_job_function | escape }}" placeholder="e.g. Welding inspection">
+                <p class="wa-form-field__error" role="alert" aria-live="polite" hidden></p>
+              </div>
+              {% endif %}
+              <div class="wa-form-field wa-profile-form__span-2">
+                <span class="wa-form-field__label">Certifications held</span>
+                <div class="wa-profile-form__chips">
+                  {% if pf_cert_status %}
+                  <span class="wa-profile-chip">✓ AS1796 Cert 10{% if pf_cert_expiry %} · {{ pf_cert_status | escape }}{% endif %}</span>
+                  {% else %}
+                  <span class="wa-profile-chip wa-profile-chip--muted">No certifications are listed yet</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {% if module.show_preferences_link %}
+          <section class="wa-profile-card" id="profile-notifications">
+            <div class="wa-profile-card__heading">
+              <span class="wa-profile-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+              </span>
+              <div>
+                <h2>Communications preferences</h2>
+                <p>Manage the updates, newsletters, event invitations and member communications you receive from Weld Australia.</p>
+              </div>
+            </div>
+            <div class="wa-profile-preferences-card">
+              <div class="wa-profile-preferences-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>
+              </div>
+              <div class="wa-profile-preferences-card__body">
+                <h3>Email subscriptions</h3>
+                <p>Open your secure preferences page to update newsletters, events, advocacy updates and other email subscriptions.</p>
+              </div>
+              <a
+                class="wa-profile-form__secondary-link wa-profile-form__preferences-button"
+                href="{{ pf_preferences_href }}"
+                {% if module.preferences_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+              >{{ module.preferences_label | default('Manage preferences', true) }}</a>
+            </div>
+          </section>
+          {% endif %}
+
+          <section class="wa-profile-card" id="profile-security">
+            <div class="wa-profile-card__heading">
+              <span class="wa-profile-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+              </span>
+              <div>
+                <h2>Security</h2>
+                <p>Use the secure password reset process to update your account password.</p>
+              </div>
+            </div>
+            {% if module.show_password_change_link %}
+            <a
+              href="{{ pf_password_change_href }}"
+              class="wa-btn wa-btn--secondary wa-profile-form__security-button"
+              {% if module.password_change_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >
+              {{ module.password_change_label | default('Change password') }}
+            </a>
+            {% endif %}
+          </section>
+
+          <div class="wa-profile-form__actions">
+            <button type="submit" class="wa-btn wa-btn--primary wa-profile-form__submit">
+              <span class="wa-profile-form__submit-label">Save changes</span>
+              <span class="wa-profile-form__submit-spinner" aria-hidden="true" hidden>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" focusable="false">
+                  <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="2" stroke-dasharray="30" stroke-dashoffset="10"/>
+                </svg>
+              </span>
+            </button>
+            <span class="wa-profile-form__actions-note">Your changes will update your member profile.</span>
+          </div>
+
+          <div class="wa-profile-form__status" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+        </form>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  var form = document.getElementById('wa-profile-form');
+  if (!form) return;
+
+  var config = JSON.parse(form.getAttribute('data-config') || '{}');
+  var root = form.closest('.wa-profile-form') || document;
+
+  function firstLetter(value) {
+    value = String(value || '').trim();
+    return value ? Array.from(value)[0].toUpperCase() : '';
+  }
+
+  var avatar = root.querySelector('.wa-profile-form__avatar');
+  if (avatar) {
+    var initials = (
+      firstLetter(avatar.getAttribute('data-first-name')) +
+      firstLetter(avatar.getAttribute('data-last-name'))
+    ).trim();
+    avatar.textContent = initials || 'WA';
+  }
+
+  var navLinks = Array.prototype.slice.call(root.querySelectorAll('[data-profile-section-link]'));
+  var navTargets = navLinks
+    .map(function (link) {
+      return {
+        link: link,
+        section: document.getElementById(link.getAttribute('data-profile-section-link'))
+      };
+    })
+    .filter(function (item) { return item.section; });
+
+  function setActiveSection(id) {
+    navLinks.forEach(function (link) {
+      link.classList.toggle('is-active', link.getAttribute('data-profile-section-link') === id);
+    });
+  }
+
+  function getProfileScrollOffset() {
+    if (!window.getComputedStyle) return 156;
+    var rootStyles = window.getComputedStyle(document.documentElement);
+    var headerOffset = parseFloat(rootStyles.getPropertyValue('--wa-site-header-offset') || '110');
+    if (!Number.isFinite(headerOffset)) headerOffset = 110;
+    var portalNav = document.querySelector('.wa-portal-nav');
+    var portalNavOffset = portalNav ? portalNav.getBoundingClientRect().height : 64;
+    return headerOffset + portalNavOffset + 34;
+  }
+
+  navLinks.forEach(function (link) {
+    link.addEventListener('click', function (event) {
+      var targetId = link.getAttribute('data-profile-section-link');
+      var target = document.getElementById(targetId);
+      if (!target) return;
+
+      event.preventDefault();
+      setActiveSection(targetId);
+
+      var targetTop = target.getBoundingClientRect().top + window.pageYOffset - getProfileScrollOffset();
+      window.scrollTo({
+        top: Math.max(targetTop, 0),
+        behavior: 'smooth'
+      });
+
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', '#' + targetId);
+      }
+    });
+  });
+
+  if ('IntersectionObserver' in window && navTargets.length) {
+    var activeObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) setActiveSection(entry.target.id);
+      });
+    }, {
+      rootMargin: '-30% 0px -55% 0px',
+      threshold: 0
+    });
+    navTargets.forEach(function (item) { activeObserver.observe(item.section); });
+  }
+
+  // Issue 30 - verify a typed member company ID against the public `members`
+  // HubDB table, mirroring validateMemberCompany() in src/shared/api/members.ts.
+  // Written inline because profile-form is a plain HubL module, not a React
+  // island. Same contract: a non-numeric or unmatched ID resolves to "no match",
+  // a network failure is reported separately so the member can retry.
+  (function initCompanyLink() {
+    var wrap = form.querySelector('[data-company-link]');
+    if (!wrap || !config.companyLinkProperty) return;
+
+    var input = wrap.querySelector('#pf-company-id');
+    var button = wrap.querySelector('[data-company-verify]');
+    var status = wrap.querySelector('.wa-profile-form__company-status');
+    var hidden = wrap.querySelector('[data-company-value]');
+
+    function setStatus(msg, tone) {
+      status.textContent = msg;
+      status.hidden = !msg;
+      status.className = 'wa-profile-form__company-status' + (tone ? ' is-' + tone : '');
+    }
+
+    function clearVerified() {
+      hidden.removeAttribute('name');
+      hidden.value = '';
+    }
+
+    // Every lookup carries a token. A response is only applied if it is still
+    // the newest one AND the box still holds the value that was looked up -
+    // otherwise editing the box while a request was in flight would let the
+    // earlier response reinstate the OLD id (and its name) underneath a
+    // different visible number, and the form would save something the member
+    // never verified.
+    var lookupToken = 0;
+
+    // Editing after a successful verify must invalidate it, or the member could
+    // verify one company and submit a different number.
+    input.addEventListener('input', function () {
+      lookupToken += 1;
+      clearVerified();
+      setStatus('', '');
+    });
+
+    button.addEventListener('click', function () {
+      var value = input.value.trim();
+      lookupToken += 1;
+      var token = lookupToken;
+      clearVerified();
+
+      function isStale() {
+        return token !== lookupToken || input.value.trim() !== value;
+      }
+
+      if (!/^\d+$/.test(value)) {
+        setStatus('Enter your member company ID - digits only.', 'error');
+        input.focus();
+        return;
+      }
+
+      button.disabled = true;
+      setStatus('Checking…', '');
+
+      var url =
+        'https://api.hubapi.com/cms/v3/hubdb/tables/members/rows?portalId=' +
+        encodeURIComponent(config.portalId) +
+        '&hubspot_company_id__eq=' + encodeURIComponent(value) +
+        '&is_active__eq=true&limit=1';
+
+      fetch(url)
+        .then(function (res) {
+          if (!res.ok) throw new Error('HubDB responded ' + res.status);
+          return res.json();
+        })
+        .then(function (body) {
+          if (isStale()) return;
+          var row = (body && body.results && body.results[0]) || null;
+          if (!row) {
+            setStatus(
+              'We could not find an active member company with that ID. Check it with your ' +
+              'employer, or contact Weld Australia and we will look it up for you.',
+              'error'
+            );
+            return;
+          }
+          var values = row.values || {};
+          var name = String(values.company_name || '').trim() || 'your member company';
+          var tier = values.member_tier;
+          var tierLabel = String((tier && (tier.name || tier.label)) || tier || '').trim();
+          hidden.value = value;
+          hidden.setAttribute('name', config.companyLinkProperty);
+          setStatus(
+            'Matched ' + name + (tierLabel ? ' (' + tierLabel + ' member)' : '') +
+            '. Save your profile to apply member pricing.',
+            'success'
+          );
+        })
+        .catch(function (err) {
+          console.error('[wa-profile-form] company lookup', err);
+          if (isStale()) return;
+          setStatus('We could not check that ID just now. Please try again in a moment.', 'error');
+        })
+        .then(function () {
+          button.disabled = false;
+        });
+    });
+  })();
+
+  function getError(input) {
+    if (input.disabled || input.readOnly || !input.name) return '';
+    if (input.required && !input.value.trim()) {
+      var labelEl = form.querySelector('label[for="' + input.id + '"]');
+      var labelText = labelEl ? labelEl.textContent.replace('*', '').trim() : 'This field';
+      return labelText + ' is required.';
+    }
+    if (input.type === 'email' && input.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
+      return 'Please enter a valid email address.';
+    }
+    if (input.type === 'tel' && input.value && !/^[\d\s+\-().]{6,20}$/.test(input.value.trim())) {
+      return 'Please enter a valid phone number.';
+    }
+    if (input.name === 'zip' && input.value && !/^\d{4}$/.test(input.value.trim())) {
+      return 'Postcode must be 4 digits.';
+    }
+    if (input.name === 'date_of_birth' && input.value && !/^(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})$/.test(input.value.trim())) {
+      return 'Use dd/mm/yyyy or yyyy-mm-dd.';
+    }
+    return '';
+  }
+
+  function applyError(input, msg) {
+    var field = input.closest('.wa-form-field');
+    var errorEl = field && field.querySelector('.wa-form-field__error');
+    if (errorEl) {
+      errorEl.textContent = msg;
+      errorEl.hidden = !msg;
+    }
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    if (msg) input.classList.add('is-invalid'); else input.classList.remove('is-invalid');
+    return !msg;
+  }
+
+  function validateInput(input) {
+    return applyError(input, getError(input));
+  }
+
+  form.querySelectorAll('input, select').forEach(function (el) {
+    el.addEventListener('blur', function () { validateInput(el); });
+    el.addEventListener('input', function () {
+      if (el.getAttribute('aria-invalid') === 'true') validateInput(el);
+    });
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var valid = true;
+    form.querySelectorAll('input, select').forEach(function (el) {
+      if (!validateInput(el)) valid = false;
+    });
+    if (!valid) {
+      var firstInvalid = form.querySelector('[aria-invalid="true"]');
+      if (firstInvalid) firstInvalid.focus();
+      return;
+    }
+
+    if (!config.formId) {
+      showStatus('We can\'t save profile updates right now. Please contact Weld Australia support.', 'error');
+      return;
+    }
+
+    var data = new FormData(form);
+    var fields = [];
+    data.forEach(function (value, name) {
+      if (value !== '') fields.push({ objectTypeId: '0-1', name: name, value: value });
+    });
+
+    var hutkMatch = document.cookie.match(/(?:^|;\s*)hubspotutk=([^;]+)/);
+    var context = {
+      hutk: hutkMatch ? hutkMatch[1] : undefined,
+      pageUri: window.location.href,
+      pageName: document.title
+    };
+
+    setLoading(true);
+    fetch(
+      'https://api.hsforms.com/submissions/v3/integration/submit/' + config.portalId + '/' + config.formId,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: fields, context: context })
+      }
+    ).then(function (res) {
+      if (!res.ok) {
+        return res.json().then(function (body) {
+          throw new Error(body.message || ('Submission failed (' + res.status + ').'));
+        });
+      }
+      showStatus(config.successMsg || 'Profile updated.', 'success');
+    }).catch(function (err) {
+      showStatus(
+        'Unable to save changes. Please try again or contact ' +
+        '<a href="mailto:office@weldaustralia.com.au">office@weldaustralia.com.au</a>.',
+        'error'
+      );
+      console.error('[wa-profile-form]', err);
+    }).then(function () {
+      setLoading(false);
+    });
+  });
+
+  function setLoading(on) {
+    var btn = form.querySelector('.wa-profile-form__submit');
+    var label = form.querySelector('.wa-profile-form__submit-label');
+    var spinner = form.querySelector('.wa-profile-form__submit-spinner');
+    if (!btn) return;
+    btn.disabled = on;
+    btn.setAttribute('aria-busy', String(on));
+    if (label) label.textContent = on ? 'Saving...' : 'Save changes';
+    if (spinner) spinner.hidden = !on;
+  }
+
+  function showStatus(html, type) {
+    var el = form.querySelector('.wa-profile-form__status');
+    if (!el) return;
+    el.innerHTML = html;
+    el.className = 'wa-profile-form__status wa-profile-form__status--' + type;
+    el.hidden = false;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (type === 'success') setTimeout(function () { el.hidden = true; }, 7000);
+  }
+}());
+</script>
+
+{% endif %}

@@ -1,0 +1,14 @@
+{
+  "label": "News Publications",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Editable News & Publications section for the blog listing page. Controls the Australian Welding publication card and Weld Connect newsletter card.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["blog", "news", "publications"]
+}

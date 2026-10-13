@@ -1,0 +1,102 @@
+[
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Upcoming events"
+  },
+  {
+    "name": "default_state_filter",
+    "label": "Default state filter",
+    "type": "choice",
+    "choices": [
+      ["any", "All"],
+      ["nsw", "NSW"],
+      ["vic", "VIC"],
+      ["qld", "QLD"],
+      ["wa", "WA"],
+      ["sa", "SA"],
+      ["tas", "TAS"],
+      ["nt", "NT"],
+      ["act", "ACT"],
+      ["national", "National"]
+    ],
+    "default": "any"
+  },
+  {
+    "name": "default_type_filter",
+    "label": "Default event type",
+    "type": "choice",
+    "choices": [
+      ["any", "All"],
+      ["webinar", "Webinar"],
+      ["in_person", "In-Person"],
+      ["hybrid", "Hybrid"],
+      ["awards", "Awards"]
+    ],
+    "default": "any"
+  },
+  {
+    "name": "page_size",
+    "label": "Results per page",
+    "type": "number",
+    "default": 12
+  },
+  {
+    "name": "show_past_events_toggle",
+    "label": "Show 'past events' toggle",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

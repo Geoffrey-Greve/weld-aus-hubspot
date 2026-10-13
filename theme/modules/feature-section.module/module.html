@@ -1,0 +1,156 @@
+{#
+  feature-section.module/module.html
+
+  Anchored feature section (image + text, or video + text).
+  Used on Technology and Engineering pages alongside sticky-sub-nav.
+
+  Fields:
+    module.anchor_id        - required: used as the section's id for sub-nav
+    module.eyebrow          - small label above the heading
+    module.heading          - required main heading
+    module.body_text             - richtext body
+    module.image            - image (if no video_url)
+    module.video_url        - YouTube or Vimeo URL (takes precedence over image)
+    module.image_position   - "left" | "right"
+    module.cta_label        - optional CTA label
+    module.cta_link         - optional CTA link
+    module.section_id       - override anchor (defaults to anchor_id)
+    module.background       - standard: bg style
+    module.spacing          - standard: vertical padding
+    module.visibility       - standard: device show/hide
+    module.members_only     - standard: member wall gate
+#}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{# QA: member-only content is company-aware. See _member-content-gate.html -
+   a corporate employee's membership lives on their employer's record, and
+   `individual_membership_status == 'Current'` cannot see it. #}
+{% include "../../templates/partials/_member-content-gate.html" %}
+{% set _is_active_member = wa_member_gate.is_member %}
+{% if module.members_only and not _is_active_member %}{% else %}
+
+{# ── Resolve section ID (section_id override, then anchor_id) ──────────────── #}
+{% set _section_id = module.section_id if module.section_id else module.anchor_id %}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+{# ── Determine if we have media ─────────────────────────────────────────────── #}
+{% set _has_video = module.video_url and module.video_url != '' %}
+{% set _has_image = module.image and module.image.src %}
+{% set _has_media = _has_video or _has_image %}
+
+{# ── Build YouTube embed URL ────────────────────────────────────────────────── #}
+{% if _has_video %}
+  {# Strip watch?v= and youtu.be shortlinks into embed format #}
+  {% set _video_url = module.video_url %}
+  {% if 'youtube.com/watch?v=' in _video_url %}
+    {% set _video_id = _video_url | replace('https://www.youtube.com/watch?v=', '') | replace('http://www.youtube.com/watch?v=', '') %}
+    {% set _embed_url = 'https://www.youtube-nocookie.com/embed/' ~ _video_id %}
+  {% elif 'youtu.be/' in _video_url %}
+    {% set _video_id = _video_url | replace('https://youtu.be/', '') | replace('http://youtu.be/', '') %}
+    {% set _embed_url = 'https://www.youtube-nocookie.com/embed/' ~ _video_id %}
+  {% elif 'vimeo.com/' in _video_url %}
+    {% set _video_id = _video_url | replace('https://vimeo.com/', '') | replace('http://vimeo.com/', '') %}
+    {% set _embed_url = 'https://player.vimeo.com/video/' ~ _video_id %}
+  {% else %}
+    {% set _embed_url = _video_url %}
+  {% endif %}
+{% endif %}
+
+<section
+  id="{{ _section_id }}"
+  class="wa-feature-section wa-section wa-section--bg-{{ module.background | default('surface') }} wa-section--spacing-{{ module.spacing | default('default') }}{% if _has_media %} wa-feature-section--has-media wa-feature-section--media-{{ module.image_position | default('right') }}{% endif %}{{ _vis_classes }}"
+  data-anchor="{{ module.anchor_id }}"
+>
+  <div class="container">
+    <div class="wa-feature-section__inner">
+
+      {# Media - left position #}
+      {% if _has_media and module.image_position == 'left' %}
+      <div class="wa-feature-section__media">
+        {% if _has_video %}
+        <div class="wa-feature-section__video-wrapper" aria-label="Video">
+          <iframe
+            src="{{ _embed_url }}"
+            class="wa-feature-section__iframe"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+            title="{{ module.heading }}"
+          ></iframe>
+        </div>
+        {% elif _has_image %}
+        <img
+          src="{{ module.image.src }}"
+          alt="{{ module.image.alt | default('') }}"
+          {% if module.image.width %}width="{{ module.image.width }}"{% endif %}
+          {% if module.image.height %}height="{{ module.image.height }}"{% endif %}
+          class="wa-feature-section__image"
+          loading="lazy"
+          decoding="async"
+        >
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {# Text content #}
+      <div class="wa-feature-section__content">
+        {% if module.eyebrow %}
+        <p class="wa-feature-section__eyebrow" aria-hidden="true">{{ module.eyebrow }}</p>
+        {% endif %}
+
+        <h2 class="wa-feature-section__heading">{{ module.heading }}</h2>
+
+        {% if module.body_text %}
+        <div class="wa-feature-section__body">{{ module.body_text }}</div>
+        {% endif %}
+
+        {% if module.cta_label and module.cta_link %}
+        <a
+          href="{{ module.cta_link.url.href }}"
+          class="btn btn-primary wa-feature-section__cta"
+          {% if module.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ module.cta_label }}</a>
+        {% endif %}
+      </div>
+
+      {# Media - right position (default) #}
+      {% if _has_media and (module.image_position == 'right' or not module.image_position) %}
+      <div class="wa-feature-section__media">
+        {% if _has_video %}
+        <div class="wa-feature-section__video-wrapper" aria-label="Video">
+          <iframe
+            src="{{ _embed_url }}"
+            class="wa-feature-section__iframe"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+            title="{{ module.heading }}"
+          ></iframe>
+        </div>
+        {% elif _has_image %}
+        <img
+          src="{{ module.image.src }}"
+          alt="{{ module.image.alt | default('') }}"
+          {% if module.image.width %}width="{{ module.image.width }}"{% endif %}
+          {% if module.image.height %}height="{{ module.image.height }}"{% endif %}
+          class="wa-feature-section__image"
+          loading="lazy"
+          decoding="async"
+        >
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
+
+{% endif %}{# end members_only gate #}

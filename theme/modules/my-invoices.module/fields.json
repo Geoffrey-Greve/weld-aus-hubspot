@@ -1,0 +1,63 @@
+[
+  {
+    "name": "heading",
+    "label": "Page heading",
+    "type": "text",
+    "default": "My Invoices & Receipts"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext",
+    "default": ""
+  },
+  {
+    "name": "finance_email",
+    "label": "Finance contact email",
+    "type": "text",
+    "default": "finance@weldaustralia.com.au",
+    "help_text": "Shown in the 'Receipt missing?' help block."
+  },
+  {
+    "name": "support_email",
+    "label": "General support email",
+    "type": "text",
+    "default": "office@weldaustralia.com.au"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": true,
+    "help_text": "Always true for portal modules."
+  }
+]

@@ -1,0 +1,96 @@
+{
+  "name": "team_and_board",
+  "label": "Team & Board",
+  "useForPages": true,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "dynamicPageUrlPattern": "/about/team/{hs_path}",
+  "dynamicMetaTags": {
+    "DESCRIPTION": "bio",
+    "FEATURED_IMAGE_URL": "headshot"
+  },
+  "columns": [
+    {
+      "name": "name",
+      "label": "Name",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "role",
+      "label": "Role / title",
+      "type": "TEXT"
+    },
+    {
+      "name": "quals",
+      "label": "Qualifications",
+      "type": "TEXT"
+    },
+    {
+      "name": "org",
+      "label": "Organisation / representing",
+      "type": "TEXT"
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "type": "SELECT",
+      "options": [
+        {
+          "name": "Board",
+          "type": "option"
+        },
+        {
+          "name": "Corporate",
+          "type": "option"
+        },
+        {
+          "name": "Strategic Partnerships",
+          "type": "option"
+        },
+        {
+          "name": "Education & Training",
+          "type": "option"
+        },
+        {
+          "name": "Q&C",
+          "type": "option"
+        },
+        {
+          "name": "Engineering",
+          "type": "option"
+        },
+        {
+          "name": "Corporate Services",
+          "type": "option"
+        }
+      ]
+    },
+    {
+      "name": "headshot",
+      "label": "Headshot",
+      "type": "IMAGE"
+    },
+    {
+      "name": "bio",
+      "label": "Bio",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "is_board_member",
+      "label": "Sits on the Board",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "display_order",
+      "label": "Display order",
+      "type": "NUMBER"
+    },
+    {
+      "name": "is_active",
+      "label": "Active",
+      "type": "BOOLEAN"
+    }
+  ]
+}

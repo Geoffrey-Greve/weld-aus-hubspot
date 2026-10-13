@@ -1,0 +1,99 @@
+.wa-membership-directory__card {
+  position: relative;
+  display: grid;
+  /* min(320px, 100%) rather than a bare 320px floor: below ~400px of available
+     width a hard 320px track is wider than the card can give it. */
+  grid-template-columns: minmax(0, 1fr) minmax(min(320px, 100%), 0.8fr);
+  gap: var(--wa-space-8);
+  overflow: hidden;
+  padding: clamp(36px, 5vw, 56px);
+  border-radius: 20px;
+  background: var(--wa-color-primary);
+}
+
+.wa-membership-directory__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.wa-membership-directory__copy,
+.wa-membership-directory__badges {
+  position: relative;
+  z-index: 1;
+}
+
+.wa-membership-directory__copy {
+  max-width: 520px;
+  min-width: 0;
+}
+
+.wa-membership-directory__copy h2 {
+  margin: 0 0 var(--wa-space-4);
+  color: #fff;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.wa-membership-directory__copy .wa-richtext {
+  margin-bottom: var(--wa-space-7, 28px);
+  color: rgba(255, 255, 255, 0.68);
+  font-size: var(--wa-text-sm);
+  line-height: var(--wa-leading-relaxed);
+}
+
+.wa-membership-directory__badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wa-space-5);
+  flex-wrap: wrap;
+}
+
+.wa-membership-directory__badges img {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+  opacity: 0.94;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.18));
+}
+
+/*
+ * QA 224 - the copy and the "Browse member directory" CTA were clipped by the
+ * right edge of the card on Android Chrome.
+ *
+ * The cure is that the CTA label must be allowed to wrap, which is a shared
+ * rule (`.btn` in components.css, which used to carry `white-space: nowrap`).
+ * This local rule restates it for the one CTA inside this card, because this
+ * card clips: `overflow: hidden` above means a non-wrapping label here is cut
+ * mid-word rather than merely spilling, so the module must not be one edit to
+ * a global stylesheet away from the bug coming back.
+ *
+ * Verified both ways in tests/a11y/overflow.spec.ts ("Content is not clipped
+ * by its own card"): with the wrap removed the guard fails at 320px and 360px.
+ */
+.wa-membership-directory__copy .btn {
+  white-space: normal;
+}
+
+@media (max-width: 820px) {
+  .wa-membership-directory__card {
+    /* minmax(0, 1fr), not 1fr. A bare `1fr` means `minmax(auto, 1fr)`, and that
+       `auto` floor is the column's min-content width - so a wide child could
+       push the track past the card's padding box and `overflow: hidden` (above)
+       would clip it. Necessary but not sufficient on its own: a nowrap CTA has
+       a min-content width wider than the card whatever the track floor says,
+       which is why the rule above exists too. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wa-membership-directory__badges {
+    justify-content: flex-start;
+  }
+}

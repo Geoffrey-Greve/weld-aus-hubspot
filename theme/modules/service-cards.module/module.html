@@ -1,0 +1,102 @@
+{#
+  service-cards.module/module.html
+  Grid of service cards with icon, heading, body text, and optional CTA.
+  1-col mobile → 2-col tablet → 3-col desktop.
+
+  Fields:
+    module.section_id    - optional anchor id
+    module.background    - background variant
+    module.spacing       - vertical spacing variant
+    module.members_only  - gating flag
+    module.section_heading - optional heading
+    module.services      - repeater group (icon, heading, body, cta_label, cta_link)
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+{%- set _style = module.card_style | default('elevated') -%}
+<section
+  class="wa-service-cards wa-service-cards--{{ _style }} wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-service-cards__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    <div class="wa-service-cards__grid">
+      {% for service in module.services %}
+
+      {% if _style == 'photo' %}
+      {# ── Photo card: full-bleed image, dark gradient, tag, title, body, CTA ── #}
+      <article class="wa-service-cards__photo">
+        {% if service.image and service.image.src %}
+        <img
+          src="{{ service.image.src }}"
+          alt=""
+          class="wa-service-cards__photo-img"
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+        >
+        {% endif %}
+        <span class="wa-service-cards__photo-scrim" aria-hidden="true"></span>
+        <div class="wa-service-cards__photo-body">
+          {% if service.tag %}
+          <span class="wa-service-cards__tag wa-service-cards__tag--{{ service.tag_color | default('blue') }}">{{ service.tag }}</span>
+          {% endif %}
+          <h3 class="wa-service-cards__photo-heading">{{ service.heading }}</h3>
+          {% if service.body_text %}
+          <div class="wa-service-cards__photo-copy">{{ service.body_text }}</div>
+          {% endif %}
+          {% if service.cta_label and service.cta_link %}
+          <a
+            href="{{ service.cta_link.url.href | default('#') }}"
+            class="btn btn-outline btn-sm wa-service-cards__photo-cta"
+            {% if service.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ service.cta_label }}</a>
+          {% endif %}
+        </div>
+      </article>
+
+      {% else %}
+      {# ── Elevated icon card (default) ───────────────────────────────────── #}
+      <div class="wa-service-cards__card">
+
+        {% if service.icon and service.icon.src %}
+        <div class="wa-service-cards__icon-wrap" aria-hidden="true">
+          <img
+            src="{{ service.icon.src }}"
+            alt="{{ service.icon.alt | default('') }}"
+            class="wa-service-cards__icon"
+            width="40"
+            height="40"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        {% endif %}
+
+        <h3 class="wa-service-cards__card-heading">{{ service.heading }}</h3>
+
+        {% if service.body_text %}
+        <div class="wa-service-cards__card-body">{{ service.body_text }}</div>
+        {% endif %}
+
+        {% if service.cta_label and service.cta_link %}
+        <a
+          href="{{ service.cta_link.url.href | default('#') }}"
+          class="wa-service-cards__cta"
+          {% if service.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ service.cta_label }}</a>
+        {% endif %}
+
+      </div>
+      {% endif %}
+
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endif %}

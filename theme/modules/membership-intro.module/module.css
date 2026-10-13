@@ -1,0 +1,256 @@
+.wa-membership-intro__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 0.9fr);
+  gap: clamp(40px, 6vw, 72px);
+  align-items: center;
+}
+
+.wa-membership-intro__heading {
+  max-width: 680px;
+  margin: 0 0 var(--wa-space-5);
+  color: var(--wa-color-primary);
+  font-size: clamp(30px, 3.5vw, 42px);
+  font-weight: var(--wa-weight-extrabold);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.wa-membership-intro__body {
+  color: var(--wa-color-text-muted);
+  font-size: var(--wa-text-base);
+  line-height: var(--wa-leading-relaxed);
+}
+
+.wa-membership-intro__body p:first-child {
+  color: var(--wa-color-text);
+  font-size: var(--wa-text-md);
+}
+
+.wa-membership-intro__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-3);
+  margin-top: var(--wa-space-7, 28px);
+}
+
+.wa-membership-intro__media {
+  overflow: hidden;
+  border: 1px solid rgba(254, 207, 5, 0.18);
+  border-radius: var(--wa-radius-lg);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24);
+  background: var(--wa-color-primary-dark);
+}
+
+.wa-membership-intro__image-wrap {
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+}
+
+.wa-membership-intro__video-frame {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+}
+
+.wa-membership-intro__video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.wa-membership-intro__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+.wa-membership-intro__video-facade {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  border: 0;
+  background: #000;
+}
+
+.wa-membership-intro__poster {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  transition: transform 0.4s ease, filter 0.3s ease;
+}
+
+.wa-membership-intro__poster-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  width: 72px;
+  height: 72px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--wa-color-primary, #0f1030);
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  transform: translate(-50%, -50%);
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+  padding-left: 4px;
+}
+
+.wa-membership-intro__poster-label {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 22px;
+  z-index: 2;
+  display: inline-flex;
+  justify-content: center;
+  color: #fff;
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.wa-membership-intro__video-facade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(15, 16, 48, 0.08) 0%, rgba(15, 16, 48, 0.42) 100%),
+    radial-gradient(circle at 50% 50%, rgba(254, 207, 5, 0.14), transparent 28%);
+}
+
+.wa-membership-intro__video-facade:hover .wa-membership-intro__poster,
+.wa-membership-intro__video-facade:focus-visible .wa-membership-intro__poster {
+  transform: scale(1.04);
+  filter: brightness(0.92);
+}
+
+.wa-membership-intro__video-facade:hover .wa-membership-intro__poster-play,
+.wa-membership-intro__video-facade:focus-visible .wa-membership-intro__poster-play {
+  background: var(--wa-color-accent, #fecf05);
+  color: var(--wa-color-primary, #0f1030);
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.wa-membership-intro__video-facade:focus-visible {
+  outline: 3px solid var(--wa-color-accent, #fecf05);
+  outline-offset: 2px;
+}
+
+.wa-membership-intro__image {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.wa-membership-intro__video-link {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wa-space-3);
+  color: #fff;
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0.38);
+}
+
+.wa-membership-intro__video-link:hover,
+.wa-membership-intro__video-link:focus,
+.wa-membership-intro__video-link:focus-visible,
+.wa-membership-intro__video-link:visited {
+  color: #fff;
+}
+
+.wa-membership-intro__play {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: background var(--wa-duration-fast) var(--wa-ease-default);
+}
+
+.wa-membership-intro__video-link:hover .wa-membership-intro__play,
+.wa-membership-intro__video-link:focus-visible .wa-membership-intro__play {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.wa-membership-intro__highlights {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wa-membership-intro__highlight {
+  padding: var(--wa-space-5) var(--wa-space-5);
+  border-top: 3px solid var(--wa-color-accent);
+  background: var(--wa-color-primary);
+}
+
+.wa-membership-intro__highlight:nth-child(2),
+.wa-membership-intro__highlight:nth-child(3) {
+  background: var(--wa-color-primary-dark);
+}
+
+.wa-membership-intro__highlight--magenta {
+  border-top-color: var(--wa-color-magenta);
+}
+
+.wa-membership-intro__highlight h3 {
+  margin: 0 0 var(--wa-space-1);
+  color: #fff;
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-bold);
+  line-height: 1.3;
+}
+
+.wa-membership-intro__highlight p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 980px) {
+  .wa-membership-intro__inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .wa-membership-intro__highlights {
+    grid-template-columns: 1fr;
+  }
+}

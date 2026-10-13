@@ -1,0 +1,14 @@
+{
+  "label": "Team Grid",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Server-rendered people grid. Header with overline/heading/intro + highlight cards, then people cards with role and qualification pill. Reads module fields or the team_and_board HubDB table.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["team", "react-island", "hubdb", "people", "interactive"]
+}

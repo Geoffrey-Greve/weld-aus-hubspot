@@ -1,0 +1,50 @@
+<!--
+  templateType: none
+-->
+{#
+  _member-tier.html
+
+  One HubL implementation of the CRM membership-sentinel rule, the entitlement-side
+  companion to _member-pricing.html.
+
+  Why this exists (defect 213, following on from 126): _member-pricing.html unified
+  how a tier maps to a PRICE COLUMN, but every surface still decided for itself what
+  counted as a real tier. HubSpot stores "no membership" as a literal dropdown label -
+  "Not Applicable", "Non Member", "Never Member", "None", "N/A" - not as an empty
+  string, so a bare truthiness test (`not contact_tier`) reads those sentinels as a
+  real individual membership and refuses to fall back to the employer's corporate
+  tier. course-filter.module scrubbed them; course-timetable-filter, featured-courses
+  and courses-upcoming-sessions did not. The same Gold-company employee was therefore
+  quoted price_gold on /courses/ and price_member on the timetable and featured lists.
+
+  The sentinel list is asserted against src/shared/utils/memberPricingParity.test.ts,
+  so adding a value here without updating that test fails the build.
+
+  Usage:
+    {% import "../../templates/partials/_member-tier.html" as wa_tier %}
+    {% set _is_real = wa_tier.is_real_tier(contact_tier)|trim %}
+    {% if company_tier and not _is_real %}...{% endif %}
+    {% set _clean = wa_tier.scrub(contact_tier)|trim %}
+
+  Always |trim the result - HubL macros emit the surrounding whitespace otherwise.
+  A truthiness test on an untrimmed macro result is always true.
+
+  Each macro is deliberately SELF-CONTAINED - no macro calls another - for the same
+  reason documented at the top of _member-pricing.html: HubL's restricted Jinja2
+  rejects some cross-macro constructs, and it only fails server-side on upload.
+#}
+
+{# 'true' when `raw` is a genuine membership value, '' when it is empty or one of the
+   CRM "no membership" sentinels. Use this - never a bare truthiness test - before
+   deciding that a contact's own membership outranks their employer's. #}
+{% macro is_real_tier(raw) %}{% set _k = raw|default('', true)|string|lower|trim|replace(' ', '_')|replace('-', '_') %}{% if _k and _k not in ['not_applicable', 'non_member', 'nonmember', 'never_member', 'none', 'n/a'] %}true{% endif %}{% endmacro %}
+
+{# `raw` with the CRM sentinels collapsed to an empty string. Apply to a resolved
+   tier or status before it reaches pricing or a display label. #}
+{% macro scrub(raw) %}{% set _v = raw|default('', true)|string|trim %}{% set _k = _v|lower|replace(' ', '_')|replace('-', '_') %}{% if _k and _k not in ['not_applicable', 'non_member', 'nonmember', 'never_member', 'none', 'n/a'] %}{{ _v }}{% endif %}{% endmacro %}
+
+{# Prefer Corporate Gold/Silver/Bronze from the company over a weaker contact
+   tier (Individual, Corporate, …). Matches the portal pricing_member_tier rule
+   and checkout pickBestMemberTier for metal companies (defects 126 / 213).
+   When the company has no metal tier, keep the contact value, else the company. #}
+{% macro prefer_pricing_tier(contact_tier, company_tier) %}{% set _company = company_tier|default('', true)|string|trim %}{% set _contact = contact_tier|default('', true)|string|trim %}{% set _ck = _company|lower %}{% if _company and ('gold' in _ck or 'silver' in _ck or 'bronze' in _ck) %}{{ _company }}{% elif _contact %}{{ _contact }}{% else %}{{ _company }}{% endif %}{% endmacro %}

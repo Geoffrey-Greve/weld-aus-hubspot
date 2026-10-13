@@ -1,0 +1,73 @@
+{#
+  step-process.module/module.html
+  Numbered process steps. Desktop: horizontal with connecting line.
+  Mobile: vertical stack.
+
+  Fields:
+    module.section_id    - optional anchor id
+    module.background    - background variant
+    module.spacing       - vertical spacing variant
+    module.members_only  - gating flag
+    module.section_heading - optional heading
+    module.steps         - repeater group (number, heading, body, icon)
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section
+  class="wa-step-process wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-step-process__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    <ol class="wa-step-process__list">
+      {% for step in module.steps %}
+      <li class="wa-step-process__step">
+
+        {# Number circle #}
+        <div class="wa-step-process__number-circle" aria-hidden="true">
+          {{ step.number if step.number else loop.index }}
+        </div>
+
+        {# Optional icon #}
+        {% if step.icon and step.icon.src %}
+        <div class="wa-step-process__icon-wrap">
+          <img
+            src="{{ step.icon.src }}"
+            alt="{{ step.icon.alt | default('') }}"
+            class="wa-step-process__icon"
+            width="40"
+            height="40"
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+          >
+        </div>
+        {% endif %}
+
+        <div class="wa-step-process__content">
+          <h3 class="wa-step-process__step-heading">{{ step.heading }}</h3>
+          {% if step.body_text %}
+          <div class="wa-step-process__step-body">{{ step.body_text }}</div>
+          {% endif %}
+        </div>
+
+        {# Connector arrow between steps (not on last) #}
+        {% if not loop.last %}
+        <span class="wa-step-process__connector" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        {% endif %}
+
+      </li>
+      {% endfor %}
+    </ol>
+
+  </div>
+</section>
+{% endif %}

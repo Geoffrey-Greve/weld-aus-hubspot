@@ -1,0 +1,14 @@
+{
+  "label": "Membership Intro",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Editable membership intro section with copy, image/video card, and feature highlights.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["membership", "section", "intro"]
+}

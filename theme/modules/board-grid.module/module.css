@@ -1,0 +1,203 @@
+/*
+ * board-grid.module/module.css
+ * Server-rendered people grid: intro + checklist header, then photo cards.
+ */
+
+/* ── Header: intro left, checklist right ─────────────────────────────────── */
+
+.wa-board__head {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-6, 1.5rem);
+  margin-bottom: var(--wa-space-10, 2.5rem);
+}
+
+@media (min-width: 900px) {
+  .wa-board__head {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: start;
+    gap: var(--wa-space-12, 3rem);
+  }
+}
+
+.wa-board__heading {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 800;
+  line-height: 1.12;
+  color: var(--wa-color-primary);
+  margin: 0 0 var(--wa-space-4, 1rem);
+}
+
+.wa-board__intro {
+  font-size: var(--wa-text-base);
+  line-height: var(--wa-leading-relaxed, 1.7);
+  color: var(--wa-color-text-muted);
+  max-width: 40ch;
+}
+
+.wa-board__checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4, 1rem);
+}
+
+.wa-board__check {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3, 0.75rem);
+}
+
+.wa-board__check-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(28, 30, 76, 0.06);
+  color: var(--wa-color-primary);
+}
+
+.wa-board__check-text {
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text);
+}
+
+/* ── Card grid ───────────────────────────────────────────────────────────── */
+
+.wa-board__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-6, 1.5rem);
+}
+
+@media (min-width: 600px) {
+  .wa-board__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 900px) {
+  .wa-board--cols-3 .wa-board__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .wa-board--cols-4 .wa-board__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.wa-board__card {
+  background: #fff;
+  border: 2px solid var(--wa-color-border, #e5e7eb);
+  border-radius: var(--wa-radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: var(--wa-shadow-card, 0 12px 30px rgba(28, 30, 76, 0.06));
+  display: flex;
+  flex-direction: column;
+}
+
+/* Linked cards (HubDB rows with a profile page). The <a> wraps the whole card
+   interior, so the hit area is the card itself - comfortably over the 44x44px
+   minimum. Colour is inherited so the name/role/org keep their own styling. */
+.wa-board__card--linked {
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.wa-board__card-link {
+  color: inherit;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.wa-board__card--linked:hover,
+.wa-board__card--linked:focus-within {
+  border-color: var(--wa-color-accent, #fecf05);
+  box-shadow: 0 1rem 2.5rem rgba(28, 30, 76, 0.14);
+  transform: translateY(-2px);
+}
+
+.wa-board__card--linked:hover .wa-board__name,
+.wa-board__card--linked:focus-within .wa-board__name {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.wa-board__card-link:focus-visible {
+  outline: 3px solid var(--wa-color-accent-magenta, #ed128d);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-board__card--linked {
+    transition: none;
+  }
+
+  .wa-board__card--linked:hover,
+  .wa-board__card--linked:focus-within {
+    transform: none;
+  }
+}
+
+.wa-board__photo-wrap {
+  position: relative;
+  /* Match team-grid portrait crop so heads aren't clipped in a square frame. */
+  aspect-ratio: 5 / 6;
+  background: var(--wa-color-surface-alt, #eef0f4);
+  overflow: hidden;
+}
+
+.wa-board__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.wa-board__photo-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--wa-font-heading);
+  font-size: 48px;
+  font-weight: 800;
+  color: rgba(28, 30, 76, 0.25);
+}
+
+.wa-board__body {
+  padding: var(--wa-space-5, 1.25rem) var(--wa-space-6, 1.5rem) var(--wa-space-6, 1.5rem);
+}
+
+.wa-board__name {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-lg, 1.125rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--wa-color-primary);
+  margin: 0 0 4px;
+}
+
+.wa-board__role {
+  font-size: var(--wa-text-sm, 0.9rem);
+  font-weight: 700;
+  color: var(--wa-color-accent-magenta, #ed128d);
+  margin: 0 0 2px;
+}
+
+.wa-board__org {
+  font-size: var(--wa-text-sm, 0.9rem);
+  color: var(--wa-color-text-muted);
+  margin: 0;
+}
+
+/* ── Dark background variant ─────────────────────────────────────────────── */
+
+.wa-board--dark .wa-board__heading { color: #fff; }
+.wa-board--dark .wa-board__intro { color: rgba(255, 255, 255, 0.7); }
+.wa-board--dark .wa-board__check-text { color: rgba(255, 255, 255, 0.85); }
+.wa-board--dark .wa-board__check-icon { background: rgba(255, 255, 255, 0.1); color: var(--wa-color-accent, #fecf05); }

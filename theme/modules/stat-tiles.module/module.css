@@ -1,0 +1,146 @@
+/*
+ * stat-tiles.module/module.css
+ * "By the numbers" stat tiles - responsive flex row, 2-6 items.
+ * Mobile-first: tiles wrap at narrow viewports, expand to a single row on wide.
+ */
+
+/* ── Section heading ─────────────────────────────────────────────────────── */
+
+.wa-stat-tiles__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl, 2rem);
+  font-weight: var(--wa-weight-bold, 700);
+  color: var(--wa-color-text);
+  text-align: center;
+  margin: 0 0 var(--wa-space-8, 2rem);
+  line-height: 1.2;
+}
+
+.wa-section--primary .wa-stat-tiles__heading,
+.wa-section--primary_dark .wa-stat-tiles__heading {
+  color: var(--wa-color-on-primary, #fff);
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+
+.wa-stat-tiles__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-8, 2rem);
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Each tile expands evenly; 200px keeps them from getting too narrow. */
+.wa-stat-tiles__item {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--wa-space-2, 0.5rem);
+}
+
+/* ── Icon ────────────────────────────────────────────────────────────────── */
+
+.wa-stat-tiles__icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  margin-bottom: var(--wa-space-2, 0.5rem);
+  flex-shrink: 0;
+}
+
+/* ── Value (the big number / text) ──────────────────────────────────────── */
+
+.wa-stat-tiles__value {
+  font-family: var(--wa-font-heading);
+  font-size: 3rem;
+  font-weight: var(--wa-weight-bold, 700);
+  line-height: 1;
+  color: var(--wa-color-primary);
+}
+
+.wa-section--primary .wa-stat-tiles__value,
+.wa-section--primary_dark .wa-stat-tiles__value {
+  color: var(--wa-color-on-primary, #fff);
+}
+
+/* ── Label (the caption beneath the value) ───────────────────────────────── */
+
+.wa-stat-tiles__label {
+  font-size: 0.9rem;
+  color: var(--wa-color-text-muted);
+  line-height: 1.4;
+}
+
+.wa-section--primary .wa-stat-tiles__label,
+.wa-section--primary_dark .wa-stat-tiles__label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Responsive: single row from 768px when few tiles ───────────────────── */
+
+@media (min-width: 768px) {
+  .wa-stat-tiles__item {
+    flex: 1 1 160px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Alternating card style - filled navy / outlined white, in sequence           */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.wa-stat-tiles--alternating .wa-stat-tiles__item {
+  padding: var(--wa-space-8) var(--wa-space-5);
+  border-radius: var(--wa-radius-lg);
+  position: relative;
+  overflow: hidden;
+  justify-content: center;
+}
+
+.wa-stat-tiles--alternating .wa-stat-tiles__item--navy {
+  background-color: var(--wa-color-primary);
+}
+
+.wa-stat-tiles--alternating .wa-stat-tiles__item--light {
+  background-color: var(--wa-color-surface);
+  border: 2px solid var(--wa-color-primary);
+}
+
+/* Soft decorative gold disc on the filled cards (matches the comp) */
+.wa-stat-tiles--alternating .wa-stat-tiles__item--navy::after {
+  content: "";
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--wa-color-accent) 7%, transparent);
+  pointer-events: none;
+}
+
+.wa-stat-tiles--alternating .wa-stat-tiles__item--navy .wa-stat-tiles__value {
+  color: var(--wa-color-accent);
+}
+
+.wa-stat-tiles--alternating .wa-stat-tiles__item--navy .wa-stat-tiles__label {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.wa-stat-tiles--alternating .wa-stat-tiles__item--light .wa-stat-tiles__value {
+  color: var(--wa-color-primary);
+}
+
+.wa-stat-tiles--alternating .wa-stat-tiles__item--light .wa-stat-tiles__label {
+  color: var(--wa-color-text-muted);
+}
+
+/* On a dark section background, the "light" card stays light (don't invert) */
+.wa-section--primary .wa-stat-tiles--alternating .wa-stat-tiles__item--light .wa-stat-tiles__value,
+.wa-section--primary_dark .wa-stat-tiles--alternating .wa-stat-tiles__item--light .wa-stat-tiles__value {
+  color: var(--wa-color-primary);
+}

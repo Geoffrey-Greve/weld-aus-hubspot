@@ -1,0 +1,81 @@
+name: Deploy theme (staging)
+
+# Deploys the theme to the STAGING portal, 443253065.
+#
+# Why this exists: until now only production had a deploy workflow. Staging was
+# pushed from whoever's laptop was handy, so "we tested it on staging" did not
+# mean the same build that would reach production - different machine, different
+# node, possibly different working tree. That is one of the ways a change can pass
+# QA and still break the live site.
+#
+# MANUAL DISPATCH ONLY, by choice (Ryan, 21 September 2026): both portals are
+# deployed by hand, so the push-to-main trigger is off. It ran on every merge with
+# no HUBSPOT_PERSONAL_ACCESS_KEY_STAGING set and failed every time, and a check
+# that is always red is how a check going red for a real reason stops being
+# noticed. Dispatch it from ANY branch when a change should be QA'd on a real
+# portal; 443253065 is not the live site. Production stays manual,
+# confirmation-gated and main-only (deploy.yml).
+#
+# The trigger is one line. Restore `push: branches: [main]` below the day the
+# secret exists and staging goes back to being whatever main is.
+#
+# Setup (before dispatching): add a repository secret HUBSPOT_PERSONAL_ACCESS_KEY_STAGING for
+# portal 443253065. It must be a DIFFERENT key from the production one - the two
+# portals are different places, and a personal access key is scoped to one of
+# them. The job fails with a clear message rather than falling back if it is unset:
+# a staging deploy that silently reached production is the defect that
+# scripts/lib/hubspot-portals.test.ts was written after.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-theme-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable corepack (pnpm)
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Write HubSpot CLI config from secret
+        env:
+          PAK: ${{ secrets.HUBSPOT_PERSONAL_ACCESS_KEY_STAGING }}
+        run: |
+          if [ -z "$PAK" ]; then
+            echo "::error::Secret HUBSPOT_PERSONAL_ACCESS_KEY_STAGING is not set. Add it in repo Settings → Secrets → Actions. It must be a key for portal 443253065, not the production one."
+            exit 1
+          fi
+          # Account name matches ACCOUNT_MAP.staging in scripts/lib/hubspot-auth.ts.
+          # upload.ts resolves on portalId first, but the name must not lie: pairing
+          # a staging name with a production id is the original defect.
+          cat > hubspot.config.yml <<YAML
+          defaultPortal: weld-australia-staging
+          portals:
+            - name: weld-australia-staging
+              portalId: 443253065
+              authType: personalaccesskey
+              personalAccessKey: $PAK
+          YAML
+
+      - name: Build theme
+        run: pnpm build
+
+      - name: Upload full theme to the staging portal (443253065)
+        run: node_modules/.bin/tsx scripts/upload.ts --env=staging
+
+      - name: Remove CLI config
+        if: always()
+        run: rm -f hubspot.config.yml

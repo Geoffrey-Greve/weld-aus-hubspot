@@ -1,0 +1,4 @@
+theme/assets/js/test-island.html
+theme/assets/js/a11y/*.html
+*.map
+**/*.map

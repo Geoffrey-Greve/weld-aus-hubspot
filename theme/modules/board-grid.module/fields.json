@@ -1,0 +1,179 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary navy"],
+      ["primary_dark", "Primary dark"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "overline",
+    "label": "Overline / eyebrow",
+    "type": "text",
+    "default": "Leadership"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Our board"
+  },
+  {
+    "name": "intro",
+    "label": "Intro paragraph",
+    "type": "richtext",
+    "default": "<p>Elected by our members, the Board provides strategic direction and strong governance - bringing together highly respected leaders from across the industry.</p>"
+  },
+  {
+    "name": "checklist",
+    "label": "Checklist items (right of intro)",
+    "type": "group",
+    "occurrence": { "min": 0, "max": 6, "default": 3 },
+    "children": [
+      {
+        "name": "item_text",
+        "label": "Item",
+        "type": "text",
+        "default": ""
+      }
+    ],
+    "default": [
+      { "item_text": "Elected by Weld Australia members" },
+      { "item_text": "Deep expertise across industry, education, and engineering" },
+      { "item_text": "Committed to strong governance and member outcomes" }
+    ]
+  },
+  {
+    "name": "columns",
+    "label": "Columns",
+    "type": "choice",
+    "choices": [
+      ["2", "2 columns"],
+      ["3", "3 columns"],
+      ["4", "4 columns"]
+    ],
+    "default": "3"
+  },
+  {
+    "name": "data_source",
+    "label": "Data source",
+    "type": "choice",
+    "choices": [
+      ["module_fields", "This module's People list"],
+      ["hubdb", "HubDB - Team & Board table"]
+    ],
+    "default": "module_fields",
+    "help_text": "HubDB reads the team_and_board table (active rows, sorted by display order) and links each card to that person's profile page."
+  },
+  {
+    "name": "board_source",
+    "label": "Who counts as board",
+    "type": "choice",
+    "choices": [
+      ["flag_or_category", "Flag ticked OR category is Board (recommended)"],
+      ["category_only", "Category is Board only"],
+      ["flag_only", "'Sits on the Board' flag only"]
+    ],
+    "default": "flag_or_category",
+    "help_text": "HubDB data source only. The default works with rows categorised 'Board' as-is, while still letting someone in a staff category (e.g. the CEO) be added to the board by ticking their 'Sits on the Board' checkbox."
+  },
+  {
+    "name": "category_filter",
+    "label": "Filter by category",
+    "type": "text",
+    "default": "any",
+    "help_text": "HubDB data source only. Applied after 'Board members only'. Comma-separated, e.g. \"board,executive\". Use \"any\" for everyone."
+  },
+  {
+    "name": "category_exclude",
+    "label": "Exclude categories",
+    "type": "text",
+    "default": "",
+    "help_text": "HubDB data source only. Comma-separated categories to leave out."
+  },
+  {
+    "name": "max_count",
+    "label": "Max people (0 = no limit)",
+    "type": "number",
+    "default": 0
+  },
+  {
+    "name": "profile_url_base",
+    "label": "Profile page URL base",
+    "type": "text",
+    "default": "/about/team/",
+    "help_text": "HubDB data source only. Each card links to this path plus the person's HubDB page path, e.g. /about/team/ian-harris. Rows without a page path render as non-clickable cards."
+  },
+  {
+    "name": "people",
+    "label": "People",
+    "type": "group",
+    "occurrence": { "min": 1, "max": 40, "default": 3 },
+    "children": [
+      {
+        "name": "name_text",
+        "label": "Name",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "role",
+        "label": "Role / title (magenta)",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "org",
+        "label": "Organisation / sub-line (muted)",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "name": "photo",
+        "label": "Headshot",
+        "type": "image"
+      }
+    ],
+    "default": [
+      { "name_text": "Prof. Ian Harris", "role": "Chairman", "org": "Industry Representative" },
+      { "name_text": "Dr. Patricia Morrison", "role": "Deputy Chair", "org": "Industry Representative" },
+      { "name_text": "Geoff Crittenden", "role": "Chief Executive Officer", "org": "Weld Australia" }
+    ]
+  }
+]

@@ -1,0 +1,230 @@
+{#
+  my-invoices.module/module.html
+
+  React island: Member portal My Invoices page.
+
+  Data strategy:
+    Reads the logged-in contact's associated HubSpot Invoices first, then falls
+    back to Deal-level invoice PDF fields used by the older finance sync. No CRM
+    records are written.
+#}
+
+{% set invoices_editor_preview = is_in_editor or (is_in_previewer | default(false)) or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+{% set invoices_has_member_context = request_contact.is_logged_in or invoices_editor_preview %}
+
+{% if module.members_only and not invoices_has_member_context %}
+
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-my-invoices-section"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div class="wa-my-invoices__auth-gate" role="status" aria-live="polite">
+      <p class="wa-my-invoices__auth-eyebrow">Member portal</p>
+      <h1 class="wa-section__heading">{{ module.heading | default('My Invoices &amp; Receipts', true) }}</h1>
+      <p class="wa-section__intro">
+        Please sign in through the member portal to view your Weld Australia invoices and receipts.
+      </p>
+      <a class="wa-my-invoices__auth-button" href="/login/?redirect=/portal/invoices/">
+        Sign in to view invoices
+      </a>
+    </div>
+  </div>
+</section>
+
+{% else %}
+
+{% set contact_id_candidates = [
+  request_contact.id | default('', true) | string | trim,
+  request_contact.hs_object_id | default('', true) | string | trim,
+  request_contact.vid | default('', true) | string | trim,
+  contact.id | default('', true) | string | trim,
+  contact.hs_object_id | default('', true) | string | trim,
+  contact.vid | default('', true) | string | trim
+] %}
+
+{% set invoice_properties = 'hs_object_id,hs_number,hs_title,hs_invoice_date,hs_due_date,hs_invoice_status,hs_payment_status,hs_amount_billed,hs_balance_due,hs_invoice_link,hs_pdf_download_link,hs_currency' %}
+{% set finance_lookup_ns = namespace(invoice_rows=[], deal_rows=[], contact_record_id='', seen=[]) %}
+{% for contact_candidate in contact_id_candidates %}
+  {% set contact_candidate_id = contact_candidate | string | trim %}
+  {% if contact_candidate_id and contact_candidate_id != '[object Object]' and contact_candidate_id != '[object object]' and contact_candidate_id not in finance_lookup_ns.seen and (finance_lookup_ns.invoice_rows|length == 0 or finance_lookup_ns.deal_rows|length == 0) %}
+    {% set finance_lookup_ns.seen = finance_lookup_ns.seen + [contact_candidate_id] %}
+    {#
+      HubSpot-defined Contact -> Invoice association.
+      HubSpot's association reference lists typeId 178 as "Contact to invoice".
+      This portal page is private/member-gated, which is required for reading
+      standard CRM objects through HubL.
+    #}
+    {% if finance_lookup_ns.invoice_rows|length == 0 %}
+      {% set raw_candidate_invoices = crm_associations(contact_candidate_id, 'HUBSPOT_DEFINED', 178, 'limit=100&order=-hs_invoice_date', invoice_properties, false) %}
+      {% set candidate_invoices = raw_candidate_invoices.results | default([], true) %}
+      {% if candidate_invoices|length > 0 %}
+        {% set finance_lookup_ns.invoice_rows = candidate_invoices %}
+        {% set finance_lookup_ns.contact_record_id = contact_candidate_id %}
+      {% endif %}
+    {% endif %}
+    {#
+      HubSpot-defined Contact -> Deal association.
+      CRM v4 confirms this portal returns associated Deals with typeId 4, and
+      HubL's crm_associations needs the association category + numeric type id.
+    #}
+    {% if finance_lookup_ns.deal_rows|length == 0 %}
+      {% set raw_candidate_deals = crm_associations(contact_candidate_id, 'HUBSPOT_DEFINED', 4, 'limit=100', 'amount,dealname,closedate,createdate,dealtype,xero_invoice_pdf_url,invoice_pdf_url,hs_object_id', false) %}
+      {% set candidate_deals = raw_candidate_deals.results | default([], true) %}
+      {% if candidate_deals|length == 0 %}
+        {% set queried_deals = crm_objects('deal', 'associations.contact=' ~ contact_candidate_id ~ '&limit=100') %}
+        {% set candidate_deals = queried_deals.results | default([], true) %}
+      {% endif %}
+      {% if candidate_deals|length > 0 %}
+        {% set finance_lookup_ns.deal_rows = candidate_deals %}
+        {% if not finance_lookup_ns.contact_record_id %}
+          {% set finance_lookup_ns.contact_record_id = contact_candidate_id %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% set invoices_ns = namespace(rows=[], seen_ids=[], seen_pdf_urls=[]) %}
+{% if finance_lookup_ns.invoice_rows|length > 0 %}
+  {% for invoice in finance_lookup_ns.invoice_rows %}
+    {% set invoice_properties_map = invoice.properties | default({}, true) %}
+    {% set invoice_id = invoice.hs_object_id | default(invoice_properties_map.hs_object_id, true) | default(invoice.id, true) | default(invoice.toObjectId, true) | default(invoice.to_object_id, true) | string | trim %}
+    {% set invoice_date = invoice.hs_invoice_date | default(invoice_properties_map.hs_invoice_date, true) %}
+    {% if not invoice_date %}
+      {% set invoice_date = invoice.createdate | default(invoice_properties_map.createdate, true) %}
+    {% endif %}
+    {% set invoice_status_raw = invoice.hs_payment_status | default(invoice_properties_map.hs_payment_status, true) | default(invoice.hs_invoice_status, true) | default(invoice_properties_map.hs_invoice_status, true) | default('Invoice available', true) | string | trim %}
+    {% set invoice_status = invoice_status_raw | replace('_', ' ') | capitalize %}
+    {% set invoice_amount_raw = invoice.hs_amount_billed | default(invoice_properties_map.hs_amount_billed, true) %}
+    {% if not invoice_amount_raw %}
+      {% set invoice_amount_raw = invoice.hs_balance_due | default(invoice_properties_map.hs_balance_due, true) %}
+    {% endif %}
+    {% set invoice_amount = invoice_amount_raw | float | default(0) %}
+    {% set invoice_number = invoice.hs_number | default(invoice_properties_map.hs_number, true) | default('', true) | string | trim %}
+    {% set invoice_title = invoice.hs_title | default(invoice_properties_map.hs_title, true) | default('', true) | string | trim %}
+    {% set invoice_name = invoice_title if invoice_title else ('Invoice #' ~ invoice_number if invoice_number else 'HubSpot invoice #' ~ invoice_id) %}
+    {% set invoice_pdf_url = invoice.hs_pdf_download_link | default(invoice_properties_map.hs_pdf_download_link, true) | default('', true) | string | trim %}
+    {#
+      Issue 34: hs_invoice_link is HubSpot's hosted, PAYABLE invoice page - not a
+      PDF. It used to be read only as a fallback when hs_pdf_download_link was
+      empty, and then collapsed into pdf_url, so whenever an invoice had a PDF
+      (almost always) the one URL a member could actually pay through was
+      discarded.
+
+      The two now stay strictly separate. pdf_url carries a real PDF or nothing:
+      putting the hosted page there gave the card a "Download" action, complete
+      with a `download` attribute, pointing at a payment page - and once "Pay now"
+      existed the same URL was offered twice under two different labels. When
+      there is no PDF the card falls back to a "View invoice" link on pay_url,
+      so nothing is lost by keeping this field honest.
+    #}
+    {% set invoice_pay_url = invoice.hs_invoice_link | default(invoice_properties_map.hs_invoice_link, true) | default('', true) | string | trim %}
+    {% set invoice_balance_due = invoice.hs_balance_due | default(invoice_properties_map.hs_balance_due, true) | float | default(0) %}
+    {% if invoice_id %}
+      {% set invoice_data = {
+        'deal_id': 'invoice-' ~ invoice_id,
+        'deal_name': invoice_name,
+        'deal_type': 'Invoice',
+        'invoice_date': invoice_date,
+        'amount': invoice_amount if invoice_amount > 0 else null,
+        'status': invoice_status,
+        'pdf_url': invoice_pdf_url,
+        'pay_url': invoice_pay_url,
+        'balance_due': invoice_balance_due if invoice_balance_due > 0 else null,
+        'tax_basis': 'inclusive',
+        'source': 'HubSpot invoice'
+      } %}
+      {% set invoices_ns.rows = invoices_ns.rows + [invoice_data] %}
+      {% set invoices_ns.seen_ids = invoices_ns.seen_ids + [invoice_id] %}
+      {% if invoice_pdf_url %}
+        {% set invoices_ns.seen_pdf_urls = invoices_ns.seen_pdf_urls + [invoice_pdf_url] %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% if finance_lookup_ns.deal_rows|length > 0 %}
+  {% for deal in finance_lookup_ns.deal_rows %}
+    {% set deal_record_id = deal.hs_object_id | default(deal.id, true) | default(deal.toObjectId, true) | default(deal.to_object_id, true) | string | trim %}
+    {% set deal_properties = deal.properties | default({}, true) %}
+    {% set deal_has_finance_fields = deal.amount | default('', true) or deal_properties.amount | default('', true) or deal.dealname | default('', true) or deal_properties.dealname | default('', true) or deal.invoice_pdf_url | default('', true) or deal_properties.invoice_pdf_url | default('', true) or deal.xero_invoice_pdf_url | default('', true) or deal_properties.xero_invoice_pdf_url | default('', true) %}
+    {% if deal_record_id and deal_record_id != '[object Object]' and deal_record_id != '[object object]' and not deal_has_finance_fields %}
+      {% set hydrated_deal = crm_object('deal', deal_record_id, 'amount,dealname,closedate,createdate,dealtype,xero_invoice_pdf_url,invoice_pdf_url,hs_object_id') %}
+      {% if hydrated_deal %}
+        {% set deal = hydrated_deal %}
+        {% set deal_properties = deal.properties | default({}, true) %}
+      {% endif %}
+    {% endif %}
+    {#
+      Deal `amount` is EX GST - confirmed by Ollie, who owns the HubSpot
+      pipelines: his deals carry the same tax-exclusive figures the HubDB course
+      columns hold (`price_gold_aud_ex_gst` and friends). HubSpot Invoice rows
+      above are the other way round: `hs_amount_billed` is the invoice total,
+      with the portal's tax rate already applied on top of the ex-tax line
+      items. The two therefore cannot be rendered the same way, so each row
+      carries its `tax_basis` and the island grosses the exclusive ones up -
+      otherwise a $585 course reads as $585 paid with $53.18 of GST inside it,
+      when the member was actually charged $643.50.
+    #}
+    {% set deal_amount_raw = deal.amount | default('', true) %}
+    {% if not deal_amount_raw %}
+      {% set deal_amount_raw = deal_properties.amount | default('', true) %}
+    {% endif %}
+    {% set deal_amount = deal_amount_raw | float | default(0) %}
+    {% set deal_name = deal.dealname | default(deal_properties.dealname, true) | default('Invoice / receipt', true) %}
+    {% set deal_pdf_url = deal.xero_invoice_pdf_url | default(deal_properties.xero_invoice_pdf_url, true) %}
+    {% if not deal_pdf_url %}
+      {% set deal_pdf_url = deal.invoice_pdf_url | default(deal_properties.invoice_pdf_url, true) %}
+    {% endif %}
+    {% set deal_pdf_url = deal_pdf_url | default('', true) | string | trim %}
+    {% if deal_pdf_url and deal_pdf_url not in invoices_ns.seen_pdf_urls %}
+      {% set deal_date = deal.closedate | default(deal_properties.closedate, true) %}
+      {% if not deal_date %}
+        {% set deal_date = deal.createdate | default(deal_properties.createdate, true) %}
+      {% endif %}
+      {% set deal_type = deal.dealtype | default(deal_properties.dealtype, true) | default('Payment', true) %}
+      {% set invoice_data = {
+        'deal_id': deal.hs_object_id | default(deal_properties.hs_object_id, true) | default(deal.id, true) | string,
+        'deal_name': deal_name,
+        'deal_type': deal_type,
+        'invoice_date': deal_date,
+        'amount': deal_amount if deal_amount > 0 else null,
+        'status': 'Receipt available',
+        'pdf_url': deal_pdf_url,
+        'tax_basis': 'exclusive',
+        'source': 'Invoice PDF'
+      } %}
+      {% set invoices_ns.rows = invoices_ns.rows + [invoice_data] %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% set island_props = {
+  'invoices': invoices_ns.rows,
+  'finance_email': module.finance_email | default('finance@weldaustralia.com.au'),
+  'support_email': module.support_email | default('office@weldaustralia.com.au')
+} %}
+
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-my-invoices-section"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    {% if module.heading %}
+      <h1 class="wa-section__heading">{{ module.heading }}</h1>
+    {% endif %}
+    {% if module.intro %}
+      <div class="wa-section__intro">{{ module.intro }}</div>
+    {% endif %}
+    <div
+      data-wa-module="my-invoices"
+      data-props="{{ island_props | tojson | escape }}"
+    ></div>
+  </div>
+</section>
+
+{# Script tag injected by pnpm build - do not edit this line manually. #}
+<script type="module" src="{{ get_asset_url('../../assets/js/my-invoices.standalone.js') }}"></script>
+
+{% endif %}

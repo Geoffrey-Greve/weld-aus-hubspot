@@ -1,0 +1,3126 @@
+{
+  "courses": {
+    "table": {
+      "id": "2207726015",
+      "name": "courses",
+      "portalId": 443253065,
+      "createdAt": "2026-05-28T14:54:22.943Z",
+      "archivedAt": "1970-01-01T00:00:00Z",
+      "publishedAt": "2026-09-04T01:31:02.585Z",
+      "assignedCount": 15,
+      "updatedAt": "2026-09-04T01:31:02.264Z",
+      "label": "Courses — Timetable & Locations",
+      "hasUnpublishedRowChanges": true,
+      "columns": [
+        {
+          "name": "course_name",
+          "label": "Course name",
+          "id": "1",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "course_id",
+          "label": "Course ID (groups sessions under one parent page)",
+          "id": "2",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "course_slug",
+          "label": "URL slug",
+          "id": "3",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "parent_template",
+          "label": "Parent template",
+          "id": "4",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "standard",
+              "label": "standard",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "sales",
+              "label": "sales",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "SELECT",
+          "optionCount": 2,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "city",
+          "label": "City",
+          "id": "5",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "Sydney",
+              "label": "Sydney",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "Melbourne",
+              "label": "Melbourne",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "Brisbane",
+              "label": "Brisbane",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "4",
+              "name": "Perth",
+              "label": "Perth",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "5",
+              "name": "Adelaide",
+              "label": "Adelaide",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "6",
+              "name": "Darwin",
+              "label": "Darwin",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "7",
+              "name": "Hobart",
+              "label": "Hobart",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "8",
+              "name": "Online",
+              "label": "Online",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "SELECT",
+          "optionCount": 8,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "start_date",
+          "label": "Start date",
+          "id": "6",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "DATE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "end_date",
+          "label": "End date",
+          "id": "7",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "DATE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "price_member",
+          "label": "Member price (AUD ex GST)",
+          "id": "8",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "NUMBER",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "price_non_member",
+          "label": "Non-member price (AUD ex GST)",
+          "id": "9",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "NUMBER",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "registration_url",
+          "label": "Registration URL",
+          "id": "10",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "URL",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "status",
+          "label": "Status",
+          "id": "11",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "Available",
+              "label": "Available",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "Sold Out",
+              "label": "Sold Out",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "Cancelled",
+              "label": "Cancelled",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:22.943Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:22.943Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "SELECT",
+          "optionCount": 3,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "seats_remaining",
+          "label": "Seats remaining",
+          "id": "12",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "NUMBER",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "meta_description",
+          "label": "SEO meta description",
+          "id": "13",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "page_title",
+          "label": "SEO page title",
+          "id": "14",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "og_image",
+          "label": "Open Graph / social share image",
+          "id": "15",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:22.943Z",
+          "type": "IMAGE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:22.943Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        }
+      ],
+      "partitioningSettings": {
+        "teamIds": [],
+        "userIds": []
+      },
+      "published": true,
+      "archived": false,
+      "updated": 1788485462264,
+      "updatedById": 88565931,
+      "cosObjectType": "HUBDB_TABLE",
+      "columnCount": 15,
+      "createdById": 88565931,
+      "cdnPurgeEmbargoTime": null,
+      "rowCount": 1,
+      "createdBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "updatedBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "useForPages": true,
+      "allowChildTables": false,
+      "enableChildTablePages": false,
+      "crmObjectTypeId": 0,
+      "dynamicMetaTags": {
+        "FEATURED_IMAGE_URL": 15,
+        "DESCRIPTION": 13
+      },
+      "allowPublicApiAccess": true
+    },
+    "rows": [
+      {
+        "id": "374311139795",
+        "createdAt": "2026-09-04T01:31:02.224Z",
+        "updatedAt": "2026-09-04T01:31:02.224Z",
+        "publishedAt": "2026-09-04T01:31:02.585Z",
+        "path": "dev-iiw-welding-engineer",
+        "name": "DEV TEST — IIW Welding Engineer",
+        "values": {
+          "course_id": "dev-iiw-welding-engineer",
+          "course_slug": "dev-iiw-welding-engineer",
+          "course_name": "DEV TEST — IIW Welding Engineer"
+        },
+        "childTableId": "0",
+        "isSoftEditable": false
+      }
+    ]
+  },
+  "events": {
+    "table": {
+      "id": "2209273286",
+      "name": "events",
+      "portalId": 443253065,
+      "createdAt": "2026-05-28T14:54:23.763Z",
+      "archivedAt": "1970-01-01T00:00:00Z",
+      "publishedAt": "2026-05-28T14:54:25.239Z",
+      "assignedCount": 12,
+      "updatedAt": "2026-05-28T14:54:24.043Z",
+      "label": "Events",
+      "hasUnpublishedRowChanges": true,
+      "columns": [
+        {
+          "name": "slug",
+          "label": "URL slug",
+          "id": "1",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "event_name",
+          "label": "Event name",
+          "id": "2",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "event_type",
+          "label": "Event type",
+          "id": "3",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "Webinar",
+              "label": "Webinar",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "In-Person",
+              "label": "In-Person",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "Hybrid",
+              "label": "Hybrid",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "4",
+              "name": "Awards",
+              "label": "Awards",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "SELECT",
+          "optionCount": 4,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "event_date",
+          "label": "Event date (start)",
+          "id": "4",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "DATE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "event_end_date",
+          "label": "Event date (end, optional)",
+          "id": "5",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "DATE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "event_state",
+          "label": "State",
+          "id": "6",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "NSW",
+              "label": "NSW",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "VIC",
+              "label": "VIC",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "QLD",
+              "label": "QLD",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "4",
+              "name": "WA",
+              "label": "WA",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "5",
+              "name": "SA",
+              "label": "SA",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "6",
+              "name": "TAS",
+              "label": "TAS",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "7",
+              "name": "NT",
+              "label": "NT",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "8",
+              "name": "ACT",
+              "label": "ACT",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "9",
+              "name": "National",
+              "label": "National",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:23.762Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:23.762Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "SELECT",
+          "optionCount": 9,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "event_location",
+          "label": "Location (venue name / address)",
+          "id": "7",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "event_description",
+          "label": "Description",
+          "id": "8",
+          "archived": false,
+          "limit": 65000,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "RICHTEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "event_image",
+          "label": "Event image",
+          "id": "9",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "IMAGE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "registration_url",
+          "label": "Registration URL",
+          "id": "10",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "URL",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "is_featured",
+          "label": "Featured",
+          "id": "11",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "BOOLEAN",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "is_members_only",
+          "label": "Members only",
+          "id": "12",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:23.762Z",
+          "type": "BOOLEAN",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:23.762Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        }
+      ],
+      "partitioningSettings": {
+        "teamIds": [],
+        "userIds": []
+      },
+      "published": true,
+      "createdById": 88565931,
+      "updated": 1779980064043,
+      "archived": false,
+      "updatedById": 88565931,
+      "cosObjectType": "HUBDB_TABLE",
+      "columnCount": 12,
+      "cdnPurgeEmbargoTime": null,
+      "rowCount": 0,
+      "createdBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "updatedBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "useForPages": true,
+      "allowChildTables": false,
+      "enableChildTablePages": false,
+      "crmObjectTypeId": 0,
+      "dynamicMetaTags": {
+        "DESCRIPTION": 8
+      },
+      "allowPublicApiAccess": true
+    },
+    "rows": []
+  },
+  "course_modules": {
+    "table": {
+      "id": "3253442019",
+      "name": "course_modules",
+      "portalId": 443253065,
+      "createdAt": "2026-09-04T01:29:52.463Z",
+      "archivedAt": "1970-01-01T00:00:00Z",
+      "publishedAt": "2026-09-04T01:32:33.030Z",
+      "assignedCount": 4,
+      "updatedAt": "2026-09-04T01:32:32.887Z",
+      "label": "Course Modules",
+      "hasUnpublishedRowChanges": true,
+      "columns": [
+        {
+          "name": "parent_course_id",
+          "label": "Parent Course ID",
+          "id": "1",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-09-04T01:29:52.463Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-09-04T01:29:52.463Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "product_id",
+          "label": "HubSpot Product ID",
+          "id": "2",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-09-04T01:29:52.463Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-09-04T01:29:52.463Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "module_order",
+          "label": "Module Order",
+          "id": "3",
+          "archived": false,
+          "createdAt": "2026-09-04T01:29:52.463Z",
+          "type": "NUMBER",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-09-04T01:29:52.463Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "show_on_website",
+          "label": "Show on Website",
+          "id": "4",
+          "archived": false,
+          "createdAt": "2026-09-04T01:29:52.463Z",
+          "type": "BOOLEAN",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-09-04T01:29:52.463Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        }
+      ],
+      "partitioningSettings": {
+        "teamIds": [],
+        "userIds": []
+      },
+      "published": true,
+      "archived": false,
+      "updated": 1788485552887,
+      "updatedById": 88565931,
+      "cosObjectType": "HUBDB_TABLE",
+      "columnCount": 4,
+      "createdById": 88565931,
+      "cdnPurgeEmbargoTime": null,
+      "rowCount": 2,
+      "createdBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "updatedBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "useForPages": false,
+      "allowChildTables": false,
+      "enableChildTablePages": false,
+      "crmObjectTypeId": 0,
+      "dynamicMetaTags": {},
+      "allowPublicApiAccess": false
+    },
+    "rows": [
+      {
+        "id": "374103058913",
+        "createdAt": "2026-09-04T01:31:02.413Z",
+        "updatedAt": "2026-09-04T01:32:32.884Z",
+        "publishedAt": "2026-09-04T01:32:33.030Z",
+        "path": null,
+        "name": "DEV TEST — Module 1: Welding Fundamentals",
+        "values": {
+          "parent_course_id": "dev-iiw-welding-engineer",
+          "product_id": "dev-module-001",
+          "show_on_website": 1,
+          "module_order": 1
+        },
+        "childTableId": "0",
+        "isSoftEditable": false
+      },
+      {
+        "id": "374103058914",
+        "createdAt": "2026-09-04T01:31:02.414Z",
+        "updatedAt": "2026-09-04T01:32:32.885Z",
+        "publishedAt": "2026-09-04T01:32:33.030Z",
+        "path": null,
+        "name": "DEV TEST — Module 2: Welding Processes",
+        "values": {
+          "parent_course_id": "dev-iiw-welding-engineer",
+          "product_id": "dev-module-002",
+          "show_on_website": 1,
+          "module_order": 2
+        },
+        "childTableId": "0",
+        "isSoftEditable": false
+      }
+    ]
+  },
+  "resources": {
+    "table": {
+      "id": "2207726018",
+      "name": "resources",
+      "portalId": 443253065,
+      "createdAt": "2026-05-28T14:54:27.771Z",
+      "archivedAt": "1970-01-01T00:00:00Z",
+      "publishedAt": "2026-05-28T14:54:28.193Z",
+      "assignedCount": 10,
+      "updatedAt": "2026-05-28T14:54:28.015Z",
+      "label": "Resources — Resources Hub",
+      "hasUnpublishedRowChanges": true,
+      "columns": [
+        {
+          "name": "title",
+          "label": "Title",
+          "id": "1",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "slug",
+          "label": "URL slug",
+          "id": "2",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "abstract",
+          "label": "Abstract / summary",
+          "id": "3",
+          "archived": false,
+          "limit": 65000,
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "RICHTEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "file_url",
+          "label": "File / link URL",
+          "id": "4",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "URL",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "file_type",
+          "label": "File type",
+          "id": "5",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "pdf",
+              "label": "pdf",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "video",
+              "label": "video",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "link",
+              "label": "link",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "SELECT",
+          "optionCount": 3,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "category",
+          "label": "Category",
+          "id": "6",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "technical",
+              "label": "technical",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "standards",
+              "label": "standards",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "case_study",
+              "label": "case_study",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "4",
+              "name": "report",
+              "label": "report",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "5",
+              "name": "webinar",
+              "label": "webinar",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "6",
+              "name": "template",
+              "label": "template",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "7",
+              "name": "advocacy",
+              "label": "advocacy",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "SELECT",
+          "optionCount": 7,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "required_tier",
+          "label": "Required tier",
+          "id": "7",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "public",
+              "label": "public",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "member",
+              "label": "member",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "bronze",
+              "label": "bronze",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "4",
+              "name": "silver",
+              "label": "silver",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "5",
+              "name": "gold",
+              "label": "gold",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:27.771Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:27.771Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "SELECT",
+          "optionCount": 5,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "preview_image",
+          "label": "Preview image",
+          "id": "8",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "IMAGE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "published_date",
+          "label": "Published date",
+          "id": "9",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "DATE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "is_active",
+          "label": "Active",
+          "id": "10",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:27.771Z",
+          "type": "BOOLEAN",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:27.771Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        }
+      ],
+      "partitioningSettings": {
+        "teamIds": [],
+        "userIds": []
+      },
+      "published": true,
+      "createdById": 88565931,
+      "updated": 1779980068015,
+      "archived": false,
+      "updatedById": 88565931,
+      "cosObjectType": "HUBDB_TABLE",
+      "columnCount": 10,
+      "cdnPurgeEmbargoTime": null,
+      "rowCount": 0,
+      "createdBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "updatedBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "useForPages": true,
+      "allowChildTables": false,
+      "enableChildTablePages": false,
+      "crmObjectTypeId": 0,
+      "dynamicMetaTags": {
+        "DESCRIPTION": 3,
+        "FEATURED_IMAGE_URL": 8
+      },
+      "allowPublicApiAccess": true
+    },
+    "rows": []
+  },
+  "jobs": {
+    "table": {
+      "id": "2207726016",
+      "name": "jobs",
+      "portalId": 443253065,
+      "createdAt": "2026-05-28T14:54:26.289Z",
+      "archivedAt": "1970-01-01T00:00:00Z",
+      "publishedAt": "2026-05-28T14:54:26.713Z",
+      "assignedCount": 12,
+      "updatedAt": "2026-05-28T14:54:26.514Z",
+      "label": "Jobs — Job Board",
+      "hasUnpublishedRowChanges": true,
+      "columns": [
+        {
+          "name": "slug",
+          "label": "URL slug",
+          "id": "1",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "job_title",
+          "label": "Job title",
+          "id": "2",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "company_name",
+          "label": "Company / employer name",
+          "id": "3",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "job_type",
+          "label": "Employment type",
+          "id": "4",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "Full-time",
+              "label": "Full-time",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "Part-time",
+              "label": "Part-time",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "Contract",
+              "label": "Contract",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "4",
+              "name": "Apprenticeship",
+              "label": "Apprenticeship",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "SELECT",
+          "optionCount": 4,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "job_state",
+          "label": "State",
+          "id": "5",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "NSW",
+              "label": "NSW",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "VIC",
+              "label": "VIC",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "QLD",
+              "label": "QLD",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "4",
+              "name": "WA",
+              "label": "WA",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "5",
+              "name": "SA",
+              "label": "SA",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "6",
+              "name": "TAS",
+              "label": "TAS",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "7",
+              "name": "NT",
+              "label": "NT",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "8",
+              "name": "ACT",
+              "label": "ACT",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:26.289Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:26.289Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "SELECT",
+          "optionCount": 8,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "job_location",
+          "label": "City / locality",
+          "id": "6",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "job_description",
+          "label": "Job description",
+          "id": "7",
+          "archived": false,
+          "limit": 65000,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "RICHTEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "application_url",
+          "label": "Apply link (URL)",
+          "id": "8",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "URL",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "closing_date",
+          "label": "Applications close",
+          "id": "9",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "DATE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "date_posted",
+          "label": "Date posted",
+          "id": "10",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "DATE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "is_active",
+          "label": "Active (visible on site)",
+          "id": "11",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "BOOLEAN",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "is_featured",
+          "label": "Featured (pinned to top)",
+          "id": "12",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:26.289Z",
+          "type": "BOOLEAN",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:26.289Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        }
+      ],
+      "partitioningSettings": {
+        "teamIds": [],
+        "userIds": []
+      },
+      "published": true,
+      "archived": false,
+      "updated": 1779980066514,
+      "updatedById": 88565931,
+      "cosObjectType": "HUBDB_TABLE",
+      "columnCount": 12,
+      "createdById": 88565931,
+      "cdnPurgeEmbargoTime": null,
+      "rowCount": 0,
+      "createdBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "updatedBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "useForPages": true,
+      "allowChildTables": false,
+      "enableChildTablePages": false,
+      "crmObjectTypeId": 0,
+      "dynamicMetaTags": {
+        "DESCRIPTION": 7
+      },
+      "allowPublicApiAccess": true
+    },
+    "rows": []
+  },
+  "certification_pathways": {
+    "table": null,
+    "rows": []
+  },
+  "team_and_board": {
+    "table": {
+      "id": "2209273287",
+      "name": "team_and_board",
+      "portalId": 443253065,
+      "createdAt": "2026-05-28T14:54:28.964Z",
+      "archivedAt": "1970-01-01T00:00:00Z",
+      "publishedAt": "2026-05-28T14:54:29.213Z",
+      "assignedCount": 7,
+      "updatedAt": "2026-05-28T14:54:28.964Z",
+      "label": "Team & Board",
+      "hasUnpublishedRowChanges": true,
+      "columns": [
+        {
+          "name": "name",
+          "label": "Name",
+          "id": "1",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:28.964Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:28.964Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "role",
+          "label": "Role / title",
+          "id": "2",
+          "archived": false,
+          "limit": 10000,
+          "createdAt": "2026-05-28T14:54:28.964Z",
+          "type": "TEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:28.964Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "category",
+          "label": "Category",
+          "id": "3",
+          "archived": false,
+          "options": [
+            {
+              "id": "1",
+              "name": "Executive",
+              "label": "Executive",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:28.964Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:28.964Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "2",
+              "name": "Board",
+              "label": "Board",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:28.964Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:28.964Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "3",
+              "name": "Engineering",
+              "label": "Engineering",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:28.964Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:28.964Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "4",
+              "name": "Training",
+              "label": "Training",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:28.964Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:28.964Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            },
+            {
+              "id": "5",
+              "name": "Q&C",
+              "label": "Q&C",
+              "type": "option",
+              "createdAt": "2026-05-28T14:54:28.964Z",
+              "createdByUserId": 88565931,
+              "createdBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "updatedAt": "2026-05-28T14:54:28.964Z",
+              "updatedByUserId": 88565931,
+              "updatedBy": {
+                "id": "88565931",
+                "email": "melwyn@refuelcreative.com.au",
+                "firstName": "Melwyn",
+                "lastName": "Anthony"
+              },
+              "order": null
+            }
+          ],
+          "createdAt": "2026-05-28T14:54:28.964Z",
+          "type": "SELECT",
+          "optionCount": 5,
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:28.964Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "headshot",
+          "label": "Headshot",
+          "id": "4",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:28.964Z",
+          "type": "IMAGE",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:28.964Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "bio",
+          "label": "Bio",
+          "id": "5",
+          "archived": false,
+          "limit": 65000,
+          "createdAt": "2026-05-28T14:54:28.964Z",
+          "type": "RICHTEXT",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:28.964Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "display_order",
+          "label": "Display order",
+          "id": "6",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:28.964Z",
+          "type": "NUMBER",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:28.964Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        },
+        {
+          "name": "is_active",
+          "label": "Active",
+          "id": "7",
+          "archived": false,
+          "createdAt": "2026-05-28T14:54:28.964Z",
+          "type": "BOOLEAN",
+          "createdByUserId": 88565931,
+          "createdBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          },
+          "updatedAt": "2026-05-28T14:54:28.964Z",
+          "updatedByUserId": 88565931,
+          "updatedBy": {
+            "id": "88565931",
+            "email": "melwyn@refuelcreative.com.au",
+            "firstName": "Melwyn",
+            "lastName": "Anthony"
+          }
+        }
+      ],
+      "partitioningSettings": {
+        "teamIds": [],
+        "userIds": []
+      },
+      "published": true,
+      "cosObjectType": "HUBDB_TABLE",
+      "columnCount": 7,
+      "archived": false,
+      "updated": 1779980068964,
+      "createdById": 88565931,
+      "updatedById": 88565931,
+      "cdnPurgeEmbargoTime": null,
+      "rowCount": 0,
+      "createdBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "updatedBy": {
+        "id": "88565931",
+        "email": "melwyn@refuelcreative.com.au",
+        "firstName": "Melwyn",
+        "lastName": "Anthony"
+      },
+      "useForPages": false,
+      "allowChildTables": false,
+      "enableChildTablePages": false,
+      "crmObjectTypeId": 0,
+      "dynamicMetaTags": {},
+      "allowPublicApiAccess": true
+    },
+    "rows": []
+  },
+  "people": {
+    "table": null,
+    "rows": []
+  }
+}

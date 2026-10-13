@@ -1,0 +1,342 @@
+<!--
+  templateType: email_subscription_preferences_page
+  label: Email Subscription Preferences
+  isAvailableForNewContent: true
+-->
+{#
+  email-subscriptions.html - Email Subscription Preferences Page
+  Assign in: HubSpot Settings → Website → Pages → System pages → Subscription Preferences Page
+
+  HubSpot renders this page when a contact clicks "Manage preferences" in any
+  HubSpot-sent email. The `subscription_preferences_module` renders HubSpot's
+  built-in subscription-management UI, which lists all subscription types the
+  contact is eligible for and allows them to opt in/out of each.
+
+  Weld Australia subscription types (configure in HubSpot Settings → Marketing → Subscriptions):
+    - Membership Updates     - renewal notices, status changes, benefits news
+    - Training & Courses     - new course dates, timetable changes, early-bird offers
+    - Certification News     - certification-step prompts, expiry reminders, industry standards
+    - Advocacy & Policy      - submissions, position papers, government updates
+    - Events & Webinars      - upcoming events, registration reminders, post-event resources
+    - Industry Newsletter    - monthly Weld Australia newsletter
+
+  Sections:
+    1. Hero (compact) - brand header with explanatory copy
+    2. Subscription preferences module - HubSpot built-in
+    3. Footer note - unsubscribe clarification
+
+  Fixed layout - no dnd_area.
+#}
+{% set page_title = "Email Preferences" %}
+{% set page_description = "Manage your Weld Australia email preferences. Choose which updates and communications you'd like to receive." %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body_class %}page-email-subscriptions{% endblock %}
+
+{% block body %}
+<section class="subs-page" aria-labelledby="subs-heading">
+
+  {# ── Hero band ──────────────────────────────────────────────────────────── #}
+  {% set _shared_hero_id = 'email-preferences-hero' %}
+  {% set _shared_hero_section_id = 'subs' %}
+  {% set _shared_hero_background = 'primary' %}
+  {% set _shared_hero_height = 'compact' %}
+  {% set _shared_hero_spacing = 'spacious' %}
+  {% set _shared_hero_alignment = 'left' %}
+  {% set _shared_hero_accent_bar = true %}
+  {% set _shared_hero_media_type = 'none' %}
+  {% set _shared_hero_eyebrow = 'Email preferences' %}
+  {% set _shared_hero_headline = 'Manage your email preferences' %}
+  {% set _shared_hero_subheadline = "<p>Choose which updates you'd like to receive from Weld Australia. You can update your preferences at any time - changes take effect immediately.</p>" %}
+  {% include "../partials/shared-hero.html" %}
+
+  {% if false %}
+  {# Legacy hero markup replaced by shared-hero in Batch 4. #}
+  <div class="subs-page__hero">
+    <div class="container container-narrow">
+      <h1 id="subs-heading" class="subs-page__heading">
+        Manage your email preferences
+      </h1>
+      <p class="subs-page__lead">
+        Choose which updates you'd like to receive from Weld Australia.
+        You can update your preferences at any time - changes take effect immediately.
+      </p>
+    </div>
+  </div>
+
+  {# ── Subscription preferences module ─────────────────────────────────────── #}
+  {#
+    `subscription_preferences_module` is HubSpot's built-in module that:
+      - Reads the contact's current subscription opt-in/out state via the token
+        in the email link (no login required).
+      - Renders a checkbox list of all active subscription types.
+      - Handles the save action and redirects to the confirmation page.
+    Do not remove or replace this module - it is required for CAN-SPAM / GDPR
+    compliance via HubSpot's consent framework.
+  #}
+  {% endif %}
+
+  <div class="subs-page__form-wrap">
+    <div class="container container-narrow">
+
+      <div class="subs-page__intro-card">
+        <p class="subs-page__subscription-types-label">
+          Our communications are grouped into the following categories:
+        </p>
+        <ul class="subs-page__categories-preview" aria-label="Available subscription categories">
+          <li>
+            <strong>Membership Updates</strong> - renewal notices, status changes, and member benefits news
+          </li>
+          <li>
+            <strong>Training &amp; Courses</strong> - new course dates, timetable updates, and early-bird offers
+          </li>
+          <li>
+            <strong>Certification News</strong> - certification-step prompts, expiry reminders, and standards updates
+          </li>
+          <li>
+            <strong>Advocacy &amp; Policy</strong> - submissions, position papers, and government engagement updates
+          </li>
+          <li>
+            <strong>Events &amp; Webinars</strong> - upcoming events, registration reminders, and post-event resources
+          </li>
+          <li>
+            <strong>Industry Newsletter</strong> - the monthly Weld Australia newsletter
+          </li>
+        </ul>
+      </div>
+
+      {# HubSpot requires the built-in email_subscriptions module on this templateType. #}
+      {% module "email_subscriptions"
+        path="@hubspot/email_subscriptions"
+        label="Subscription preferences"
+      %}
+
+    </div>
+  </div>
+
+  {# ── Unsubscribe clarification ─────────────────────────────────────────── #}
+  <div class="subs-page__footer-note">
+    <div class="container container-narrow">
+      <p>
+        <strong>Note:</strong> Unsubscribing from marketing communications does not
+        affect transactional emails - you will always receive emails that are
+        necessary to deliver services you've purchased (e.g. course confirmations,
+        certificates, and invoices).
+      </p>
+      <p>
+        To update your personal details or contact information, log in to your
+        <a href="/portal/">member portal</a> and visit
+        <a href="/portal/profile/">My Profile</a>.
+      </p>
+      <p>
+        Questions about your data? Contact us at
+        <a href="mailto:office@weldaustralia.com.au">office@weldaustralia.com.au</a>.
+      </p>
+    </div>
+  </div>
+
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── Subscription Preferences Page Styles ────────────────────────────────── */
+
+  .subs-page {
+    background-color: var(--wa-color-surface);
+    min-height: 60vh;
+  }
+
+  /* Hero band */
+  .subs-page__hero {
+    background-color: var(--wa-color-primary-dark);
+    color: var(--wa-color-text-inverse);
+    padding: var(--wa-space-16) var(--wa-space-4) var(--wa-space-12);
+  }
+
+  .subs-page__heading {
+    font-family: var(--wa-font-heading);
+    font-size: clamp(var(--wa-text-2xl), 4vw, var(--wa-text-3xl));
+    font-weight: var(--wa-weight-bold);
+    color: var(--wa-color-text-inverse);
+    margin: 0 0 var(--wa-space-4);
+    line-height: var(--wa-leading-tight);
+  }
+
+  .subs-page__lead {
+    font-size: var(--wa-text-md);
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 56ch;
+    line-height: var(--wa-leading-relaxed);
+    margin: 0;
+  }
+
+  /* Form wrapper */
+  .subs-page__form-wrap {
+    padding: var(--wa-space-12) var(--wa-space-4);
+  }
+
+  /* Intro card that lists subscription types */
+  .subs-page__intro-card {
+    background-color: var(--wa-color-surface-2);
+    border: 1px solid var(--wa-color-border);
+    border-radius: var(--wa-radius-lg);
+    padding: var(--wa-space-6) var(--wa-space-8);
+    margin-bottom: var(--wa-space-8);
+  }
+
+  .subs-page__subscription-types-label {
+    font-size: var(--wa-text-sm);
+    font-weight: var(--wa-weight-semibold);
+    color: var(--wa-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 var(--wa-space-4);
+  }
+
+  .subs-page__categories-preview {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-3);
+  }
+
+  .subs-page__categories-preview li {
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-text-muted);
+    line-height: var(--wa-leading-normal);
+    padding-left: var(--wa-space-5);
+    position: relative;
+  }
+
+  .subs-page__categories-preview li::before {
+    content: "•";
+    position: absolute;
+    left: var(--wa-space-2);
+    color: var(--wa-color-accent);
+    font-weight: var(--wa-weight-bold);
+  }
+
+  .subs-page__categories-preview strong {
+    color: var(--wa-color-text);
+    font-weight: var(--wa-weight-semibold);
+  }
+
+  /*
+   * Style HubSpot's built-in subscription preferences module to match the theme.
+   * The rendered HTML from @hubspot/subscription_preferences wraps checkboxes in
+   * `.hs-subscription-types-list`. These overrides integrate it visually.
+   */
+  .hs-subscription-types-list {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-3);
+  }
+
+  .hs-subscription-type-item {
+    border: 1px solid var(--wa-color-border);
+    border-radius: var(--wa-radius-md);
+    background-color: var(--wa-color-surface);
+    padding: var(--wa-space-4) var(--wa-space-5);
+    transition: border-color var(--wa-duration-fast) var(--wa-ease-default);
+  }
+
+  .hs-subscription-type-item:has(input:checked) {
+    border-color: var(--wa-color-primary);
+    background-color: var(--wa-color-surface-2);
+  }
+
+  .hs-subscription-type-item label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wa-space-3);
+    cursor: pointer;
+    font-size: var(--wa-text-base);
+    font-weight: var(--wa-weight-medium);
+    color: var(--wa-color-text);
+    line-height: var(--wa-leading-normal);
+  }
+
+  .hs-subscription-type-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    margin-top: 1px;
+    accent-color: var(--wa-color-primary);
+    cursor: pointer;
+    border-radius: var(--wa-radius-sm);
+  }
+
+  .hs-subscription-type-description {
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-text-muted);
+    margin: var(--wa-space-1) 0 0;
+    line-height: var(--wa-leading-relaxed);
+  }
+
+  /* Save button override - align to primary button style */
+  .hs-button.primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--wa-touch-min);
+    padding: var(--wa-space-3) var(--wa-space-6);
+    font-family: var(--wa-font-body);
+    font-size: var(--wa-text-base);
+    font-weight: var(--wa-weight-semibold);
+    background-color: var(--wa-color-primary);
+    color: var(--wa-color-on-primary);
+    border: 2px solid var(--wa-color-primary);
+    border-radius: var(--wa-radius-md);
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: var(--wa-space-6);
+    transition:
+      background-color var(--wa-duration-fast) var(--wa-ease-default),
+      border-color var(--wa-duration-fast) var(--wa-ease-default);
+  }
+
+  .hs-button.primary:hover {
+    background-color: var(--wa-color-primary-dark);
+    border-color: var(--wa-color-primary-dark);
+  }
+
+  .hs-button.primary:focus-visible {
+    outline: 3px solid var(--wa-color-primary);
+    outline-offset: 3px;
+  }
+
+  /* Footer note */
+  .subs-page__footer-note {
+    background-color: var(--wa-color-surface-2);
+    border-top: 1px solid var(--wa-color-border);
+    padding: var(--wa-space-12) var(--wa-space-4);
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-text-muted);
+    line-height: var(--wa-leading-relaxed);
+  }
+
+  .subs-page__footer-note p {
+    margin: 0 0 var(--wa-space-3);
+  }
+
+  .subs-page__footer-note p:last-child {
+    margin-bottom: 0;
+  }
+
+  .subs-page__footer-note a {
+    color: var(--wa-color-primary);
+    text-decoration: underline;
+  }
+
+  .subs-page__footer-note a:hover {
+    color: var(--wa-color-primary-dark);
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A11y Test - Course Filter (no sessions)</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/assets/css/components.css" />
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    a.skip-to-content {
+      position: absolute; left: -9999px; top: 0; z-index: 9999;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; min-width: 44px;
+      padding: 0.5rem 1rem; background: #002f5f; color: #fff;
+    }
+    a.skip-to-content:focus { left: 0; }
+  </style>
+</head>
+<body>
+  <a class="skip-to-content" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h1>Course Filter Island Test - No Sessions</h1>
+
+    <!-- Course with no scheduled sessions: the EOI form is the whole UI and
+         there is no location selector, so the copy must not name a city. -->
+    <section aria-labelledby="filter-heading">
+      <h2 id="filter-heading">Upcoming Sessions</h2>
+      <div
+        data-wa-module="course-filter"
+        data-props='{
+          "rows": [],
+          "member_tier": "corporate_gold",
+          "default_city": "auto",
+          "default_delivery_mode": "any",
+          "show_pricing": true,
+          "show_seats_remaining": true,
+          "register_cta_label": "Register now",
+          "eoi_form_id": "test-eoi-form",
+          "eoi_heading": "Interested in a session near you?",
+          "eoi_message": "<p>Register your interest and we will notify you.</p>",
+          "portal_id": "4538263"
+        }'
+      ></div>
+    </section>
+  </main>
+  <script type="module" src="/src/modules/course-filter/index.tsx"></script>
+</body>
+</html>

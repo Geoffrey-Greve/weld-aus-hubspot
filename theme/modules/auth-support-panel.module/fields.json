@@ -1,0 +1,74 @@
+[
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": "Need access?"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "New to the member portal?"
+  },
+  {
+    "name": "panel_body",
+    "label": "Body",
+    "type": "richtext",
+    "default": "<p>Your login is connected to your Weld Australia contact record and private content access.</p>"
+  },
+  {
+    "name": "primary_link_label",
+    "label": "Primary link label",
+    "type": "text",
+    "default": "Create your login"
+  },
+  {
+    "name": "primary_link",
+    "label": "Primary link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": "/signup/"
+      }
+    }
+  },
+  {
+    "name": "primary_link_style",
+    "label": "Primary link style",
+    "type": "choice",
+    "choices": [
+      ["button", "Button"],
+      ["text", "Text link"]
+    ],
+    "default": "button"
+  },
+  {
+    "name": "secondary_link_label",
+    "label": "Secondary link label",
+    "type": "text",
+    "default": "Explore membership"
+  },
+  {
+    "name": "secondary_link",
+    "label": "Secondary link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": "/membership/"
+      }
+    }
+  },
+  {
+    "name": "secondary_link_style",
+    "label": "Secondary link style",
+    "type": "choice",
+    "choices": [
+      ["button", "Button"],
+      ["text", "Text link"]
+    ],
+    "default": "text"
+  }
+]

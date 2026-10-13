@@ -1,0 +1,169 @@
+<!--
+  templateType: none
+-->
+{#
+  ─────────────────────────────────────────────────────────────────────────────
+  _job-apply.html - Job Board apply-destination resolver (defect 68)
+  ─────────────────────────────────────────────────────────────────────────────
+
+  Modes:
+    url    - real web application link. Link straight to it.
+    email  - employer email. Emit split data-job-apply-u / data-job-apply-d
+             attributes (no contiguous address, no mailto: in source). JS joins
+             them on click. Basic scraper deterrence only - a full application
+             system can replace this later.
+    none   - no destination. Callers fall back to /contact-us.
+
+  Both `application_email` and legacy `mailto:` values in `application_url`
+  resolve to email mode.
+
+  Usage:
+    {% import "../partials/_job-apply.html" as ja %}
+    {% set apply_mode = ja.apply_mode(row) | trim %}
+    <a href="#apply" {{ ja.obfuscated_apply_attrs(row, 'Application: Role') }}>Apply</a>
+    {% include "../partials/_job-apply-script.html" %}
+
+  Keep the jobs HubDB table private (allowPublicApiAccess: false) so the
+  address is not also exposed via the public HubDB API.
+#}
+
+{#
+  apply_mode - 'url' | 'email' | 'none'
+#}
+{% macro apply_mode(row) %}
+  {%- set col = row.application_url -%}
+  {%- set raw = '' -%}
+  {%- if col -%}
+    {%- if col.url and col.url.href -%}
+      {%- set raw = col.url.href -%}
+    {%- elif col.href -%}
+      {%- set raw = col.href -%}
+    {%- else -%}
+      {%- set raw = col -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- set raw = raw | default('', true) | trim -%}
+  {%- if not (raw[:4] == 'http' or raw[:1] == '/' or 'mailto:' in raw) -%}
+    {%- set raw = '' -%}
+  {%- endif -%}
+  {%- set email = row.application_email | default('', true) | trim -%}
+  {%- if raw and 'mailto:' not in raw -%}
+    {{- 'url' -}}
+  {%- elif email or 'mailto:' in raw -%}
+    {{- 'email' -}}
+  {%- else -%}
+    {{- 'none' -}}
+  {%- endif -%}
+{% endmacro %}
+
+{#
+  apply_url - external web application link, or '' for email / none.
+#}
+{% macro apply_url(row) %}
+  {%- set col = row.application_url -%}
+  {%- set raw = '' -%}
+  {%- if col -%}
+    {%- if col.url and col.url.href -%}
+      {%- set raw = col.url.href -%}
+    {%- elif col.href -%}
+      {%- set raw = col.href -%}
+    {%- else -%}
+      {%- set raw = col -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- set raw = raw | default('', true) | trim -%}
+  {%- if not (raw[:4] == 'http' or raw[:1] == '/' or 'mailto:' in raw) -%}
+    {%- set raw = '' -%}
+  {%- endif -%}
+  {%- if raw and 'mailto:' not in raw -%}
+    {{- raw -}}
+  {%- endif -%}
+{% endmacro %}
+
+{#
+  apply_email - employer address from application_email or a legacy mailto:
+  in application_url. Used only to split into obfuscated attributes - never
+  print this as a contiguous string or mailto: href in the template.
+#}
+{% macro apply_email(row) %}
+  {%- set email = row.application_email | default('', true) | trim -%}
+  {%- if not email -%}
+    {%- set col = row.application_url -%}
+    {%- set raw = '' -%}
+    {%- if col -%}
+      {%- if col.url and col.url.href -%}
+        {%- set raw = col.url.href -%}
+      {%- elif col.href -%}
+        {%- set raw = col.href -%}
+      {%- else -%}
+        {%- set raw = col -%}
+      {%- endif -%}
+    {%- endif -%}
+    {%- set raw = raw | default('', true) | trim -%}
+    {%- if 'mailto:' in raw -%}
+      {%- set email = raw | replace('mailto:', '') | trim -%}
+      {%- set email = email | split('?') | first | trim -%}
+    {%- endif -%}
+  {%- endif -%}
+  {{- email -}}
+{% endmacro %}
+
+{#
+  obfuscated_apply_attrs - data-job-apply-u / data-job-apply-d (+ optional
+  subject). Pair with _job-apply-script.html. The full address never appears
+  as one string in the HTML source.
+
+  Email extraction is inlined (not via apply_email) so this macro works when
+  the partial is imported as a namespace - HubL nested macro calls are unreliable.
+#}
+{% macro obfuscated_apply_attrs(row, subject='') %}
+  {%- set email = row.application_email | default('', true) | trim -%}
+  {%- if not email -%}
+    {%- set col = row.application_url -%}
+    {%- set raw = '' -%}
+    {%- if col -%}
+      {%- if col.url and col.url.href -%}
+        {%- set raw = col.url.href -%}
+      {%- elif col.href -%}
+        {%- set raw = col.href -%}
+      {%- else -%}
+        {%- set raw = col -%}
+      {%- endif -%}
+    {%- endif -%}
+    {%- set raw = raw | default('', true) | trim -%}
+    {%- if 'mailto:' in raw -%}
+      {%- set email = raw | replace('mailto:', '') | trim -%}
+      {%- set email = email | split('?') | first | trim -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- if email and '@' in email -%}
+    {%- set bits = email | split('@') -%}
+    {%- set local = bits[0] | default('', true) | trim -%}
+    {%- set domain = bits[1] | default('', true) | trim -%}
+    {%- if local and domain -%}
+ data-job-apply data-job-apply-u="{{ local | escape_attr }}" data-job-apply-d="{{ domain | escape_attr }}"{% if subject %} data-job-apply-subject="{{ subject | escape_attr }}"{% endif %}
+    {%- endif -%}
+  {%- endif -%}
+{% endmacro %}
+
+{#
+  job_detail_url - /job-board/{slug} for a row.
+#}
+{% macro job_detail_url(row) %}
+  {%- set route = row.hs_path | default(row.path, true) | default(row.slug, true) | default('', true) | trim -%}
+  {%- if route -%}
+    {{- '/job-board/' ~ route -}}
+  {%- endif -%}
+{% endmacro %}
+
+{#
+  contact_fallback_url - only when there is no apply destination at all.
+#}
+{% macro contact_fallback_url(row) %}
+  {%- set route = row.hs_path | default(row.path, true) | default(row.slug, true) | default('', true) | trim -%}
+  {%- if route -%}
+    {{- '/contact-us?topic=job-board&ref=' ~ route ~ '#enquiry' -}}
+  {%- else -%}
+    {{- '/contact-us?topic=job-board#enquiry' -}}
+  {%- endif -%}
+{% endmacro %}

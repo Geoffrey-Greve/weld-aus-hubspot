@@ -1,0 +1,223 @@
+/*
+ * hero-video.module/module.css
+ * Two-column hero: text left, video right.
+ * On mobile: stacked, video below text.
+ * Scoped to .wa-hero-video. Mobile-first. Tokens from --wa-* custom properties.
+ *
+ * CLS: the video wrapper uses aspect-ratio: 16/9 and explicit width/height on
+ * the <iframe> so the browser reserves space before the embed loads.
+ */
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+
+.wa-hero-video {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Inner: stacked on mobile, two-column on desktop ─────────────────────── */
+
+.wa-hero-video__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-10);
+  align-items: center;
+}
+
+/* ── Text column ──────────────────────────────────────────────────────────── */
+
+.wa-hero-video__headline {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-bold);
+  line-height: 1.15;
+  margin: 0 0 var(--wa-space-4) 0;
+  color: inherit;
+}
+
+.wa-hero-video__subheadline {
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-lg);
+  line-height: 1.6;
+  margin: 0 0 var(--wa-space-8) 0;
+  color: inherit;
+  opacity: 0.9;
+}
+
+.wa-hero-video__subheadline > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-hero-video__cta {
+  min-height: var(--wa-touch-min);
+  min-width: var(--wa-touch-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding-inline: var(--wa-space-6);
+  /* No `white-space: nowrap` - it out-specified the .btn base and would stop a
+     long CTA label wrapping on a narrow viewport. */
+  margin-bottom: var(--wa-space-8);
+}
+
+/* ── Trust badges ─────────────────────────────────────────────────────────── */
+
+.wa-hero-video__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-4);
+  align-items: center;
+  margin-top: var(--wa-space-4);
+}
+
+.wa-hero-video__badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wa-space-1);
+  text-align: center;
+}
+
+.wa-hero-video__badge-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  display: block;
+}
+
+.wa-hero-video__badge-label {
+  font-family: var(--wa-font-body);
+  font-size: var(--wa-text-xs, 0.75rem);
+  color: inherit;
+  opacity: 0.8;
+  line-height: 1.3;
+  max-width: 80px;
+}
+
+/* ── Video column ─────────────────────────────────────────────────────────── */
+
+.wa-hero-video__media {
+  width: 100%;
+}
+
+/* 16:9 aspect-ratio container - prevents CLS */
+.wa-hero-video__video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--wa-radius-lg);
+  overflow: hidden;
+  background-color: #000;
+}
+
+.wa-hero-video__iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ── Poster (click-to-play) ───────────────────────────────────────────────── */
+
+.wa-hero-video__poster {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-hero-video__poster-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wa-hero-video__play-btn {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  transition: transform 0.15s ease;
+}
+
+.wa-hero-video__poster:hover .wa-hero-video__play-btn,
+.wa-hero-video__poster:focus-visible .wa-hero-video__play-btn {
+  transform: scale(1.1);
+}
+
+.wa-hero-video__poster:focus-visible {
+  outline: 3px solid var(--wa-color-primary);
+  outline-offset: 4px;
+}
+
+/* ── Vertical spacing ─────────────────────────────────────────────────────── */
+
+.wa-hero-video--sp-compact  { padding-block: var(--wa-space-8);  }
+.wa-hero-video--sp-default  { padding-block: var(--wa-space-16); }
+.wa-hero-video--sp-spacious { padding-block: var(--wa-space-24); }
+
+/* ── Background colour variants ───────────────────────────────────────────── */
+
+.wa-hero-video--bg-surface {
+  background-color: var(--wa-color-surface);
+  color: var(--wa-color-text);
+}
+
+.wa-hero-video--bg-surface_alt {
+  background-color: var(--wa-color-surface-alt, #f5f5f5);
+  color: var(--wa-color-text);
+}
+
+.wa-hero-video--bg-primary {
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+}
+
+.wa-hero-video--bg-primary_dark {
+  background-color: var(--wa-color-primary-dark, #0b2a4a);
+  color: var(--wa-color-on-primary);
+}
+
+.wa-hero-video--bg-transparent {
+  background-color: transparent;
+  color: var(--wa-color-text);
+}
+
+/* ── Visibility helpers ───────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .wa-hidden-mobile { display: none !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .wa-hidden-tablet { display: none !important; }
+}
+
+@media (min-width: 1024px) {
+  .wa-hidden-desktop { display: none !important; }
+}
+
+/* ── Two-column layout at ≥768px ──────────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  .wa-hero-video__headline {
+    font-size: var(--wa-text-4xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-hero-video__inner {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wa-space-16);
+  }
+
+  .wa-hero-video__headline {
+    font-size: var(--wa-text-5xl, clamp(2.5rem, 4vw, 3.5rem));
+  }
+}

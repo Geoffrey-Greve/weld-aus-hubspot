@@ -1,0 +1,14 @@
+{
+  "label": "Resource Library",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "React island: faceted resource hub from HubDB Table 5 (resources). Server-side member gating bakes a locked boolean per row. Place on resources.html. Locked rows show upgrade overlay - never a 403.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["resources", "react-island", "hubdb", "members", "gated", "interactive"]
+}

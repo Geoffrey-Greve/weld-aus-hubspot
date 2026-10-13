@@ -1,0 +1,57 @@
+{% set _row = dynamic_page_hubdb_row %}
+{% set _course_name = module.headline_override | default(_row.course_name, true) | default('Course') %}
+{% set _image_url = module.background_image.src | default('') %}
+{% set _hero_height = 'large' %}
+{% if module.height == 'compact' %}
+  {% set _hero_height = 'compact' %}
+{% elif module.height == 'large' %}
+  {% set _hero_height = 'tall' %}
+{% endif %}
+
+<section
+  class="wa-hero wa-course-detail-hero wa-course-detail-hero--{{ module.height | default('standard') }} wa-hero--bg-primary wa-hero--sp-default wa-hero--h-{{ _hero_height }} wa-hero--align-left wa-hero--accent-bar{% if _image_url %} wa-course-detail-hero--has-image{% endif %}"
+  aria-labelledby="wa-course-detail-hero-{{ name }}"
+  {% if _image_url %}
+  style="--wa-course-hero-image: url('{{ _image_url | escape_url }}'); --wa-course-hero-overlay: {{ module.overlay_opacity | default(76) / 100 }};"
+  {% endif %}
+>
+  <div class="container wa-hero__inner wa-course-detail-hero__inner">
+    <div class="wa-hero__content wa-course-detail-hero__content">
+      {% if module.show_breadcrumb %}
+      <nav class="wa-hero__breadcrumb wa-course-detail-hero__breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/training/">Training</a></li>
+          <li aria-hidden="true">/</li>
+          <li><a href="/courses/">Course timetable</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page">{{ _course_name }}</li>
+        </ol>
+      </nav>
+      {% endif %}
+
+      {% if module.eyebrow %}
+      <div class="wa-overline wa-overline--light">
+        <span class="wa-overline__text">{{ module.eyebrow }}</span>
+      </div>
+      {% endif %}
+
+      <h1 class="wa-hero__headline" id="wa-course-detail-hero-{{ name }}">{{ _course_name }}</h1>
+
+      {% if module.summary %}
+      <div class="wa-hero__subheadline wa-course-detail-hero__summary">{{ module.summary }}</div>
+      {% endif %}
+
+      <div class="wa-hero__ctas wa-course-detail-hero__actions">
+        {% if module.primary_cta_label and module.primary_cta_anchor %}
+        <a class="btn btn-primary btn-gold wa-hero__cta" href="#{{ module.primary_cta_anchor }}">{{ module.primary_cta_label }}</a>
+        {% endif %}
+        {% if module.secondary_cta_label and module.secondary_cta_anchor %}
+        <a class="btn btn-outline btn-white-outline wa-hero__cta" href="#{{ module.secondary_cta_anchor }}">{{ module.secondary_cta_label }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% set _brand_line_context = 'hero' %}
+  {% set _brand_line_class = 'wa-hero__accent-bar wa-course-detail-hero__accent' %}
+  {% include "../../templates/partials/brand-line.html" %}
+</section>

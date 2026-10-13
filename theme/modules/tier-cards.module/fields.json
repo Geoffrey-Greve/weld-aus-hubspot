@@ -1,0 +1,158 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White/Light"
+      ],
+      [
+        "surface_alt",
+        "Alt grey"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "tier_style",
+    "label": "Tier colour",
+    "type": "choice",
+    "choices": [
+      [
+        "gold",
+        "Gold"
+      ],
+      [
+        "silver",
+        "Silver"
+      ],
+      [
+        "bronze",
+        "Bronze"
+      ],
+      [
+        "individual",
+        "Individual (navy)"
+      ],
+      [
+        "corporate",
+        "Corporate (magenta)"
+      ],
+      [
+        "apprentice",
+        "Apprentice (green)"
+      ]
+    ],
+    "default": "gold"
+  },
+  {
+    "name": "name_text",
+    "label": "Tier name",
+    "type": "text",
+    "default": "Gold Member"
+  },
+  {
+    "name": "price",
+    "label": "Price",
+    "type": "text",
+    "default": "$1,500"
+  },
+  {
+    "name": "price_period",
+    "label": "Price period",
+    "type": "text",
+    "default": "per year + GST"
+  },
+  {
+    "name": "description",
+    "label": "Description",
+    "type": "richtext"
+  },
+  {
+    "name": "benefits",
+    "label": "Benefits list",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 30,
+      "default": 1
+    },
+    "children": [
+      {
+        "name": "text",
+        "label": "Benefit text",
+        "type": "text"
+      },
+      {
+        "name": "included",
+        "label": "Included",
+        "type": "boolean",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "highlighted",
+    "label": "Highlighted / recommended",
+    "type": "boolean",
+    "default": false,
+    "help_text": "Adds a 'Recommended' badge and elevated styling."
+  },
+  {
+    "name": "primary_cta_label",
+    "label": "Primary CTA label",
+    "type": "text",
+    "default": "Join now"
+  },
+  {
+    "name": "primary_cta_link",
+    "label": "Primary CTA link",
+    "type": "link"
+  },
+  {
+    "name": "secondary_cta_label",
+    "label": "Secondary CTA label",
+    "type": "text"
+  },
+  {
+    "name": "secondary_cta_link",
+    "label": "Secondary CTA link",
+    "type": "link"
+  }
+]

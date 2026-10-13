@@ -1,0 +1,166 @@
+<!--
+  templateType: page
+  label: Certification - Individual
+  isAvailableForNewContent: true
+-->
+﻿{#
+  certification-individual.html - Weld Australia Individual Certification Page
+  URL: /certification/individual/
+  Template type: drag-and-drop page
+
+  Sections (§ 3.10 variant - individual certification focus):
+    1. Hero - individual cert focus
+    2. What individual certification covers - three-up value props
+    3. Available certifications - cert-pathway-cards filtered to individual certs (AS1796, IIW Inspector, etc.)
+    4. Individual cert process - Apply / Submit evidence / Audit / Certified four-step
+    5. Accreditation logos - international recognition logo strip
+    6. FAQ accordion - individual cert specific
+    7. Final CTA - Start your application
+
+  Modules used:
+    hero, value-props-3up, cert-pathway-cards, step-process,
+    logo-strip, faq-accordion, cta-banner
+#}
+{% set page_title_exact = page_meta.html_title | default('Individual Certification - Weld Australia') %}
+{% set page_description = page_meta.meta_description | default('Weld Australia individual certifications including AS1796 and IIW International Welding Inspector. Earn nationally and internationally recognised credentials.') %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 1  HERO COMPACT - Individual certification entry point
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero - Individual Certification"
+          background="primary_dark"
+          height="compact"
+          spacing="default"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+          eyebrow="Certification"
+          headline="Individual Welding Certification"
+          subheadline="<p>Earn nationally and internationally recognised credentials that validate your welding expertise.</p>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 2  WHAT IS INDIVIDUAL CERTIFICATION - Three-up value props
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/value-props-3up"
+          label="Individual certification benefits"
+          section_heading="Why pursue individual certification?"
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 3  AVAILABLE CERTIFICATIONS - Individual cert pathway cards
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cert-pathway-cards"
+          label="Individual certification pathways"
+          section_heading="Available certifications"
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 4  CERTIFICATION PROCESS - Four-step process for individuals
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/step-process"
+          label="Individual certification process"
+          section_heading="How to get certified"
+          step_count=4
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 5  ACCREDITATION LOGOS - International recognition
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/logo-strip"
+          label="Accreditation logos"
+          section_heading="Internationally recognised accreditation"
+          source="manual"
+          background="surface_alt"
+          spacing="compact"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 6  FAQ - Individual certification questions
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/faq-accordion"
+          label="Individual certification FAQ"
+          section_heading="Frequently asked questions"
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 7  FINAL CTA - Start your application
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA - Start application"
+          headline="Ready to start your certification journey?"
+          body_text="<p>Contact our certification team to discuss the right pathway and begin your application.</p>"
+          cta_label="Start your application"
+          cta_link={"url": {"href": "/contact-us?topic=certification#enquiry", "type": "EXTERNAL"}}
+          secondary_cta_label="All certification pathways"
+          secondary_cta_link={"url": {"href": "/certification/", "type": "EXTERNAL"}}
+          background="primary"
+          spacing="default"
+          align="split"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

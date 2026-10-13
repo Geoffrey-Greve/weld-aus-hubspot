@@ -1,0 +1,51 @@
+{
+  "name": "state_offices",
+  "label": "State Offices",
+  "useForPages": false,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "columns": [
+    {
+      "name": "state",
+      "label": "State",
+      "type": "SELECT",
+      "options": [
+        { "name": "NSW", "type": "option" },
+        { "name": "VIC", "type": "option" },
+        { "name": "QLD", "type": "option" },
+        { "name": "WA", "type": "option" },
+        { "name": "SA", "type": "option" },
+        { "name": "TAS", "type": "option" },
+        { "name": "NT", "type": "option" },
+        { "name": "ACT", "type": "option" }
+      ]
+    },
+    {
+      "name": "office_name",
+      "label": "Office name",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "address",
+      "label": "Address",
+      "type": "TEXT"
+    },
+    {
+      "name": "phone",
+      "label": "Phone",
+      "type": "TEXT"
+    },
+    {
+      "name": "email",
+      "label": "Email",
+      "type": "TEXT"
+    },
+    {
+      "name": "manager_contact_id",
+      "label": "Manager HubSpot Contact ID",
+      "type": "NUMBER"
+    }
+  ]
+}

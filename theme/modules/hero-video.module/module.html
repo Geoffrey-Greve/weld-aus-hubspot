@@ -1,0 +1,208 @@
+{#
+  hero-video.module/module.html
+  Two-column hero: left = text + CTA + trust badges, right = embedded video.
+  Video is loaded in a click-to-play poster state on mobile to save bandwidth.
+
+  Video ID extraction:
+    YouTube   - accepts bare ID or /watch?v=ID or youtu.be/ID
+    Vimeo     - accepts bare ID or vimeo.com/ID
+    HubSpot   - URL used directly as iframe src
+
+  Standard fields: section_id, background, spacing, visibility, members_only
+  Module fields:   headline, subheadline, video_source, video_id_or_url,
+                   poster_image, trust_badges, primary_cta
+#}
+
+{%- set _vis = module.visibility | default(['mobile','tablet','desktop']) -%}
+{%- set _has_video = module.video_id_or_url -%}
+
+{#-- Extract clean video ID from whatever the editor pasted --#}
+{%- set _raw = module.video_id_or_url | default('') -%}
+
+{%- if module.video_source == 'youtube' -%}
+  {#-- Strip full YouTube URL to bare ID --#}
+  {%- if 'youtube.com/watch' in _raw -%}
+    {%- set _raw = _raw.split('v=')[1] -%}
+    {%- if '&' in _raw -%}{%- set _raw = _raw.split('&')[0] -%}{%- endif -%}
+  {%- elif 'youtu.be/' in _raw -%}
+    {%- set _raw = _raw.split('youtu.be/')[1] -%}
+    {%- if '?' in _raw -%}{%- set _raw = _raw.split('?')[0] -%}{%- endif -%}
+  {%- elif 'youtube.com/embed/' in _raw -%}
+    {%- set _raw = _raw.split('embed/')[1] -%}
+    {%- if '?' in _raw -%}{%- set _raw = _raw.split('?')[0] -%}{%- endif -%}
+  {%- endif -%}
+  {%- set _embed_url = 'https://www.youtube-nocookie.com/embed/' ~ _raw ~ '?rel=0&modestbranding=1' -%}
+  {%- set _video_title = 'YouTube video player' -%}
+
+{%- elif module.video_source == 'vimeo' -%}
+  {#-- Strip full Vimeo URL to bare ID --#}
+  {%- if 'vimeo.com/' in _raw -%}
+    {%- set _raw = _raw.split('vimeo.com/')[1] -%}
+    {%- if '?' in _raw -%}{%- set _raw = _raw.split('?')[0] -%}{%- endif -%}
+  {%- endif -%}
+  {%- set _embed_url = 'https://player.vimeo.com/video/' ~ _raw ~ '?dnt=1' -%}
+  {%- set _video_title = 'Vimeo video player' -%}
+
+{%- else -%}
+  {#-- HubSpot Video: use URL as-is --#}
+  {%- set _embed_url = _raw -%}
+  {%- set _video_title = 'Video player' -%}
+{%- endif -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{%- set _section_classes = [
+  'wa-hero-video',
+  'wa-hero-video--bg-' ~ (module.background | default('surface')),
+  'wa-hero-video--sp-' ~ (module.spacing    | default('default'))
+] -%}
+{%- if 'mobile'  not in _vis -%}{%- set _section_classes = _section_classes + ['wa-hidden-mobile']  -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _section_classes = _section_classes + ['wa-hidden-tablet']  -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes + ['wa-hidden-desktop'] -%}{%- endif -%}
+
+<section
+  class="{{ _section_classes | join(' ') }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  aria-labelledby="{% if module.section_id %}{{ module.section_id }}-heading{% else %}wa-hero-video-heading{% endif %}"
+>
+  <div class="container wa-hero-video__inner">
+
+    {# ── Left: text content ─────────────────────────────────────────────── #}
+    <div class="wa-hero-video__text">
+
+      <h1
+        class="wa-hero-video__headline"
+        id="{% if module.section_id %}{{ module.section_id }}-heading{% else %}wa-hero-video-heading{% endif %}"
+      >
+        {{ module.headline }}
+      </h1>
+
+      {% if module.subheadline %}
+      <div class="wa-hero-video__subheadline">{{ module.subheadline }}</div>
+      {% endif %}
+
+      {% if module.primary_cta.label_text %}
+      <a
+        href="{{ module.primary_cta.link.url.href | default('#') }}"
+        class="btn btn-primary wa-hero-video__cta"
+        {% if module.primary_cta.link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >{{ module.primary_cta.label_text }}</a>
+      {% endif %}
+
+      {# ── Trust badges ────────────────────────────────────────────────── #}
+      {% if module.trust_badges %}
+      <div class="wa-hero-video__badges" role="list" aria-label="Trust badges">
+        {% for badge in module.trust_badges %}
+        {% if badge.badge_image and badge.badge_image.src %}
+        <div class="wa-hero-video__badge" role="listitem">
+          <img
+            src="{{ badge.badge_image.src }}"
+            alt="{{ badge.badge_label | default(badge.badge_image.alt) | default('') }}"
+            class="wa-hero-video__badge-img"
+            loading="lazy"
+            decoding="async"
+            width="64"
+            height="64"
+          >
+          {% if badge.badge_label %}
+          <span class="wa-hero-video__badge-label">{{ badge.badge_label }}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+    </div>
+
+    {# ── Right: video ───────────────────────────────────────────────────── #}
+    {% if _has_video %}
+    <div class="wa-hero-video__media">
+      {#
+        Aspect-ratio wrapper ensures 16:9 container dimensions are stable
+        before the iframe loads - this is the CLS-safe pattern for iframes.
+        The intrinsic size is declared via width/height attributes too.
+      #}
+      <div class="wa-hero-video__video-wrap" aria-label="{{ _video_title }}">
+        {% if module.poster_image and module.poster_image.src %}
+        {#
+          Poster image: renders immediately, replaced by iframe on user interaction.
+          The data-embed-url is read by the inline script below to lazy-load the iframe.
+        #}
+        <div
+          class="wa-hero-video__poster"
+          data-embed-url="{{ _embed_url }}&autoplay=1"
+          data-video-title="{{ _video_title }}"
+          role="button"
+          tabindex="0"
+          aria-label="Play {{ _video_title }}"
+        >
+          <img
+            src="{{ module.poster_image.src }}"
+            alt="{{ module.poster_image.alt | default('Video thumbnail') }}"
+            class="wa-hero-video__poster-img"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            {% if module.poster_image.width  %}width="{{ module.poster_image.width }}"{% endif %}
+            {% if module.poster_image.height %}height="{{ module.poster_image.height }}"{% endif %}
+          >
+          <div class="wa-hero-video__play-btn" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.6)"/>
+              <polygon points="10,8 18,12 10,16" fill="#fff"/>
+            </svg>
+          </div>
+        </div>
+        {% else %}
+        {# No poster - load iframe directly; width/height give the browser intrinsic size #}
+        <iframe
+          src="{{ _embed_url }}"
+          title="{{ _video_title }}"
+          class="wa-hero-video__iframe"
+          width="560"
+          height="315"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{# Poster click-to-play: swap poster div for autoplay iframe on click/Enter #}
+{% if _has_video and module.poster_image and module.poster_image.src %}
+<script>
+(function () {
+  var posters = document.querySelectorAll('.wa-hero-video__poster');
+  posters.forEach(function (poster) {
+    function activate() {
+      var url = poster.getAttribute('data-embed-url');
+      var title = poster.getAttribute('data-video-title') || 'Video player';
+      if (!url) return;
+      var iframe = document.createElement('iframe');
+      iframe.src = url;
+      iframe.title = title;
+      iframe.className = 'wa-hero-video__iframe';
+      iframe.setAttribute('width', '560');
+      iframe.setAttribute('height', '315');
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+      iframe.setAttribute('allowfullscreen', '');
+      poster.parentNode.replaceChild(iframe, poster);
+    }
+    poster.addEventListener('click', activate);
+    poster.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+    });
+  });
+}());
+</script>
+{% endif %}
+
+{% endif %}

@@ -1,0 +1,14 @@
+{
+  "label": "CTA Banner (Conditional)",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "CTA banner that only renders for a specific visitor membership state (all, non-members, lapsed, or active members). Uses contact.contact_membership_status for gating.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["cta", "conversion", "banner", "personalisation", "membership"]
+}

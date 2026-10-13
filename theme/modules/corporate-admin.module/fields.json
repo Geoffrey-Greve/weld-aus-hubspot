@@ -1,0 +1,54 @@
+[
+  {
+    "id": "add_employee_form_url",
+    "name": "add_employee_form_url",
+    "label": "Add Employee form URL",
+    "help_text": "URL of the form page where admins can add a new employee contact.",
+    "type": "link",
+    "default": { "url": { "href": "/portal/team/add-employee" } }
+  },
+  {
+    "id": "office_email",
+    "name": "office_email",
+    "label": "Office email (team requests)",
+    "help_text": "Inbox that receives fallback team requests and bulk-booking requests.",
+    "type": "text",
+    "default": "office@weldaustralia.com.au"
+  },
+  {
+    "id": "worker_base_url",
+    "name": "worker_base_url",
+    "label": "Event Engine worker base URL",
+    "help_text": "Leave blank to inherit the theme-wide setting at Design Manager → Theme settings → Integrations, which selects the Worker. Keep that on `Production`, which is event-engine.refuel-creative.workers.dev. The Worker formerly deployed as event-engine-staging was RENAMED to it and that hostname no longer resolves, so do not put it back. A value here overrides it for this module only. Note: only used with a server-minted corporate_action_token for authenticated Worker-direct writes. Unauthenticated browser calls to this Worker are not supported — prefer the same-origin /_hcms/api/corporate serverless handlers.",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "show_access_notice",
+    "name": "show_access_notice",
+    "label": "Show 'not an admin' notice",
+    "help_text": "On the standalone team page, show a friendly notice to logged-in non-admins. Leave off when used as a dashboard tile.",
+    "type": "boolean",
+    "default": false
+  },
+  {
+    "id": "courses_table",
+    "name": "courses_table",
+    "label": "HubDB courses table name",
+    "help_text": "Name of the HubDB table containing course sessions.",
+    "type": "text",
+    "default": "courses"
+  },
+  {
+    "id": "background",
+    "name": "background",
+    "label": "Section background",
+    "type": "choice",
+    "choices": [
+      ["white", "White"],
+      ["light", "Light grey"],
+      ["dark", "Dark"]
+    ],
+    "default": "white"
+  }
+]

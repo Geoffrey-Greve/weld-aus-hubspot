@@ -1,0 +1,38 @@
+[
+  {
+    "name": "brand_panel_heading",
+    "label": "Brand panel heading",
+    "type": "text",
+    "default": "Weld Australia member portal"
+  },
+  {
+    "name": "brand_panel_body",
+    "label": "Brand panel body",
+    "type": "richtext",
+    "default": "<p>Sign in to manage your membership, training and certifications.</p>"
+  },
+  {
+    "name": "brand_panel_image",
+    "label": "Brand panel image",
+    "type": "image",
+    "help_text": "Optional background image for the brand panel. A dark overlay will be applied automatically."
+  },
+  {
+    "name": "secondary_link_label",
+    "label": "Secondary link label",
+    "type": "text",
+    "default": "Become a member"
+  },
+  {
+    "name": "secondary_link",
+    "label": "Secondary link",
+    "type": "link"
+  },
+  {
+    "name": "footer_microcopy",
+    "label": "Footer microcopy",
+    "type": "richtext",
+    "default": "<p>Access your Weld Australia member dashboard, resources and training activity from one secure place.</p>",
+    "help_text": "SSO disclaimer shown at the bottom of the brand panel. Per CLAUDE.md § 9.2 - do not promise unified login in Phase 1."
+  }
+]

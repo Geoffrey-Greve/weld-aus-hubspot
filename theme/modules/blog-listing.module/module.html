@@ -1,0 +1,122 @@
+{#
+  blog-listing.module/module.html
+  Latest blog posts as a responsive card grid.
+  Used on: Home page "News & insights" section, full Blog listing page.
+
+  Fields:
+    module.section_id       - optional anchor id
+    module.background       - background variant
+    module.spacing          - vertical spacing variant
+    module.visibility       - device show/hide
+    module.members_only     - gating flag
+    module.section_heading  - heading above the grid
+    module.blog_id          - HubSpot blog to pull from
+    module.max_count        - number of posts to show (default 3)
+    module.show_filter_chips - render tag chips on each card
+    module.tag_filter       - optional: only show posts with this tag
+    module.view_all_label   - "View all" CTA text
+    module.view_all_link    - "View all" CTA destination
+#}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{% set _member_status = request_contact.individual_membership_status | default('') %}
+{% set _is_active_member = _member_status in ['Current'] %}
+{% if module.members_only and not _is_active_member %}{% else %}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+{# ── Fetch posts ────────────────────────────────────────────────────────────── #}
+{% set _count = module.max_count | int | default(3) %}
+{% set posts = blog_recent_posts(module.blog_id, _count) %}
+
+<section
+  class="wa-blog-listing wa-section wa-section--{{ module.background | default('surface') }} wa-section--{{ module.spacing | default('default') }}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-blog-listing__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    {% if posts %}
+
+    <div class="wa-blog-listing__grid">
+      {% for post in posts %}
+      <article class="wa-blog-listing__card">
+
+        {# Featured image #}
+        {% if post.featured_image %}
+        <a href="{{ post.absolute_url }}" class="wa-blog-listing__card-img-link" tabindex="-1" aria-hidden="true">
+          <img
+            src="{{ post.featured_image }}"
+            alt="{{ post.featured_image_alt_text | default(post.name) }}"
+            class="wa-blog-listing__card-img"
+            loading="lazy"
+            decoding="async"
+            width="800"
+            height="450"
+          >
+        </a>
+        {% endif %}
+
+        <div class="wa-blog-listing__card-body">
+
+          {# Tag chips #}
+          {% if module.show_filter_chips and post.tag_list %}
+          <div class="wa-blog-listing__tags" aria-label="Post tags">
+            {% for tag in post.tag_list %}
+            <span class="wa-blog-listing__tag">{{ tag.name }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {# Title #}
+          <h3 class="wa-blog-listing__title">
+            <a href="{{ post.absolute_url }}">{{ post.name }}</a>
+          </h3>
+
+          {# Meta: publish date #}
+          <p class="wa-blog-listing__meta">
+            <time datetime="{{ post.publish_date | datetimeformat('%Y-%m-%d') }}">
+              {{ post.publish_date | datetimeformat('%d %B %Y') }}
+            </time>
+          </p>
+
+          {# Excerpt #}
+          <p class="wa-blog-listing__excerpt">
+            {{ post.meta_description | default(post.post_summary | striptags | truncate(160)) }}
+          </p>
+
+        </div>{# /.wa-blog-listing__card-body #}
+
+      </article>
+      {% endfor %}
+    </div>{# /.wa-blog-listing__grid #}
+
+    {% else %}
+
+    <p class="wa-blog-listing__empty">No posts yet - check back soon.</p>
+
+    {% endif %}
+
+    {# View all CTA #}
+    {% if module.view_all_link and module.view_all_label %}
+    <div class="wa-blog-listing__view-all">
+      <a
+        href="{{ module.view_all_link.url.href }}"
+        class="btn btn-secondary"
+        {% if module.view_all_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >{{ module.view_all_label }}</a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}{# end members_only gate #}

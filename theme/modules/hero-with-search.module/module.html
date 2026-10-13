@@ -1,0 +1,147 @@
+{#
+  hero-with-search.module/module.html
+  Hero with inline search bar. The form GETs to the correct target page
+  with ?q= so the React island on that page picks up the initial query.
+
+  Search targets:
+    resource_library  → /resources/
+    find_a_member     → /find-a-member/
+    course_timetable  → /courses/
+
+  Standard fields: section_id, background, spacing, visibility, members_only
+  Module fields:   headline, subheadline, search_placeholder, search_target,
+                   background_image
+#}
+
+{%- set _has_bg_img = module.background_image and module.background_image.src -%}
+{%- set _vis        = module.visibility | default(['mobile','tablet','desktop']) -%}
+{%- set _eyebrow    = module.eyebrow | default('', true) | trim -%}
+
+{#-- Map search_target choice to the page path --#}
+{%- if module.search_target == 'find_a_member' -%}
+  {%- set _search_action = '/find-a-member/' -%}
+  {%- set _search_label  = 'Search for a member' -%}
+  {%- if not _eyebrow -%}{%- set _eyebrow = 'Member directory' -%}{%- endif -%}
+{%- elif module.search_target == 'course_timetable' -%}
+  {%- set _search_action = '/courses/' -%}
+  {%- set _search_label  = 'Search courses' -%}
+  {%- if not _eyebrow -%}{%- set _eyebrow = 'Course timetable' -%}{%- endif -%}
+{%- else -%}
+  {%- set _search_action = '/resources/' -%}
+  {%- set _search_label  = 'Search resources' -%}
+  {%- if not _eyebrow -%}{%- set _eyebrow = 'Resource library' -%}{%- endif -%}
+{%- endif -%}
+{%- set _show_search_form = module.search_target != 'find_a_member' -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{%- set _section_classes = [
+  'wa-hero-search',
+  'wa-hero-search--bg-' ~ (module.background | default('surface')),
+  'wa-hero-search--sp-' ~ (module.spacing    | default('default'))
+] -%}
+{%- if _has_bg_img    -%}{%- set _section_classes = _section_classes + ['wa-hero-search--has-image'] -%}{%- endif -%}
+{%- if 'mobile'  not in _vis -%}{%- set _section_classes = _section_classes + ['wa-hidden-mobile']  -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _section_classes = _section_classes + ['wa-hidden-tablet']  -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes + ['wa-hidden-desktop'] -%}{%- endif -%}
+
+<section
+  class="{{ _section_classes | join(' ') }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  {% if _has_bg_img %}style="--_overlay: 40%;"{% endif %}
+  aria-labelledby="{% if module.section_id %}{{ module.section_id }}-heading{% else %}wa-hero-search-heading{% endif %}"
+>
+
+  {% if _has_bg_img %}
+  <img
+    src="{{ module.background_image.src }}"
+    alt=""
+    class="wa-hero-search__bg-img"
+    aria-hidden="true"
+    fetchpriority="high"
+    loading="eager"
+    decoding="async"
+    {% if module.background_image.width  %}width="{{ module.background_image.width }}"{% endif %}
+    {% if module.background_image.height %}height="{{ module.background_image.height }}"{% endif %}
+  >
+  <div class="wa-hero-search__overlay" aria-hidden="true"></div>
+  {% endif %}
+
+  <div class="container wa-hero-search__inner">
+    <div class="wa-hero-search__content">
+
+      {% if _eyebrow %}
+      <div class="wa-overline wa-overline--light">
+        <span class="wa-overline__text">{{ _eyebrow }}</span>
+      </div>
+      {% endif %}
+
+      <h1
+        class="wa-hero-search__headline"
+        id="{% if module.section_id %}{{ module.section_id }}-heading{% else %}wa-hero-search-heading{% endif %}"
+      >
+        {{ module.headline }}
+      </h1>
+
+      {% if module.subheadline %}
+      <div class="wa-hero-search__subheadline">{{ module.subheadline }}</div>
+      {% endif %}
+
+      {# Search form - GETs to the target page with ?q= query param #}
+      {% if _show_search_form %}
+      <form
+        class="wa-hero-search__form"
+        action="{{ _search_action }}"
+        method="get"
+        role="search"
+        aria-label="{{ _search_label }}"
+      >
+        <div class="wa-hero-search__input-wrap">
+          <label for="wa-hero-search-input" class="sr-only">{{ _search_label }}</label>
+          <svg
+            class="wa-hero-search__icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20" height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="search"
+            id="wa-hero-search-input"
+            name="q"
+            class="wa-hero-search__input"
+            placeholder="{{ module.search_placeholder | default('Search...') }}"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+          >
+          <button
+            type="submit"
+            class="wa-hero-search__submit btn btn-primary"
+            aria-label="Submit search"
+          >
+            Search
+          </button>
+        </div>
+      </form>
+      {% endif %}
+
+    </div>
+  </div>
+
+  {% set _brand_line_context = 'hero' %}
+  {% set _brand_line_class = 'wa-hero-search__accent-bar' %}
+  {% include "../../templates/partials/brand-line.html" %}
+
+</section>
+
+{% endif %}

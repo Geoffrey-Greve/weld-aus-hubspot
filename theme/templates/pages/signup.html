@@ -1,0 +1,90 @@
+<!--
+  templateType: page
+  label: Member Signup / Access
+  isAvailableForNewContent: true
+-->
+{#
+  signup.html - Member portal access page
+  Suggested URL: /signup/
+
+  HubSpot Private Content owns member passwords. This page does not create or
+  store credentials. It explains the real access path and links users to the
+  right next action inside the standard Weld Australia theme shell.
+#}
+{% set page_title_exact = 'Create your member login - Weld Australia' %}
+{% set page_description = 'Request access to the Weld Australia member portal or sign in with your existing member login.' %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/auth.css') }}">
+<style>
+  .auth-signup-hero {
+    background:
+      linear-gradient(135deg, var(--wa-color-primary-dark, #0f1030) 0%, var(--wa-color-primary, #1c1e4c) 100%);
+  }
+
+  .auth-signup-hero::before {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 5px;
+    border-radius: 0;
+    background: var(--wa-gradient-flame, linear-gradient(90deg, #ed128d 0%, #f04828 40%, #fecf05 100%));
+  }
+
+  .auth-signup__hero-eyebrow {
+    margin: 0 0 var(--wa-space-4);
+  }
+
+  .auth-signup__aside {
+    background:
+      linear-gradient(145deg, var(--wa-color-primary-dark, #0f1030) 0%, var(--wa-color-primary, #1c1e4c) 100%);
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}is-auth-page{% endblock %}
+
+{% block body %}
+{% set _shared_hero_id = 'member-signup-hero' %}
+{% set _shared_hero_section_id = 'member-signup-hero' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'compact' %}
+{% set _shared_hero_spacing = 'spacious' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = 'none' %}
+{% set _shared_hero_eyebrow = 'Member portal' %}
+{% set _shared_hero_headline = 'Create your member login' %}
+{% set _shared_hero_subheadline = '<p>Set up secure access to your Weld Australia member dashboard using the email address connected to your membership.</p>' %}
+{% include "../partials/shared-hero.html" %}
+
+<section class="auth-page-section" aria-label="Member portal access">
+  <div class="auth-page-shell">
+    <div class="auth-page-card">
+      <div class="auth-page-card__main">
+        {% module "signup_access_content" path="../../modules/member-signup-access"
+          label="Signup Access Content"
+        %}
+      </div>
+
+      <aside class="auth-page-card__aside auth-signup__aside" aria-label="Member access help">
+        {% module "signup_support_panel" path="../../modules/auth-support-panel"
+          label="Signup Support Panel"
+          overline="Need help?"
+          heading="Contact Weld Australia"
+          panel_body="<p>If you believe you should already have access, contact the Weld Australia team and ask them to confirm your member portal access.</p>"
+          primary_link_label="info@weldaustralia.com.au"
+          primary_link={ "url": { "type": "EXTERNAL", "href": "mailto:info@weldaustralia.com.au" } }
+          primary_link_style="text"
+          secondary_link_label="1800 189 900"
+          secondary_link={ "url": { "type": "EXTERNAL", "href": "tel:1800189900" } }
+          secondary_link_style="text"
+        %}
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}

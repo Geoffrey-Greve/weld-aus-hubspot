@@ -1,0 +1,77 @@
+{#
+  google-map-embed.module/module.html
+  Renders a lazy-loaded Google Maps iframe inside an aspect-ratio container.
+
+  Fields:
+    module.embed_url   - the Google Maps embed src URL (from Share > Embed a map)
+    module.height_px   - map height in pixels (default 400)
+    module.caption     - optional caption below the map
+    module.section_id  - anchor ID
+    module.background  - background style
+    module.spacing     - vertical spacing
+    module.visibility  - device visibility
+    module.members_only - boolean gate
+
+  Security note: embed_url is output unescaped inside an iframe src, which is
+  intentionally controlled by the CMS editor, not user input.
+#}
+
+{%- if module.members_only and not request_contact.is_logged_in -%}{%- else -%}
+
+{# ── Visibility classes ───────────────────────────────────────────────────── #}
+{%- set vis_classes = [] -%}
+{%- if 'mobile' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-mobile'] -%}{%- endif -%}
+{%- if 'tablet' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-tablet'] -%}{%- endif -%}
+{%- if 'desktop' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-desktop'] -%}{%- endif -%}
+
+{%- set map_height = module.height_px | default(400) -%}
+
+<section
+  class="wa-section wa-map-embed wa-bg--{{ module.background }} wa-spacing--{{ module.spacing }}{{ ' ' ~ vis_classes | join(' ') if vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    <figure class="wa-map-embed__figure">
+
+      {# ── Aspect-ratio wrapper - height is driven by the editor field ─────── #}
+      <div
+        class="wa-map-embed__wrapper"
+        style="--wa-map-height: {{ map_height }}px;"
+      >
+        {%- if module.embed_url -%}
+        <iframe
+          src="{{ module.embed_url }}"
+          class="wa-map-embed__iframe"
+          width="100%"
+          height="{{ map_height }}"
+          style="border: 0;"
+          loading="lazy"
+          allowfullscreen=""
+          referrerpolicy="no-referrer-when-downgrade"
+          title="{% if module.caption %}{{ module.caption }}{% else %}Google Maps{% endif %}"
+          aria-label="{% if module.caption %}Map: {{ module.caption }}{% else %}Embedded Google Map{% endif %}"
+        ></iframe>
+        {%- else -%}
+        <div class="wa-map-embed__placeholder" aria-label="Map placeholder - no embed URL configured">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+            <line x1="9" y1="3" x2="9" y2="18"/>
+            <line x1="15" y1="6" x2="15" y2="21"/>
+          </svg>
+          <p>Map URL not configured</p>
+        </div>
+        {%- endif -%}
+      </div>
+
+      {# ── Optional caption ──────────────────────────────────────────────── #}
+      {% if module.caption %}
+      <figcaption class="wa-map-embed__caption">{{ module.caption }}</figcaption>
+      {% endif %}
+
+    </figure>
+
+  </div>
+</section>
+
+{%- endif -%}

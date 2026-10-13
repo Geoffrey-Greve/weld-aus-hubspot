@@ -1,0 +1,88 @@
+{#
+  news-mention-list.module/module.html
+
+  Fields:
+    module.section_heading     - heading (default "In the news")
+    module.mentions            - group of media mentions
+      .publication_logo  - publication logo image
+      .headline          - article headline (required)
+      .publication_date  - date
+      .link              - URL (required)
+    module.section_id          - standard: anchor ID
+    module.background          - standard: bg style
+    module.spacing             - standard: vertical padding
+    module.visibility          - standard: device show/hide
+    module.members_only        - standard: member wall gate
+#}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{# QA: member-only content is company-aware. See _member-content-gate.html -
+   a corporate employee's membership lives on their employer's record, and
+   `individual_membership_status == 'Current'` cannot see it. #}
+{% include "../../templates/partials/_member-content-gate.html" %}
+{% set _is_active_member = wa_member_gate.is_member %}
+{% if module.members_only and not _is_active_member %}{% else %}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+<section
+  class="wa-news-mentions wa-section wa-section--bg-{{ module.background | default('surface') }} wa-section--spacing-{{ module.spacing | default('default') }}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% set _heading = module.section_heading | default('In the news') %}
+    <h2 class="wa-news-mentions__heading">{{ _heading }}</h2>
+
+    <ul class="wa-news-mentions__list" role="list">
+      {% for mention in module.mentions %}
+      <li class="wa-news-mentions__item">
+        <a
+          href="{{ mention.link }}"
+          class="wa-news-mentions__link"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="{{ mention.headline }} (opens in new tab)"
+        >
+          {% if mention.publication_logo and mention.publication_logo.src %}
+          <div class="wa-news-mentions__logo-wrap">
+            <img
+              src="{{ mention.publication_logo.src }}"
+              alt="{{ mention.publication_logo.alt | default('') }}"
+              {% if mention.publication_logo.width %}width="{{ mention.publication_logo.width }}"{% endif %}
+              height="32"
+              class="wa-news-mentions__logo"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
+          {% endif %}
+
+          <p class="wa-news-mentions__headline">{{ mention.headline }}</p>
+
+          {% if mention.publication_date %}
+          <time
+            class="wa-news-mentions__date"
+            datetime="{{ mention.publication_date | datetimeformat('%Y-%m-%d') }}"
+          >{{ mention.publication_date | datetimeformat('%d %B %Y') }}</time>
+          {% endif %}
+
+          <span class="wa-news-mentions__arrow" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+              <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+            </svg>
+          </span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+
+  </div>
+</section>
+
+{% endif %}{# end members_only gate #}

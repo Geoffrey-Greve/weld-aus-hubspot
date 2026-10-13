@@ -1,0 +1,76 @@
+{#
+  case-study-cards.module/module.html
+  Grid of case study cards. 1-col mobile → 3-col desktop.
+  Each card: 16:9 image, client name, title, summary, result stat, CTA.
+
+  Fields:
+    module.section_id    - optional anchor id
+    module.background    - background variant
+    module.spacing       - vertical spacing variant
+    module.members_only  - gating flag
+    module.section_heading - optional heading
+    module.case_studies  - repeater group
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section
+  class="wa-case-study-cards wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-case-study-cards__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    <div class="wa-case-study-cards__grid">
+      {% for cs in module.case_studies %}
+      <div class="wa-case-study-cards__card">
+
+        {# 16:9 image #}
+        {% if cs.image and cs.image.src %}
+        <div class="wa-case-study-cards__image-wrap">
+          <img
+            src="{{ cs.image.src }}"
+            alt="{{ cs.image.alt | default(cs.title) }}"
+            {% if cs.image.width %}width="{{ cs.image.width }}"{% endif %}
+            {% if cs.image.height %}height="{{ cs.image.height }}"{% endif %}
+            class="wa-case-study-cards__image"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        {% endif %}
+
+        <div class="wa-case-study-cards__body">
+
+          {% if cs.client_name %}
+          <span class="wa-case-study-cards__client">{{ cs.client_name }}</span>
+          {% endif %}
+
+          <h3 class="wa-case-study-cards__title">{{ cs.title }}</h3>
+
+          {% if cs.summary %}
+          <div class="wa-case-study-cards__summary">{{ cs.summary }}</div>
+          {% endif %}
+
+          {% if cs.result_stat %}
+          <p class="wa-case-study-cards__stat">{{ cs.result_stat }}</p>
+          {% endif %}
+
+          {% if cs.cta_label and cs.cta_link %}
+          <a
+            href="{{ cs.cta_link.url.href }}"
+            class="wa-case-study-cards__cta"
+            {% if cs.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >{{ cs.cta_label }}</a>
+          {% endif %}
+
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endif %}

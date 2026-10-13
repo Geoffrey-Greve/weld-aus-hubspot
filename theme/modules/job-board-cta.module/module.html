@@ -1,0 +1,77 @@
+{#
+  job-board-cta.module/module.html
+  Editable CTA section used on the Job Board page.
+#}
+
+{% set _section_id = module.section_id|default('job-board-connect', true) %}
+{% set _heading_id = _section_id ~ '-heading' %}
+
+<section class="wa-job-board-cta" id="{{ _section_id }}" aria-labelledby="{{ _heading_id }}">
+  <div class="container">
+    <div class="wa-job-board-section-head wa-job-board-section-head--inverse">
+      {% if module.eyebrow %}
+        <p class="wa-job-board__eyebrow">{{ module.eyebrow }}</p>
+      {% endif %}
+      {% if module.heading %}
+        <h2 id="{{ _heading_id }}">{{ module.heading }}</h2>
+      {% endif %}
+    </div>
+
+    {% if module.cards %}
+      <div class="wa-job-board-cta__grid">
+        {% for card in module.cards %}
+          {% set _icon_style = card.icon_style|default('employer', true) %}
+          {% set _icon_class = 'gold' %}
+          {% if _icon_style == 'seeker' %}
+            {% set _icon_class = 'magenta' %}
+          {% endif %}
+          <article class="wa-job-board-cta-card">
+            <span class="wa-job-board-cta-card__icon wa-job-board-cta-card__icon--{{ _icon_class }}" aria-hidden="true">
+              {% if _icon_style == 'seeker' %}
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="7" width="20" height="14" rx="2"></rect>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+              {% else %}
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                  <line x1="9" y1="7" x2="9" y2="7.01"></line>
+                  <line x1="15" y1="7" x2="15" y2="7.01"></line>
+                  <line x1="9" y1="12" x2="9" y2="12.01"></line>
+                  <line x1="15" y1="12" x2="15" y2="12.01"></line>
+                </svg>
+              {% endif %}
+            </span>
+            {% if card.kicker %}
+              <p class="wa-job-board-cta-card__kicker">{{ card.kicker }}</p>
+            {% endif %}
+            {% if card.title %}
+              <h3>{{ card.title }}</h3>
+            {% endif %}
+            {% if card.body_text %}
+              <p class="wa-job-board-cta-card__body">{{ card.body_text }}</p>
+            {% endif %}
+            {% if card.primary_label or card.secondary_label %}
+              <div class="wa-job-board-cta-card__actions">
+                {% if card.primary_label %}
+                  <a
+                    class="btn btn-gold"
+                    href="{{ card.primary_link.url.href|default('#') }}"
+                    {% if card.primary_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                  >{{ card.primary_label }}</a>
+                {% endif %}
+                {% if card.secondary_label %}
+                  <a
+                    class="btn btn-white-outline"
+                    href="{{ card.secondary_link.url.href|default('#') }}"
+                    {% if card.secondary_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                  >{{ card.secondary_label }}</a>
+                {% endif %}
+              </div>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>

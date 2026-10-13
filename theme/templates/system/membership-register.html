@@ -1,0 +1,105 @@
+<!--
+  templateType: membership_register_page
+  label: Weld Australia Membership Registration
+  isAvailableForNewContent: true
+-->
+{#
+  HubSpot Private Content registration/password setup page.
+  Served by HubSpot at /_hcms/mem/register.
+#}
+{% set page_title_exact = 'Set up your member login - Weld Australia' %}
+{% set page_description = 'Set up your Weld Australia member portal password.' %}
+{% extends "../layouts/base.html" %}
+
+{%- set _member_dashboard_redirect = '/portal' -%}
+{%- set _raw_return = request.query_dict.redirect_url | default(request.query_dict.redirect, true) | default(_member_dashboard_redirect) -%}
+{%- if _raw_return and _raw_return[0:1] == '/' and _raw_return[0:2] != '//' -%}
+  {%- set _redirect = _raw_return -%}
+{%- else -%}
+  {%- set _redirect = _member_dashboard_redirect -%}
+{%- endif -%}
+{%- if _redirect == '/portal/' or _redirect == '/portal' or _redirect == '/membership/' or _redirect == '/membership' -%}
+  {%- set _redirect = _member_dashboard_redirect -%}
+{%- endif -%}
+
+{% block extra_head %}
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/auth.css') }}">
+{% endblock %}
+
+{% block body_class %}is-auth-page is-auth-system-page{% endblock %}
+
+{% block body %}
+{% set _shared_hero_id = 'member-register-hero' %}
+{% set _shared_hero_section_id = 'member-register-hero' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'compact' %}
+{% set _shared_hero_spacing = 'spacious' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = 'none' %}
+{% set _shared_hero_eyebrow = 'Member portal' %}
+{% set _shared_hero_headline = 'Set up your member login' %}
+{% set _shared_hero_subheadline = '<p>Create the password for your Weld Australia member portal access.</p>' %}
+{% include "../partials/shared-hero.html" %}
+
+<section class="auth-page-section" aria-labelledby="member-register-heading">
+  <div class="auth-page-shell">
+    <div class="auth-page-card">
+      <div class="auth-page-card__main">
+        <div class="auth-reset">
+          <p class="wa-overline auth-reset__eyebrow">
+            <span class="wa-overline__text">Set up login</span>
+          </p>
+          <h2 class="auth-reset__heading" id="member-register-heading">Set up your password</h2>
+          <div class="auth-reset__intro">
+            <p>Create a secure password for the email address connected to your Weld Australia member profile.</p>
+          </div>
+
+          <div class="auth-reset__native auth-login__native" data-auth-redirect="{{ _redirect | escape_attr }}">
+            {% member_register "system_member_register" %}
+          </div>
+
+          <script>
+            (function () {
+              var root = document.currentScript && document.currentScript.previousElementSibling;
+              if (!root) return;
+
+              var redirect = root.getAttribute('data-auth-redirect') || '/portal';
+              var form = root.querySelector('form[action^="/_hcms/mem/register"]');
+              if (!form) return;
+
+              var redirectInputs = form.querySelectorAll('input[name="redirect_url"]');
+              redirectInputs.forEach(function (input) {
+                input.value = redirect;
+              });
+
+              try {
+                var actionUrl = new URL(form.getAttribute('action'), window.location.origin);
+                actionUrl.searchParams.set('redirect_url', redirect);
+                form.setAttribute('action', actionUrl.pathname + actionUrl.search);
+              } catch (e) {
+                form.setAttribute('action', '/_hcms/mem/register?redirect_url=' + encodeURIComponent(redirect));
+              }
+            })();
+          </script>
+        </div>
+      </div>
+
+      <aside class="auth-page-card__aside auth-reset__aside" aria-label="Member login setup help">
+        <div class="auth-support">
+          <p class="auth-support__label">Secure access</p>
+          <h2>Create your member portal password</h2>
+          <div class="auth-support__body">
+            <p>This setup page is only for approved Weld Australia member portal accounts. Use the email address linked to your membership access.</p>
+          </div>
+          <div class="auth-support__actions">
+            <a class="btn btn-secondary" href="/login/?redirect={{ _redirect|urlencode }}">Back to sign in</a>
+            <a class="auth-support__text-link" href="/contact-us">Need help?</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}

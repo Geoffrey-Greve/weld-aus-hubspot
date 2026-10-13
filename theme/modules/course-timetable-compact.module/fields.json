@@ -1,0 +1,90 @@
+[
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Upcoming courses"
+  },
+  {
+    "name": "max_count",
+    "label": "Max sessions to show",
+    "type": "number",
+    "default": 8
+  },
+  {
+    "name": "category_filter",
+    "label": "Filter by training division (optional)",
+    "type": "choice",
+    "choices": [
+      ["any", "All"],
+      ["welding-inspection", "Welding Inspection"],
+      ["welding-supervision", "Welding Supervision"],
+      ["welding-coordination", "Welding Coordination"],
+      ["short-courses", "Short Courses"]
+    ],
+    "default": "any",
+    "help_text": "Divisions are defined in config/course-categories.json and group the courses HubDB 'category' values."
+  },
+  {
+    "name": "view_all_label",
+    "label": "View all label",
+    "type": "text",
+    "default": "View full timetable"
+  },
+  {
+    "name": "view_all_link",
+    "label": "View all link",
+    "type": "link"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

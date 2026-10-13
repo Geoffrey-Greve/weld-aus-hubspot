@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A11y Test - Checkout</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/assets/css/components.css" />
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; }
+    a.skip-to-content {
+      position: absolute; left: -9999px; top: 0; z-index: 9999;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; min-width: 44px;
+      padding: 0.5rem 1rem; background: #002f5f; color: #fff;
+    }
+    a.skip-to-content:focus { left: 0; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-to-content" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h1 class="sr-only">Course registration</h1>
+    <div id="wa-checkout-steps"></div>
+    <div
+      data-wa-module="checkout-tunnel"
+      data-props='{
+        "session": {
+          "id": "sess-001",
+          "course_name": "AS1796 Cert 10",
+          "city": "Sydney",
+          "start_date": "2026-08-04",
+          "end_date": "2026-08-06",
+          "price_member": 980,
+          "price_non_member": 1380,
+          "registration_url": "https://hapily.test/event/001",
+          "status": "available",
+          "zoom_link": ""
+        },
+        "member_tier": "Individual",
+        "member_name": "Ryan Jones",
+        "member_email": "ryan@example.com.au",
+        "step_labels": {
+          "step_1": "Confirm session",
+          "step_2": "Your details",
+          "step_3": "Review & pay",
+          "step_4": "Confirmation"
+        },
+        "guest_checkout_allowed": true,
+        "membership_offer_post_purchase": true,
+        "membership_offer_message": "<p>Join Weld Australia to save on future courses.</p>",
+        "payment_provider": "hapily",
+        "stripe_publishable_key": "",
+        "confirmation_redirect": "/portal/",
+        "support_email": "training@weldaustralia.com.au",
+        "portal_id": "4538263"
+      }'
+    ></div>
+  </main>
+  <script src="/a11y/_future-dates.js"></script>
+  <script type="module" src="/src/modules/checkout-tunnel/index.tsx"></script>
+</body>
+</html>

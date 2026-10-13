@@ -1,0 +1,14 @@
+{
+  "label": "Course Timetable (Compact)",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Pure HubL: compact vertical list of upcoming course sessions from HubDB Table 1 (courses). Use as a sidebar or homepage widget. For the full interactive timetable, use course-timetable-filter instead.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["courses", "hubdb", "timetable", "compact", "static"]
+}

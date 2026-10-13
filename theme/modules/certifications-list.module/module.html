@@ -1,0 +1,199 @@
+{#
+  certifications-list.module/module.html
+
+  Server-rendered list of a logged-in member's certifications.
+  No React island - data comes directly from request_contact CRM properties.
+
+  Reads three certification property groups (§ 8.2):
+    as1796  → as1796_cert_status / _expiry / _url / _step
+    iiw     → iiw_cert_status   / _expiry / _url / _step
+    iso3834 → iso3834_cert_status / _expiry / _url / _step
+
+  Each cert that exists renders a card with:
+    • Display name + status badge
+    • Expiry date (if set)
+    • "Download Certificate" button (active certs with a cert URL only)
+    • "View progress" link → /portal/certifications/{slug}/
+
+  If module.show_lapsed is false, expired/lapsed certs are filtered out.
+  If no certs remain after filtering, the empty state is shown.
+
+  Cert type slugs (used in the progress URL query parameter):
+    as1796       → type=as1796
+    iiw_inspector → type=iiw_inspector
+    iso3834      → type=iso3834
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{# ── Normalise the three cert groups into a list ──────────────────────── #}
+{% set ns = namespace(certs=[]) %}
+
+{%- if request_contact.as1796_cert_status -%}
+  {%- set _status = request_contact.as1796_cert_status | lower -%}
+  {%- set _is_inactive = _status == 'expired' or _status == 'lapsed' or _status == 'suspended' -%}
+  {%- if module.show_lapsed or not _is_inactive -%}
+    {%- set ns.certs = ns.certs + [{
+      'type':          'as1796',
+      'label':         'AS 1796 Welder Certification',
+      'status':        request_contact.as1796_cert_status,
+      'expiry':        request_contact.as1796_cert_expiry | default('', true),
+      'cert_url':      request_contact.as1796_cert_url | default('', true),
+      'current_step':  request_contact.as1796_cert_step | default('', true),
+      'is_active':     _status == 'current' or _status == 'current',
+      'is_inactive':   _is_inactive
+    }] -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- if request_contact.iiw_cert_status -%}
+  {%- set _status = request_contact.iiw_cert_status | lower -%}
+  {%- set _is_inactive = _status == 'expired' or _status == 'lapsed' or _status == 'suspended' -%}
+  {%- if module.show_lapsed or not _is_inactive -%}
+    {%- set ns.certs = ns.certs + [{
+      'type':          'iiw_inspector',
+      'label':         'IIW Welding Inspector',
+      'status':        request_contact.iiw_cert_status,
+      'expiry':        request_contact.iiw_cert_expiry | default('', true),
+      'cert_url':      request_contact.iiw_cert_url | default('', true),
+      'current_step':  request_contact.iiw_cert_step | default('', true),
+      'is_active':     _status == 'current' or _status == 'current',
+      'is_inactive':   _is_inactive
+    }] -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- if request_contact.iso3834_cert_status -%}
+  {%- set _status = request_contact.iso3834_cert_status | lower -%}
+  {%- set _is_inactive = _status == 'expired' or _status == 'lapsed' or _status == 'suspended' -%}
+  {%- if module.show_lapsed or not _is_inactive -%}
+    {%- set ns.certs = ns.certs + [{
+      'type':          'iso3834',
+      'label':         'ISO 3834 Certification',
+      'status':        request_contact.iso3834_cert_status,
+      'expiry':        request_contact.iso3834_cert_expiry | default('', true),
+      'cert_url':      request_contact.iso3834_cert_url | default('', true),
+      'current_step':  request_contact.iso3834_cert_step | default('', true),
+      'is_active':     _status == 'current' or _status == 'current',
+      'is_inactive':   _is_inactive
+    }] -%}
+  {%- endif -%}
+{%- endif -%}
+
+{# ── Status label lookup (capitalised display) ────────────────────────── #}
+{%- macro status_label(raw) -%}
+  {%- set s = raw | lower -%}
+  {%- if s == 'current' -%}Active
+  {%- elif s == 'current' -%}Current
+  {%- elif s == 'in_progress' or s == 'in progress' -%}In Progress
+  {%- elif s == 'pending' -%}Pending
+  {%- elif s == 'expired' -%}Expired
+  {%- elif s == 'lapsed' -%}Lapsed
+  {%- elif s == 'suspended' -%}Suspended
+  {%- else -%}{{ raw }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{# ── Status modifier for badge colour class ───────────────────────────── #}
+{%- macro status_mod(raw) -%}
+  {%- set s = raw | lower -%}
+  {%- if s == 'current' or s == 'current' -%}active
+  {%- elif s == 'in_progress' or s == 'in progress' or s == 'pending' -%}pending
+  {%- else -%}expired
+  {%- endif -%}
+{%- endmacro -%}
+
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-certifications-section"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.heading %}
+    <h1 class="wa-certifications-section__heading">{{ module.heading }}</h1>
+    {% endif %}
+
+    {% if ns.certs | length == 0 %}
+
+      {# ── Empty state ────────────────────────────────────────────────── #}
+      <div class="wa-certifications-empty">
+        {% if module.empty_state_message %}
+          <div class="wa-certifications-empty__message">
+            {{ module.empty_state_message }}
+          </div>
+        {% endif %}
+
+        {% if module.empty_state_cta_label and module.empty_state_cta_link %}
+          <a
+            href="{{ module.empty_state_cta_link.url.href }}"
+            class="wa-btn wa-btn--primary"
+            {% if module.empty_state_cta_link.url.type == 'EXTERNAL' %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >
+            {{ module.empty_state_cta_label }}
+          </a>
+        {% endif %}
+      </div>
+
+    {% else %}
+
+      {# ── Cert cards grid ────────────────────────────────────────────── #}
+      <div class="wa-certifications-grid" role="list">
+        {% for cert in ns.certs %}
+          {%- set _mod = status_mod(cert.status) -%}
+          {%- set _label = status_label(cert.status) -%}
+
+          <article class="wa-cert-card wa-cert-card--{{ _mod }}" role="listitem" aria-label="{{ cert.label }}">
+            <header class="wa-cert-card__header">
+              <h2 class="wa-cert-card__name">{{ cert.label }}</h2>
+              <span class="wa-cert-status-badge wa-cert-status-badge--{{ _mod }}" aria-label="Status: {{ _label }}">
+                {{ _label }}
+              </span>
+            </header>
+
+            {% if cert.expiry %}
+            <p class="wa-cert-card__expiry">
+              <span class="wa-cert-card__expiry-label">
+                {%- if _mod == 'expired' -%}Expired{%- else -%}Expires{%- endif -%}:
+              </span>
+              {{ cert.expiry | datetimeformat('%d %B %Y') }}
+            </p>
+            {% endif %}
+
+            {% if cert.current_step and not cert.is_active %}
+            <p class="wa-cert-card__step">
+              <span class="wa-cert-card__step-label">Current step:</span>
+              {{ cert.current_step }}
+            </p>
+            {% endif %}
+
+            <div class="wa-cert-card__actions">
+              {% if cert.cert_url and cert.is_active %}
+              <a
+                href="{{ cert.cert_url }}"
+                class="wa-btn wa-btn--primary wa-btn--sm"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Download {{ cert.label }} certificate (opens in new tab)"
+              >
+                Download certificate
+              </a>
+              {% endif %}
+
+              <a
+                href="/portal/certifications/{{ cert.type }}/"
+                class="wa-btn wa-btn--secondary wa-btn--sm"
+                aria-label="View progress for {{ cert.label }}"
+              >
+                View progress
+              </a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}

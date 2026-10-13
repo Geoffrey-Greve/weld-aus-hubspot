@@ -1,0 +1,353 @@
+<!--
+  templateType: none
+-->
+{#
+  _module-session-resolve.html
+
+  Resolves ONE course-module booking URL into the session behind it, so a module
+  row can be rendered with its real dates and price instead of a bare name.
+
+  Why this exists: course_modules (the HubDB table) carries only a name, an order
+  and a booking URL - no date, no price. Everything a buyer needs to choose
+  between modules already exists, but it lives on the `courses` or `events` row
+  that the booking URL points at, and until now only the checkout tunnel ever
+  looked it up. So the course page asked people to tick boxes with no idea what
+  each tick cost or when it ran, and they found out one page later.
+
+  PARITY IS LOAD-BEARING, not tidiness. The checkout sends each selected module's
+  displayed price as `expectedUnitCents`, and the worker's per-module guard is the
+  same DIRECTIONAL `comparePriceQuote` the single-session path uses
+  (packages/worker/src/routes/reserve.ts): it refuses only a price resolving ABOVE
+  what this page displayed. So the failure direction is a page price that is too
+  LOW - which is exactly what an unresolved or zero price is, and why the caller
+  still refuses to make such a row selectable.
+  The caller therefore refuses to make a module selectable until it has resolved a
+  price above zero: an unpriced tickbox is a checkout that cannot complete.
+
+  This mirrors the primary resolution path in
+  theme/modules/checkout-tunnel.module/module.html (the `module_session_ids`
+  block) - same id parsing, same courses-before-events precedence, same
+  ticket_types_json price resolution. The page must never quote a number the
+  checkout then disagrees with; that is defect 213's whole family. The checkout's
+  extra fallbacks (hs_id__eq / id__eq / a 250-row scan) are deliberately NOT
+  copied: they are a per-module table scan on a page that renders many modules,
+  and their only effect here would be to make an already-degraded row render a
+  price. A row this partial cannot resolve degrades to its own booking link,
+  which is the same place it went before.
+
+  RESOLUTION ORDER: the module's HubSpot PRODUCT ID first, its booking URL second.
+
+  events-engine migration 0031 says it outright - "The Course Modules HubDB table
+  identifies a module by its HubSpot Product ID" - and the Worker stores that id on the
+  child event so a course page can find the session "without inferring it from a title".
+  The CMS never used it, so every module needed `/checkout/?session_id=<row>` typed by
+  hand into `module_booking_url`, and on production all 44 rows had none: the entire
+  selector rendered "Contact to book".
+
+  The join is HubDB to HubDB, server-side: a `courses` row carrying the same
+  `module_product_id` IS the module's session. That keeps the checkbox value a HubDB row
+  id (what `/checkout/` resolves), keeps the Worker pricing that same row through
+  `hubdb-pricing.ts` (which finds it by `worker_event_id`, migration 0035), and needs no
+  Worker call from this page at all. Reading the Worker's `ticket_types.price_cents`
+  instead would put a SECOND price source back on the module path, which is the exact
+  fault 0035 removed.
+
+  A module taught in several sittings matches several rows. The soonest one still on
+  sale wins; if none is, the soonest overall is kept so the row still renders with its
+  badge rather than vanishing. Letting the buyer CHOOSE between sittings is the
+  parent-pickable problem in CLAUDE.md § 7.7 and is deliberately not attempted here.
+
+  Inputs travel on the `module_session_input` NAMESPACE, set before the include:
+    module_session_input.url        - the raw course_modules.module_booking_url
+    module_session_input.product_id - course_modules.hubspot_product_id, matched against
+                                      courses.module_product_id
+    module_session_input.tier       - the visitor's resolved member tier, or '' when
+                                      they are not entitled to a member rate
+
+  A namespace rather than two plain variables because the caller resolves modules
+  inside a {% for %} loop: a namespace attribute assigned in a loop body is
+  visible to the include by construction, where a loop-local {% set %} depends on
+  include scoping that would only fail server-side on upload.
+
+  Output: the `module_session` namespace -
+    found, source ('courses'|'events'), resolved_by ('product'|'url'|''), id, name,
+    location, start_date, end_date, date_label, member_price, non_member_price,
+    worker_event_id, member_ticket_type_id, non_member_ticket_type_id, bookable,
+    members_only, status, has_started, off_sale, off_sale_label
+
+  `bookable` gates on worker_event_id ALONE, matching the checkout's own gate for
+  a selected module. It deliberately does not also require use_event_engine: that
+  flag routes a row's OWN Register CTA (CLAUDE.md § 11.5), and the selected-module
+  checkout never reads it, so requiring it here would hide modules the checkout
+  would happily reserve.
+
+  `off_sale` is the courses row's own `status` column saying Cancelled or Sold
+  Out - which CLAUDE.md § 7.6 makes an EDITORIAL decision no live read may reverse
+  - OR the session's start date having passed. `off_sale_label` says which, because
+  "Sold out" invites a waitlist enquiry and "Registrations closed" does not.
+  Every other surface that offers a session already honours it - the corporate
+  bulk booking panel excludes both, the course cards badge them - and the module
+  selector did not, so a cancelled module kept its tickbox and went into the
+  basket beside live ones. Reported separately from `bookable` because the two
+  are different facts: an off-sale module is still a resolved, priced session and
+  still shows its dates, it just cannot be bought today. The `events` table has no
+  status column, so an events-sourced module can only ever go off sale on its date.
+#}
+{% import "./_member-pricing.html" as wa_price %}
+{% import "./session-status.html" as wa_status_ms %}
+
+{% set module_session = namespace(
+  found=false,
+  source='',
+  resolved_by='',
+  id='',
+  name='',
+  location='',
+  start_date='',
+  end_date='',
+  date_label='',
+  member_price=0,
+  non_member_price=0,
+  worker_event_id='',
+  member_ticket_type_id='',
+  non_member_ticket_type_id='',
+  bookable=false,
+  members_only=false,
+  status='',
+  off_sale=false,
+  off_sale_label='',
+  has_started=false
+) %}
+
+{% set _ms_url = module_session_input.url | default('', true) | string | trim %}
+{% set _ms_tier = module_session_input.tier | default('', true) | string | trim %}
+{% set _ms_product_id = module_session_input.product_id | default('', true) | string | trim %}
+
+{# Asked once per module, and reused by the off-sale rule further down. #}
+{% set _ms_today_key = local_dt | datetimeformat('%Y%m%d') %}
+
+{% if _ms_product_id %}
+  {% set _ms_pick = namespace(live=null, any=null) %}
+  {#- Only a row flagged `is_module` is a module's session. A whole-course row carrying a
+      product id (production's 19 parent rows were given their full-course Product ID on
+      21 Sep) would otherwise answer for any module sharing it, and the selector would
+      sell the whole course, at the whole course's price, under a module's name - which is
+      what QA saw on Dev for IWI-S Part 2 (Ref 46). The predicate is in the QUERY so
+      the limit cannot fill with parent rows before a module row is reached; the
+      loop checks again in case a portal's filter syntax ever ignores it. -#}
+  {% for _ms_candidate in hubdb_table_rows('courses', 'module_product_id__eq=' ~ _ms_product_id ~ '&is_module__eq=true&orderBy=start_date&limit=10') %}
+    {% if _ms_candidate.is_module %}
+      {% if not _ms_pick.any %}
+        {% set _ms_pick.any = _ms_candidate %}
+      {% endif %}
+      {% if not _ms_pick.live %}
+        {% set _ms_c_off_sale = wa_status_ms.is_off_sale(_ms_candidate.status.name) | trim %}
+        {% set _ms_c_start = _ms_candidate.start_date | datetimeformat('%Y%m%d') if _ms_candidate.start_date else '' %}
+        {% if not (_ms_c_start and _ms_c_start < _ms_today_key) and not _ms_c_off_sale %}
+          {% set _ms_pick.live = _ms_candidate %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% set _ms_matched = _ms_pick.live | default(_ms_pick.any, true) %}
+  {% if _ms_matched %}
+    {% set module_session.id = _ms_matched.hs_id | string %}
+    {% set module_session.resolved_by = 'product' %}
+  {% endif %}
+{% endif %}
+
+{# The booking URL is the OVERRIDE, reached only when no `courses` row claims the
+   product id: a module the Worker does not know about, or one an editor has pointed
+   somewhere deliberately. It was the only path before, so every existing row keeps
+   working unchanged. #}
+{% if not module_session.id and _ms_url %}
+  {# Id parsing mirrors the selector JS: session_id first, event_id as the
+     alternate spelling. Production module rows use event_id. #}
+  {% set _ms_url_parts = _ms_url | split('?') %}
+  {% set _ms_query = _ms_url_parts[1] if (_ms_url_parts | length) > 1 else '' %}
+  {% set _ms_id_ns = namespace(session='', event='') %}
+  {% for _ms_pair in _ms_query | split('&') %}
+    {% set _ms_kv = _ms_pair | split('=') %}
+    {% set _ms_key = _ms_kv[0] | default('', true) | string | lower | trim %}
+    {% set _ms_value = (_ms_kv[1] | default('', true) | string | trim) if (_ms_kv | length) > 1 else '' %}
+    {% if _ms_key == 'session_id' and not _ms_id_ns.session %}
+      {% set _ms_id_ns.session = _ms_value %}
+    {% elif _ms_key == 'event_id' and not _ms_id_ns.event %}
+      {% set _ms_id_ns.event = _ms_value %}
+    {% endif %}
+  {% endfor %}
+  {% set module_session.id = _ms_id_ns.session | default(_ms_id_ns.event, true) | string | trim %}
+  {% if module_session.id %}
+    {% set module_session.resolved_by = 'url' %}
+  {% endif %}
+{% endif %}
+
+{% if module_session.id %}
+  {% set _ms_course_row = hubdb_table_row('courses', module_session.id) %}
+  {% set _ms_event_row = null %}
+  {% if not (_ms_course_row and _ms_course_row.worker_event_id) %}
+    {% set _ms_event_row = hubdb_table_row('events', module_session.id) %}
+  {% endif %}
+
+  {% if _ms_course_row and _ms_course_row.worker_event_id %}
+    {% set module_session.found = true %}
+    {% set module_session.source = 'courses' %}
+    {% set module_session.name = _ms_course_row.course_name | default('', true) | string | trim %}
+    {% set module_session.location = _ms_course_row.city.name | default('', true) | string | trim %}
+    {% set module_session.start_date = _ms_course_row.start_date | default('', true) %}
+    {% set module_session.end_date = _ms_course_row.end_date | default('', true) %}
+    {% set module_session.member_price = wa_price.member_price(_ms_course_row, _ms_tier) | trim | float %}
+    {% set module_session.non_member_price = wa_price.non_member_price(_ms_course_row) | trim | float %}
+    {% set module_session.worker_event_id = _ms_course_row.worker_event_id | default('', true) | string | trim %}
+    {% set module_session.member_ticket_type_id = _ms_course_row.member_ticket_type_id | default('', true) | string | trim %}
+    {% set module_session.non_member_ticket_type_id = _ms_course_row.non_member_ticket_type_id | default('', true) | string | trim %}
+
+  {% elif _ms_event_row %}
+    {% set module_session.found = true %}
+    {% set module_session.source = 'events' %}
+    {% set module_session.name = _ms_event_row.event_name | default('', true) | string | trim %}
+    {% set module_session.start_date = _ms_event_row.event_date | default('', true) %}
+    {% set module_session.end_date = _ms_event_row.event_end_date | default('', true) %}
+    {% set module_session.worker_event_id = _ms_event_row.worker_event_id | default('', true) | string | trim %}
+    {% set module_session.members_only = _ms_event_row.is_members_only ? true : false %}
+
+    {% set _ms_event_city = _ms_event_row.city | default('', true) | string | trim %}
+    {% set _ms_event_location = _ms_event_row.event_location | default('', true) | string | trim %}
+    {% set _ms_event_state = _ms_event_row.event_state.name | default('', true) | string | trim %}
+    {% if _ms_event_city %}
+      {% set module_session.location = _ms_event_city %}
+    {% elif _ms_event_location %}
+      {% if 'online' in (_ms_event_location | lower) or 'webinar' in (_ms_event_location | lower) %}
+        {% set module_session.location = 'Online' %}
+      {% else %}
+        {% set module_session.location = _ms_event_location %}
+      {% endif %}
+    {% elif _ms_event_state %}
+      {% set module_session.location = _ms_event_state %}
+    {% endif %}
+
+    {# Ticket JSON is authoritative when present, exactly as the checkout reads it:
+       the first member_only ticket sets the member price, the first public ticket
+       sets the standard price. #}
+    {% set _ms_ticket_ns = namespace(has_member=false, has_public=false, member=0, public=0, member_id='', public_id='') %}
+    {% if _ms_event_row.ticket_types_json %}
+      {% for _ms_ticket in (_ms_event_row.ticket_types_json | fromjson) %}
+        {% set _ms_ticket_id = _ms_ticket.worker_ticket_type_id | default(_ms_ticket.id, true) | default('', true) | string | trim %}
+        {% set _ms_ticket_price = _ms_ticket.price_dollars | default(0, true) | float %}
+        {% if _ms_ticket_id and (_ms_ticket.member_only ? true : false) and not _ms_ticket_ns.has_member %}
+          {% set _ms_ticket_ns.has_member = true %}
+          {% set _ms_ticket_ns.member = _ms_ticket_price %}
+          {% set _ms_ticket_ns.member_id = _ms_ticket_id %}
+        {% elif _ms_ticket_id and not (_ms_ticket.member_only ? true : false) and not _ms_ticket_ns.has_public %}
+          {% set _ms_ticket_ns.has_public = true %}
+          {% set _ms_ticket_ns.public = _ms_ticket_price %}
+          {% set _ms_ticket_ns.public_id = _ms_ticket_id %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {# The checkout's own fallback: a member takes the public ticket when the row
+       has no member-only one. The reverse is deliberately NOT mirrored - a row
+       whose only ticket is member-only leaves the guest id empty, which is the
+       audit's `guest_ticket_missing` error, and the caller's selectability gate
+       reads that emptiness rather than sending a guest to a payment step that
+       can only say "not configured". #}
+    {% set module_session.member_ticket_type_id = _ms_ticket_ns.member_id | default(_ms_ticket_ns.public_id, true) %}
+    {% set module_session.non_member_ticket_type_id = _ms_ticket_ns.public_id %}
+
+    {% set _ms_event_member_raw = _ms_event_row.member_price | default('', true) | string | trim %}
+    {% set _ms_event_public_raw = _ms_event_row.non_member_price | default('', true) | string | trim %}
+    {% set _ms_event_from_raw = _ms_event_row.price_from | default('', true) | string | trim %}
+
+    {% if _ms_ticket_ns.has_member %}
+      {% set module_session.member_price = _ms_ticket_ns.member %}
+    {% elif _ms_event_member_raw %}
+      {% set module_session.member_price = _ms_event_member_raw | float %}
+    {% elif _ms_ticket_ns.has_public %}
+      {% set module_session.member_price = _ms_ticket_ns.public %}
+    {% elif _ms_event_from_raw %}
+      {% set module_session.member_price = _ms_event_from_raw | float %}
+    {% endif %}
+
+    {% if _ms_ticket_ns.has_public %}
+      {% set module_session.non_member_price = _ms_ticket_ns.public %}
+    {% elif _ms_event_public_raw %}
+      {% set module_session.non_member_price = _ms_event_public_raw | float %}
+    {% elif _ms_event_from_raw %}
+      {% set module_session.non_member_price = _ms_event_from_raw | float %}
+    {% else %}
+      {% set module_session.non_member_price = module_session.member_price %}
+    {% endif %}
+
+    {# A member never pays more than the public rate. An events row whose only
+       ticket is public resolves both sides to the same number, and that is the
+       honest answer: there is no member discount configured on it. #}
+    {% if module_session.member_price <= 0 %}
+      {% set module_session.member_price = module_session.non_member_price %}
+    {% endif %}
+
+  {% elif _ms_course_row %}
+    {# Present but not bookable through the engine - render what we know. #}
+    {% set module_session.found = true %}
+    {% set module_session.source = 'courses' %}
+    {% set module_session.name = _ms_course_row.course_name | default('', true) | string | trim %}
+    {% set module_session.location = _ms_course_row.city.name | default('', true) | string | trim %}
+    {% set module_session.start_date = _ms_course_row.start_date | default('', true) %}
+    {% set module_session.end_date = _ms_course_row.end_date | default('', true) %}
+    {% set module_session.member_price = wa_price.member_price(_ms_course_row, _ms_tier) | trim | float %}
+    {% set module_session.non_member_price = wa_price.non_member_price(_ms_course_row) | trim | float %}
+  {% endif %}
+
+  {% set module_session.bookable = module_session.worker_event_id ? true : false %}
+
+  {# The status column is on `courses` only. Read once here rather than in each of
+     the two courses branches above, so the engine-ready and degraded paths cannot
+     answer differently. #}
+  {% if module_session.source == 'courses' and _ms_course_row %}
+    {% set module_session.status = _ms_course_row.status.name | default('', true) | string | trim %}
+  {% endif %}
+
+  {# A module whose session has already STARTED is off sale too, and this half applies to
+     both sources: `events` carries no status column, but every row here has a date.
+
+     Ref 46 round 2 found four IWI-S modules whose booking URLs all resolved to one August
+     session, offered for sale in September. The date is the only thing on the row that
+     knew. It is the Worker's own default cutoff (`registration_closes_at` NULL resolves to
+     `starts_at`, migration 0038) and the same rule `hasStartDatePassed` applies in the
+     React islands; said here because this partial never asks the Worker anything.
+
+     Folded into `off_sale` rather than kept beside it because the consequences are
+     identical - no tickbox, and no "Book this module" link into a dead end - but the LABEL
+     is its own, per CLAUDE.md § 7.6's "five states, five sentences": "Sold out" invites a
+     waitlist enquiry, a course that has already run does not. A row with no date at all is
+     left alone: "we cannot tell when this runs" is not evidence that it is over. #}
+  {% set _ms_start_key = module_session.start_date | datetimeformat('%Y%m%d') if module_session.start_date else '' %}
+  {% set module_session.has_started = _ms_start_key and _ms_start_key < _ms_today_key %}
+
+  {# Cancelled, Sold Out and Closed (Ref 74c) through the shared vocabulary, and the
+     LABEL from it too: a raw "Closed" option name is not the sentence a buyer is shown. #}
+  {% if wa_status_ms.is_off_sale(module_session.status) | trim %}
+    {% set module_session.off_sale = true %}
+    {% set _ms_status_key = wa_status_ms.status_of(module_session.status) | trim %}
+    {% set module_session.off_sale_label = wa_status_ms.status_label(_ms_status_key) | trim %}
+  {% elif module_session.has_started %}
+    {% set module_session.off_sale = true %}
+    {% set module_session.off_sale_label = 'Registrations closed' %}
+  {% endif %}
+
+  {# Date label mirrors formatDateRange() in src/shared/utils/formatDate.ts -
+     "12-15 Mar 2026" within one month, "12 Mar - 3 Apr 2026" across two. #}
+  {% if module_session.start_date and module_session.end_date %}
+    {% set _ms_start_month = module_session.start_date | datetimeformat('%Y%m') %}
+    {% set _ms_end_month = module_session.end_date | datetimeformat('%Y%m') %}
+    {% if module_session.start_date | datetimeformat('%Y%m%d') == module_session.end_date | datetimeformat('%Y%m%d') %}
+      {% set module_session.date_label = module_session.start_date | datetimeformat('%d %b %Y') %}
+    {% elif _ms_start_month == _ms_end_month %}
+      {% set module_session.date_label = (module_session.start_date | datetimeformat('%d')) ~ '-' ~ (module_session.end_date | datetimeformat('%d %b %Y')) %}
+    {% else %}
+      {% set module_session.date_label = (module_session.start_date | datetimeformat('%d %b')) ~ ' - ' ~ (module_session.end_date | datetimeformat('%d %b %Y')) %}
+    {% endif %}
+  {% elif module_session.start_date %}
+    {% set module_session.date_label = module_session.start_date | datetimeformat('%d %b %Y') %}
+  {% endif %}
+{% endif %}

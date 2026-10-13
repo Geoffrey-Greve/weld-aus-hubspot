@@ -1,0 +1,582 @@
+<!--
+  templateType: page
+  label: Resource Detail
+  isAvailableForNewContent: true
+-->
+{#
+  resource-detail.html - Individual resource page (HubDB dynamic)
+  URL: /resources/{slug}
+  Dynamic data source: HubDB Table 5 (resources)
+
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  SECURITY: file_url is NEVER emitted in HTML for locked or paid      ║
+  ║  resources. All gating is computed server-side. The branch that      ║
+  ║  renders file_url runs only when the resource is neither locked nor  ║
+  ║  priced for this visitor.                                            ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+
+  Gating logic mirrors resource-library.module (§ CLAUDE.md 6.3):
+
+    Tier rank table (contact → required):
+      public / empty  | 0     (not logged in / inactive)  | 0
+      member          | 1     Individual / Apprentice etc  | 1
+      bronze          | 2     Corporate Bronze             | 2
+      silver          | 3     Corporate Silver             | 3
+      gold            | 4     Corporate Gold               | 4
+
+    is_locked = (req_rank > 0) AND (contact_rank < req_rank)
+
+  When locked → renders a "Become a Member" overlay; file_url is absent
+  from the page source entirely.
+
+  When priced for this visitor (QA #220 - member_label / non_member_label read
+  as a price rather than free/CTA copy) → renders the price plus an enquiry CTA;
+  file_url is likewise absent. See partials/_resource-pricing.html.
+
+  When unlocked and free → renders the download/video/link CTA with file_url.
+#}
+{% import "../partials/_sharepoint.html" as sp %}
+{% import "../partials/_resource-pricing.html" as rp %}
+
+{# Resolve HubDB row once for the whole template. #}
+{% set _row = dynamic_page_hubdb_row %}
+{# Title and description are resolved ABOVE the extends. layouts/base.html
+   includes partials/_head.html, which emits the document's ONLY <title> and
+   meta description; an assignment made after the extends lands too late for
+   it, and a second <title> emitted from extra_head is ignored by crawlers,
+   which take the first. #}
+{% set page_title_exact = (_row.title | default('Resource', true)) ~ ' - Weld Australia Resources' %}
+{% if _row.abstract %}
+  {% set page_description = _row.abstract | striptags | truncate(160) %}
+{% endif %}
+{% extends "../layouts/base.html" %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ get_asset_url('../../modules/hero.module/module.css') }}">
+{% if _row.preview_image and _row.preview_image.url %}
+<meta property="og:image" content="{{ _row.preview_image.url }}">
+<meta property="og:image:alt" content="{{ _row.title | default('') | escape }}">
+{% endif %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_settings.site_url | default('https://weldaustralia.com.au') }}" },
+    { "@type": "ListItem", "position": 2, "name": "Resources", "item": "{{ site_settings.site_url | default('https://weldaustralia.com.au') }}/resources/" },
+    { "@type": "ListItem", "position": 3, "name": "{{ _row.title | default('Resource') | escape }}" }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block body %}
+
+{# ════════════════════════════════════════════════════════════════════════
+   § 1  SERVER-SIDE GATING - computed once per request.
+        file_url is only referenced inside the {% if not is_locked %} branch.
+   ════════════════════════════════════════════════════════════════════════ #}
+
+{% set contact_logged_in = request_contact.is_logged_in | default(false) %}
+{% include "../partials/_resource-member-resolve.html" %}
+{% set contact_logged_in = resource_member.logged_in %}
+{% set is_active_member = resource_member.is_active %}
+{% set contact_tier_rank = resource_member.tier_rank %}
+
+{# Map required_tier → numeric rank #}
+{% set req_tier_name = _row.required_tier.name | default('') %}
+{% if req_tier_name == 'gold' %}
+  {% set req_rank = 4 %}
+{% elif req_tier_name == 'silver' %}
+  {% set req_rank = 3 %}
+{% elif req_tier_name == 'bronze' %}
+  {% set req_rank = 2 %}
+{% elif req_tier_name == 'member' %}
+  {% set req_rank = 1 %}
+{% else %}
+  {% set req_rank = 0 %}
+{% endif %}
+
+{# Gating decision. file_url is ONLY referenced below this line inside the unlocked branch. #}
+{% set is_locked = req_rank > 0 and contact_tier_rank < req_rank %}
+
+{# QA #220: a resource can be open to everyone yet still cost money. Price labels
+   are per-audience, so resolve the one that applies to this visitor. When it
+   reads as a price the file is NOT handed over for free - the page shows the
+   price and an enquiry CTA instead, and file_url is never emitted. #}
+{% set member_price = _row.member_label | default('', true) | string | trim %}
+{% set non_member_price = _row.non_member_label | default('', true) | string | trim %}
+{% set member_is_paid = (rp.is_paid_label(member_price) | trim) == 'true' %}
+{% set non_member_is_paid = (rp.is_paid_label(non_member_price) | trim) == 'true' %}
+{# Which price applies keys off *active* membership, not contact_tier_rank: the
+   rank mapping above credits a Corporate tier even once it has lapsed, so a
+   lapsed contact would otherwise be quoted (and handed) the member rate. #}
+{% set visitor_price = member_price if (is_active_member and member_is_paid) else (non_member_price if (not is_active_member and non_member_is_paid) else '') %}
+{% set requires_payment = visitor_price != '' %}
+
+{# ════════════════════════════════════════════════════════════════════════
+   § 2  HERO - always rendered (no sensitive data here)
+   ════════════════════════════════════════════════════════════════════════ #}
+
+{% set _resource_title = _row.title | default('Resource') %}
+{% set _resource_hero_media_type = 'none' %}
+{% set _resource_hero_image = {} %}
+{% if _row.preview_image and _row.preview_image.url %}
+  {% set _resource_hero_media_type = 'image' %}
+  {% set _resource_hero_image = {"src": _row.preview_image.url, "alt": _row.preview_image.alt | default(_resource_title, true), "width": 480, "height": 270} %}
+{% endif %}
+{% set _resource_hero_extra %}
+  <div class="wa-hero__badges" aria-label="Resource classification">
+    {% if _row.category and _row.category.name %}
+    <span class="wa-hero__badge wa-hero__badge--accent">
+      {{ _row.category.name | replace('_', ' ') | title }}
+    </span>
+    {% endif %}
+
+    {% if _row.file_type and _row.file_type.name %}
+    <span class="wa-hero__badge">{{ _row.file_type.name | upper }}</span>
+    {% endif %}
+
+    {% if req_rank > 0 %}
+    <span class="wa-hero__badge wa-hero__badge--muted" aria-label="Members only resource">
+      Members only
+    </span>
+    {% endif %}
+
+    {% if requires_payment %}
+    <span class="wa-hero__badge wa-hero__badge--muted" aria-label="Paid resource">
+      Paid resource - {{ visitor_price }}
+    </span>
+    {% endif %}
+  </div>
+
+  {% if _row.published_date %}
+  <p class="wa-hero__meta-line">
+    Published
+    <time datetime="{{ _row.published_date | datetimeformat('%Y-%m-%d') }}">
+      {{ _row.published_date | datetimeformat('%d %B %Y') }}
+    </time>
+  </p>
+  {% endif %}
+{% endset %}
+
+{% set _shared_hero_id = 'resource-detail-hero' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'large' %}
+{% set _shared_hero_spacing = 'default' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = _resource_hero_media_type %}
+{% set _shared_hero_image = _resource_hero_image %}
+{% set _shared_hero_show_breadcrumb = true %}
+{% set _shared_hero_show_breadcrumb_home = true %}
+{% set _shared_hero_breadcrumb_home_label = 'Home' %}
+{% set _shared_hero_breadcrumb_home_href = '/' %}
+{% set _shared_hero_breadcrumb_parent_label = 'Resources' %}
+{% set _shared_hero_breadcrumb_parent_href = '/resources/' %}
+{% set _shared_hero_breadcrumb_current_label = _resource_title %}
+{% set _shared_hero_eyebrow = 'Resource library' %}
+{% set _shared_hero_headline = _resource_title %}
+{% set _shared_hero_subheadline = _row.abstract %}
+{% set _shared_hero_extra = _resource_hero_extra %}
+{% set _shared_hero_primary_label = '' %}
+{% set _shared_hero_secondary_label = '' %}
+{% include "../partials/shared-hero.html" %}
+
+{% if false %}
+<section
+  class="wa-resource-detail__hero wa-section wa-section--primary_dark wa-section--default"
+  aria-labelledby="wa-resource-detail-heading"
+>
+  <div class="container">
+
+    <nav class="wa-breadcrumb" aria-label="Breadcrumb">
+      <ol class="wa-breadcrumb__list">
+        <li><a href="/" class="wa-breadcrumb__link">Home</a></li>
+        <li aria-hidden="true" class="wa-breadcrumb__sep">/</li>
+        <li><a href="/resources/" class="wa-breadcrumb__link">Resources</a></li>
+        <li aria-hidden="true" class="wa-breadcrumb__sep">/</li>
+        <li aria-current="page" class="wa-breadcrumb__current">{{ _row.title | default('Resource') }}</li>
+      </ol>
+    </nav>
+
+    <div class="wa-resource-detail__hero-inner">
+
+      <div class="wa-resource-detail__hero-content">
+
+        <div class="wa-resource-detail__badges" aria-label="Resource classification">
+          {% if _row.category and _row.category.name %}
+          <span class="wa-badge wa-badge--category">
+            {{ _row.category.name | replace('_', ' ') | title }}
+          </span>
+          {% endif %}
+
+          {% if _row.file_type and _row.file_type.name %}
+          <span class="wa-badge wa-badge--type">{{ _row.file_type.name | upper }}</span>
+          {% endif %}
+
+          {% if req_rank > 0 %}
+          <span class="wa-badge wa-badge--locked" aria-label="Members only resource">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+            Members only
+          </span>
+          {% endif %}
+
+          {% if requires_payment %}
+          <span class="wa-badge wa-badge--paid" aria-label="Paid resource">
+            Paid resource - {{ visitor_price }}
+          </span>
+          {% endif %}
+        </div>
+
+        <h1 class="wa-resource-detail__title" id="wa-resource-detail-heading">
+          {{ _row.title | default('Resource') }}
+        </h1>
+
+        {% if _row.abstract %}
+        <div class="wa-resource-detail__abstract">{{ _row.abstract }}</div>
+        {% endif %}
+
+        {% if _row.published_date %}
+        <p class="wa-resource-detail__meta">
+          Published
+          <time datetime="{{ _row.published_date | datetimeformat('%Y-%m-%d') }}">
+            {{ _row.published_date | datetimeformat('%d %B %Y') }}
+          </time>
+        </p>
+        {% endif %}
+
+      </div>
+
+      {% if _row.preview_image and _row.preview_image.url %}
+      <div class="wa-resource-detail__hero-image" aria-hidden="true">
+        <img
+          src="{{ _row.preview_image.url }}"
+          alt="{{ _row.preview_image.alt | default(_row.title | default('')) }}"
+          class="wa-resource-detail__preview-img"
+          width="480"
+          height="270"
+          loading="eager"
+        >
+      </div>
+      {% endif %}
+
+    </div>{# /.wa-resource-detail__hero-inner #}
+
+  </div>
+</section>
+{% endif %}
+
+{# ════════════════════════════════════════════════════════════════════════
+   § 3  ACCESS - Locked overlay OR full resource content.
+        IMPORTANT: _row.file_url is ONLY referenced inside the unlocked branch.
+   ════════════════════════════════════════════════════════════════════════ #}
+
+{% if is_locked %}
+
+  {# ── LOCKED: member wall overlay ────────────────────────────────────── #}
+  <section
+    class="wa-resource-detail__locked wa-section wa-section--surface wa-section--spacious"
+    aria-labelledby="wa-resource-locked-heading"
+  >
+    <div class="container">
+      <div class="wa-resource-detail__locked-inner">
+
+        <div class="wa-resource-detail__locked-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+
+        <h2 class="wa-resource-detail__locked-heading" id="wa-resource-locked-heading">
+          This resource is for Weld Australia members
+        </h2>
+
+        {# Contextual tier message without leaking file content #}
+        {% if req_rank == 4 %}
+          {% set _tier_label = 'a Corporate Gold' %}
+        {% elif req_rank == 3 %}
+          {% set _tier_label = 'a Corporate Silver or Gold' %}
+        {% elif req_rank == 2 %}
+          {% set _tier_label = 'a Corporate Bronze, Silver or Gold' %}
+        {% else %}
+          {% set _tier_label = 'an active Weld Australia' %}
+        {% endif %}
+
+        <p class="wa-resource-detail__locked-message">
+          Access to this resource requires {{ _tier_label }} membership.
+          {% if contact_logged_in and not is_active_member %}
+            Your current membership is not active - please renew to access this resource.
+          {% elif not contact_logged_in %}
+            Already a member? Log in to access this and other member resources.
+          {% endif %}
+        </p>
+
+        <div class="wa-resource-detail__locked-actions">
+          {% if contact_logged_in and not is_active_member %}
+            <a href="/membership/" class="wa-btn wa-btn--primary">Renew membership</a>
+            <a href="/portal/" class="wa-btn wa-btn--outline">Go to my account</a>
+          {% else %}
+            <a href="/membership/" class="wa-btn wa-btn--primary">Explore membership</a>
+            <a href="/login/?redirect={{ content.absolute_url | urlencode }}" class="wa-btn wa-btn--outline">Member login</a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+{% elif requires_payment %}
+
+  {# ── PAID: open to this visitor, but not free. Same posture as the locked
+       branch - the price and an enquiry CTA are shown, file_url is not. ── #}
+  <section
+    class="wa-resource-detail__paid wa-section wa-section--surface wa-section--spacious"
+    aria-labelledby="wa-resource-paid-heading"
+  >
+    <div class="container">
+      <div class="wa-resource-detail__paid-inner">
+
+        <h2 class="wa-resource-detail__paid-heading" id="wa-resource-paid-heading">
+          This resource is available to purchase
+        </h2>
+
+        <p class="wa-resource-detail__paid-price">
+          <span class="wa-resource-detail__paid-price-label">
+            {% if is_active_member %}Member price{% else %}Price{% endif %}
+          </span>
+          <strong>{{ visitor_price }}</strong>
+        </p>
+
+        {% if not is_active_member and not member_is_paid %}
+        <p class="wa-resource-detail__paid-member-note">
+          Weld Australia members get this resource at no extra cost.
+        </p>
+        {% endif %}
+
+        <div class="wa-resource-detail__paid-actions">
+          <a
+            href="/contact-us/?resource={{ _row.title | default('') | urlencode }}#enquiry"
+            class="wa-btn wa-btn--primary"
+          >Enquire - {{ visitor_price }}</a>
+          {% if not is_active_member and not member_is_paid %}
+          <a href="/membership/" class="wa-btn wa-btn--outline">Explore membership</a>
+          {% endif %}
+        </div>
+
+        <div class="wa-resource-detail__back">
+          <a href="/resources/" class="wa-btn wa-btn--outline wa-btn--sm">
+            &larr; Back to Resources Hub
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+{% else %}
+
+  {# ── UNLOCKED: render resource content.
+       file_url is only referenced here - never in the locked or paid branches. ── #}
+  <section
+    class="wa-resource-detail__access wa-section wa-section--surface wa-section--spacious"
+    aria-labelledby="wa-resource-access-heading"
+  >
+    <div class="container">
+      <div class="wa-resource-detail__access-inner">
+
+        <h2 class="wa-resource-detail__access-heading sr-only" id="wa-resource-access-heading">
+          Access this resource
+        </h2>
+
+        {% set _file_type = _row.file_type.name | default('link') %}
+        {# QA #46: normalise SharePoint share links so they open on Android without a Microsoft
+           login. Videos keep their original URL - the video branch embeds it in an <iframe> and
+           must stay playable; only downloadable resource types get the direct-download rewrite. #}
+        {% if _file_type == 'video' %}
+          {% set _file_url = _row.file_url | default('') %}
+        {% else %}
+          {% set _file_url = sp.sharepoint_direct_url(_row.file_url | default('')) | trim %}
+        {% endif %}
+
+        {% if _file_url %}
+
+          {% if _file_type == 'pdf' %}
+            <div class="wa-resource-detail__download">
+              <div class="wa-resource-detail__download-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              </div>
+              <div class="wa-resource-detail__download-content">
+                <p class="wa-resource-detail__download-label">PDF document - ready to download</p>
+                <a
+                  href="{{ _file_url }}"
+                  class="wa-btn wa-btn--primary wa-btn--lg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  data-wa-event="resource_download"
+                  data-resource-id="{{ _row.hs_id | default('') }}"
+                  data-resource-title="{{ _row.title | default('') | escape }}"
+                >
+                  Download PDF
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+          {% elif _file_type == 'video' %}
+            <div class="wa-resource-detail__video">
+              <div class="wa-resource-detail__video-wrap" style="position:relative;padding-top:56.25%;">
+                <iframe
+                  src="{{ _file_url }}"
+                  title="{{ _row.title | default('Video') }}"
+                  style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  loading="lazy"
+                ></iframe>
+              </div>
+            </div>
+
+          {% else %}
+            {# External link - open in new tab #}
+            <div class="wa-resource-detail__link">
+              <a
+                href="{{ _file_url }}"
+                class="wa-btn wa-btn--primary wa-btn--lg"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-wa-event="resource_download"
+                data-resource-id="{{ _row.hs_id | default('') }}"
+                data-resource-title="{{ _row.title | default('') | escape }}"
+              >
+                Access resource
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            </div>
+          {% endif %}
+
+        {% else %}
+
+          <p class="wa-resource-detail__no-link">
+            This resource does not have a direct download link.
+            Please <a href="/contact-us/">contact our team</a> for access.
+          </p>
+
+        {% endif %}
+
+        <div class="wa-resource-detail__back">
+          <a href="/resources/" class="wa-btn wa-btn--outline wa-btn--sm">
+            &larr; Back to Resources Hub
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+{% endif %}{# end is_locked #}
+
+{# ════════════════════════════════════════════════════════════════════════
+   § 4  RELATED RESOURCES - same category, gating applied per row
+        file_url is never included in related cards (cards link to detail pages).
+   ════════════════════════════════════════════════════════════════════════ #}
+
+{% set _category_filter = _row.category.name | default('') %}
+{% if _category_filter %}
+  {% set related_rows = hubdb_table_rows('resources', 'is_active__eq=true&category__eq=' ~ _category_filter ~ '&hs_id__neq=' ~ (_row.hs_id | default('0')) ~ '&limit=3') %}
+{% else %}
+  {% set related_rows = hubdb_table_rows('resources', 'is_active__eq=true&hs_id__neq=' ~ (_row.hs_id | default('0')) ~ '&limit=3') %}
+{% endif %}
+
+{% if related_rows %}
+<section
+  class="wa-resource-detail__related wa-section wa-section--surface_alt wa-section--spacious"
+  aria-labelledby="wa-resource-related-heading"
+>
+  <div class="container">
+    <h2 class="wa-resource-detail__related-heading" id="wa-resource-related-heading">Related resources</h2>
+
+    <div class="wa-resource-card-grid">
+      {% for rel in related_rows %}
+        {# Compute locked state for each related card - never leak its file_url #}
+        {% set rel_req_name = rel.required_tier.name | default('') %}
+        {% if rel_req_name == 'gold' %}{% set rel_req_rank = 4 %}
+        {% elif rel_req_name == 'silver' %}{% set rel_req_rank = 3 %}
+        {% elif rel_req_name == 'bronze' %}{% set rel_req_rank = 2 %}
+        {% elif rel_req_name == 'member' %}{% set rel_req_rank = 1 %}
+        {% else %}{% set rel_req_rank = 0 %}{% endif %}
+        {% set rel_locked = rel_req_rank > 0 and contact_tier_rank < rel_req_rank %}
+
+        <article class="wa-resource-card{% if rel_locked %} wa-resource-card--locked{% endif %}">
+
+          {% if rel.preview_image and rel.preview_image.url %}
+          <div class="wa-resource-card__img-wrap">
+            <img
+              src="{{ rel.preview_image.url }}"
+              alt="{{ rel.preview_image.alt | default(rel.title | default('')) }}"
+              class="wa-resource-card__img"
+              loading="lazy"
+              width="400"
+              height="225"
+            >
+            {% if rel_locked %}
+            <div class="wa-resource-card__img-overlay" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/></svg>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <div class="wa-resource-card__body">
+            {% if rel.category and rel.category.name %}
+            <span class="wa-badge wa-badge--category">
+              {{ rel.category.name | replace('_', ' ') | title }}
+            </span>
+            {% endif %}
+
+            <h3 class="wa-resource-card__title">
+              <a href="/resources/{{ rel.slug | default('#') }}">{{ rel.title | default('Resource') }}</a>
+            </h3>
+
+            {% if rel.abstract %}
+            <p class="wa-resource-card__abstract">
+              {{ rel.abstract | striptags | truncate(120) }}
+            </p>
+            {% endif %}
+
+            {% if rel_locked %}
+            <span class="wa-resource-card__locked-label" aria-label="Members only resource">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              Members only
+            </span>
+            {% endif %}
+
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    <div class="wa-resource-detail__related-all">
+      <a href="/resources/" class="wa-btn wa-btn--outline">Browse all resources</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

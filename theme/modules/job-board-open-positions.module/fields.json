@@ -1,0 +1,203 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "job-board-open-roles"
+  },
+  {
+    "name": "featured_eyebrow",
+    "label": "Featured eyebrow",
+    "type": "text",
+    "default": "Don't miss"
+  },
+  {
+    "name": "featured_heading",
+    "label": "Featured heading",
+    "type": "text",
+    "default": "Featured opportunity"
+  },
+  {
+    "name": "featured_badge_label",
+    "label": "Featured badge label",
+    "type": "text",
+    "default": "Featured role"
+  },
+  {
+    "name": "featured_apply_label",
+    "label": "Featured apply button label",
+    "type": "text",
+    "default": "Apply for this role"
+  },
+  {
+    "name": "featured_details_label",
+    "label": "Featured details link label",
+    "type": "text",
+    "default": "View full details"
+  },
+  {
+    "name": "listing_eyebrow",
+    "label": "Listing eyebrow",
+    "type": "text",
+    "default": "Open positions"
+  },
+  {
+    "name": "listing_heading",
+    "label": "Listing heading",
+    "type": "text",
+    "default": "Browse the latest job opportunities"
+  },
+  {
+    "name": "search_placeholder",
+    "label": "Search placeholder",
+    "type": "text",
+    "default": "Search roles or companies..."
+  },
+  {
+    "name": "all_roles_label",
+    "label": "All roles filter label",
+    "type": "text",
+    "default": "All"
+  },
+  {
+    "name": "trades_label",
+    "label": "Trades filter label",
+    "type": "text",
+    "default": "Trades & Workshop"
+  },
+  {
+    "name": "engineering_label",
+    "label": "Engineering filter label",
+    "type": "text",
+    "default": "Engineering"
+  },
+  {
+    "name": "inspection_label",
+    "label": "Inspection filter label",
+    "type": "text",
+    "default": "Inspection & Quality"
+  },
+  {
+    "name": "leadership_label",
+    "label": "Leadership filter label",
+    "type": "text",
+    "default": "Supervision & Leadership"
+  },
+  {
+    "name": "apprenticeships_label",
+    "label": "Apprenticeships filter label",
+    "type": "text",
+    "default": "Apprenticeships"
+  },
+  {
+    "name": "saved_label",
+    "label": "Saved jobs toggle label",
+    "type": "text",
+    "help_text": "Label for the Saved jobs control in the filter toolbar. Also the destination of the 'View your saved jobs' link on each job page (/job-board?view=saved).",
+    "default": "Saved jobs"
+  },
+  {
+    "name": "location_label",
+    "label": "Location label",
+    "type": "text",
+    "default": "Location"
+  },
+  {
+    "name": "all_locations_label",
+    "label": "All locations option label",
+    "type": "text",
+    "default": "All locations"
+  },
+  {
+    "name": "all_types_label",
+    "label": "All types filter label",
+    "type": "text",
+    "default": "All types"
+  },
+  {
+    "name": "all_arrangements_label",
+    "label": "All arrangements filter label",
+    "type": "text",
+    "default": "All arrangements"
+  },
+  {
+    "name": "clear_filters_label",
+    "label": "Clear filters label",
+    "type": "text",
+    "default": "Clear filters"
+  },
+  {
+    "name": "card_details_label",
+    "label": "Job card details link label",
+    "type": "text",
+    "default": "View role"
+  },
+  {
+    "name": "card_apply_label",
+    "label": "Job card apply button label",
+    "type": "text",
+    "default": "Apply now"
+  },
+  {
+    "name": "jobs_per_page",
+    "label": "Jobs per page",
+    "type": "number",
+    "default": 10,
+    "help_text": "Controls how many job cards show per pagination page."
+  },
+  {
+    "name": "no_filter_results_heading",
+    "label": "No filter results heading",
+    "type": "text",
+    "default": "No roles match those filters"
+  },
+  {
+    "name": "no_filter_results_text",
+    "label": "No filter results text",
+    "type": "text",
+    "default": "Try a different role family, location, employment type or keyword."
+  },
+  {
+    "name": "no_saved_heading",
+    "label": "No saved jobs heading",
+    "type": "text",
+    "default": "You haven't saved any jobs yet"
+  },
+  {
+    "name": "no_saved_text",
+    "label": "No saved jobs text",
+    "type": "text",
+    "default": "Tap the bookmark on any role to save it here so you can find it again later."
+  },
+  {
+    "name": "orphan_saved_heading",
+    "label": "Withdrawn saved jobs heading",
+    "type": "text",
+    "help_text": "Shown in the Saved jobs view for roles saved on this device that are no longer listed on the board.",
+    "default": "Saved roles no longer on the board"
+  },
+  {
+    "name": "orphan_saved_text",
+    "label": "Withdrawn saved jobs text",
+    "type": "text",
+    "default": "You saved these on this device, but they are no longer listed - they may have been filled or withdrawn."
+  },
+  {
+    "name": "no_jobs_heading",
+    "label": "No jobs heading",
+    "type": "text",
+    "default": "No jobs are listed currently."
+  },
+  {
+    "name": "no_jobs_text",
+    "label": "No jobs text",
+    "type": "text",
+    "default": "Please check back soon, or contact Weld Australia if you would like to advertise a vacancy."
+  },
+  {
+    "name": "updated_label",
+    "label": "Updated label",
+    "type": "text",
+    "default": "updated daily"
+  }
+]

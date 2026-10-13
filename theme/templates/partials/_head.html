@@ -1,0 +1,138 @@
+<!--
+  templateType: none
+-->
+{#
+  _head.html - Global <head> partial for the Weld Australia theme.
+
+  Include in every layout template:
+    {% include "./partials/_head.html" %}
+
+  Templates can set the following variables before including:
+    {% set page_title = "Custom page title" %}       → rendered as "… - Weld Australia"
+    {% set page_title_exact = "Full <title> text" %} → rendered verbatim, no suffix
+    {% set page_description = "Custom page description" %}
+    {% set og_image = "https://..." %}
+
+  SET THEM ABOVE THE {% extends %}. This partial is included by the LAYOUT, so a
+  page's top-level assignments after its extends tag run after the layout has
+  already rendered the head and never reach here.
+
+  THIS IS THE DOCUMENT'S ONLY <title> AND META DESCRIPTION. Page templates used
+  to emit their own from `extra_head` as well, which sits after this partial in
+  base.html - so every page shipped two or three of each, crawlers took the
+  first (this one), and the carefully written template titles never applied.
+  That is what left /courses/iwi-s titled with a session name and date, and the
+  /certification?pathway= pages on the generic certification title. Nothing else
+  may emit a <title> or a meta description; tests/unit/head-tags.test.ts fails
+  the build if a template starts again.
+
+  The CANONICAL is deliberately absent here too: HubSpot's own
+  standard_header_includes (base.html, immediately after this include) emits one
+  per page. Eleven templates emitted a second, which is the duplicate rel=canonical
+  QA found on every course and certification page.
+#}
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+{# ── Page title ─────────────────────────────────────────────────────────── #}
+<title>
+  {%- if page_title_exact -%}
+    {{ page_title_exact }}
+  {%- elif page_title -%}
+    {{ page_title }} - Weld Australia
+  {%- elif content.html_title -%}
+    {{ content.html_title }}
+  {%- else -%}
+    Weld Australia - Professional Welding Industry Association
+  {%- endif -%}
+</title>
+
+{# ── Meta description ───────────────────────────────────────────────────── #}
+<meta name="description" content="
+  {%- if page_description -%}
+    {{ page_description }}
+  {%- elif content.meta_description -%}
+    {{ content.meta_description }}
+  {%- else -%}
+    Weld Australia is the national professional association for the welding industry. Membership, training, certification, and technical resources.
+  {%- endif -%}
+">
+
+{# ── Open Graph ─────────────────────────────────────────────────────────── #}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Weld Australia">
+{% set _resolved_meta_title = content.html_title | default('Weld Australia') %}
+{% if page_title %}
+  {% set _resolved_meta_title = page_title ~ ' | Weld Australia' %}
+{% endif %}
+{% if page_title_exact %}
+  {% set _resolved_meta_title = page_title_exact %}
+{% endif %}
+{% set _resolved_meta_description = content.meta_description | default('') %}
+{% if page_description %}
+  {% set _resolved_meta_description = page_description %}
+{% endif %}
+<meta property="og:title" content="{{ _resolved_meta_title }}">
+<meta property="og:description" content="{{ _resolved_meta_description }}">
+{% if og_image %}<meta property="og:image" content="{{ og_image }}">{% endif %}
+<meta name="twitter:title" content="{{ _resolved_meta_title }}">
+<meta name="twitter:description" content="{{ _resolved_meta_description }}">
+<meta name="twitter:card" content="summary_large_image">
+
+{# ── Google Tag Manager - injected as early as possible in <head> ────────── #}
+{# Container ID is editor-configurable via Theme Settings → Analytics.        #}
+{% if theme.analytics and theme.analytics.gtm_container_id %}
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','{{ theme.analytics.gtm_container_id }}');</script>
+{% endif %}
+
+{# ── HubSpot standard head - tracking, preview bar, required scripts ─────── #}
+{# ── Favicon ────────────────────────────────────────────────────────────── #}
+{# Assets from official Weld mark (legacy site weld-icn-512 + logo SVG path). #}
+<link rel="icon" type="image/svg+xml" href="{{ get_asset_url('../../assets/img/favicon.svg') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ get_asset_url('../../assets/img/favicon-32.png') }}">
+<link rel="apple-touch-icon" href="{{ get_asset_url('../../assets/img/apple-touch-icon.png') }}">
+
+{# ── Local Poppins - HubL get_asset_url (relative CSS urls 404 on HS CDN) ─── #}
+{% include "./_fonts.html" %}
+
+{# ── Critical CSS - single blocking request ──────────────────────────────── #}
+{#
+  critical.css is generated by `pnpm build` (scripts/build.ts) by concatenating:
+    tokens.css → reset.css → base.css → utilities.css → components.css
+  @font-face lives in _fonts.html (not here) so get_asset_url can resolve font
+  files on HubSpot's CDN. The file is committed so `hs watch` / bare upload work
+  without a prior build.
+#}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/critical.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/brand-line.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/course-detail-legacy-cleanup.css') }}">
+
+{# ── Brand-kit overrides ─────────────────────────────────────────────────── #}
+{#
+  Editors tweak the brand kit via Theme settings → Brand colours / Typography.
+  Each field maps onto a --wa-* custom property defined in tokens.css, so a
+  change here cascades through every template and React island. tokens.css holds
+  the same values as defaults, so the site renders correctly even before any
+  override is set.
+#}
+<style>
+  :root {
+    {% if theme.colors.primary_color.color %}--wa-color-primary: {{ theme.colors.primary_color.color }};{% endif %}
+    {% if theme.colors.primary_dark_color.color %}--wa-color-primary-dark: {{ theme.colors.primary_dark_color.color }};{% endif %}
+    {% if theme.colors.secondary_color.color %}--wa-color-secondary: {{ theme.colors.secondary_color.color }};{% endif %}
+    {% if theme.colors.accent_color.color %}--wa-color-accent: {{ theme.colors.accent_color.color }};{% endif %}
+    {% if theme.colors.magenta_color.color %}--wa-color-magenta: {{ theme.colors.magenta_color.color }};{% endif %}
+    {% if theme.colors.success_color.color %}--wa-color-success: {{ theme.colors.success_color.color }};{% endif %}
+    {% if theme.colors.magenta_color.color and theme.colors.accent_color.color %}
+    --wa-gradient-flame: linear-gradient(90deg, {{ theme.colors.magenta_color.color }} 0%, {{ theme.colors.gradient_mid_color.color | default('#f04828') }} 40%, {{ theme.colors.accent_color.color }} 100%);
+    {% endif %}
+    {% if theme.typography.heading_font.font %}--wa-font-heading: '{{ theme.typography.heading_font.font }}', system-ui, -apple-system, 'Segoe UI', sans-serif;{% endif %}
+    {% if theme.typography.body_font.font %}--wa-font-body: '{{ theme.typography.body_font.font }}', system-ui, -apple-system, 'Segoe UI', sans-serif;{% endif %}
+  }
+</style>

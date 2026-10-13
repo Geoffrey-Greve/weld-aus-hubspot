@@ -1,0 +1,14 @@
+{
+  "label": "Membership Tiers",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Membership tier overview band with tier cards.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["membership", "tiers", "pricing"]
+}

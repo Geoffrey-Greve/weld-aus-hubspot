@@ -1,0 +1,61 @@
+[
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Member login"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Sign in to your account"
+  },
+  {
+    "name": "email_label",
+    "label": "Email field label",
+    "type": "text",
+    "default": "Email"
+  },
+  {
+    "name": "password_label",
+    "label": "Password field label",
+    "type": "text",
+    "default": "Password"
+  },
+  {
+    "name": "submit_label",
+    "label": "Submit label",
+    "type": "text",
+    "default": "Sign in"
+  },
+  {
+    "name": "forgot_password_label",
+    "label": "Forgot password label",
+    "type": "text",
+    "default": "Forgot password?"
+  },
+  {
+    "name": "forgot_password_link",
+    "label": "Forgot password link",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "EXTERNAL",
+        "href": "/_hcms/mem/reset/request?redirect_url=/portal"
+      }
+    }
+  },
+  {
+    "name": "post_login_redirect",
+    "label": "Post-login redirect",
+    "type": "link",
+    "default": {
+      "url": {
+        "type": "CONTENT",
+        "href": "/portal"
+      }
+    },
+    "help_text": "Where to send the member after a successful sign-in."
+  }
+]

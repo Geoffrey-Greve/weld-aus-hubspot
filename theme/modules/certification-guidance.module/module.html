@@ -1,0 +1,64 @@
+{#
+  certification-guidance.module/module.html
+
+  React island: per-certification guidance page.
+
+  Data flow:
+    1. Reads the cert type slug from the last URL path segment to determine
+       which certification to show (as1796 | iiw_inspector | iso3834).
+    2. Serialises module editor fields + the cert type slug into data-props.
+    3. The React island reads window.__WELD_MEMBER__.certifications to find
+       the contact's currentStep for that cert type.
+    4. Fetches HubDB Table 4 (certification_guidance) for the matching
+       (certification_type, step) row and renders the guidance content.
+
+  URL pattern:
+    /portal/certifications/as1796/
+    /portal/certifications/iiw_inspector/
+    /portal/certifications/iso3834/
+
+  The cert type slug is the last path segment of the URL. It is read here and
+  passed into data-props so the React component knows which cert context to
+  load. It is also derived the same way for the page <title> in the page
+  template.
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{# Derive the cert type slug from the last non-empty path segment #}
+{% set ns = namespace(cert_type='') %}
+{% for seg in request.path | split('/') %}
+  {% if seg %}{% set ns.cert_type = seg %}{% endif %}
+{% endfor %}
+{% set cert_type = ns.cert_type %}
+{% set evidence_form_id = module.evidence_form.form_id | default(module.evidence_form_id, true) | default('', true) %}
+
+{# Compose props blob for the React island #}
+{% set island_props = {
+  'certType':          cert_type,
+  'headingTemplate':   module.heading_template | default('Your {certification_type} progress'),
+  'showEvidenceUpload': module.show_evidence_upload | default(true),
+  'evidenceFormId':    evidence_form_id,
+  'qcContactEmail':    module.qc_contact_email | default('qnc@weldaustralia.com.au'),
+  'qcContactPhone':    module.qc_contact_phone | default('')
+} %}
+
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-cert-guidance-section"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div
+      data-wa-module="certification-guidance"
+      data-props="{{ island_props | tojson | escape }}"
+    ></div>
+  </div>
+</section>
+
+{% if module.show_evidence_upload and evidence_form_id %}
+<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+{% endif %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/js/assets/certification-guidance.standalone.css') }}">
+<script type="module" src="{{ get_asset_url('../../assets/js/certification-guidance.standalone.js') }}"></script>
+
+{% endif %}

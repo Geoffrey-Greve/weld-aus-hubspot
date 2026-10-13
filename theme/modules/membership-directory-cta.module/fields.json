@@ -1,0 +1,92 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "directory"
+  },
+  {
+    "name": "background",
+    "label": "Outer background",
+    "type": "choice",
+    "choices": [
+      ["surface", "White"],
+      ["surface_alt", "Light grey"]
+    ],
+    "default": "surface_alt"
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Member directory"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Find a Weld Australia member near you"
+  },
+  {
+    "name": "body_text",
+    "label": "Body copy",
+    "type": "richtext"
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA label",
+    "type": "text",
+    "default": "Browse member directory"
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA link",
+    "type": "link"
+  },
+  {
+    "name": "background_image",
+    "label": "Background image",
+    "type": "image"
+  },
+  {
+    "name": "logos",
+    "label": "Logo/badge images",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 6,
+      "default": 4
+    },
+    "children": [
+      {
+        "name": "image",
+        "label": "Image",
+        "type": "image"
+      },
+      {
+        "name": "image_label",
+        "label": "Accessible label",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

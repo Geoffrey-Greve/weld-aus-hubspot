@@ -1,0 +1,94 @@
+{#
+  statement-cards.module/module.html
+  Optional left feature panel (image + quote) beside a column of statement cards.
+  When no feature image is set, the cards render side by side as before.
+#}
+
+{%- set _bg  = module.background | default('surface') -%}
+{%- set _sp  = module.spacing    | default('default') -%}
+{%- set _vis = module.visibility | default(['mobile','tablet','desktop']) -%}
+{%- set _has_feature = module.feature_image and module.feature_image.src -%}
+
+{%- set _section_classes = 'wa-statement-cards wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-' ~ _sp -%}
+{%- if 'mobile'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+<section
+  class="{{ _section_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div class="wa-statement-cards__layout{% if _has_feature %} wa-statement-cards__layout--split{% endif %}">
+
+      {% if _has_feature %}
+      <figure class="wa-statement-cards__feature">
+        <img
+          src="{{ module.feature_image.src }}"
+          alt="{{ module.feature_image.alt | default('') }}"
+          class="wa-statement-cards__feature-img"
+          loading="lazy"
+          decoding="async"
+          {% if module.feature_image.width  %}width="{{ module.feature_image.width }}"{% endif %}
+          {% if module.feature_image.height %}height="{{ module.feature_image.height }}"{% endif %}
+        >
+        {% if module.feature_quote or module.feature_attribution %}
+        <figcaption class="wa-statement-cards__feature-overlay">
+          <span class="wa-statement-cards__feature-rule" aria-hidden="true"></span>
+          {% if module.feature_quote %}
+          <blockquote class="wa-statement-cards__feature-quote">{{ module.feature_quote }}</blockquote>
+          {% endif %}
+          {% if module.feature_attribution %}
+          <span class="wa-statement-cards__feature-attr">{{ module.feature_attribution }}</span>
+          {% endif %}
+        </figcaption>
+        {% endif %}
+      </figure>
+      {% endif %}
+
+      {% if module.cards %}
+      <div class="wa-statement-cards__col">
+        {% for card in module.cards %}
+        {% set _dark_card = card.card_style == 'navy' %}
+        <div class="wa-statement-cards__card wa-statement-cards__card--{{ card.card_style | default('navy') }}">
+          <span class="wa-statement-cards__card-circle" aria-hidden="true"></span>
+
+          {% if card.overline %}
+          <div class="wa-overline{% if _dark_card %} wa-overline--light{% endif %}">
+            <span class="wa-overline__text">{{ card.overline }}</span>
+          </div>
+          {% endif %}
+
+          {% if card.heading %}
+          <h2 class="wa-statement-cards__heading">{{ card.heading }}</h2>
+          {% endif %}
+
+          {% if card.body_text %}
+          <div class="wa-statement-cards__body wa-richtext">{{ card.body_text }}</div>
+          {% endif %}
+
+          {% if card.photo and card.photo.src %}
+          <div class="wa-statement-cards__photo-wrap">
+            <img
+              src="{{ card.photo.src }}"
+              alt="{{ card.photo.alt | default(card.photo_caption | default('')) }}"
+              class="wa-statement-cards__photo"
+              loading="lazy"
+              decoding="async"
+              width="64"
+              height="64"
+            >
+            {% if card.photo_caption %}
+            <span class="wa-statement-cards__photo-caption">{{ card.photo_caption }}</span>
+            {% endif %}
+          </div>
+          {% endif %}
+
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>

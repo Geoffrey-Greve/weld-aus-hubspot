@@ -1,0 +1,28 @@
+/*
+ * Shared Weld Australia brand accent line.
+ * Used for the bottom edge of heroes and the top edge of the global footer.
+ */
+
+.wa-brand-line {
+  --wa-brand-line-height: 4px;
+  display: block;
+  inline-size: 100%;
+  block-size: var(--wa-brand-line-height);
+  min-block-size: var(--wa-brand-line-height);
+  flex: 0 0 auto;
+  pointer-events: none;
+  background: var(--wa-gradient-flame, linear-gradient(90deg, #ed128d 0%, #f04828 40%, #fecf05 100%));
+}
+
+.wa-brand-line--hero {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 3;
+}
+
+.wa-brand-line--footer {
+  position: relative;
+  z-index: 4;
+  margin-block-start: calc(-1 * var(--wa-brand-line-height));
+}

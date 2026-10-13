@@ -1,0 +1,275 @@
+{#
+  credential-grid.module/module.html
+  Certification credentials organised in divider-labelled groups with code-badge cards.
+  Each card: code badge (colour-coded by accent), title, optional description.
+
+  Fields:
+    module.section_id   - optional anchor id
+    module.background   - background variant
+    module.spacing      - vertical spacing variant
+    module.visibility   - device show/hide
+    module.members_only - gating flag
+    module.overline     - optional overline text
+    module.heading      - optional section heading
+    module.intro        - optional intro richtext
+    module.groups       - repeater: group_label + items[](code, title, description, accent_color)
+#}
+
+{# ── Members-only gate ──────────────────────────────────────────────────────── #}
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{# ── Derived flags ──────────────────────────────────────────────────────────── #}
+{%- set _bg   = module.background | default('surface') -%}
+{%- set _sp   = module.spacing    | default('default') -%}
+{%- set _dark = _bg in ['primary', 'primary_dark'] -%}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{%- set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) -%}
+{%- set _vis_classes = '' -%}
+{%- if 'mobile'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-mobile'  -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-tablet'  -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _vis_classes = _vis_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{# ── Optional HubDB source for public individual certification pathways ── #}
+{% set _render_groups = module.groups %}
+{% set _use_pathway_certification_source = module.source == 'hubdb_certification_pathways' %}
+{% set _use_courses_certification_source = module.source == 'hubdb_courses_certifications' %}
+{% set _credential_heading_key = module.heading | default('') | lower %}
+{% if not _use_pathway_certification_source and not _use_courses_certification_source and module.section_id == 'individual' and 'certification' in _credential_heading_key %}
+  {% set _use_pathway_certification_source = true %}
+{% endif %}
+{% if _use_pathway_certification_source %}
+  {% set _pathways_table = module.pathways_table | default('certification_pathways', true) %}
+  {% set _pathways_audience = module.pathways_audience | default('individual', true) %}
+  {% set _pathways_query = 'is_active__eq=true&orderBy=sort_order' %}
+  {% if _pathways_audience and _pathways_audience != 'all' %}
+    {% set _pathways_query = 'audience__eq=' ~ _pathways_audience ~ '&' ~ _pathways_query %}
+  {% endif %}
+  {% set _pathway_rows = hubdb_table_rows(_pathways_table, _pathways_query) %}
+  {% set _pathway_ns = namespace(iiw=[], australian=[], other=[]) %}
+
+  {% for row in _pathway_rows %}
+    {% set _row_code = row.code | default('', true) %}
+    {% set _row_code_key = _row_code | lower %}
+    {% set _row_category = row.category | default('Certification pathways', true) %}
+    {% set _row_category_key = _row_category | lower %}
+    {% set _pathway_slug = row.hs_path | default(row.slug, true) %}
+    {% set _pathway_href = '' %}
+    {% if _pathway_slug %}
+      {% set _pathway_href = '/certification?pathway=' ~ _pathway_slug %}
+    {% elif row.link_url %}
+      {% set _pathway_href = row.link_url %}
+    {% endif %}
+    {% set _accent = 'navy' %}
+    {% if 'as1796' in _row_code_key or 'as2214' in _row_code_key or _row_code_key in ['iwe', 'iwt', 'iws'] %}
+      {% set _accent = 'gold' %}
+    {% elif 'iso' in _row_code_key %}
+      {% set _accent = 'green' %}
+    {% endif %}
+    {% set _item = {
+      'code': _row_code,
+      'title': row.title | default('Certification pathway', true),
+      'description': _row_category,
+      'accent_color': _accent,
+      'href': _pathway_href,
+      'open_in_new_tab': false
+    } %}
+
+    {% if 'iiw' in _row_category_key or _row_code_key in ['iwe', 'iwt', 'iws', 'iwi-s', 'iwi-b', 'iwp'] %}
+      {% set _pathway_ns.iiw = _pathway_ns.iiw + [_item] %}
+    {% elif 'australian' in _row_category_key or 'as' in _row_code_key or 'iso 9606' in _row_code_key %}
+      {% set _pathway_ns.australian = _pathway_ns.australian + [_item] %}
+    {% else %}
+      {% set _pathway_ns.other = _pathway_ns.other + [_item] %}
+    {% endif %}
+  {% endfor %}
+
+  {% set _dynamic_groups = [] %}
+  {% if _pathway_ns.iiw %}
+    {% set _dynamic_groups = _dynamic_groups + [{'group_label': 'IIW International Qualifications', 'items': _pathway_ns.iiw}] %}
+  {% endif %}
+  {% if _pathway_ns.australian %}
+    {% set _dynamic_groups = _dynamic_groups + [{'group_label': 'Australian Qualifications', 'items': _pathway_ns.australian}] %}
+  {% endif %}
+  {% if _pathway_ns.other %}
+    {% set _dynamic_groups = _dynamic_groups + [{'group_label': 'Other Certification Pathways', 'items': _pathway_ns.other}] %}
+  {% endif %}
+  {% if _dynamic_groups %}
+    {% set _render_groups = _dynamic_groups %}
+  {% endif %}
+{% endif %}
+{% if _use_courses_certification_source %}
+  {% set _courses_table = module.courses_table | default('courses', true) %}
+  {% set _slug_csv = module.certification_slugs | default('iwe,iwt,iws,iwi-s,iwi-b,as1796-cert-10,as1796-cert-11,as1796-cert-1-9,as2214,iso9606,welding-supervisor', true) %}
+  {% set _wanted_slugs = _slug_csv | lower | replace(' ', '') | split(',') %}
+  {% set _course_rows = hubdb_table_rows(_courses_table, 'status__neq=Cancelled&orderBy=course_name') %}
+  {% set _course_ns = namespace(iiw=[], australian=[], seen=[]) %}
+
+  {% for row in _course_rows %}
+    {% set _row_slug = row.course_slug | default(row.course_id, true) | lower %}
+    {% if _row_slug in _wanted_slugs and _row_slug not in _course_ns.seen %}
+      {% set _course_ns.seen = _course_ns.seen + [_row_slug] %}
+      {% set _code = _row_slug | upper %}
+      {% set _accent = 'navy' %}
+      {% if _row_slug == 'as1796-cert-10' %}
+        {% set _code = 'AS1796' %}
+        {% set _accent = 'gold' %}
+      {% elif _row_slug == 'as1796-cert-11' %}
+        {% set _code = 'AS1796-11' %}
+        {% set _accent = 'gold' %}
+      {% elif _row_slug == 'as1796-cert-1-9' %}
+        {% set _code = 'AS1796 1-9' %}
+        {% set _accent = 'gold' %}
+      {% elif _row_slug == 'as2214' %}
+        {% set _code = 'AS2214' %}
+        {% set _accent = 'gold' %}
+      {% elif _row_slug == 'iso9606' %}
+        {% set _code = 'ISO 9606' %}
+        {% set _accent = 'green' %}
+      {% elif _row_slug == 'welding-supervisor' %}
+        {% set _code = 'SUP' %}
+        {% set _accent = 'gold' %}
+      {% elif _row_slug == 'iwe' or _row_slug == 'iwt' or _row_slug == 'iws' %}
+        {% set _code = _row_slug | upper %}
+        {% set _accent = 'gold' %}
+      {% elif _row_slug == 'iwi-s' %}
+        {% set _code = 'IWI-S' %}
+      {% elif _row_slug == 'iwi-b' %}
+        {% set _code = 'IWI-B' %}
+      {% endif %}
+
+      {% set _category_label = row.category.label | default(row.category.name, true) | default('Certification pathway', true) %}
+      {% set _item = {
+        'code': _code,
+        'title': row.course_name | default(row.page_title, true) | default('Certification pathway', true),
+        'description': _category_label,
+        'accent_color': _accent,
+        'href': '/courses',
+        'open_in_new_tab': false
+      } %}
+
+      {% if _row_slug in ['iwe', 'iwt', 'iws', 'iwi-s', 'iwi-b'] %}
+        {% set _course_ns.iiw = _course_ns.iiw + [_item] %}
+      {% else %}
+        {% set _course_ns.australian = _course_ns.australian + [_item] %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {% set _dynamic_groups = [] %}
+  {% if _course_ns.iiw %}
+    {% set _dynamic_groups = _dynamic_groups + [{'group_label': 'IIW International Qualifications', 'items': _course_ns.iiw}] %}
+  {% endif %}
+  {% if _course_ns.australian %}
+    {% set _dynamic_groups = _dynamic_groups + [{'group_label': 'Australian Qualifications', 'items': _course_ns.australian}] %}
+  {% endif %}
+  {% if _dynamic_groups %}
+    {% set _render_groups = _dynamic_groups %}
+  {% endif %}
+{% endif %}
+
+<section
+  class="wa-credential-grid wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}{{ _vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {# ── Section head ──────────────────────────────────────────────────────── #}
+    {% if module.overline or module.heading or module.intro %}
+    <div class="wa-section-head">
+      {% if module.overline %}
+      <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+        <span class="wa-overline__text">{{ module.overline }}</span>
+      </div>
+      {% endif %}
+      {% if module.heading %}
+      <h2 class="wa-credential-grid__heading">{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+      <div class="wa-credential-grid__intro">{{ module.intro }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# ── Credential groups ─────────────────────────────────────────────────── #}
+    {% if _render_groups %}
+    <div class="wa-credential-grid__groups">
+      {% for group in _render_groups %}
+      <div class="wa-credential-grid__group">
+
+        {% if group.group_label %}
+        <h3 class="wa-credential-grid__group-label">{{ group.group_label }}</h3>
+        {% endif %}
+
+        {% if group.items %}
+        <div class="wa-credential-grid__grid">
+          {% for item in group.items %}
+          {%- set _accent = item.accent_color | default('navy') -%}
+          {%- set _item_code_key = item.code | default('', true) | lower -%}
+          {%- set _item_title_key = item.title | default('', true) | lower -%}
+          {%- set _item_key = _item_code_key ~ ' ' ~ _item_title_key -%}
+          {%- set _item_href = item.href | default(item.link_url.url.href, true) -%}
+          {%- if not _item_href -%}
+            {%- if 'iwi-s' in _item_key or 'inspector - standard' in _item_key or 'inspector - standard' in _item_key -%}
+              {%- set _item_href = '/courses/iwi-s' -%}
+            {%- elif 'iwi-b' in _item_key or 'inspector - basic' in _item_key or 'inspector - basic' in _item_key -%}
+              {%- set _item_href = '/courses/iwi-b' -%}
+            {%- elif 'iwe' in _item_key or 'welding engineer' in _item_key -%}
+              {%- set _item_href = '/courses/iwe' -%}
+            {%- elif 'iwt' in _item_key or 'welding technologist' in _item_key -%}
+              {%- set _item_href = '/courses/iwt' -%}
+            {%- elif 'iws' in _item_key or 'welding specialist' in _item_key -%}
+              {%- set _item_href = '/courses/iws' -%}
+            {%- elif 'iwp' in _item_key or 'welding practitioner' in _item_key -%}
+              {%- set _item_href = '/courses' -%}
+            {%- elif 'as1796' in _item_key -%}
+              {%- set _item_href = '/courses/as1796-cert-10' -%}
+            {%- elif 'as2214' in _item_key -%}
+              {%- set _item_href = '/courses/welding-supervisor' -%}
+            {%- endif -%}
+          {%- endif -%}
+          {% if _item_href %}
+          <a
+            class="wa-credential-grid__card wa-credential-grid__card--{{ _accent }} wa-credential-grid__card--link"
+            href="{{ _item_href }}"
+            {% if item.open_in_new_tab or item.link_url.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >
+          {% else %}
+          <div class="wa-credential-grid__card wa-credential-grid__card--{{ _accent }}">
+          {% endif %}
+            {% if item.code %}
+            <span class="wa-credential-grid__code">{{ item.code }}</span>
+            {% endif %}
+            {% if item.title %}
+            <span class="wa-credential-grid__title">{{ item.title }}</span>
+            {% endif %}
+            {% if item.description %}
+            <span class="wa-credential-grid__desc">{{ item.description }}</span>
+            {% endif %}
+            {% if _item_href %}
+            <span class="wa-credential-grid__action">
+              View pathway
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </span>
+            {% endif %}
+          {% if _item_href %}
+          </a>
+          {% else %}
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}{# end members_only gate #}

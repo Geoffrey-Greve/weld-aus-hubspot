@@ -1,0 +1,61 @@
+{
+  "name": "weld-australia-theme",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Weld Australia HubSpot CMS theme + React-island custom modules",
+  "type": "module",
+  "packageManager": "pnpm@11.27.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsx scripts/build.ts && tsx scripts/validate-theme.ts && tsx scripts/check-bundle-size.ts",
+    "validate": "tsx scripts/validate-theme.ts",
+    "validate:marketplace": "hs cms theme marketplace-validate weld-australia-theme",
+    "check:bundle": "tsx scripts/check-bundle-size.ts",
+    "watch": "hs cms watch theme weld-australia-theme",
+    "upload:staging": "pnpm build && tsx scripts/upload.ts --env=staging",
+    "upload:prod": "pnpm build && tsx scripts/upload.ts --env=production",
+    "upload:sandbox": "pnpm build && tsx scripts/upload.ts --env=staging",
+    "seed:hubdb": "tsx scripts/seed-hubdb.ts",
+    "seed:hubdb:demo": "tsx scripts/seed-hubdb-demo.ts",
+    "backfill:paths": "tsx scripts/backfill-hubdb-paths.ts",
+    "backfill:course-seo": "tsx scripts/backfill-course-seo.ts",
+    "audit:event-engine": "tsx scripts/audit-event-engine.ts",
+    "audit:course-modules": "tsx scripts/audit-course-modules.ts",
+    "audit:course-routing": "tsx scripts/audit-course-routing.ts",
+    "backfill:course-state": "tsx scripts/backfill-course-state.ts",
+    "test": "vitest run && playwright test",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "test:a11y": "playwright test",
+    "test:a11y:ui": "playwright test --ui",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@hubspot/cli": "^8.15.0",
+    "@playwright/test": "^1.60.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^14.3.1",
+    "@types/node": "^20.19.41",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "axe-core": "^4.11.4",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.8.3",
+    "tsx": "^4.22.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.3",
+    "vitest": "^4.1.11"
+  },
+  "dependencies": {
+    "@hubspot/api-client": "^12.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

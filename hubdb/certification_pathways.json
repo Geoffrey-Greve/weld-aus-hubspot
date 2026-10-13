@@ -1,0 +1,82 @@
+{
+  "name": "certification_pathways",
+  "label": "Certification Pathways",
+  "useForPages": true,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "dynamicPageUrlPattern": "/certification/{slug}",
+  "dynamicMetaTags": {
+    "DESCRIPTION": "meta_description"
+  },
+  "columns": [
+    {
+      "name": "title",
+      "label": "Title",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "slug",
+      "label": "URL slug",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "audience",
+      "label": "Audience",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "code",
+      "label": "Short code / standard",
+      "type": "TEXT"
+    },
+    {
+      "name": "summary",
+      "label": "Summary",
+      "type": "TEXT"
+    },
+    {
+      "name": "detail",
+      "label": "Detail content",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "type": "TEXT"
+    },
+    {
+      "name": "link_url",
+      "label": "Listing link URL",
+      "type": "TEXT"
+    },
+    {
+      "name": "cta_label",
+      "label": "CTA label",
+      "type": "TEXT"
+    },
+    {
+      "name": "sort_order",
+      "label": "Sort order",
+      "type": "NUMBER"
+    },
+    {
+      "name": "is_active",
+      "label": "Active",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "page_title",
+      "label": "SEO page title",
+      "type": "TEXT"
+    },
+    {
+      "name": "meta_description",
+      "label": "SEO meta description",
+      "type": "TEXT"
+    }
+  ]
+}

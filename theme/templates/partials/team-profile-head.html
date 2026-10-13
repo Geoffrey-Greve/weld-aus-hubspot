@@ -1,0 +1,76 @@
+<!--
+  templateType: none
+-->
+{#
+  team-profile-head.html - Head/meta for team & board member profile pages.
+  Expects dynamic_page_hubdb_row from the parent template (about-team.html).
+
+  Every meta value is composed from columns that already exist on the
+  team_and_board table - there are no dedicated page_title / meta_description /
+  og_image columns, by design.
+
+  The document <title> and meta description are NOT emitted here: partials/_head.html
+  already emits exactly one of each, from the page_title / page_description variables
+  that about-team.html sets before its {% extends %}. This partial owns only the tags
+  _head.html does not cover - canonical, og:image and the JSON-LD blocks. `_description`
+  is still computed below because the Person schema needs it; keep it in step with the
+  page_description in about-team.html.
+#}
+{% set _row = dynamic_page_hubdb_row %}
+
+{% set _name  = _row.name | default('Weld Australia team member', true) %}
+{% set _role  = _row.role | default('', true) %}
+{% set _quals = _row.quals | default('', true) %}
+{% set _org   = _row.org | default('', true) %}
+{% set _category = _row.category.name | default(_row.category, true) | default('', true) %}
+
+{# Description: the bio if there is one, otherwise a sentence built from role and
+   category so the page never ships an empty meta description. #}
+{% set _bio_text = _row.bio | default('', true) | striptags | trim %}
+{% if _bio_text %}
+  {% set _description = _bio_text | truncate(160) %}
+{% elif _role %}
+  {% set _description = _name ~ ' is ' ~ _role ~ ' at Weld Australia, the peak body for the Australian welding industry.' %}
+{% else %}
+  {% set _description = _name ~ ' is part of the team at Weld Australia, the peak body for the Australian welding industry.' %}
+{% endif %}
+
+{% set _site_url = site_settings.site_url | default('https://weldaustralia.com.au') %}
+
+{% if _row.headshot and _row.headshot.url %}
+<meta property="og:image" content="{{ _row.headshot.url }}">
+<meta property="og:image:alt" content="{{ _name | escape }}">
+{% endif %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/team-profile.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../modules/team-grid.module/module.css') }}">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "{{ _name | escape }}",
+  {% if _role %}"jobTitle": "{{ _role | escape }}",{% endif %}
+  {% if _quals %}"honorificSuffix": "{{ _quals | escape }}",{% endif %}
+  {% if _row.headshot and _row.headshot.url %}"image": "{{ _row.headshot.url }}",{% endif %}
+  "url": "{{ content.absolute_url }}",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "{{ _org | default('Weld Australia', true) | escape }}",
+    "url": "{{ _site_url }}"
+  },
+  "description": "{{ _description | escape }}"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ _site_url }}" },
+    { "@type": "ListItem", "position": 2, "name": "About", "item": "{{ _site_url }}/about" },
+    { "@type": "ListItem", "position": 3, "name": "Our team", "item": "{{ _site_url }}/about/team" },
+    { "@type": "ListItem", "position": 4, "name": "{{ _name | escape }}" }
+  ]
+}
+</script>

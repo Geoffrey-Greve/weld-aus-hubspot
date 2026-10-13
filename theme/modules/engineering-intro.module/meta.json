@@ -1,0 +1,14 @@
+{
+  "label": "Engineering Intro",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Editable two-column Engineering intro section with copy, industry chips, video/prospectus card.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["engineering", "section", "intro"]
+}

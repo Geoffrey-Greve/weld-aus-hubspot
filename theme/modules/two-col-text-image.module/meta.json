@@ -1,0 +1,14 @@
+{
+  "label": "Two Column - Text & Image",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Two-column layout with body text on one side and an image on the other. Image position (left/right) is configurable.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["layout", "text", "image", "two-column"]
+}

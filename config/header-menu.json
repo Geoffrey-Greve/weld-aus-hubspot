@@ -1,0 +1,165 @@
+[
+  {
+    "label": "Membership",
+    "url": "/membership",
+    "overviewLabel": "Membership overview",
+    "children": [
+      {
+        "label": "Individual membership",
+        "url": "/membership#membership-individual"
+      },
+      {
+        "label": "Corporate membership",
+        "url": "/membership#membership-corporate"
+      },
+      {
+        "label": "Industry supplier membership",
+        "url": "/membership#membership-supplier"
+      },
+      {
+        "label": "Membership Options",
+        "url": "/membership"
+      }
+    ]
+  },
+  {
+    "label": "Training",
+    "url": "/training",
+    "overviewLabel": "Training overview",
+    "children": [
+      {
+        "label": "Course timetable",
+        "url": "/courses"
+      },
+      {
+        "label": "Welding Inspection",
+        "url": "/courses?category=welding-inspection#all-courses"
+      },
+      {
+        "label": "Welding Supervision",
+        "url": "/courses?category=welding-supervision#all-courses"
+      },
+      {
+        "label": "Welding Coordination",
+        "url": "/courses?category=welding-coordination#all-courses"
+      },
+      {
+        "label": "Short Courses",
+        "url": "/courses?category=short-courses#all-courses"
+      },
+      {
+        "label": "IIW Inspector",
+        "url": "/courses/iwi-s"
+      },
+      {
+        "label": "AS1796 Cert 10",
+        "url": "/courses/as1796-cert-10"
+      }
+    ]
+  },
+  {
+    "label": "Certification",
+    "url": "/certification",
+    "children": [
+      {
+        "label": "Certification Guidance",
+        "url": "/certification"
+      },
+      {
+        "label": "Welders",
+        "url": "/certification?pathway=welders"
+      },
+      {
+        "label": "Welding Supervisors",
+        "url": "/certification?pathway=welding-supervisor"
+      },
+      {
+        "label": "Welding Inspectors",
+        "url": "/certification?pathway=iwi-s"
+      },
+      {
+        "label": "Welding Coordinators",
+        "url": "/certification?pathway=welding-coordinators"
+      },
+      {
+        "label": "Company Certifications",
+        "url": "/certification?pathway=iso-3834"
+      },
+      {
+        "label": "AICIP",
+        "url": "https://aicip.org.au/",
+        "openInNewTab": true
+      }
+    ]
+  },
+  {
+    "label": "Engineering",
+    "url": "/engineering"
+  },
+  {
+    "label": "Events",
+    "url": "/events",
+    "children": [
+      {
+        "label": "All Events",
+        "url": "/events"
+      },
+      {
+        "label": "National Manufacturing Summit",
+        "url": "/404/"
+      },
+      {
+        "label": "Webinars",
+        "url": "/events"
+      },
+      {
+        "label": "Committee events",
+        "url": "/events"
+      }
+    ]
+  },
+  {
+    "label": "Resources",
+    "url": "/resources",
+    "children": [
+      {
+        "label": "Technical Resources Hub",
+        "url": "/resources"
+      },
+      {
+        "label": "News",
+        "url": "/news#latest-articles"
+      },
+      {
+        "label": "Australian Welding magazine",
+        "url": "/news#magazine-connect"
+      },
+      {
+        "label": "Weld Connect newsletter",
+        "url": "/news#magazine-connect"
+      }
+    ]
+  },
+  {
+    "label": "About",
+    "url": "/about",
+    "children": [
+      {
+        "label": "Advocacy",
+        "url": "/advocacy"
+      },
+      {
+        "label": "About Weld Australia",
+        "url": "/about"
+      },
+      {
+        "label": "Our team",
+        "url": "/about#our-team"
+      },
+      {
+        "label": "Contact us",
+        "url": "/contact-us"
+      }
+    ]
+  }
+]

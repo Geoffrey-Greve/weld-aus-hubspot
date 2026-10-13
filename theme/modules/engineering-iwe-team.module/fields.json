@@ -1,0 +1,65 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Our team"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Australia's largest team of International Welding Engineers"
+  },
+  {
+    "name": "body_text",
+    "label": "Body copy",
+    "type": "richtext"
+  },
+  {
+    "name": "badge_image",
+    "label": "Badge/logo image",
+    "type": "image"
+  },
+  {
+    "name": "badge_overline",
+    "label": "Badge overline",
+    "type": "text",
+    "default": "Australian Member Body of the"
+  },
+  {
+    "name": "badge_text",
+    "label": "Badge text",
+    "type": "text",
+    "default": "International Institute of Welding"
+  },
+  {
+    "name": "points_heading",
+    "label": "Points heading",
+    "type": "text",
+    "default": "All IWEs have advanced capability to:"
+  },
+  {
+    "name": "points",
+    "label": "Capability points",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 8,
+      "default": 4
+    },
+    "children": [
+      {
+        "name": "text",
+        "label": "Point",
+        "type": "text"
+      }
+    ]
+  }
+]

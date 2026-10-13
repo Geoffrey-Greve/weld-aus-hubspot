@@ -1,0 +1,388 @@
+{
+  "name": "courses",
+  "label": "Courses - Timetable & Locations",
+  "useForPages": true,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "dynamicPageUrlPattern": "/courses/{course_slug}",
+  "dynamicMetaTags": {
+    "DESCRIPTION": "meta_description",
+    "FEATURED_IMAGE_URL": "og_image"
+  },
+  "columns": [
+    {
+      "name": "course_name",
+      "label": "Course name",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "course_id",
+      "label": "Course ID (groups sessions under one parent page)",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "course_slug",
+      "label": "URL slug",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "parent_template",
+      "label": "Parent template",
+      "type": "SELECT",
+      "options": [
+        {
+          "name": "standard",
+          "type": "option"
+        },
+        {
+          "name": "sales",
+          "type": "option"
+        }
+      ]
+    },
+    {
+      "name": "city",
+      "label": "City",
+      "type": "SELECT",
+      "_comment": [
+        "Capital cities first, then the regional centres Weld Australia runs",
+        "training in, then Online. This list is the source of truth for the live",
+        "SELECT: `pnpm seed:hubdb -- --env=<portal>` appends anything the portal",
+        "does not already hold, and never removes or renames an existing option",
+        "(rows store the option id).",
+        "",
+        "To add a town: add it here, run the seed, then run `pnpm build`.",
+        "src/shared/courseCities.test.ts fails the build if the React islands'",
+        "display order drifts from this list."
+      ],
+      "options": [
+        {
+          "name": "Sydney",
+          "type": "option"
+        },
+        {
+          "name": "Melbourne",
+          "type": "option"
+        },
+        {
+          "name": "Brisbane",
+          "type": "option"
+        },
+        {
+          "name": "Perth",
+          "type": "option"
+        },
+        {
+          "name": "Adelaide",
+          "type": "option"
+        },
+        {
+          "name": "Canberra",
+          "type": "option"
+        },
+        {
+          "name": "Darwin",
+          "type": "option"
+        },
+        {
+          "name": "Hobart",
+          "type": "option"
+        },
+        {
+          "name": "Newcastle",
+          "type": "option"
+        },
+        {
+          "name": "Wollongong",
+          "type": "option"
+        },
+        {
+          "name": "Geelong",
+          "type": "option"
+        },
+        {
+          "name": "Mackay",
+          "type": "option"
+        },
+        {
+          "name": "Maryborough",
+          "type": "option"
+        },
+        {
+          "name": "Gladstone",
+          "type": "option"
+        },
+        {
+          "name": "Townsville",
+          "type": "option"
+        },
+        {
+          "name": "Online",
+          "type": "option"
+        }
+      ]
+    },
+    {
+      "name": "state",
+      "label": "State",
+      "type": "SELECT",
+      "options": [
+        {
+          "name": "NSW",
+          "type": "option"
+        },
+        {
+          "name": "VIC",
+          "type": "option"
+        },
+        {
+          "name": "QLD",
+          "type": "option"
+        },
+        {
+          "name": "WA",
+          "type": "option"
+        },
+        {
+          "name": "SA",
+          "type": "option"
+        },
+        {
+          "name": "TAS",
+          "type": "option"
+        },
+        {
+          "name": "NT",
+          "type": "option"
+        },
+        {
+          "name": "ACT",
+          "type": "option"
+        },
+        {
+          "name": "National",
+          "type": "option"
+        }
+      ]
+    },
+    {
+      "name": "start_date",
+      "label": "Start date",
+      "type": "DATE"
+    },
+    {
+      "name": "end_date",
+      "label": "End date",
+      "type": "DATE"
+    },
+    {
+      "name": "price_member",
+      "label": "Member price (AUD ex GST)",
+      "type": "NUMBER"
+    },
+    {
+      "name": "price_non_member",
+      "label": "Non-member price (AUD ex GST)",
+      "type": "CURRENCY"
+    },
+    {
+      "name": "price_individual",
+      "label": "Individual member price (AUD ex GST)",
+      "type": "CURRENCY"
+    },
+    {
+      "name": "price_student_aud_ex_gst",
+      "label": "Apprentice/student member price (AUD ex GST)",
+      "type": "CURRENCY"
+    },
+    {
+      "name": "price_bronze_aud_ex_gst",
+      "label": "Corporate Bronze member price (AUD ex GST)",
+      "type": "CURRENCY"
+    },
+    {
+      "name": "price_silver_aud_ex_gst",
+      "label": "Corporate Silver member price (AUD ex GST)",
+      "type": "CURRENCY"
+    },
+    {
+      "name": "price_gold_aud_ex_gst",
+      "label": "Corporate Gold member price (AUD ex GST)",
+      "type": "CURRENCY"
+    },
+    {
+      "name": "registration_url",
+      "label": "Registration URL",
+      "type": "URL"
+    },
+    {
+      "name": "use_event_engine",
+      "label": "Use Event Engine booking",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "course_package_booking",
+      "label": "Book complete course package",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "worker_event_id",
+      "label": "Event Engine event id (this session)",
+      "type": "TEXT"
+    },
+    {
+      "name": "member_ticket_type_id",
+      "label": "Event Engine member ticket type id (tt_\u2026)",
+      "type": "TEXT"
+    },
+    {
+      "name": "non_member_ticket_type_id",
+      "label": "Event Engine non-member ticket type id (tt_\u2026)",
+      "type": "TEXT"
+    },
+    {
+      "name": "is_module",
+      "label": "This row is a course MODULE, not a whole course",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "module_product_id",
+      "label": "HubSpot Product ID of the module this session teaches",
+      "type": "TEXT"
+    },
+    {
+      "name": "status",
+      "label": "Status",
+      "type": "SELECT",
+      "options": [
+        {
+          "name": "Available",
+          "type": "option"
+        },
+        {
+          "name": "Sold Out",
+          "type": "option"
+        },
+        {
+          "name": "Cancelled",
+          "type": "option"
+        },
+        {
+          "name": "Closed",
+          "type": "option"
+        }
+      ]
+    },
+    {
+      "name": "seats_remaining",
+      "label": "Seats remaining",
+      "type": "NUMBER"
+    },
+    {
+      "name": "meta_description",
+      "label": "SEO meta description",
+      "type": "TEXT"
+    },
+    {
+      "name": "page_title",
+      "label": "SEO page title",
+      "type": "TEXT"
+    },
+    {
+      "name": "og_image",
+      "label": "Open Graph / social share image",
+      "type": "IMAGE"
+    },
+    {
+      "name": "category",
+      "label": "Course category",
+      "type": "SELECT",
+      "options": [
+        {
+          "name": "Welding Inspection",
+          "type": "option"
+        },
+        {
+          "name": "Supervision",
+          "type": "option"
+        },
+        {
+          "name": "Welding Processes",
+          "type": "option"
+        },
+        {
+          "name": "NDT",
+          "type": "option"
+        },
+        {
+          "name": "Robotic Welding",
+          "type": "option"
+        },
+        {
+          "name": "Engineering",
+          "type": "option"
+        },
+        {
+          "name": "Management",
+          "type": "option"
+        },
+        {
+          "name": "Welding Coordination",
+          "type": "option"
+        }
+      ]
+    },
+    {
+      "name": "delivery_mode",
+      "label": "Delivery mode",
+      "type": "SELECT",
+      "options": [
+        {
+          "name": "Face-to-Face",
+          "type": "option"
+        },
+        {
+          "name": "Online",
+          "type": "option"
+        },
+        {
+          "name": "Blended",
+          "type": "option"
+        },
+        {
+          "name": "In-House",
+          "type": "option"
+        }
+      ]
+    },
+    {
+      "name": "duration",
+      "label": "Duration (e.g. 3 days, 2 weeks)",
+      "type": "TEXT"
+    },
+    {
+      "name": "description",
+      "label": "Course description",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "photo",
+      "label": "Course photo",
+      "type": "IMAGE"
+    },
+    {
+      "name": "standards",
+      "label": "Relevant standards (e.g. AS1796, ISO 9606)",
+      "type": "TEXT"
+    },
+    {
+      "name": "is_free",
+      "label": "Free course",
+      "type": "BOOLEAN"
+    }
+  ]
+}

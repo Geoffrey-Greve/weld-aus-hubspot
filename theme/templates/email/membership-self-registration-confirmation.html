@@ -1,0 +1,139 @@
+<!--
+  templateType: email
+  isEnabledForEmailV3Rendering: true
+  label: Weld Australia - Self Registration Confirmation
+  isAvailableForNewContent: true
+-->
+{#
+  Branded HubSpot Private Content self-registration confirmation email.
+#}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Confirm your Weld Australia member portal registration</title>
+  <style>
+    @media only screen and (max-width: 620px) {
+      .wa-email-container { width: 100% !important; }
+      .wa-email-padding { padding-left: 22px !important; padding-right: 22px !important; }
+      .wa-email-card { border-radius: 18px !important; }
+      .wa-email-heading { font-size: 32px !important; line-height: 1.08 !important; }
+      .wa-email-button { display: block !important; text-align: center !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background:#f5f7fb; color:#111827; font-family:Arial, Helvetica, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent;">
+    Confirm your email address to finish setting up your Weld Australia member portal login.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fb; border-collapse:collapse;">
+    <tr>
+      <td align="center" style="padding:32px 14px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" class="wa-email-container" style="width:600px; max-width:600px; border-collapse:collapse;">
+          <tr>
+            <td class="wa-email-card" style="border-radius:24px; overflow:hidden; background:#ffffff; box-shadow:0 18px 50px rgba(15,16,48,0.12);">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                <tr>
+                  <td class="wa-email-padding" style="padding:26px 44px 22px; background:#ffffff;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                      <tr>
+                        <td style="font-size:0; line-height:0; vertical-align:middle;">
+                          <img
+                            src="{{ get_asset_url('../../assets/img/weld-australia-email-logo-horizontal.png') }}"
+                            width="286"
+                            height="50"
+                            alt="Weld Australia"
+                            style="display:block; width:286px; max-width:100%; height:auto; border:0; outline:none; text-decoration:none;"
+                          >
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="wa-email-padding" style="padding:42px 44px 36px; background:#0f1030; background-image:linear-gradient(135deg,#0f1030 0%,#1c1e4c 100%);">
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                      <tr>
+                        <td width="28" style="padding:0 10px 0 0;"><div style="height:2px; width:24px; background:#ed128d;"></div></td>
+                        <td style="color:#ed128d; font-size:11px; line-height:16px; font-weight:800; letter-spacing:1.8px; text-transform:uppercase;">Member portal</td>
+                      </tr>
+                    </table>
+                    <h1 class="wa-email-heading" style="margin:18px 0 14px; color:#ffffff; font-size:42px; line-height:1.05; font-weight:800; letter-spacing:-1.3px;">
+                      Confirm your registration
+                    </h1>
+                    <p style="margin:0; color:#d8dbea; font-size:17px; line-height:1.65;">
+                      Please confirm your email address to finish setting up your Weld Australia member portal login.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="height:5px; line-height:5px; background:#ed128d; background-image:linear-gradient(90deg,#ed128d 0%,#f04828 45%,#fecf05 100%); font-size:0;">&nbsp;</td>
+                </tr>
+
+                <tr>
+                  <td class="wa-email-padding" style="padding:38px 44px 8px;">
+                    <p style="margin:0 0 18px; color:#202334; font-size:16px; line-height:1.7;">
+                      Hi {{ contact.firstname|default('there')|escape }},
+                    </p>
+                    <p style="margin:0 0 24px; color:#4b5565; font-size:16px; line-height:1.7;">
+                      Thanks for registering for Weld Australia member portal access. Confirm your email address below so HubSpot can complete your account setup.
+                    </p>
+
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:0 0 30px;">
+                      <tr>
+                        <td bgcolor="#fecf05" style="border-radius:8px;">
+                          <a href="{{ membership_verify_registration_link }}" class="wa-email-button" style="display:inline-block; padding:15px 24px; color:#111827; font-size:15px; line-height:18px; font-weight:800; text-decoration:none; border-radius:8px;">
+                            Confirm registration
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; background:#f7f8fc; border:1px solid #e3e7f0; border-radius:16px;">
+                      <tr>
+                        <td style="padding:22px 24px;">
+                          <p style="margin:0 0 8px; color:#0f1030; font-size:14px; line-height:1.5; font-weight:800;">What happens next?</p>
+                          <p style="margin:0; color:#596174; font-size:14px; line-height:1.7;">
+                            Once confirmed, you can sign in to view member resources, training activity and your Weld Australia member dashboard.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td class="wa-email-padding" style="padding:18px 44px 38px;">
+                    <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.7;">
+                      If the button does not work, copy and paste this link into your browser:<br>
+                      <a href="{{ membership_verify_registration_link }}" style="color:#1c1e4c; text-decoration:underline; word-break:break-all;">{{ membership_verify_registration_link }}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding:24px 28px 0; color:#6b7280; font-size:12px; line-height:1.7;">
+              <p style="margin:0 0 8px; font-weight:700; color:#1c1e4c;">{{ site_settings.company_name }}</p>
+              <p style="margin:0 0 8px;">
+                {{ site_settings.company_street_address_1 }}{% if site_settings.company_street_address_2 %}, {{ site_settings.company_street_address_2 }}{% endif %}<br>
+                {{ site_settings.company_city }}, {{ site_settings.company_state }} {{ site_settings.company_zip }}
+              </p>
+              <p style="margin:0;">This email was sent because this address was used to register for Weld Australia member portal access.</p>
+              <p style="margin:12px 0 0;">Need help? <a href="mailto:membership@weldaustralia.com.au" style="color:#1c1e4c; text-decoration:underline;">membership@weldaustralia.com.au</a></p>
+              {% if unsubscribe_link %}
+              <p style="margin:12px 0 0;"><a href="{{ unsubscribe_link }}" style="color:#6b7280; text-decoration:underline;">Manage email preferences</a></p>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

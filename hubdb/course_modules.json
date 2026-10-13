@@ -1,0 +1,56 @@
+{
+  "name": "course_modules",
+  "label": "Course Modules",
+  "useForPages": false,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": false,
+  "columns": [
+    {
+      "name": "parent_course_id",
+      "label": "Parent Course ID",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "name",
+      "label": "Module name",
+      "type": "TEXT"
+    },
+    {
+      "name": "product_id",
+      "label": "HubSpot Product ID",
+      "type": "TEXT"
+    },
+    {
+      "name": "hubspot_product_id",
+      "label": "HubSpot Product ID",
+      "type": "TEXT"
+    },
+    {
+      "name": "sku",
+      "label": "Product SKU",
+      "type": "TEXT"
+    },
+    {
+      "name": "product_year",
+      "label": "Product year",
+      "type": "NUMBER"
+    },
+    {
+      "name": "module_order",
+      "label": "Module Order",
+      "type": "NUMBER"
+    },
+    {
+      "name": "show_on_website",
+      "label": "Show on Website",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "module_booking_url",
+      "label": "Individual Module Booking URL",
+      "type": "URL"
+    }
+  ]
+}

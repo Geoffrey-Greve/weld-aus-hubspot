@@ -1,0 +1,304 @@
+<!--
+  templateType: page
+  label: Advocacy
+  isAvailableForNewContent: true
+-->
+{#
+  advocacy.html - Weld Australia Advocacy Page
+  URL: /advocacy/
+  Design source: Project-Related/Designs/Sample HTML/Advocacy - Standalone.html
+
+  Drag-and-drop page. Area name is "advocacy_v2", NOT "main_content".
+  Earlier revisions used fixed {% module %} tags (and before that a
+  page-header / "advocacy_hero" instance) because the published page still
+  carried a pre-consolidation layout_sections snapshot under "main_content".
+  HubSpot only overlays a saved snapshot onto a dnd_area of the same name, and
+  dnd_module derives its instance id from position - so a fresh area name
+  guarantees the consolidated modules/hero binds cleanly. Same reasoning as
+  dnd_area "training_hub_v2" / "courses_listing_v2". Do not rename this back
+  to "main_content".
+
+  NOTE: edits to the live /advocacy/ page after first publish live in HubSpot,
+  not here. Changing these defaults governs newly created pages and the first
+  render of this fresh area.
+#}
+{% set page_title_exact = 'Welding Industry Advocacy Australia | Weld Australia' %}
+{% set page_description = 'Weld Australia advocates for the welding and fabrication industry across standards compliance, sovereign manufacturing capability, workforce development, apprenticeships, diversity and public safety.' %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/blog.css') }}">
+<style>
+  body.is-advocacy-page #women .wa-split-feature__body {
+    margin-bottom: 0;
+  }
+
+  /*
+    Temporary launch fix: hide the placeholder member-survey stat band until
+    Weld Australia supplies the real figures. The module content remains in
+    the page/editor so it can be restored and updated later.
+  */
+  body.is-advocacy-page .dnd-section:has(#hs_cos_wrapper_advocacy_v2-module-4),
+  body.is-advocacy-page #hs_cos_wrapper_advocacy_v2-module-4 {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}is-advocacy-page{% endblock %}
+
+{% block body %}
+{% dnd_area "advocacy_v2" label="Main content" %}
+
+  {# ── § 1  HERO ────────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero"
+          section_id="advocacy-hero"
+          background="primary"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="image"
+          background_image={"src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/Screenshot%202026-07-31%20182528.jpg", "alt": "Geoff Crittenden", "width": 1851, "height": 1012}
+          eyebrow="Industry advocacy"
+          headline="Building a stronger welding industry for all Australians"
+          subheadline="<p>Weld Australia leads advocacy for the welding and fabrication industry - addressing critical issues including standards compliance, skills shortages, sovereign manufacturing capability, and public safety. We work with government and industry to drive policy reform and strengthen Australia's industrial future.</p>"
+          primary_cta={"label_text": "Our priorities", "link": {"url": {"href": "#sovereign", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "Read our submissions", "link": {"url": {"href": "/news/", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# TODO(#87): Placeholder member survey structure. Replace once Ben supplies figures. #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/stat-band"
+          label="Member survey snapshot"
+          background="surface"
+          spacing="default"
+          overline="Member survey"
+          heading="What our members told us"
+          stats=[
+            {"value_text": "XX%", "label_text": "Placeholder - member survey figure to be supplied", "sublabel": "Pending member survey data from Ben", "accent_color": "gold"},
+            {"value_text": "XX%", "label_text": "Placeholder - member survey figure to be supplied", "sublabel": "Pending member survey data from Ben", "accent_color": "magenta"},
+            {"value_text": "XX%", "label_text": "Placeholder - member survey figure to be supplied", "sublabel": "Pending member survey data from Ben", "accent_color": "gold"},
+            {"value_text": "XX%", "label_text": "Placeholder - member survey figure to be supplied", "sublabel": "Pending member survey data from Ben", "accent_color": "magenta"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Securing the long-term future"
+          section_id="mission"
+          background="surface"
+          spacing="spacious"
+          overline="Our mission"
+          heading="Securing the long-term future of Australia's welding sector"
+          body_text="<p>We work closely with government, industry, education providers, and key stakeholders to influence policy, drive reform, and champion initiatives that deliver real outcomes.</p><p>From strengthening onshore manufacturing and improving quality and safety, through to advancing training, supporting apprenticeships, and promoting diversity and wellbeing - our advocacy spans the full breadth of the industry.</p>"
+          media_side="right"
+          media_type="video"
+          video_url="https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/Weld%20Australia%20Advocacy%20Video.mp4"
+          video_poster_image={
+            "src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/Screenshot%202026-07-31%20182528.jpg",
+            "alt": "Weld Australia industry advocacy",
+            "width": 3702,
+            "height": 2024
+          }
+          video_label="Watch - Weld Australia industry advocacy"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Sovereign manufacturing capability"
+          section_id="sovereign"
+          background="surface_alt"
+          spacing="spacious"
+          overline="Priority area 01"
+          heading="Sovereign manufacturing capability in Australia"
+          body_text="<p>Australia's sovereign manufacturing capability is under increasing pressure, with decades of offshoring eroding local industry capacity, jobs, and expertise. Once contributing around 28% of GDP, manufacturing now accounts for just 5% - a decline driven by procurement decisions that prioritise lowest upfront cost over quality, safety, and long-term value.</p><p>Weld Australia advocates for stronger local content policies and smarter procurement practices that recognise the importance of investing in Australian industry. Building sovereign capability ensures safety, resilience, and a sustainable future.</p>"
+          media_side="left"
+          media_type="image_callout"
+          callout_title="Manufacturing capability"
+          callout_sub="From around 28% of GDP historically to approximately 5% today"
+          alert={"tone": "navy", "title": "Why it matters", "body_text": "Sovereign capability strengthens safety, resilience, local jobs and long-term national interest."}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Standards, quality and public safety"
+          section_id="standards"
+          background="surface"
+          spacing="spacious"
+          overline="Priority area 02"
+          heading="Welding standards, quality, compliance and public safety"
+          body_text="<p>Australia has some of the highest-quality welding standards in the world, but too often, compliance with these standards is voluntary rather than enforced. This creates a critical gap, allowing non-compliant products - particularly imported fabricated steel - to enter the market at the expense of quality, safety, and long-term performance.</p><p>Weld Australia advocates for stronger regulatory frameworks that require all fabricated steel - whether produced locally or overseas - to meet Australian Standards. Ensuring compliance is not just an industry issue; it is a public safety imperative.</p>"
+          media_side="right"
+          media_type="image"
+          image={"src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-2188581107%20(2).jpg", "alt": "Welding standards compliance inspection", "width": 8256, "height": 5504}
+          alert={"tone": "amber", "title": "Compliance gap", "body_text": "In many international markets, certification to recognised standards is mandatory. In Australia, it remains largely voluntary - creating an uneven playing field and genuine public safety risks."}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Welding skills shortage"
+          section_id="skills"
+          background="primary_dark"
+          spacing="spacious"
+          overline="Priority area 03"
+          heading="Welders Australia will be short of by 2030"
+          figure_block={"number": "70,000", "label_text": "welders Australia will be short of by 2030", "accent_color": "gold"}
+          body_text="<p>Australia is facing a critical shortage of skilled welders threatening the delivery of major infrastructure, energy, defence, and manufacturing projects. Many businesses are already operating at just 30-50% capacity due to a lack of qualified personnel.</p><p>This challenge is compounded by a declining workforce, an ageing demographic, and a global shortage of welding talent - meaning international recruitment alone cannot solve the problem.</p>"
+          media_side="right"
+          media_type="stat_panel"
+          stat_panel_items=[
+            {"value_text": "2030", "label_text": "Projected critical shortage year", "accent_color": "gold"},
+            {"value_text": "30-50%", "label_text": "Capacity some businesses are operating at", "accent_color": "magenta"},
+            {"value_text": "Ageing", "label_text": "Workforce under increasing demographic pressure", "accent_color": "gold"},
+            {"value_text": "Global", "label_text": "Shortage cannot be solved by recruitment alone", "accent_color": "magenta"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Women in welding"
+          section_id="women"
+          background="surface_alt"
+          spacing="spacious"
+          overline="Priority area 04"
+          heading="Women in welding"
+          figure_block={"number": "&lt;1%", "label_text": "of Australia's welding and fabrication workforce is female", "accent_color": "magenta"}
+          body_text="<p>This imbalance is not just an equity issue - it is a missed opportunity to address critical skills shortages, boost productivity, and drive innovation. As demand for skilled welders continues to grow, increasing female participation is one of the most effective ways to expand the talent pool.</p><p>Weld Australia advocates for targeted initiatives that encourage more women into welding - including improved access to training, stronger career pathways, and measurable diversity targets. Creating a more diverse workforce is essential to the long-term sustainability of the industry.</p>"
+          media_side="right"
+          media_type="image"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Welding apprentices and TAFE training"
+          section_id="apprentices"
+          background="surface"
+          spacing="spacious"
+          overline="Priority area 05"
+          heading="Welding apprentices and TAFE training"
+          body_text="<p>Australia's future welding capability depends on a strong pipeline of skilled tradespeople. Yet apprenticeships have declined significantly while demand for qualified welders grows. An ageing workforce and increasing reliance on university pathways have left critical gaps in vocational skills.</p><p>TAFEs remain a strategic national asset. Weld Australia advocates for renewed investment in TAFEs and a revitalised apprenticeship system - including future-focused curricula, stronger industry alignment, and clear pathways from training into employment.</p>"
+          media_side="left"
+          media_type="image_panels"
+          panels_label="What we're calling for"
+          panels=[
+            {"title": "Renewed TAFE investment", "desc": "Hands-on technical training as a strategic national asset", "accent_color": "gold"},
+            {"title": "Revitalised apprenticeships", "desc": "Clear pathways from training into long-term employment", "accent_color": "magenta"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="VET rehabilitation programs"
+          section_id="vet"
+          background="surface_alt"
+          spacing="spacious"
+          overline="Priority area 06"
+          heading="VET rehabilitation programs for prisoners"
+          body_text="<p>Australia's growing prison population presents both a challenge and an opportunity. Many inmates - particularly younger individuals and repeat offenders - have low levels of education and limited access to meaningful employment pathways, contributing to high rates of reoffending.</p><p>Weld Australia advocates for targeted VET rehabilitation programs within correctional facilities as a practical solution - addressing skills shortages while creating real pathways to employment and reducing recidivism.</p>"
+          media_side="right"
+          media_type="quote"
+          quote_text="Training gave me a real skill, a real job, and a future I could build towards. This program changed everything."
+          quote_author="Program participant - VET Welding Centre of Excellence"
+          alert={"tone": "green", "title": "Job-ready skills", "body_text": "Welding training to ISO 9606 standards through VET Centre of Excellence programs is already demonstrating strong results - equipping participants with industry-aligned skills."}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/news-articles-browser"
+          label="News and insights"
+          section_id="news"
+          background="white"
+          featured={"show": false}
+          browser={
+            "heading": "Industry news & updates",
+            "show_view_all": true,
+            "view_all_label": "View all announcements",
+            "view_all_href": "/news/"
+          }
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Advocacy CTA"
+          section_id="advocacy-cta"
+          background="primary"
+          spacing="default"
+          align="split"
+          image_position="none"
+          headline="Stand with us. Advocate for Australia's future."
+          body_text="<p>Join Weld Australia and add your voice to the advocacy work shaping Australia's industrial future.</p>"
+          cta_label="Become a member"
+          cta_link={"url": {"href": "/membership", "type": "EXTERNAL"}}
+          secondary_cta_label="Contact us"
+          secondary_cta_link={"url": {"href": "/contact-us", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

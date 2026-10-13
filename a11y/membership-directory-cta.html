@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A11y Test - Membership Directory CTA</title>
+  <link rel="stylesheet" href="/theme/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/reset.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/assets/css/utilities.css" />
+  <link rel="stylesheet" href="/theme/assets/css/components.css" />
+  <link rel="stylesheet" href="/theme/modules/membership-directory-cta.module/module.css" />
+  <!--
+    Poppins locally, mirroring templates/partials/_fonts.html. Without it the
+    fixture measures a system fallback, which is narrower than Poppins - the
+    exact difference that decides whether a label fits its card on a phone.
+  -->
+  <style>
+    @font-face { font-family:'Poppins'; src:url('/theme/assets/fonts/Poppins-Regular.ttf') format('truetype'); font-weight:400; font-style:normal; font-display:block; }
+    @font-face { font-family:'Poppins'; src:url('/theme/assets/fonts/Poppins-Medium.ttf') format('truetype'); font-weight:500; font-style:normal; font-display:block; }
+    @font-face { font-family:'Poppins'; src:url('/theme/assets/fonts/Poppins-SemiBold.ttf') format('truetype'); font-weight:600; font-style:normal; font-display:block; }
+    @font-face { font-family:'Poppins'; src:url('/theme/assets/fonts/Poppins-Bold.ttf') format('truetype'); font-weight:700; font-style:normal; font-display:block; }
+    @font-face { font-family:'Poppins'; src:url('/theme/assets/fonts/Poppins-ExtraBold.ttf') format('truetype'); font-weight:800; font-style:normal; font-display:block; }
+  </style>
+</head>
+<body>
+  <main id="main-content" tabindex="-1">
+    <!--
+      Mirrors theme/modules/membership-directory-cta.module/module.html with the
+      copy the Memberships page actually ships (see membership.html § 7). The
+      background <img> is omitted: it is decorative, absolutely positioned and
+      needs no network fetch to reproduce the layout.
+    -->
+    <section class="wa-membership-directory wa-section wa-section--bg-surface_alt wa-section--spacing-spacious" id="directory">
+      <div class="container">
+        <div class="wa-membership-directory__card">
+          <div class="wa-membership-directory__copy">
+            <div class="wa-overline wa-overline--light">
+              <span class="wa-overline__text">Member directory</span>
+            </div>
+            <h2>Find a Weld Australia member near you</h2>
+            <div class="wa-richtext">
+              <p>Search our national directory of member companies - from Gold-tier fabricators and primes to specialist suppliers, training providers, and engineers.</p>
+            </div>
+            <a class="btn btn-gold btn-lg" href="/find-a-member/">
+              <span>Browse member directory</span>
+              <svg class="wa-btn__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+
+          <div class="wa-membership-directory__badges" aria-label="Membership tiers">
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="82" height="82" alt="Gold member" />
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="82" height="82" alt="Silver member" />
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="82" height="82" alt="Bronze member" />
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="82" height="82" alt="Individual member" />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

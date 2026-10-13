@@ -1,0 +1,137 @@
+{#
+  course-timetable-compact.module/module.html
+
+  Pure HubL (no React): compact vertical list of upcoming course sessions.
+
+  Data flow:
+    1. Queries HubDB Table 1 (courses) for upcoming, non-cancelled sessions.
+    2. Applies the optional training-division filter server-side via the query
+       string. A division can span several HubDB `category` values, so this is
+       a category__in query - see theme/templates/partials/course-taxonomy.html.
+    3. Slices to max_count.
+    4. Renders as a vertical list - one row per session.
+    5. "View full timetable" CTA links to view_all_link.
+
+  NOTE: The `category` filter relies on a SELECT column named "category" being
+  present on the HubDB courses table. If the column is absent, use "any" only.
+  Coordinate with Ollie to add the category column to the courses table schema.
+
+  Dependencies:
+    - HubDB table named "courses" (CLAUDE.md §7.1).
+    - Optional: courses table must have a `category` SELECT column for category filtering.
+#}
+
+{% import "../../templates/partials/course-taxonomy.html" as wa_tax %}
+{% import "../../templates/partials/session-status.html" as wa_status %}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{# 1. Build the HubDB query. Apply division filter if set (and not 'any'). #}
+{% set ns = namespace(rows=[]) %}
+{% set max = module.max_count | int | default(8) %}
+
+{% if module.category_filter and module.category_filter != 'any' %}
+  {% set _cat_values = wa_tax.bucket_values_csv(module.category_filter) | trim %}
+  {% set all_rows = hubdb_table_rows('courses',
+    'status__neq=Cancelled&category__in=' ~ _cat_values,
+    'start_date') %}
+{% else %}
+  {% set all_rows = hubdb_table_rows('courses', 'status__neq=Cancelled', 'start_date') %}
+{% endif %}
+
+{% import "../../templates/partials/_session-priceable.html" as wa_session %}
+{% set _ctc_today_key = local_dt | datetimeformat('%Y%m%d') %}
+{# 2. Slice to max_count, skipping finished sessions (Ref 120, § 7.6): this list says
+      "upcoming" and had no date test at all. #}
+{% for row in all_rows %}
+  {% if ns.rows | length < max and not wa_session.has_ended(row, _ctc_today_key) | trim %}
+    {% set ns.rows = ns.rows + [row] %}
+  {% endif %}
+{% endfor %}
+
+{# 3. Resolve view-all link. #}
+{% set view_all_href = module.view_all_link.url.href | default('') %}
+
+{# 4. Render. #}
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+      <h2 class="wa-ctc__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    {% if ns.rows | length > 0 %}
+      <ul class="wa-ctc__list" role="list">
+        {% for row in ns.rows %}
+          {% set course_name  = row.course_name      | default('') %}
+          {% set course_slug  = row.course_slug      | default('') %}
+          {% set city         = row.city.name        | default('') %}
+          {% set start_date   = row.start_date       | datetimeformat('%d %B %Y') | default('') %}
+          {% set status_name  = row.status.name      | default('Available') %}
+          {% set reg_url      = row.registration_url | default('') %}
+
+          {# Status, through the one vocabulary the React islands use (Ref 74c). #}
+          {% set status_key = wa_status.status_of(status_name) | trim %}
+          {% set status_slug = wa_status.status_slug(status_key) | trim %}
+          {% set status_label = wa_status.status_label(status_key) | trim %}
+          {% set status_bookable = wa_status.status_is_bookable(status_key) | trim == 'true' %}
+
+          <li class="wa-ctc__item wa-ctc__item--{{ status_slug }}">
+
+            {# Course info (left) #}
+            <div class="wa-ctc__info">
+              {% if course_slug %}
+                <a href="/courses/{{ course_slug }}" class="wa-ctc__course-name">
+                  {{ course_name }}
+                </a>
+              {% else %}
+                <span class="wa-ctc__course-name">{{ course_name }}</span>
+              {% endif %}
+              <span class="wa-ctc__meta">
+                {% if city %}{{ city }}{% if start_date %} &middot; {% endif %}{% endif %}
+                {% if start_date %}<time>{{ start_date }}</time>{% endif %}
+              </span>
+            </div>
+
+            {# Status badge + CTA (right) #}
+            <div class="wa-ctc__action">
+              {% if not status_bookable %}
+                <span class="wa-ctc__status-badge wa-ctc__status-badge--{{ status_slug }}">
+                  {{ status_label }}
+                </span>
+              {% elif reg_url %}
+                <a
+                  href="{{ reg_url }}"
+                  class="wa-btn wa-btn--sm wa-btn--primary wa-ctc__register-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Register
+                </a>
+              {% endif %}
+            </div>
+
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="wa-ctc__empty">
+        <p>No upcoming courses scheduled.</p>
+      </div>
+    {% endif %}
+
+    {% if view_all_href %}
+      <div class="wa-ctc__view-all">
+        <a href="{{ view_all_href }}" class="wa-btn wa-btn--secondary">
+          {{ module.view_all_label | default('View full timetable') }}
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}

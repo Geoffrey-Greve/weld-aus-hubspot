@@ -1,0 +1,26 @@
+# HubL templates — Prettier treats them as HTML and rewrites {# #} / {% %}
+# into wrapped prose. Never format these.
+theme/**/*.html
+
+# Dependencies & lockfile
+node_modules/
+pnpm-lock.yaml
+
+# Build artefacts
+dist/
+.vite/
+theme/assets/js/
+theme/assets/css/critical.css
+
+# Test / tooling output
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+.hs-cache/
+.hsbuildlog
+
+# Local / secrets
+hubspot.config.yml
+.env
+.env.*

@@ -1,0 +1,199 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White / Light (default)"
+      ],
+      [
+        "surface_alt",
+        "Surface alt"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext"
+  },
+  {
+    "name": "map_image",
+    "label": "Map image",
+    "type": "image",
+    "help_text": "Australia map image used as the marker base. Defaults to the uploaded Weld Australia map if left blank.",
+    "default": {
+      "src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/ThirdpartyImages/ChatGPT%20Image%20Jun%2022%2c%202026%2c%2010_06_52%20PM.png",
+      "alt": "Map of Australia"
+    }
+  },
+  {
+    "name": "map_side",
+    "label": "Map position",
+    "type": "choice",
+    "choices": [
+      [
+        "right",
+        "Right (default)"
+      ],
+      [
+        "left",
+        "Left"
+      ]
+    ],
+    "default": "right"
+  },
+  {
+    "name": "cities",
+    "label": "City markers",
+    "type": "group",
+    "help_text": "Coordinates are percentage-based within the SVG viewBox (0-100). Pre-set city positions are listed in the help text below.",
+    "occurrence": {
+      "min": 0,
+      "max": 20
+    },
+    "children": [
+      {
+        "name": "name_text",
+        "label": "City name",
+        "type": "text"
+      },
+      {
+        "name": "is_primary",
+        "label": "Primary / head office",
+        "type": "boolean",
+        "default": false
+      },
+      {
+        "name": "city_preset",
+        "label": "City (preset coordinates)",
+        "type": "choice",
+        "choices": [
+          [
+            "sydney",
+            "Sydney"
+          ],
+          [
+            "melbourne",
+            "Melbourne"
+          ],
+          [
+            "brisbane",
+            "Brisbane"
+          ],
+          [
+            "perth",
+            "Perth"
+          ],
+          [
+            "adelaide",
+            "Adelaide"
+          ],
+          [
+            "darwin",
+            "Darwin"
+          ],
+          [
+            "hobart",
+            "Hobart"
+          ],
+          [
+            "canberra",
+            "Canberra"
+          ],
+          [
+            "custom",
+            "Custom (use X/Y below)"
+          ]
+        ],
+        "default": "sydney"
+      },
+      {
+        "name": "cx",
+        "label": "Custom X position (% from left, 0-100)",
+        "type": "number",
+        "default": 50
+      },
+      {
+        "name": "cy",
+        "label": "Custom Y position (% from top, 0-100)",
+        "type": "number",
+        "default": 50
+      }
+    ]
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  }
+]

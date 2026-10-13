@@ -1,0 +1,385 @@
+{% import "../../templates/partials/course-taxonomy.html" as wa_tax %}
+{#
+  card-grid.module/module.html
+  Configurable card grid. Replaces category-cards-3up, case-study-cards, service-cards.
+
+  card_style variants:
+    photo_overlay  - full-bleed image, overlay, white text, tag badge
+    clean_white    - image top half, content below (most common)
+    bordered       - no image, outline border card
+    icon_overlay   - icon + title + body (no image)
+    detail         - tag badge + title + body + link
+#}
+
+{%- set _bg     = module.background    | default('surface') -%}
+{%- set _sp     = module.spacing       | default('default') -%}
+{%- set _vis    = module.visibility    | default(['mobile','tablet','desktop']) -%}
+{%- set _style  = module.card_style    | default('clean_white') -%}
+{%- set _cols   = module.columns       | default('3') -%}
+{%- set _align  = module.section_align | default('center') -%}
+{%- set _heading_text = module.heading|striptags|trim -%}
+{%- set _overline_text = module.overline|striptags|trim -%}
+{%- set _cta_text = module.cta_label|striptags|trim -%}
+{%- set _is_news = _heading_text in ['Industry news & updates', 'News from Weld Australia'] or _overline_text in ['Latest News', 'Industry updates'] or _cta_text == 'View all news' -%}
+{%- set _news_source = module.news_source | default('blog', true) -%}
+{%- set _news_blog_id = module.news_blog_id | default('default', true) -%}
+{%- set _news_post_count = module.news_post_count | default(3, true) | int -%}
+{%- if _news_post_count < 1 -%}{%- set _news_post_count = 3 -%}{%- endif -%}
+{%- set _client_news_fallback_image = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1299734004%20(3).jpg' -%}
+{%- set _news_fallback_image_src = module.news_fallback_image.src | default(_client_news_fallback_image, true) -%}
+{%- set _news_fallback_image_alt = module.news_fallback_image.alt | default('Weld Australia welding and fabrication', true) -%}
+{%- set _news_posts = [] -%}
+{%- if _is_news and _news_source != 'manual' -%}
+  {%- set _news_posts = blog_recent_posts(_news_blog_id, _news_post_count) -%}
+{%- endif -%}
+{%- set _use_dynamic_news = _is_news and _news_posts and _news_posts|length -%}
+{%- set _news_archive_href = module.cta_link.url.href | default('/news/', true) -%}
+{%- if _is_news and _news_archive_href in ['/blog', '/blog/'] -%}
+  {%- set _news_archive_href = '/news/' -%}
+{%- endif -%}
+{%- set _display_overline = module.overline -%}
+{%- set _display_heading = module.heading -%}
+{%- if _is_news -%}
+  {%- set _display_overline = 'Latest News' -%}
+  {%- set _display_heading = 'Industry news & updates' -%}
+{%- endif -%}
+{%- if module.overline -%}
+  {%- set _align = 'left' -%}
+{%- endif -%}
+{%- set _dark   = _bg in ['primary', 'primary_dark'] -%}
+
+{%- set _section_classes = 'wa-card-grid wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-' ~ _sp -%}
+{%- if _is_news -%}{%- set _section_classes = _section_classes ~ ' wa-card-grid--news-section' -%}{%- endif -%}
+{%- if 'mobile'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+<section
+  class="{{ _section_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="{% if _is_news %}container-wide{% else %}container{% endif %}">
+
+    {# ── Section head ──────────────────────────────────────────────────────── #}
+    {% if module.overline or module.heading or module.intro %}
+    {% if _is_news %}
+    <div class="wa-card-grid__news-head">
+      <div class="wa-card-grid__news-head-copy">
+        {% if _display_overline %}
+        <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+          <span class="wa-overline__text">{{ _display_overline }}</span>
+        </div>
+        {% endif %}
+        {% if _display_heading %}
+        <h2 class="wa-card-grid__heading">{{ _display_heading }}</h2>
+        {% endif %}
+        {% if module.intro %}
+        <div class="wa-card-grid__intro wa-richtext">{{ module.intro }}</div>
+        {% endif %}
+      </div>
+      {% if module.cta_label and module.cta_link and module.cta_link.url and module.cta_link.url.href %}
+      <a
+        href="{{ _news_archive_href }}"
+        class="btn btn-navy-outline wa-card-grid__news-view-all"
+        {% if module.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >
+        <span>{{ module.cta_label }}</span>
+        <svg class="wa-btn__arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="wa-section-head{% if _align == 'center' %} wa-section-head--center{% endif %}">
+      {% if module.overline %}
+      <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+        <span class="wa-overline__text">{{ module.overline }}</span>
+      </div>
+      {% endif %}
+      {% if module.heading %}
+      <h2 class="wa-card-grid__heading">{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+      <div class="wa-card-grid__intro wa-richtext">{{ module.intro }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {# ── Card grid ─────────────────────────────────────────────────────────── #}
+    {% set _cards_to_render = module.cards %}
+    {% if _use_dynamic_news %}
+      {% set _cards_to_render = _news_posts %}
+    {% endif %}
+    {% if _cards_to_render %}
+    <div class="wa-card-grid__grid wa-card-grid__grid--{{ _cols }}col wa-card-grid--{{ _style }}">
+      {% for card in _cards_to_render %}
+      {%- set _card_href = card.link_url.url.href | default('', true) | trim -%}
+      {%- set _card_link_label = card.link_label | default('', true) | lower | trim -%}
+      {%- if _card_link_label == 'find a course' -%}
+        {%- set _card_href = '/courses' -%}
+      {%- endif -%}
+      {#- A card whose title is a training division ("Welding Inspection", "Short
+          Courses", …) resolves its own destination when the saved link field is
+          empty, so the "Browse courses by training division" grid on /courses
+          cannot render label-only dead links.
+
+          bucket_slug also accepts the broad taxonomy aliases (Engineering,
+          Management, Certification, NDT, Appreciation …), which are plausible
+          titles for unrelated cards elsewhere in the theme. Requiring the slug
+          to round-trip back to the card title through bucket_label narrows this
+          to the four canonical division titles, so no ordinary card is given a
+          link - let alone one to a division it has nothing to do with. -#}
+      {%- if not _card_href and _card_link_label -%}
+        {%- set _card_division = wa_tax.bucket_slug(card.title) | trim -%}
+        {%- set _card_division_label = wa_tax.bucket_label(_card_division) | trim | lower -%}
+        {%- if _card_division != 'uncategorised' and _card_division_label == card.title | default('', true) | string | lower | trim -%}
+          {%- set _card_href = wa_tax.bucket_url(_card_division) | trim -%}
+        {%- endif -%}
+      {%- endif -%}
+      {# QA 226: the complementary case - the link field is NOT empty but holds a
+         saved /training/<division>-courses/ href, and those four pages do not
+         exist. Re-resolve it through the taxonomy so a card instance stored in
+         HubSpot follows config/course-categories.json rather than its saved URL.
+         Non-division /training/ URLs (e.g. welding-safety-courses) are left
+         alone because no division slug appears in them. #}
+      {%- if '/training/' in _card_href -%}
+        {%- set _card_legacy = namespace(slug='') -%}
+        {%- for _slug in wa_tax.slugs_csv('') | trim | split(',') -%}
+          {%- if not _card_legacy.slug and _slug in _card_href -%}
+            {%- set _card_legacy.slug = _slug -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if _card_legacy.slug -%}
+          {%- set _card_href = wa_tax.bucket_url(_card_legacy.slug) | trim -%}
+        {%- endif -%}
+      {%- endif -%}
+      <article class="wa-card-grid__card">
+
+        {# ── photo_overlay ─────────────────────────────────────────────────── #}
+        {% if _is_news %}
+          {%- set _news_href = '/news/' -%}
+          {%- set _news_label = module.news_read_label | default('Read more', true) -%}
+          {%- set _news_date = '' -%}
+          {%- set _news_title = '' -%}
+          {%- set _news_body = '' -%}
+          {%- set _news_image_src = '' -%}
+          {%- set _news_image_alt = '' -%}
+          {%- set _news_image_width = '' -%}
+          {%- set _news_image_height = '' -%}
+          {%- set _news_tag_text = 'Industry News' -%}
+          {%- set _news_tag_slug = 'industry-news' -%}
+          {%- set _news_open_in_new_tab = false -%}
+
+          {%- if _use_dynamic_news -%}
+            {%- set _news_href = card.absolute_url -%}
+            {%- set _news_date = card.publish_date | datetimeformat('%d %b %Y') -%}
+            {%- set _news_title = card.name -%}
+            {%- set _news_body = card.meta_description | default(card.post_summary | striptags | truncate(165), true) -%}
+            {%- set _news_image_src = card.featured_image | default(_news_fallback_image_src, true) -%}
+            {%- set _news_image_alt = card.featured_image_alt_text | default(card.name, true) -%}
+            {%- if card.tag_list and card.tag_list|length -%}
+              {%- set _news_tag_text = card.tag_list[0].name -%}
+              {%- set _news_tag_slug = card.tag_list[0].slug | default('industry-news', true) -%}
+            {%- elif card.topic_list and card.topic_list|length -%}
+              {%- set _news_tag_text = card.topic_list[0].name | default(card.topic_list[0].label, true) | default('Industry News', true) -%}
+              {%- set _news_tag_slug = card.topic_list[0].slug | default('industry-news', true) -%}
+            {%- endif -%}
+          {%- else -%}
+            {%- if card.link_url and card.link_url.url and card.link_url.url.href -%}
+              {%- set _news_href = card.link_url.url.href -%}
+            {%- endif -%}
+            {%- if card.link_label and card.link_label != 'Learn more' -%}
+              {%- set _news_label = card.link_label -%}
+            {%- endif -%}
+            {%- set _news_date = card.date_text | default('') -%}
+            {%- set _news_title = card.title -%}
+            {%- set _news_body = card.body_text -%}
+            {%- set _news_image_src = card.image.src -%}
+            {%- set _news_image_alt = card.image.alt | default('', true) -%}
+            {%- set _news_image_width = card.image.width -%}
+            {%- set _news_image_height = card.image.height -%}
+            {%- set _news_tag_text = card.tag_text | default('Industry News', true) -%}
+            {%- set _news_tag_slug = card.tag_text | lower | replace(' ', '-') | default('industry-news', true) -%}
+            {%- set _news_open_in_new_tab = card.link_url.open_in_new_tab -%}
+          {%- endif -%}
+
+          {%- if not _news_image_src -%}
+            {%- set _news_image_src = _news_fallback_image_src -%}
+            {%- set _news_image_alt = _news_fallback_image_alt -%}
+          {%- elif _use_dynamic_news and not card.featured_image -%}
+            {%- set _news_image_alt = _news_fallback_image_alt -%}
+          {%- endif -%}
+
+          {%- set _news_tag_color = 'navy' -%}
+          {%- if _news_tag_slug in ['advocacy', 'member-news'] -%}
+            {%- set _news_tag_color = 'magenta' -%}
+          {%- elif _news_tag_slug in ['training', 'certification'] -%}
+            {%- set _news_tag_color = 'green' -%}
+          {%- elif _news_tag_slug in ['standards', 'technology'] -%}
+            {%- set _news_tag_color = 'gold' -%}
+          {%- endif -%}
+          <div class="wa-card-grid__news-media">
+            {% if _news_image_src %}
+            <img
+              src="{{ _news_image_src | escape_url }}"
+              alt="{{ _news_image_alt | escape }}"
+              class="wa-card-grid__img"
+              loading="lazy"
+              decoding="async"
+              {% if _news_image_width %}width="{{ _news_image_width }}"{% endif %}
+              {% if _news_image_height %}height="{{ _news_image_height }}"{% endif %}
+            >
+            {% endif %}
+            <div class="wa-card-grid__news-media-shade" aria-hidden="true"></div>
+            {% if _news_tag_text %}
+            <span class="wa-card-grid__tag wa-card-grid__tag--{{ _news_tag_color }}">{{ _news_tag_text }}</span>
+            {% endif %}
+            {% if _news_date %}
+            <span class="wa-card-grid__news-date">{{ _news_date }}</span>
+            {% endif %}
+          </div>
+          <div class="wa-card-grid__body">
+            {% if _news_title %}
+            <h3 class="wa-card-grid__title">{{ _news_title }}</h3>
+            {% endif %}
+            {% if _news_body %}
+            <div class="wa-card-grid__desc wa-richtext">{{ _news_body }}</div>
+            {% endif %}
+            <a
+              href="{{ _news_href }}"
+              class="wa-card-grid__link wa-card-grid__news-read-more"
+              {% if _news_open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >
+              <span>{{ _news_label }}</span>
+              <svg class="wa-btn__arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+
+        {% elif _style == 'photo_overlay' %}
+          {% if card.image and card.image.src %}
+          <div class="wa-card-grid__img-wrap">
+            <img
+              src="{{ card.image.src }}"
+              alt="{{ card.image.alt | default('') }}"
+              class="wa-card-grid__img"
+              loading="lazy"
+              decoding="async"
+              {% if card.image.width %}width="{{ card.image.width }}"{% endif %}
+              {% if card.image.height %}height="{{ card.image.height }}"{% endif %}
+            >
+            <div class="wa-card-grid__overlay" aria-hidden="true"></div>
+          </div>
+          {% endif %}
+          <div class="wa-card-grid__body">
+            {% if card.tag_text %}
+            <span class="wa-card-grid__tag wa-card-grid__tag--{{ card.tag_color | default('navy') }}">{{ card.tag_text }}</span>
+            {% endif %}
+            <div class="wa-card-grid__content">
+            {% if card.title %}
+            <h3 class="wa-card-grid__title">{{ card.title }}</h3>
+            {% endif %}
+            {% if card.body_text %}
+            <div class="wa-card-grid__desc wa-richtext">{{ card.body_text }}</div>
+            {% endif %}
+            {% if _card_href and card.link_label %}
+            <a
+              href="{{ _card_href }}"
+              class="wa-card-grid__link wa-card-grid__link--{{ card.link_style | default('arrow') }}"
+              {% if card.link_url.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ card.link_label }}{% if card.link_style == 'arrow' or not card.link_style %} <span aria-hidden="true">→</span>{% endif %}</a>
+            {% endif %}
+          </div>
+
+        {# ── clean_white (default) ─────────────────────────────────────────── #}
+          </div>
+        {% elif _style == 'clean_white' or _style == 'bordered' %}
+          {% if card.image and card.image.src %}
+          <div class="wa-card-grid__img-wrap">
+            <img
+              src="{{ card.image.src }}"
+              alt="{{ card.image.alt | default('') }}"
+              class="wa-card-grid__img"
+              loading="lazy"
+              decoding="async"
+              {% if card.image.width %}width="{{ card.image.width }}"{% endif %}
+              {% if card.image.height %}height="{{ card.image.height }}"{% endif %}
+            >
+          </div>
+          {% endif %}
+          <div class="wa-card-grid__body">
+            {% if card.tag_text %}
+            <span class="wa-card-grid__tag wa-card-grid__tag--{{ card.tag_color | default('navy') }}">{{ card.tag_text }}</span>
+            {% endif %}
+            {% if card.title %}
+            <h3 class="wa-card-grid__title">{{ card.title }}</h3>
+            {% endif %}
+            {% if card.body_text %}
+            <div class="wa-card-grid__desc wa-richtext">{{ card.body_text }}</div>
+            {% endif %}
+            {% if _card_href and card.link_label %}
+            {% if card.link_style and card.link_style != 'arrow' %}
+            <a
+              href="{{ _card_href }}"
+              class="btn btn-{% if card.link_style == 'button_primary' %}primary{% elif card.link_style == 'button_gold' %}gold{% else %}outline{% endif %} wa-card-grid__cta-btn"
+              {% if card.link_url.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ card.link_label }}</a>
+            {% else %}
+            <a
+              href="{{ _card_href }}"
+              class="wa-card-grid__link"
+              {% if card.link_url.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ card.link_label }} <span aria-hidden="true">→</span></a>
+            {% endif %}
+            {% endif %}
+          </div>
+
+        {# ── icon_overlay / detail ─────────────────────────────────────────── #}
+        {% else %}
+          <div class="wa-card-grid__body">
+            {% if card.tag_text %}
+            <span class="wa-card-grid__tag wa-card-grid__tag--{{ card.tag_color | default('navy') }}">{{ card.tag_text }}</span>
+            {% endif %}
+            {% if card.title %}
+            <h3 class="wa-card-grid__title">{{ card.title }}</h3>
+            {% endif %}
+            {% if card.body_text %}
+            <div class="wa-card-grid__desc wa-richtext">{{ card.body_text }}</div>
+            {% endif %}
+            {% if _card_href and card.link_label %}
+            <a
+              href="{{ _card_href }}"
+              class="wa-card-grid__link"
+              {% if card.link_url.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ card.link_label }} <span aria-hidden="true">→</span></a>
+            {% endif %}
+          </div>
+        {% endif %}
+
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ── Bottom CTA ────────────────────────────────────────────────────────── #}
+    {% if not _is_news and module.cta_label and module.cta_link and module.cta_link.url and module.cta_link.url.href %}
+    <div class="wa-card-grid__section-cta">
+      <a
+        href="{{ module.cta_link.url.href }}"
+        class="btn btn-{{ module.cta_style | default('primary') }}"
+        {% if module.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >{{ module.cta_label }}</a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}

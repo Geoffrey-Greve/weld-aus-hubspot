@@ -1,0 +1,62 @@
+[
+  {
+    "name": "heading",
+    "label": "Page heading",
+    "type": "text",
+    "default": "My Events"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext",
+    "default": ""
+  },
+  {
+    "name": "empty_state_message",
+    "label": "Empty state message override",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "browse_url",
+    "label": "Browse events URL",
+    "type": "url",
+    "default": { "type": "CONTENT", "href": "/events/" }
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": true,
+    "help_text": "Always true for portal modules."
+  }
+]

@@ -1,0 +1,33 @@
+# hubspot.config.yml - HubSpot CLI configuration
+#
+# HOW TO USE:
+#   1. Copy this file:  cp hubspot.config.example.yml hubspot.config.yml
+#   2. Replace the placeholder access keys below with your real ones.
+#   3. hubspot.config.yml is gitignored - never commit it.
+#
+# GENERATING A PERSONAL ACCESS KEY:
+#   In HubSpot: Settings → Account Setup → Integrations → Private Apps
+#   (or use `hs auth` which guides you through the flow)
+#
+# PORTALS - there are two, and they are DIFFERENT places:
+#   weld-australia-staging  443253065  staging - prove changes here first
+#   weld-australia          441838610  PRODUCTION - the live weldaustralia.com.au site
+#
+# `--env=staging` and `--env=production` each touch exactly one of these. There
+# is no fallback between them.
+#
+# Note: 4538263 is the Refuel Creative AGENCY portal. It is not Weld Australia,
+# and earlier versions of this file listed it as Weld "production" by mistake.
+
+defaultPortal: weld-australia-staging
+
+portals:
+  - name: weld-australia-staging
+    portalId: 443253065
+    authType: personalaccesskey
+    personalAccessKey: pat-ap1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+  - name: weld-australia
+    portalId: 441838610
+    authType: personalaccesskey
+    personalAccessKey: pat-ap1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx

@@ -1,0 +1,11 @@
+/* ============================================================
+   Events landing page
+   Route: /events
+   The hero is the shared hero.module; only page-level anchor offsets live here.
+   ============================================================ */
+
+#events,
+#events-updates {
+  scroll-margin-top: calc(var(--wa-site-header-offset, 110px) + 1.5rem);
+}
+

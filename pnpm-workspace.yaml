@@ -1,0 +1,11 @@
+# pnpm 11 config (settings live here, not in package.json / .npmrc).
+# esbuild's postinstall compiles the platform binary Vite and tsx need.
+allowBuilds:
+  esbuild: true
+
+# Transitive pins that `pnpm audit --fix=update` cannot move (parent packages
+# request an exact / too-narrow version). Patch-level only.
+overrides:
+  js-yaml@4.3.1: 4.3.2
+  qs@6.15.3: 6.16.0
+  "@opentelemetry/core@2.5.0": 2.11.0

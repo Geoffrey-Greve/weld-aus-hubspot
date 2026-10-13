@@ -1,0 +1,14 @@
+{
+  "label": "Membership Directory CTA",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Editable dark callout that links visitors to the Weld Australia member directory.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["membership", "directory", "cta"]
+}

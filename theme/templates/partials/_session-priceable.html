@@ -1,0 +1,94 @@
+<!--
+  templateType: none
+-->
+{#
+  _session-priceable.html
+
+  One HubL answer to "may this `courses` row set the price a visitor is quoted for this
+  course?", shared by the course page's fees panel (pricing-table.module) and the course
+  directory card (featured-courses.module).
+
+  Why it exists (Ref 40, the pricing defects found alongside it). One course was quoting
+  four different numbers across four surfaces, because each surface picked its own row:
+  the directory card took the first row HubDB returned for the course, the fees panel took
+  the minimum across rows, and neither asked whether the row it landed on was one a
+  customer could act on. AS1796 Cert 10 advertised a price belonging to a session that had
+  already run; /courses/iwe advertised "From $60" off a row called "IWE Module 1 Test"
+  against a single bookable session at $18,786.36.
+
+  A row may set a price when ALL of:
+
+    - it is not a MODULE row. `courses.is_module` marks a session of one module of a
+      course, which exists so the module selector can price it and so the Worker can
+      read the same row (`hubdb-pricing.ts`). A module is cheaper than the course that
+      contains it, so left in the minimum it drags every headline "From" price down to
+      the cheapest module - the Ref 40 / Ref 46 fault with a new cause;
+    - it has not already STARTED. The Worker's own default cutoff
+      (`registration_closes_at` NULL resolves to `starts_at`, migration 0038), and the
+      start rather than the end, or a course that began three weeks ago keeps pricing a
+      page that can no longer sell it. A row with NO start date is kept: "we cannot tell
+      when this runs" is not evidence that it is over, which is how `hasStartDatePassed`
+      in src/shared/api/eventEngine.ts reads a missing date too;
+    - its `status` does not take it off sale: Cancelled, Sold Out or Closed (Ref 74c).
+      Editorial decisions per CLAUDE.md § 7.6, which nothing may reverse. The key list is
+      the off-sale half of HUBDB_STATUS_ALIASES in src/shared/status/sessionStatus.ts,
+      written out here rather than imported because this is a macro file and a call into
+      another imported namespace from inside a macro is not something HubL is relied on
+      for (see _member-pricing.html). tests/unit/course-from-price.test.ts fails the build
+      if the two lists come apart;
+    - there is a way to BUY it: the Event Engine (`use_event_engine` AND
+      `worker_event_id`, the pairing § 11.5 requires before any CTA routes at the
+      checkout) or a registration URL that goes somewhere. A row with neither renders as
+      "Online booking is not available for this session yet", and a price attached to
+      nothing anyone can click is the headline this rule exists to remove.
+
+  `today_key` is the caller's `local_dt | datetimeformat('%Y%m%d')`, passed in so one
+  render asks the clock once.
+
+  Returns the string 'true' or '' - HubL macros return text, so callers must |trim and
+  test for truthiness, never compare to a boolean.
+
+  `has_started` is the same date rule on its own, exported because the directory card
+  needs to BADGE a course whose sessions have all run, not merely decline to price it.
+  Without it /courses listed a finished course as an ordinary bookable card (QA ref 120,
+  Visual Welding Inspection), and the only way to hide one was the "Starting from today"
+  toggle - which also hid a rolling all-year course whose start date is in the past
+  (QA ref 107). One rule, two callers, so the price and the badge cannot disagree.
+
+  `has_ended` is the rule for LEAVING the website (QA ref 120, Weld's training team,
+  22 Sep): a session whose END date is before today is taken off every listing - the
+  directory card, the timetable, the course page's session list - instead of sitting
+  there badged. A session that has started but not finished stays, badged "Registrations
+  closed" by `has_started`, because it is still running and someone may be looking for
+  it. A row with NO end date never counts as ended: the rolling all-year Online Welding
+  Supervisor course (QA ref 107) starts in the past and must not vanish, and "we cannot
+  tell when this finishes" is not evidence that it has. Staff who want a row gone sooner
+  cancel it; nothing here deletes anything.
+
+  Usage:
+    {% import "../../templates/partials/_session-priceable.html" as wa_session %}
+    {% set _today_key = local_dt | datetimeformat('%Y%m%d') %}
+    {% if wa_session.priceable(row, _today_key) | trim %}
+    {% if wa_session.has_started(row, _today_key) | trim %}
+    {% if not wa_session.has_ended(row, _today_key) | trim %}
+#}
+
+{% macro has_started(row, today_key) %}
+{%- set _start_key = row.start_date | datetimeformat('%Y%m%d') if row.start_date else '' -%}
+{%- if _start_key and today_key and _start_key < today_key -%}true{%- endif -%}
+{% endmacro %}
+
+{% macro has_ended(row, today_key) %}
+{%- set _end_key = row.end_date | datetimeformat('%Y%m%d') if row.end_date else '' -%}
+{%- if _end_key and today_key and _end_key < today_key -%}true{%- endif -%}
+{% endmacro %}
+
+{% macro priceable(row, today_key) %}
+{%- set _status_key = row.status.name | default('', true) | string | lower | trim | replace(' ', '_') | replace('-', '_') -%}
+{%- set _has_started = has_started(row, today_key) | trim -%}
+{%- set _worker_id = row.worker_event_id | default('', true) | string | trim -%}
+{%- set _uses_engine = row.use_event_engine | default(false, true) and _worker_id -%}
+{%- set _reg_url = row.registration_url | default('', true) | string | trim -%}
+{%- set _has_reg_url = _reg_url and _reg_url != '#' -%}
+{%- if not row.is_module and not _has_started and _status_key not in ['canceled', 'cancelled', 'closed', 'registration_closed', 'registrations_closed', 'sold_out', 'soldout'] and (_uses_engine or _has_reg_url) -%}true{%- endif -%}
+{% endmacro %}

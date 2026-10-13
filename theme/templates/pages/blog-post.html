@@ -1,0 +1,289 @@
+<!--
+  templateType: blog_post
+  isAvailableForNewContent: true
+  label: Weld Australia - News & Publications Article
+-->
+{#
+  blog-post.html - Individual News & Publications article
+  URL: /news/{post_slug}
+
+  This template maps the supplied V2 "Article" design to HubSpot blog post data:
+  content.name, post_body, featured_image, blog_author, tag/topic lists, article sidebar and recent posts.
+  Hero visual refresh marker: no-radial-flare.
+#}
+{% set page_title_exact = content.html_title | default(content.name ~ ' | Weld Australia') %}
+{% set page_description = content.meta_description | default('') %}
+{% extends "../layouts/base.html" %}
+{% set _blog_fallback_image = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1299734004%20(3).jpg' %}
+{% set _blog_fallback_alt = 'Weld Australia welding and fabrication' %}
+
+{% block extra_head %}
+{% set _social_image = content.featured_image | default(_blog_fallback_image, true) %}
+{% set _social_image_alt = content.featured_image_alt_text | default(content.name, true) %}
+{% if not content.featured_image %}{% set _social_image_alt = _blog_fallback_alt %}{% endif %}
+
+<meta property="og:type" content="article">
+<meta property="og:image" content="{{ _social_image | escape_url }}">
+<meta property="og:image:alt" content="{{ _social_image_alt | escape }}">
+<meta property="article:published_time" content="{{ content.publish_date | datetimeformat('%Y-%m-%dT%H:%M:%S+00:00') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/blog.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../modules/hero.module/module.css') }}">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ content.name | escape }}",
+  "description": "{{ content.meta_description | default('') | escape }}",
+  "datePublished": "{{ content.publish_date | datetimeformat('%Y-%m-%dT%H:%M:%S+00:00') }}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Weld Australia",
+    "url": "{{ site_settings.site_url | default('https://weldaustralia.com.au') }}"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "Weld Australia"
+  },
+  "image": "{{ _social_image | escape_url }}"
+}
+</script>
+{% endblock %}
+
+{% block body_class %}wa-article-page{% endblock %}
+
+{% block body %}
+<div class="wa-blog-shell">
+  {% module "article_hero_settings" path="../../modules/news-article-hero-settings", label="Article hero settings", export_to_template_context=True %}
+  {% set article_hero_settings = widget_data.article_hero_settings.body if widget_data.article_hero_settings and widget_data.article_hero_settings.body else {} %}
+  {% set _article_read_source = content.post_body | default(content.post_summary, true) | default(content.meta_description, true) %}
+  {% set _article_word_count = _article_read_source | striptags | wordcount %}
+  {% set _article_read_minutes = (_article_word_count / 220) | round(0, 'ceil') | int %}
+  {% if _article_read_minutes < 1 %}
+    {% set _article_read_minutes = 1 %}
+  {% endif %}
+  {% set article_tag_ns = namespace(items=[]) %}
+  {% if content.tag_list and content.tag_list|length %}
+    {% set article_tag_ns.items = content.tag_list %}
+  {% elif content.topic_list and content.topic_list|length %}
+    {% set article_tag_ns.items = content.topic_list %}
+  {% elif content.tags and content.tags|length %}
+    {% set article_tag_ns.items = content.tags %}
+  {% endif %}
+  {% set _hero_eyebrow = article_hero_settings.eyebrow_text | default('Welding industry news Australia', true) %}
+  {% set _hero_summary = content.meta_description | default(content.post_summary, true) %}
+  {% if article_hero_settings.summary_override %}
+    {% set _hero_summary = article_hero_settings.summary_override %}
+  {% endif %}
+  {% set _hero_bg_src = content.featured_image | default(_blog_fallback_image, true) %}
+  {% if article_hero_settings.background_image and article_hero_settings.background_image.src %}
+    {% set _hero_bg_src = article_hero_settings.background_image.src %}
+  {% endif %}
+  {% set _fallback_tag_label = article_hero_settings.fallback_tag_label | default('Industry News', true) %}
+  {% set _fallback_tag_slug = article_hero_settings.fallback_tag_slug | default('industry-news', true) %}
+  {% set _fallback_tag_url = article_hero_settings.fallback_tag_url | default('/news/tag/industry-news/', true) %}
+
+  {% set _article_hero_image = {"src": _hero_bg_src, "alt": _social_image_alt, "width": 1200, "height": 900} %}
+  {% set _article_breadcrumb_home_label = article_hero_settings.breadcrumb_home_label | default('Home', true) %}
+  {% set _article_breadcrumb_blog_label = article_hero_settings.breadcrumb_blog_label | default('News &amp; Publications', true) %}
+  {% set _article_breadcrumb_blog_url = article_hero_settings.breadcrumb_blog_url | default('/news/', true) %}
+  {% set _article_breadcrumb_current_label = article_hero_settings.breadcrumb_current_label | default('Article', true) %}
+  {% set _article_hero_subheadline %}
+    {% if _hero_summary %}<p>{{ _hero_summary }}</p>{% endif %}
+  {% endset %}
+  {% set _article_hero_extra %}
+    {% if article_hero_settings.show_tag != false %}
+    {% if (article_tag_ns.items and article_tag_ns.items|length) or (article_hero_settings.show_fallback_tag != false and _fallback_tag_label) %}
+    <div class="wa-hero__tag-list" aria-label="Article topic">
+      {% if article_tag_ns.items and article_tag_ns.items|length %}
+      {% for tag in article_tag_ns.items %}
+        {% if loop.first %}
+          {% set _hero_tag_label = tag.name | default(tag.label, true) | default(tag, true) %}
+          {% set _hero_tag_slug = tag.slug | default(_hero_tag_label | lower | replace(' ', '-'), true) %}
+          {% set _hero_tag_url = tag.absolute_url | default('/news/tag/' ~ _hero_tag_slug ~ '/', true) %}
+        <a class="wa-hero__tag wa-hero__tag--accent" href="{{ _hero_tag_url }}">{{ _hero_tag_label }}</a>
+        {% endif %}
+      {% endfor %}
+      {% elif article_hero_settings.show_fallback_tag != false and _fallback_tag_label %}
+        <a class="wa-hero__tag wa-hero__tag--accent" href="{{ _fallback_tag_url }}">{{ _fallback_tag_label }}</a>
+      {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+    <div class="wa-hero__meta-list" aria-label="Article information">
+      <span class="wa-hero__meta-pill">Weld Australia</span>
+      <span class="wa-hero__meta-pill">
+        <time datetime="{{ content.publish_date | datetimeformat('%Y-%m-%d') }}">{{ content.publish_date | datetimeformat('%d %B %Y') }}</time>
+      </span>
+      <span class="wa-hero__meta-pill">{{ _article_read_minutes }} min read</span>
+    </div>
+  {% endset %}
+
+  <article>
+    {% set _shared_hero_id = 'blog-article-hero' %}
+    {% set _shared_hero_background = 'primary' %}
+    {% set _shared_hero_height = 'large' %}
+    {% set _shared_hero_spacing = 'default' %}
+    {% set _shared_hero_alignment = 'left' %}
+    {% set _shared_hero_accent_bar = true %}
+    {% set _shared_hero_media_type = 'image' %}
+    {% set _shared_hero_image = _article_hero_image %}
+    {% set _shared_hero_show_breadcrumb = true %}
+    {% set _shared_hero_show_breadcrumb_home = true %}
+    {% set _shared_hero_breadcrumb_home_label = _article_breadcrumb_home_label %}
+    {% set _shared_hero_breadcrumb_home_href = '/' %}
+    {% set _shared_hero_breadcrumb_parent_label = _article_breadcrumb_blog_label %}
+    {% set _shared_hero_breadcrumb_parent_href = _article_breadcrumb_blog_url %}
+    {% set _shared_hero_breadcrumb_current_label = _article_breadcrumb_current_label %}
+    {% set _shared_hero_eyebrow = _hero_eyebrow %}
+    {% set _shared_hero_headline = content.name %}
+    {% set _shared_hero_subheadline = _article_hero_subheadline %}
+    {% set _shared_hero_extra = _article_hero_extra %}
+    {% set _shared_hero_primary_label = '' %}
+    {% set _shared_hero_secondary_label = '' %}
+    {% include "../partials/shared-hero.html" %}
+
+    <section class="wa-blog-section wa-article-body-section" aria-label="Article content">
+      <div class="wa-blog-container">
+        <div class="wa-article-layout">
+          <div class="wa-article-content">
+            {{ content.post_body }}
+
+            {% if article_tag_ns.items and article_tag_ns.items|length %}
+            <div class="wa-article-tags" aria-label="Article topics">
+              {% for tag in article_tag_ns.items %}
+                {% set _article_tag_label = tag.name | default(tag.label, true) | default(tag, true) %}
+                {% set _article_tag_slug = tag.slug | default(_article_tag_label | lower | replace(' ', '-'), true) %}
+                {% set _article_tag_url = tag.absolute_url | default('/news/tag/' ~ _article_tag_slug ~ '/', true) %}
+              <a class="wa-article-tag-link" href="{{ _article_tag_url }}">{{ _article_tag_label }}</a>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+          </div>
+
+          <aside class="wa-article-sidebar" aria-label="Article sidebar">
+            <section class="wa-article-sidebar__card">
+              <h2 class="wa-article-sidebar__heading">Share this article</h2>
+              <ul class="wa-share-list">
+                <li>
+                  <a class="wa-share-link" href="https://www.linkedin.com/sharing/share-offsite/?url={{ content.absolute_url | urlencode }}" target="_blank" rel="noopener" aria-label="Share on LinkedIn">in</a>
+                </li>
+                <li>
+                  <a class="wa-share-link" href="https://twitter.com/intent/tweet?url={{ content.absolute_url | urlencode }}&amp;text={{ content.name | urlencode }}" target="_blank" rel="noopener" aria-label="Share on X">X</a>
+                </li>
+                <li>
+                  <a class="wa-share-link" href="https://www.facebook.com/sharer/sharer.php?u={{ content.absolute_url | urlencode }}" target="_blank" rel="noopener" aria-label="Share on Facebook">f</a>
+                </li>
+                <li>
+                  <a class="wa-share-link" href="mailto:?subject={{ content.name | urlencode }}&amp;body={{ content.absolute_url | urlencode }}" aria-label="Share by email">@</a>
+                </li>
+              </ul>
+            </section>
+
+            {% set _sidebar_blog_tags = blog_tags(content.blog_list_id, 250) %}
+            <section class="wa-article-sidebar__card">
+              <h2 class="wa-article-sidebar__heading">Browse by category</h2>
+              <ul class="wa-sidebar-category-list">
+                {% for tag in _sidebar_blog_tags %}
+                  {% if tag.slug and tag.live_posts|default(0)|int > 0 %}
+                  <li>
+                    <a class="wa-topic--{{ tag.slug }}" href="{{ blog_tag_url(content.blog_list_id, tag.slug) | escape_url }}">
+                      {{ tag.name | default(tag, true) }}
+                    </a>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </section>
+
+            {#- Weld Connect sidebar signup. Previously hardcoded here as a form
+                posting to /contact-us/, which never reached HubSpot. Now the
+                shared module, which embeds the form picked in its dropdown. -#}
+            {% module "article_subscribe_sidebar"
+              path="../../modules/news-subscribe",
+              layout="sidebar_card",
+              heading="Get Weld Connect",
+              body_text="Monthly industry news and insights, free to your inbox.",
+              submit_label="Subscribe",
+              note=""
+            %}
+          </aside>
+        </div>
+      </div>
+    </section>
+  </article>
+
+  {% set related_posts = blog_recent_posts(content.blog_list_id, 4) %}
+  {% set rel_ns = namespace(posts=[]) %}
+  {% for rel in related_posts %}
+    {% if rel.absolute_url != content.absolute_url and rel_ns.posts|length < 3 %}
+      {% set rel_ns.posts = rel_ns.posts + [rel] %}
+    {% endif %}
+  {% endfor %}
+
+  {% if rel_ns.posts|length %}
+  <section class="wa-blog-section wa-blog-section--surface" aria-labelledby="wa-related-articles-heading">
+    <div class="wa-blog-container">
+      <div class="wa-article-related__head">
+        <div>
+          <p class="wa-blog-overline">Keep reading</p>
+          <h2 class="wa-blog-section-head__title" id="wa-related-articles-heading">More from News &amp; Publications</h2>
+        </div>
+        <a class="wa-article-related__all" href="/news/">
+          View all articles
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="wa-blog-grid">
+        {% for post in rel_ns.posts %}
+        {% set _related_image_src = post.featured_image | default(_blog_fallback_image, true) %}
+        {% set _related_image_alt = post.featured_image_alt_text | default(post.name, true) %}
+        {% if not post.featured_image %}{% set _related_image_alt = _blog_fallback_alt %}{% endif %}
+        <a class="wa-blog-card" href="{{ post.absolute_url }}">
+          <div class="wa-blog-card__media">
+            {% if _related_image_src %}
+            <img
+              src="{{ _related_image_src | escape_url }}"
+              alt="{{ _related_image_alt | escape }}"
+              loading="lazy"
+            >
+            {% endif %}
+            {% if post.tag_list %}
+            <span class="wa-blog-card__tag-wrap">
+              {% for tag in post.tag_list %}
+                {% if loop.first %}
+                <span class="wa-topic-tag wa-topic-tag--{{ tag.slug }}">{{ tag.name }}</span>
+                {% endif %}
+              {% endfor %}
+            </span>
+            {% endif %}
+          </div>
+          <div class="wa-blog-card__body">
+            <h3 class="wa-blog-card__title">{{ post.name }}</h3>
+            <p class="wa-blog-card__excerpt">{{ post.meta_description | default(post.post_summary | striptags | truncate(135)) }}</p>
+          </div>
+          <div class="wa-blog-card__footer">
+            <span class="wa-blog-card__date">{{ post.publish_date | datetimeformat('%d %b %Y') }}</span>
+            <span class="wa-blog-card__arrow" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24">
+                <path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {#- Weld Connect subscribe banner. Previously hardcoded here as a form posting
+      to /contact-us/, which never reached HubSpot. Now the same module the news
+      listing uses, with a form picker dropdown. -#}
+  {% module "article_news_subscribe" path="../../modules/news-subscribe" %}
+</div>
+{% endblock %}

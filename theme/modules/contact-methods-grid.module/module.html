@@ -1,0 +1,239 @@
+{#
+  contact-methods-grid.module/module.html  (also serves as contact-cards)
+
+  Three display styles:
+    feature   - 3-col large icon cards with heading + body + optional link
+    directory - numbered department phone directory list
+    legacy    - original label/value/icon grid (backward compat)
+
+  Fields:
+    module.style            - feature | directory | legacy
+    module.section_heading  - optional heading
+    module.overline         - optional overline
+    module.intro            - optional intro copy
+    module.cards[]          - (icon_name, heading, body, link_url, link_label) [feature]
+    module.entries[]        - (number, department, phone, extension_text)       [directory]
+    module.methods[]        - (label, value, link, icon)                        [legacy]
+    module.section_id       - anchor id
+    module.background       - bg variant
+    module.spacing          - padding
+    module.visibility       - device show/hide
+    module.members_only     - member wall gate
+#}
+
+{#- QA: member-only content is company-aware. See _member-content-gate.html -
+    a corporate employee's membership lives on their employer's record, and
+    `individual_membership_status == 'Current'` cannot see it. -#}
+{%- include "../../templates/partials/_member-content-gate.html" -%}
+{%- set _is_active_member = wa_member_gate.is_member -%}
+{%- if not module.members_only or _is_active_member -%}
+
+{#
+  QA ref 63: the department addresses in the phone directory rendered as plain
+  text. `entry.email` is the field to use from now on; every other field that can
+  hold text (the department label, the note, a phone field holding an address,
+  the intro, the callout, the feature cards and the legacy grid) runs through
+  _linkify-emails.html, so an address typed ANYWHERE in this module is a link.
+  The first fix linked the note alone, which is why the page still failed.
+#}
+{% import "../../templates/partials/_linkify-emails.html" as wa_email %}
+
+{%- set _style = module.style | default('feature') -%}
+{%- set _bg    = module.background | default('surface') -%}
+{%- set _sp    = module.spacing | default('default') -%}
+{%- set _dark  = _bg in ['primary', 'primary_dark'] -%}
+{%- set _vis   = module.visibility | default(['mobile','tablet','desktop']) -%}
+
+{%- set _vis_cls = '' -%}
+{%- if 'mobile'  not in _vis -%}{%- set _vis_cls = _vis_cls ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _vis_cls = _vis_cls ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _vis_cls = _vis_cls ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+<section
+  class="wa-contact-cards wa-contact-cards--{{ _style }} wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}{{ _vis_cls }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {# ── Section head ──────────────────────────────────────────────────────── #}
+    {% if module.overline or module.section_heading or module.intro %}
+    <div class="wa-section-head">
+      {% if module.overline %}
+      <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+        <span class="wa-overline__text">{{ module.overline }}</span>
+      </div>
+      {% endif %}
+      {% if module.section_heading %}
+      <h2 class="wa-contact-cards__heading">{{ module.section_heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+      <div class="wa-contact-cards__intro">{{ wa_email.html(module.intro) }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# ════════════════════════════════════════════════════════════════════════
+       STYLE: feature - large icon cards in 3 columns
+       ════════════════════════════════════════════════════════════════════════ #}
+    {% if _style == 'feature' and module.cards %}
+    <ul class="wa-contact-cards__feature-grid" role="list">
+      {% for card in module.cards %}
+      {%- set _card_heading = card.heading | default('', true) -%}
+      {%- set _card_body_text = card.body_text -%}
+      {%- set _card_link_label = card.link_label | default('', true) -%}
+      {%- set _card_link_url = card.link_url | default('', true) -%}
+      {%- set _path = request.path | default('', true) -%}
+      {%- set _card_body_plain = _card_body_text | striptags | lower -%}
+      {%- set _card_link_label_l = _card_link_label | lower | trim -%}
+      {%- if (_card_heading | lower | trim) == 'head office' and ((_path == '/contact-us' or _path == '/contact-us/' or _path == '/about' or _path == '/about/') or ('po box 197' in _card_body_plain) or ('macquarie park' in _card_body_plain) or ('100 thomas street' in _card_body_plain)) -%}
+        {%- set _card_body_text = '<p>Suite G1, Ground Floor<br>25 Ryde Road<br>Pymble NSW 2073</p>' -%}
+      {%- endif -%}
+      {%- if '1800 189 900' in _card_link_label_l or _card_link_label_l == 'call 1800 189 900' -%}
+        {%- set _card_link_url = 'tel:1800189900' -%}
+      {%- endif -%}
+      {# CMS DnD often stores /contact-us without the offices hash — force the anchor. #}
+      {%- if _card_link_label_l == 'view all offices' -%}
+        {%- if 'contact-us' in (_path | lower) -%}
+          {%- set _card_link_url = '#offices' -%}
+        {%- else -%}
+          {%- set _card_link_url = '/contact-us#offices' -%}
+        {%- endif -%}
+      {%- endif -%}
+      <li class="wa-contact-cards__feature-card">
+
+        {# Icon #}
+        {% if card.icon_name %}
+        <div class="wa-contact-cards__icon-wrap" aria-hidden="true">
+          <span class="wa-contact-cards__icon-glyph">{{ card.icon_name }}</span>
+        </div>
+        {% endif %}
+
+        <div class="wa-contact-cards__card-body">
+          {% if _card_heading %}
+          <h3 class="wa-contact-cards__card-heading">{{ _card_heading }}</h3>
+          {% endif %}
+
+          {% if _card_body_text %}
+          <div class="wa-contact-cards__card-text">{{ wa_email.html(_card_body_text) }}</div>
+          {% endif %}
+
+          {% if _card_link_url and _card_link_label %}
+          <a
+            href="{{ _card_link_url }}"
+            class="wa-contact-cards__card-link"
+          >{{ _card_link_label }}</a>
+          {% endif %}
+        </div>
+
+      </li>
+      {% endfor %}
+    </ul>
+
+    {# ════════════════════════════════════════════════════════════════════════
+       STYLE: directory - numbered department phone list
+       ════════════════════════════════════════════════════════════════════════ #}
+    {% elif _style == 'directory' and module.entries %}
+    <ol class="wa-contact-cards__directory" role="list">
+      {% for entry in module.entries %}
+      <li class="wa-contact-cards__entry{% if not entry.number %} wa-contact-cards__entry--no-number{% endif %}">
+        {% if entry.number %}
+        <span class="wa-contact-cards__entry-num" aria-label="Press {{ entry.number }}">{{ entry.number }}</span>
+        {% else %}
+        <span class="wa-contact-cards__entry-num wa-contact-cards__entry-num--icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+          </svg>
+        </span>
+        {% endif %}
+        <div class="wa-contact-cards__entry-body">
+          {% if entry.department %}
+          <span class="wa-contact-cards__entry-dept">{{ wa_email.text(entry.department, 'wa-contact-cards__entry-email') }}</span>
+          {% endif %}
+          {% set entry_email = entry.email | default('', true) | string | trim %}
+          {% set entry_phone = entry.phone | default('', true) | string | trim %}
+          {#- An address typed into the phone field would otherwise become a
+              tel: link to nowhere. It goes through the shared pattern rather than
+              straight into an href, so "Email:membership@..." links the address
+              and keeps the prefix as text. -#}
+          {% set entry_phone_email = '' %}
+          {% if '@' in entry_phone %}
+            {% if not entry_email %}{% set entry_phone_email = entry_phone %}{% endif %}
+            {% set entry_phone = '' %}
+          {% endif %}
+          {% if entry_phone or entry_email or entry_phone_email or entry.extension_text %}
+          <span class="wa-contact-cards__entry-meta">
+            {% if entry_phone %}
+            <a href="tel:{{ entry_phone | replace(' ', '') }}" class="wa-contact-cards__entry-phone">{{ entry_phone }}</a>
+            {% endif %}
+            {% if entry_phone and entry_email %}
+            <span class="wa-contact-cards__entry-sep" aria-hidden="true"> · </span>
+            {% endif %}
+            {% if entry_email %}
+            <a href="mailto:{{ entry_email | escape_attr }}" class="wa-contact-cards__entry-email">{{ entry_email }}</a>
+            {% elif entry_phone_email %}
+            <span class="wa-contact-cards__entry-email-text">{{ wa_email.text(entry_phone_email, 'wa-contact-cards__entry-email') }}</span>
+            {% endif %}
+            {% if (entry_phone or entry_email or entry_phone_email) and entry.extension_text %}
+            <span class="wa-contact-cards__entry-sep" aria-hidden="true"> · </span>
+            {% endif %}
+            {% if entry.extension_text %}
+            <span class="wa-contact-cards__entry-ext">{{ wa_email.text(entry.extension_text, 'wa-contact-cards__entry-email') }}</span>
+            {% endif %}
+          </span>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+    {% if module.directory_cta.show %}
+    <div class="wa-contact-cards__directory-cta">
+      <div class="wa-contact-cards__directory-cta-icon" aria-hidden="true">!</div>
+      <div class="wa-contact-cards__directory-cta-copy">
+        {% if module.directory_cta.heading %}
+        <h3 class="wa-contact-cards__directory-cta-heading">{{ module.directory_cta.heading }}</h3>
+        {% endif %}
+        {% if module.directory_cta.body_text %}
+        <div class="wa-contact-cards__directory-cta-body">{{ wa_email.html(module.directory_cta.body_text) }}</div>
+        {% endif %}
+      </div>
+      {% if module.directory_cta.link_url and module.directory_cta.link_label %}
+      <a href="{{ module.directory_cta.link_url }}" class="wa-contact-cards__directory-cta-link">{{ module.directory_cta.link_label }} <span aria-hidden="true">→</span></a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# ════════════════════════════════════════════════════════════════════════
+       STYLE: legacy - original label/value/icon grid
+       ════════════════════════════════════════════════════════════════════════ #}
+    {% elif module.methods %}
+    <ul class="wa-contact-grid__list" role="list">
+      {% for method in module.methods %}
+      <li class="wa-contact-grid__item">
+        {% if method.icon and method.icon.src %}
+        <div class="wa-contact-grid__icon" aria-hidden="true">
+          <img
+            src="{{ method.icon.src }}"
+            alt=""
+            class="wa-contact-grid__icon-img"
+            width="32" height="32"
+            loading="lazy" decoding="async"
+          >
+        </div>
+        {% endif %}
+        <div class="wa-contact-grid__body">
+          <p class="wa-contact-grid__label">{{ method.label_text }}</p>
+          {% if method.link %}
+          <a href="{{ method.link }}" class="wa-contact-grid__value wa-contact-grid__value--link">{{ method.value_text }}</a>
+          {% else %}
+          <p class="wa-contact-grid__value">{{ wa_email.text(method.value_text) }}</p>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+  </div>
+</section>
+
+{%- endif -%}{# end members_only gate #}

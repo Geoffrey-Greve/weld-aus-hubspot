@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A11y Test - Member Dashboard</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/assets/css/components.css" />
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    a.skip-to-content {
+      position: absolute; left: -9999px; top: 0; z-index: 9999;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; min-width: 44px;
+      padding: 0.5rem 1rem; background: #002f5f; color: #fff;
+    }
+    a.skip-to-content:focus { left: 0; }
+  </style>
+  <script>
+    window.__WELD_MEMBER__ = {
+      contact: {
+        id: 'test-001',
+        firstName: 'Ryan',
+        lastName: 'Jones',
+        email: 'ryan@example.com.au',
+        membershipTier: 'individual',
+        membershipStatus: 'active',
+        membershipExpiry: '2027-06-30',
+        nextCourse: {
+          name: 'AS1796 Cert 10',
+          date: '2026-08-04',
+          location: 'Sydney'
+        }
+      },
+      associations: [],
+      activeContext: 'personal',
+      certifications: [
+        {
+          type: 'as1796',
+          status: 'Active',
+          expiry: '2027-12-31',
+          certificateUrl: 'https://cdn.example.com/certs/as1796-001.pdf',
+          currentStep: 'evidence_review'
+        }
+      ],
+      entitlements: {
+        canDownloadResources: true,
+        isPrimaryAdmin: false
+      }
+    }
+  </script>
+</head>
+<body>
+  <a class="skip-to-content" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <div
+      data-wa-module="member-dashboard"
+      data-props='{
+        "welcome_message": "Welcome back",
+        "expiry_warning_days": 60,
+        "tiles": [
+          { "tile_type": "welcome_banner", "tile_heading_override": "", "tile_visible": true },
+          { "tile_type": "smart_alerts", "tile_heading_override": "", "tile_visible": true },
+          { "tile_type": "membership_status", "tile_heading_override": "", "tile_visible": true },
+          { "tile_type": "certifications", "tile_heading_override": "", "tile_visible": true },
+          { "tile_type": "upcoming_courses", "tile_heading_override": "", "tile_visible": true },
+          { "tile_type": "registered_events", "tile_heading_override": "", "tile_visible": true },
+          { "tile_type": "invoices", "tile_heading_override": "", "tile_visible": true },
+          { "tile_type": "geo_events", "tile_heading_override": "", "tile_visible": true }
+        ],
+        "renewal_url": "/membership/",
+        "support_email": "office@weldaustralia.com.au",
+        "member_state": "NSW",
+        "geo_events": [],
+        "registered_events": [],
+        "invoices": [
+          {
+            "deal_id": "inv-001",
+            "deal_name": "AS1796 Cert 10 - August 2026",
+            "invoice_date": "2026-06-01",
+            "amount_display": "$980.00",
+            "pdf_url": "https://cdn.example.com/invoices/inv-001.pdf"
+          }
+        ],
+        "resources_for_you": []
+      }'
+    ></div>
+  </main>
+  <script type="module" src="/src/modules/member-dashboard/index.tsx"></script>
+</body>
+</html>

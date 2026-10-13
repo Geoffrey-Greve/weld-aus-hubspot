@@ -1,0 +1,634 @@
+<!--
+  templateType: none
+-->
+﻿{#
+  job-detail-body.html - Body for Job Board dynamic detail rows.
+  Expects dynamic_page_hubdb_row from the parent template.
+#}
+{% set _row = dynamic_page_hubdb_row %}
+{% import "../partials/_job-apply.html" as ja %}
+
+{#
+  apply_attrs - href/target for a normal (non-email) Apply CTA.
+  Email-apply roles use obfuscated data-job-apply-* attrs instead (defect 68).
+#}
+{% macro apply_attrs(href, new_tab) %}
+  href="{{ href }}"{% if new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}
+{% endmacro %}
+
+{% set _job_title = _row.job_title | default('Welding opportunity', true) %}
+{% set _company = _row.company_name | default('Weld Australia member employer', true) %}
+{% set _job_type = _row.job_type.name | default(_row.job_type, true) | default('', true) %}
+{% set _state = _row.job_state.name | default(_row.job_state, true) | default('', true) %}
+{% set _location = _row.job_location | default('', true) %}
+{% set _arrangement_raw = _row.arrangement.name | default(_row.arrangement, true) | default('', true) %}
+{% set _arrangement_lower = _arrangement_raw | lower %}
+{% if _arrangement_lower == 'on-site' or _arrangement_lower == 'on site' or _arrangement_lower == 'onsite' %}
+  {% set _arrangement = 'On-site' %}
+{% elif _arrangement_lower == 'fly-in fly-out' or _arrangement_lower == 'fifo' %}
+  {% set _arrangement = 'FIFO' %}
+{% else %}
+  {% set _arrangement = _arrangement_raw %}
+{% endif %}
+{% set _sector = _row.sector.name | default(_row.sector, true) | default('Welding and fabrication', true) %}
+{% set _category = _row.category.name | default(_row.category, true) | default('Welding role', true) %}
+{% set _salary = _row.salary | default('Competitive', true) %}
+{% set _salary_note = _row.salary_note | default('Salary details on application', true) %}
+{% set _salary_note_text = _salary_note | striptags | trim %}
+{% set _reference = _row.ref | default(_row.hs_id, true) | default('', true) %}
+{% set _excerpt = _row.excerpt | default('', true) %}
+{% if not _excerpt and _row.job_description %}
+  {% set _excerpt = _row.job_description | striptags | truncate(190) %}
+{% endif %}
+{% if not _excerpt %}
+  {% set _excerpt = 'Explore this welding, fabrication or manufacturing opportunity advertised through the Weld Australia Jobs Board.' %}
+{% endif %}
+
+{% set _job_slug = _row.hs_path | default(_row.path, true) | default(_row.slug, true) | default('', true) %}
+{% set _apply_mode = ja.apply_mode(_row) | trim %}
+{% set _apply_web_url = ja.apply_url(_row) | trim %}
+{% set _apply_fallback_url = ja.contact_fallback_url(_row) | trim %}
+{% set _apply_subject = 'Application: ' ~ (_job_title | striptags) %}
+{% if _reference %}
+  {% set _apply_subject = _apply_subject ~ ' (ref ' ~ (_reference | striptags) ~ ')' %}
+{% endif %}
+
+{% if _apply_mode == 'url' %}
+  {% set _apply_href = _apply_web_url %}
+  {% set _apply_new_tab = true %}
+{% elif _apply_mode == 'email' %}
+  {#- Progressive enhancement: without JS, scroll to #apply. With JS, open mailto. -#}
+  {% set _apply_href = '#apply' %}
+  {% set _apply_new_tab = false %}
+{% else %}
+  {% set _apply_href = _apply_fallback_url %}
+  {% set _apply_new_tab = false %}
+{% endif %}
+
+{% set _location_label = '' %}
+{% if _location %}
+  {% set _location_label = _location %}
+  {% if _state %}
+    {% set _location_label = _location_label ~ ', ' ~ _state %}
+  {% endif %}
+{% elif _state %}
+  {% set _location_label = _state %}
+{% else %}
+  {% set _location_label = 'Australia' %}
+{% endif %}
+
+{% set _closing_label = '' %}
+{% if _row.closing_date %}
+  {% set _closing_label = _row.closing_date | datetimeformat('%d %b %Y') %}
+{% endif %}
+{% set _posted_label = '' %}
+{% if _row.date_posted %}
+  {% set _posted_label = _row.date_posted | datetimeformat('%d %b %Y') %}
+{% endif %}
+
+{% set _category_key = 'trades' %}
+{% set _category_lower = (_category ~ ' ' ~ _job_title) | lower %}
+{% if 'inspector' in _category_lower or 'quality' in _category_lower %}
+  {% set _category_key = 'inspection' %}
+{% elif 'supervisor' in _category_lower or 'management' in _category_lower or 'manager' in _category_lower or 'lead' in _category_lower %}
+  {% set _category_key = 'leadership' %}
+{% elif 'apprentice' in _category_lower %}
+  {% set _category_key = 'apprenticeships' %}
+{% elif 'engineer' in _category_lower or 'technologist' in _category_lower %}
+  {% set _category_key = 'engineering' %}
+{% endif %}
+
+{% set _job_detail_subheadline %}
+  <p class="wa-job-detail-hero__company">{{ _company }}</p>
+  <p class="wa-job-detail-hero__summary">{{ _excerpt }}</p>
+{% endset %}
+
+{% set _job_detail_extra %}
+  <div class="wa-job-detail-hero__badges">
+    <span class="wa-job-detail-category wa-job-detail-category--{{ _category_key }}">{{ _category }}</span>
+    {% if _row.is_featured %}
+      <span class="wa-job-detail-pill wa-job-detail-pill--featured">Featured</span>
+    {% endif %}
+  </div>
+
+  <div class="wa-job-detail-hero__facts" aria-label="Role summary">
+    <div class="wa-job-detail-fact">
+      <span class="wa-job-detail-fact__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.1 7-11a7 7 0 0 0-14 0c0 5.9 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      </span>
+      <span>
+        <strong>{{ _location_label }}</strong>
+        {% if _arrangement %}<small>{{ _arrangement }}</small>{% endif %}
+      </span>
+    </div>
+    <div class="wa-job-detail-fact">
+      <span class="wa-job-detail-fact__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>
+      </span>
+      <span>
+        <strong>{{ _job_type | default('Employment type TBC', true) }}</strong>
+        <small>{{ _sector }}</small>
+      </span>
+    </div>
+    <div class="wa-job-detail-fact">
+      <span class="wa-job-detail-fact__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V7a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h14a1 1 0 0 1 1 1Z"/><path d="M3 8v9a2 2 0 0 0 2 2h15v-5"/><path d="M16 14h6v5h-6a2.5 2.5 0 0 1 0-5Z"/></svg>
+      </span>
+      <span>
+        <strong>{{ _salary }}</strong>
+        {% if _salary_note_text %}<small>{{ _salary_note_text }}</small>{% endif %}
+      </span>
+    </div>
+  </div>
+{% endset %}
+
+{% set _job_detail_apply_card %}
+  <aside class="wa-job-detail-apply-card" aria-label="Apply for this role">
+    <div class="wa-job-detail-apply-card__salary">
+      <span>Salary</span>
+      <strong>{{ _salary }}</strong>
+      {% if _salary_note_text %}<small>{{ _salary_note_text }}</small>{% endif %}
+    </div>
+
+    <dl class="wa-job-detail-apply-card__list">
+      {% if _job_type %}
+        <div><dt>Employment</dt><dd>{{ _job_type }}</dd></div>
+      {% endif %}
+      {% if _arrangement %}
+        <div><dt>Arrangement</dt><dd>{{ _arrangement }}</dd></div>
+      {% endif %}
+      <div><dt>Location</dt><dd>{{ _location_label }}</dd></div>
+      {% if _closing_label %}
+        <div><dt>Closes</dt><dd>{{ _closing_label }}</dd></div>
+      {% endif %}
+    </dl>
+
+    {% if _apply_mode == 'email' %}
+      <a class="btn btn-primary wa-job-detail-apply-card__cta" href="{{ _apply_href }}"{{ ja.obfuscated_apply_attrs(_row, _apply_subject) }}>Apply for this role</a>
+      <p class="wa-job-detail-apply-card__meta">Opens your email app to contact the employer directly.</p>
+    {% else %}
+      <a class="btn btn-primary wa-job-detail-apply-card__cta" {{ apply_attrs(_apply_href, _apply_new_tab) }}>Apply for this role</a>
+    {% endif %}
+
+    {% if _reference or _posted_label %}
+      <p class="wa-job-detail-apply-card__meta">
+        {% if _reference %}Ref {{ _reference }}{% endif %}
+        {% if _reference and _posted_label %}<span aria-hidden="true">Â·</span>{% endif %}
+        {% if _posted_label %}posted {{ _posted_label }}{% endif %}
+      </p>
+    {% endif %}
+  </aside>
+{% endset %}
+
+{% set _shared_hero_id = 'job-detail-hero' %}
+{% set _shared_hero_section_id = 'wa-job-detail' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'large' %}
+{% set _shared_hero_spacing = 'default' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = 'text' %}
+{% set _shared_hero_media_text = _job_detail_apply_card %}
+{% set _shared_hero_show_breadcrumb = true %}
+{% set _shared_hero_show_breadcrumb_home = false %}
+{% set _shared_hero_breadcrumb_parent_label = 'Jobs Board' %}
+{% set _shared_hero_breadcrumb_parent_href = '/job-board' %}
+{% set _shared_hero_breadcrumb_current_label = _category %}
+{% set _shared_hero_eyebrow = 'Jobs board' %}
+{% set _shared_hero_headline = _job_title %}
+{% set _shared_hero_subheadline = _job_detail_subheadline %}
+{% set _shared_hero_extra = _job_detail_extra %}
+{% include "./shared-hero.html" %}
+
+{% if false %}
+{# Legacy hero markup replaced by shared-hero in Batch 4. #}
+<section class="wa-job-detail-hero wa-job-detail-hero--{{ _category_key }}" aria-labelledby="wa-job-detail-heading">
+  <div class="wa-job-detail-hero__orb wa-job-detail-hero__orb--gold" aria-hidden="true"></div>
+  <div class="wa-job-detail-hero__orb wa-job-detail-hero__orb--pink" aria-hidden="true"></div>
+
+  <div class="container wa-job-detail-hero__inner">
+    <div class="wa-job-detail-hero__content">
+      <nav class="wa-job-detail-breadcrumb wa-job-detail-breadcrumb--light" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/job-board">Jobs Board</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page">{{ _category }}</li>
+        </ol>
+      </nav>
+
+      <div class="wa-job-detail-hero__badges">
+        <span class="wa-job-detail-category wa-job-detail-category--{{ _category_key }}">{{ _category }}</span>
+        {% if _row.is_featured %}
+          <span class="wa-job-detail-pill wa-job-detail-pill--featured">Featured</span>
+        {% endif %}
+      </div>
+
+      <div class="wa-job-detail-hero__heading-row">
+        <div class="wa-job-detail-company-mark" aria-hidden="true">
+          {{ _company | striptags | truncate(2, true, '') }}
+        </div>
+        <div class="wa-job-detail-hero__title-wrap">
+          <h1 id="wa-job-detail-heading">{{ _job_title }}</h1>
+          <p class="wa-job-detail-hero__company">{{ _company }}</p>
+        </div>
+      </div>
+
+      <p class="wa-job-detail-hero__summary">{{ _excerpt }}</p>
+
+      <div class="wa-job-detail-hero__facts" aria-label="Role summary">
+        <div class="wa-job-detail-fact">
+          <span class="wa-job-detail-fact__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.1 7-11a7 7 0 0 0-14 0c0 5.9 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          </span>
+          <span>
+            <strong>{{ _location_label }}</strong>
+            {% if _arrangement %}<small>{{ _arrangement }}</small>{% endif %}
+          </span>
+        </div>
+        <div class="wa-job-detail-fact">
+          <span class="wa-job-detail-fact__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>
+          </span>
+          <span>
+            <strong>{{ _job_type | default('Employment type TBC', true) }}</strong>
+            <small>{{ _sector }}</small>
+          </span>
+        </div>
+        <div class="wa-job-detail-fact">
+          <span class="wa-job-detail-fact__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V7a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h14a1 1 0 0 1 1 1Z"/><path d="M3 8v9a2 2 0 0 0 2 2h15v-5"/><path d="M16 14h6v5h-6a2.5 2.5 0 0 1 0-5Z"/></svg>
+          </span>
+          <span>
+            <strong>{{ _salary }}</strong>
+            {% if _salary_note_text %}<small>{{ _salary_note_text }}</small>{% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <aside class="wa-job-detail-apply-card" aria-label="Apply for this role">
+      <div class="wa-job-detail-apply-card__salary">
+        <span>Salary</span>
+        <strong>{{ _salary }}</strong>
+        {% if _salary_note_text %}<small>{{ _salary_note_text }}</small>{% endif %}
+      </div>
+
+      <dl class="wa-job-detail-apply-card__list">
+        {% if _job_type %}
+          <div><dt>Employment</dt><dd>{{ _job_type }}</dd></div>
+        {% endif %}
+        {% if _arrangement %}
+          <div><dt>Arrangement</dt><dd>{{ _arrangement }}</dd></div>
+        {% endif %}
+        <div><dt>Location</dt><dd>{{ _location_label }}</dd></div>
+        {% if _closing_label %}
+          <div><dt>Closes</dt><dd>{{ _closing_label }}</dd></div>
+        {% endif %}
+      </dl>
+
+      {% if _apply_mode == 'email' %}
+        <a class="btn btn-primary wa-job-detail-apply-card__cta" href="{{ _apply_href }}"{{ ja.obfuscated_apply_attrs(_row, _apply_subject) }}>Apply for this role</a>
+        <p class="wa-job-detail-apply-card__meta">Opens your email app to contact the employer directly.</p>
+      {% else %}
+        <a class="btn btn-primary wa-job-detail-apply-card__cta" {{ apply_attrs(_apply_href, _apply_new_tab) }}>Apply for this role</a>
+      {% endif %}
+
+      {% if _reference or _posted_label %}
+        <p class="wa-job-detail-apply-card__meta">
+          {% if _reference %}Ref {{ _reference }}{% endif %}
+          {% if _reference and _posted_label %}<span aria-hidden="true">·</span>{% endif %}
+          {% if _posted_label %}posted {{ _posted_label }}{% endif %}
+        </p>
+      {% endif %}
+    </aside>
+  </div>
+  <span class="wa-job-detail-hero__accent" aria-hidden="true"></span>
+</section>
+
+{% endif %}
+
+<section class="wa-job-detail-body wa-section wa-section--surface wa-section--spacious" id="job-details">
+  <div class="container">
+    <div class="wa-job-detail-body__grid">
+      <article class="wa-job-detail-content">
+        <section class="wa-job-detail-content__section" aria-labelledby="job-about-heading">
+          <h2 id="job-about-heading">About the role</h2>
+          {% if _row.job_description %}
+            <div class="wa-job-detail-prose">{{ _row.job_description }}</div>
+          {% else %}
+            <p>This opportunity is advertised through the Weld Australia Jobs Board on behalf of {{ _company }}.</p>
+          {% endif %}
+          <p>This opportunity sits within the {{ _sector }} sector and is a {{ _job_type | lower | default('role', true) }}{% if _arrangement %}, {{ _arrangement | lower }}{% endif %} position based in {{ _location_label }}.</p>
+        </section>
+
+        <section class="wa-job-detail-content__section" aria-labelledby="job-responsibilities-heading">
+          <h2 id="job-responsibilities-heading">Key responsibilities</h2>
+          {% if _row.responsibilities %}
+            <div class="wa-job-detail-prose">{{ _row.responsibilities }}</div>
+          {% else %}
+            <ul class="wa-job-detail-check-list">
+              <li>Carry out welding, fabrication or technical work to the relevant Australian Standards and project specifications.</li>
+              <li>Interpret drawings, specifications, procedures or quality requirements relevant to the role.</li>
+              <li>Maintain strong safety, quality and documentation practices throughout the work.</li>
+              <li>Collaborate with supervisors, engineers, inspectors, trades and project teams to deliver reliable outcomes.</li>
+            </ul>
+          {% endif %}
+        </section>
+
+        <section class="wa-job-detail-content__section" aria-labelledby="job-requirements-heading">
+          <h2 id="job-requirements-heading">About you</h2>
+          {% if _row.requirements %}
+            <div class="wa-job-detail-prose">{{ _row.requirements }}</div>
+          {% else %}
+            <ul class="wa-job-detail-check-list">
+              <li>Relevant trade, engineering, inspection, supervision or industry experience for the advertised role.</li>
+              <li>Sound understanding of welding, fabrication, manufacturing or quality requirements.</li>
+              <li>A commitment to safe work practices, continuous improvement and professional standards.</li>
+              <li>Strong communication skills and the ability to work well with cross-functional teams.</li>
+            </ul>
+          {% endif %}
+        </section>
+
+        <section class="wa-job-detail-content__section" aria-labelledby="job-offer-heading">
+          <h2 id="job-offer-heading">What’s on offer</h2>
+          <ul class="wa-job-detail-check-list">
+            <li>{{ _salary }}{% if _salary_note_text %} - {{ _salary_note_text }}{% endif %}.</li>
+            <li>Opportunity to contribute to Australia’s welding, fabrication and manufacturing capability.</li>
+            <li>Career development and exposure to industry projects, standards and professional networks.</li>
+            <li>A role advertised through Weld Australia’s dedicated industry Jobs Board.</li>
+          </ul>
+        </section>
+
+        <section class="wa-job-detail-content__section" aria-labelledby="job-company-heading">
+          <h2 id="job-company-heading">About {{ _company }}</h2>
+          <p>{{ _company }} is advertising this role through the Weld Australia Jobs Board to connect with skilled people across Australia’s welding, fabrication and manufacturing industries.</p>
+          {% if _sector %}
+            <p>The role is connected to the {{ _sector }} sector and may suit candidates looking to apply their technical skills in a focused industry environment.</p>
+          {% endif %}
+        </section>
+
+        <section class="wa-job-detail-apply-block" id="apply" aria-labelledby="job-apply-heading">
+          <div>
+            <h2 id="job-apply-heading">Ready to apply?</h2>
+            <p>Submit your application for <strong>{{ _job_title }}</strong> at {{ _company }}{% if _closing_label %}. Applications close {{ _closing_label }}{% endif %}{% if _reference %} - quote reference {{ _reference }}{% endif %}.</p>
+          </div>
+          {#- Defect 69: the secondary "Email this job to a friend" button was a
+              bare mailto: with no recipient sitting beside "Apply now", so it
+              read as "email the employer". Sharing now lives only in the Share
+              this role card, where it is labelled for what it does. -#}
+          <div class="wa-job-detail-apply-block__actions">
+            {% if _apply_mode == 'email' %}
+              <a class="btn btn-primary" href="#apply"{{ ja.obfuscated_apply_attrs(_row, _apply_subject) }}>Apply now</a>
+              <p class="wa-job-detail-apply-hint">Opens your email app to contact the employer directly.</p>
+            {% else %}
+              <a class="btn btn-primary" {{ apply_attrs(_apply_href, _apply_new_tab) }}>Apply now</a>
+            {% endif %}
+          </div>
+        </section>
+      </article>
+
+      <aside class="wa-job-detail-sidebar" aria-label="Job tools and summary">
+        <div class="wa-job-detail-sidebar-card">
+          <p class="wa-job-detail-sidebar-card__kicker">Job snapshot</p>
+          <dl class="wa-job-detail-sidebar-list">
+            <div><dt>Role family</dt><dd>{{ _category }}</dd></div>
+            {% if _job_type %}<div><dt>Employment</dt><dd>{{ _job_type }}</dd></div>{% endif %}
+            {% if _arrangement %}<div><dt>Arrangement</dt><dd>{{ _arrangement }}</dd></div>{% endif %}
+            <div><dt>Location</dt><dd>{{ _location_label }}</dd></div>
+            <div><dt>Salary</dt><dd>{{ _salary }}</dd></div>
+            {% if _reference %}<div><dt>Reference</dt><dd>{{ _reference }}</dd></div>{% endif %}
+            {% if _closing_label %}<div><dt>Closing date</dt><dd>{{ _closing_label }}</dd></div>{% endif %}
+          </dl>
+          {% if _apply_mode == 'email' %}
+            <a class="btn btn-primary wa-job-detail-sidebar-card__cta" href="#apply"{{ ja.obfuscated_apply_attrs(_row, _apply_subject) }}>Apply for this role</a>
+          {% else %}
+            <a class="btn btn-primary wa-job-detail-sidebar-card__cta" {{ apply_attrs(_apply_href, _apply_new_tab) }}>Apply for this role</a>
+          {% endif %}
+        </div>
+
+        <div class="wa-job-detail-sidebar-card">
+          <p class="wa-job-detail-sidebar-card__kicker">Share this role</p>
+          <div class="wa-job-detail-share" aria-label="Share links">
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ content.absolute_url | urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+            <a href="mailto:?subject={{ _job_title | urlencode }}&body={{ content.absolute_url | urlencode }}" aria-label="Share this role by email - opens your email app">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            </a>
+            <button type="button" data-copy-job-url aria-label="Copy job link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+            </button>
+          </div>
+          <p class="wa-job-detail-share__hint">Sharing by email opens your own email app so you can choose who to send this role to.</p>
+          <p class="wa-job-detail-share__status" data-copy-job-status aria-live="polite"></p>
+        </div>
+
+        <div class="wa-job-detail-alert-card">
+          <span class="wa-job-detail-alert-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </span>
+          <h2>Get similar jobs</h2>
+          <p>Interested in more {{ _category | lower }} roles? Send Weld Australia a job alert request.</p>
+          <form class="wa-job-detail-alert-form" data-job-alert-form>
+            <label class="wa-visually-hidden" for="job-alert-email">Email address</label>
+            <input id="job-alert-email" type="email" name="email" placeholder="your@email.com.au" required>
+            <button class="btn btn-primary" type="submit">Request job alerts</button>
+          </form>
+          {#- Same defect class as 69: this looked like a subscribe form but
+              silently opened a mail client. Say so rather than surprise people. -#}
+          <p class="wa-job-detail-alert-form__hint">Opens your email app with a pre-written request to the Weld Australia team.</p>
+          <p class="wa-job-detail-alert-form__status" data-job-alert-status aria-live="polite"></p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% set _related_query = 'is_active__eq=true&orderBy=-is_featured&orderBy=-date_posted&limit=12' %}
+{% set _related_rows = hubdb_table_rows('jobs', _related_query) %}
+{% set _related_count_ns = namespace(count=0) %}
+{% for _candidate in _related_rows %}
+  {% if _candidate.hs_id != _row.hs_id and _related_count_ns.count < 5 %}
+    {% set _related_count_ns.count = _related_count_ns.count + 1 %}
+  {% endif %}
+{% endfor %}
+
+{% if _related_count_ns.count > 0 %}
+<section class="wa-job-detail-related wa-section wa-section--surface_alt wa-section--spacious" aria-labelledby="related-jobs-heading">
+  <div class="container">
+    <div class="wa-job-detail-related__head">
+      <div>
+        <p class="wa-job-detail-content__kicker">Keep looking</p>
+        <h2 id="related-jobs-heading">More roles you might like</h2>
+      </div>
+      <a class="wa-job-detail-related__all" href="/job-board">View all jobs <span aria-hidden="true">→</span></a>
+    </div>
+
+    <div class="wa-job-detail-related__list">
+      {% set _related_render_ns = namespace(count=0) %}
+      {% for _rel in _related_rows %}
+        {% if _rel.hs_id != _row.hs_id and _related_render_ns.count < 5 %}
+        {% set _related_render_ns.count = _related_render_ns.count + 1 %}
+        {% set _rel_type = _rel.job_type.name | default(_rel.job_type, true) | default('', true) %}
+        {% set _rel_state = _rel.job_state.name | default(_rel.job_state, true) | default('', true) %}
+        {% set _rel_arrangement_raw = _rel.arrangement.name | default(_rel.arrangement, true) | default('', true) %}
+        {% set _rel_arrangement_lower = _rel_arrangement_raw | lower %}
+        {% set _rel_arrangement_label = _rel_arrangement_raw %}
+        {% if _rel_arrangement_lower == 'on-site' or _rel_arrangement_lower == 'on site' or _rel_arrangement_lower == 'onsite' %}
+          {% set _rel_arrangement_label = 'On-site' %}
+        {% elif _rel_arrangement_lower == 'fly-in fly-out' or _rel_arrangement_lower == 'fifo' %}
+          {% set _rel_arrangement_label = 'FIFO' %}
+        {% endif %}
+        {% set _rel_category = _rel.category.name | default(_rel.category, true) | default('Welding role', true) %}
+        {% set _rel_title_lower = _rel.job_title | default('', true) | lower %}
+        {% set _rel_role_family = 'Trades & Workshop' %}
+        {% set _rel_role_key = 'trades' %}
+        {% if _rel_category == 'Inspector' or 'inspector' in _rel_title_lower or 'quality' in _rel_title_lower %}
+          {% set _rel_role_family = 'Inspection & Quality' %}
+          {% set _rel_role_key = 'inspection' %}
+        {% elif _rel_category == 'Supervisor' or _rel_category == 'Management' or 'supervisor' in _rel_title_lower or 'manager' in _rel_title_lower or 'lead' in _rel_title_lower %}
+          {% set _rel_role_family = 'Supervision & Leadership' %}
+          {% set _rel_role_key = 'leadership' %}
+        {% elif _rel_category == 'Apprentice' or 'apprentice' in _rel_title_lower %}
+          {% set _rel_role_family = 'Apprenticeships' %}
+          {% set _rel_role_key = 'apprenticeships' %}
+        {% elif _rel_category == 'Engineer' or _rel_category == 'Technologist' or 'engineer' in _rel_title_lower or 'technologist' in _rel_title_lower %}
+          {% set _rel_role_family = 'Engineering' %}
+          {% set _rel_role_key = 'engineering' %}
+        {% endif %}
+        {% set _rel_route = _rel.hs_path | default(_rel.path, true) | default(_rel.slug, true) %}
+        {% set _rel_mode = ja.apply_mode(_rel) | trim %}
+        {% set _rel_web_url = ja.apply_url(_rel) | trim %}
+        {% set _rel_detail_href = '#' %}
+        {% if _rel_route %}
+          {% set _rel_detail_href = '/job-board/' ~ _rel_route %}
+        {% elif _rel_web_url %}
+          {% set _rel_detail_href = _rel_web_url %}
+        {% endif %}
+        {#- Email-apply: obfuscated mailto on click (defect 68). -#}
+        {% set _rel_apply_subject = 'Application: ' ~ (_rel.job_title | default('role', true) | striptags) %}
+        {% if _rel.ref %}
+          {% set _rel_apply_subject = _rel_apply_subject ~ ' (ref ' ~ (_rel.ref | striptags) ~ ')' %}
+        {% endif %}
+        {% if _rel_mode == 'url' %}
+          {% set _rel_apply_href = _rel_web_url %}
+          {% set _rel_apply_new_tab = true %}
+          {% set _rel_apply_email = false %}
+        {% elif _rel_mode == 'email' %}
+          {% set _rel_apply_href = _rel_detail_href ~ '#apply' %}
+          {% set _rel_apply_new_tab = false %}
+          {% set _rel_apply_email = true %}
+        {% else %}
+          {% set _rel_apply_href = '' %}
+          {% set _rel_apply_new_tab = false %}
+          {% set _rel_apply_email = false %}
+        {% endif %}
+        {% set _rel_excerpt = _rel.excerpt | default('', true) %}
+        {% if not _rel_excerpt and _rel.job_description %}
+          {% set _rel_excerpt = _rel.job_description | striptags | truncate(190) %}
+        {% endif %}
+
+        <article class="wa-job-board-card wa-job-board-card--{{ _rel_role_key }}">
+          <div class="wa-job-board-card__identity">
+            <div class="wa-job-board-monogram wa-job-board-monogram--{{ _rel_role_key }}" aria-hidden="true">
+              {{ _rel.company_name | default('WA', true) | striptags | truncate(2, true, '') }}
+            </div>
+
+            <div class="wa-job-board-card__content">
+              <div class="wa-job-board-card__title-row">
+                <h3><a href="{{ _rel_detail_href }}">{{ _rel.job_title | default('Welding opportunity', true) }}</a></h3>
+              </div>
+              <div class="wa-job-board-card__meta">
+                {% if _rel.company_name %}
+                  <span class="wa-job-board-card__company">{{ _rel.company_name }}</span>
+                {% endif %}
+                {% if _rel.job_location or _rel_state %}
+                  <span>{% if _rel.job_location %}{{ _rel.job_location }}{% if _rel_state %}, {% endif %}{% endif %}{{ _rel_state }}</span>
+                {% endif %}
+                {% if _rel_arrangement_label %}
+                  <span>{{ _rel_arrangement_label }}</span>
+                {% endif %}
+              </div>
+              {% if _rel_excerpt %}
+                <p class="wa-job-board-card__excerpt">{{ _rel_excerpt }}</p>
+              {% endif %}
+              <div class="wa-job-board-card__tags">
+                <span class="wa-job-board-category wa-job-board-category--{{ _rel_role_key }}">{{ _rel_role_family }}</span>
+                {% if _rel_type %}
+                  <span class="wa-job-board-type">{{ _rel_type }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="wa-job-board-card__side">
+            <div class="wa-job-board-card__salary">
+              {% if _rel.salary %}
+                <span>{{ _rel.salary }}</span>
+                {% if _rel.salary_note %}<small>{{ _rel.salary_note }}</small>{% endif %}
+              {% else %}
+                <span>Competitive</span>
+                <small>Salary details on application</small>
+              {% endif %}
+            </div>
+            <div class="wa-job-board-card__actions">
+              {% if _rel.date_posted %}
+                <span class="wa-job-board-card__posted">Posted {{ _rel.date_posted | datetimeformat('%d %b %Y') }}</span>
+              {% endif %}
+              <a class="wa-job-board-card__link" href="{{ _rel_detail_href }}">View role <span aria-hidden="true">→</span></a>
+              {% if _rel_apply_href %}
+                {% if _rel_apply_email %}
+                  <a class="wa-job-board-card__apply" href="{{ _rel_apply_href }}"{{ ja.obfuscated_apply_attrs(_rel, _rel_apply_subject) }}>Apply</a>
+                {% else %}
+                  <a class="wa-job-board-card__apply" {{ apply_attrs(_rel_apply_href, _rel_apply_new_tab) }}>Apply</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </article>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<script>
+(function () {
+  // Defect 67: Save-this-role UI is hidden for now (no portal-aware saved list
+  // for individual vs corporate members). Re-enable with the listing module's
+  // SAVED_JOBS_ENABLED flag when ready.
+  var jobCategory = {{ (_category | striptags) | tojson }};
+  var jobTitle = {{ (_job_title | striptags) | tojson }};
+
+  var copyButton = document.querySelector('[data-copy-job-url]');
+  var copyStatus = document.querySelector('[data-copy-job-status]');
+  if (copyButton) {
+    copyButton.addEventListener('click', function () {
+      var url = window.location.href;
+      var done = function () {
+        if (copyStatus) copyStatus.textContent = 'Link copied.';
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done).catch(done);
+      } else {
+        done();
+      }
+    });
+  }
+
+  var alertForm = document.querySelector('[data-job-alert-form]');
+  var alertStatus = document.querySelector('[data-job-alert-status]');
+  if (alertForm) {
+    alertForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var email = alertForm.querySelector('input[type="email"]');
+      var subject = 'Job alert request - ' + jobCategory + ' roles';
+      var body = 'Please send me similar Weld Australia Jobs Board opportunities.%0A%0ARole category: ' + encodeURIComponent(jobCategory) + '%0AReference role: ' + encodeURIComponent(jobTitle) + '%0AEmail: ' + encodeURIComponent(email ? email.value : '');
+      if (alertStatus) alertStatus.textContent = 'Opening your email client...';
+      window.location.href = 'mailto:info@weldaustralia.com.au?subject=' + encodeURIComponent(subject) + '&body=' + body;
+    });
+  }
+})();
+</script>
+{% include "../partials/_job-apply-script.html" %}

@@ -1,0 +1,223 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "membership-options"
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      ["surface", "White"],
+      ["surface_alt", "Light grey"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow",
+    "type": "text",
+    "default": "Welding membership options"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Find the membership that's right for you"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext"
+  },
+  {
+    "name": "tabs",
+    "label": "Membership tabs",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 6,
+      "default": 4
+    },
+    "children": [
+      {
+        "name": "tab_key",
+        "label": "Tab key",
+        "type": "text",
+        "help_text": "Unique lowercase key, for example corporate or free."
+      },
+      {
+        "name": "tab_label",
+        "label": "Tab label",
+        "type": "text"
+      },
+      {
+        "name": "tab_badge",
+        "label": "Tab badge",
+        "type": "text"
+      },
+      {
+        "name": "tab_icon",
+        "label": "Tab icon",
+        "type": "image"
+      },
+      {
+        "name": "heading",
+        "label": "Panel heading",
+        "type": "text"
+      },
+      {
+        "name": "body_text",
+        "label": "Panel body",
+        "type": "richtext"
+      },
+      {
+        "name": "cards",
+        "label": "Membership cards",
+        "type": "group",
+        "occurrence": {
+          "min": 0,
+          "max": 8,
+          "default": 3
+        },
+        "children": [
+          {
+            "name": "title",
+            "label": "Title",
+            "type": "text"
+          },
+          {
+            "name": "subtitle",
+            "label": "Subtitle",
+            "type": "text"
+          },
+          {
+            "name": "badge_text",
+            "label": "Badge text",
+            "type": "text"
+          },
+          {
+            "name": "tier_color",
+            "label": "Tier colour",
+            "type": "choice",
+            "choices": [
+              ["gold", "Gold"],
+              ["silver", "Silver"],
+              ["bronze", "Bronze"],
+              ["navy", "Navy"],
+              ["blue", "Blue"],
+              ["green", "Green"]
+            ],
+            "default": "navy"
+          },
+          {
+            "name": "logo",
+            "label": "Logo/badge image",
+            "type": "image"
+          },
+          {
+            "name": "credit_label",
+            "label": "Credit/price label",
+            "type": "text"
+          },
+          {
+            "name": "credit_value",
+            "label": "Credit/price value",
+            "type": "text"
+          },
+          {
+            "name": "credit_sub",
+            "label": "Credit/price subtext",
+            "type": "text"
+          },
+          {
+            "name": "description",
+            "label": "Short description",
+            "type": "text"
+          },
+          {
+            "name": "benefits",
+            "label": "Benefits",
+            "type": "group",
+            "occurrence": {
+              "min": 0,
+              "max": 12
+            },
+            "children": [
+              {
+                "name": "benefit_text",
+                "label": "Benefit",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "name": "cta_label",
+            "label": "CTA label",
+            "type": "text",
+            "default": "Apply now"
+          },
+          {
+            "name": "cta_link",
+            "label": "CTA link",
+            "type": "link"
+          }
+        ]
+      },
+      {
+        "name": "side_panel",
+        "label": "Optional side panel",
+        "type": "group",
+        "children": [
+          {
+            "name": "heading",
+            "label": "Heading",
+            "type": "text"
+          },
+          {
+            "name": "items",
+            "label": "Items",
+            "type": "group",
+            "occurrence": {
+              "min": 0,
+              "max": 10
+            },
+            "children": [
+              {
+                "name": "item_text",
+                "label": "Item",
+                "type": "text"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "note",
+        "label": "Panel note",
+        "type": "richtext"
+      }
+    ]
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

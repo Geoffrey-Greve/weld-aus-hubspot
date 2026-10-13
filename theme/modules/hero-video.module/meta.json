@@ -1,0 +1,14 @@
+{
+  "label": "Hero - Video",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Hero with an embedded video (YouTube, Vimeo, or HubSpot Video), optional trust badges, and a CTA.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["hero", "video", "youtube", "vimeo", "trust-badges"]
+}

@@ -1,0 +1,67 @@
+/*
+ * google-map-embed.module/module.css
+ * Responsive aspect-ratio container for the lazy-loaded Google Maps iframe.
+ *
+ * --wa-map-height is set inline by module.html from the editor's height_px field.
+ * The wrapper maintains 100% width and the editor-specified height, making
+ * the embed responsive to container width.
+ */
+
+.wa-map-embed__figure {
+  margin: 0;
+}
+
+/* ── Aspect-ratio container ────────────────────────────────────────────── */
+.wa-map-embed__wrapper {
+  position: relative;
+  width: 100%;
+  height: var(--wa-map-height, 400px);
+  border-radius: var(--wa-radius-md, 8px);
+  overflow: hidden;
+  background-color: var(--wa-color-surface-alt, #f3f4f6);
+}
+
+.wa-map-embed__iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ── Placeholder (no URL configured) ──────────────────────────────────── */
+.wa-map-embed__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wa-space-3, 0.75rem);
+  color: var(--wa-color-text-muted);
+  font-size: 0.875rem;
+}
+
+.wa-map-embed__placeholder svg {
+  opacity: 0.4;
+}
+
+.wa-map-embed__placeholder p {
+  margin: 0;
+}
+
+/* ── Caption ───────────────────────────────────────────────────────────── */
+.wa-map-embed__caption {
+  margin-top: var(--wa-space-3, 0.75rem);
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted);
+  text-align: center;
+}
+
+/* ── Mobile override: taller map for narrow viewports ──────────────────── */
+@media (max-width: 767px) {
+  .wa-map-embed__wrapper {
+    /* Clamp to minimum 250px on small screens in case editor set a large value */
+    height: max(250px, var(--wa-map-height, 400px));
+  }
+}

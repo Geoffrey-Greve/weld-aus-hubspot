@@ -1,0 +1,32 @@
+name: Validate
+
+# Static HubSpot spec-compliance gate. Runs on every PR and push so module
+# field types, categories, content_types, names, and the theme manifest are
+# checked locally - instead of being discovered one-error-at-a-time during a
+# server-side `hs upload`. No HubSpot credentials or Vite build required.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable corepack (pnpm)
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate theme spec compliance
+        run: pnpm validate

@@ -1,0 +1,23 @@
+{
+  "name": "weld-australia-launchpad",
+  "label": "Weld Australia Launchpad",
+  "preview_path": "./templates/pages/home.html",
+  "screenshot_path": "./assets/img/theme-screenshot.png",
+  "enable_domain_stylesheets": false,
+  "version": "0.1.0",
+  "author": {
+    "name": "Refuel Creative",
+    "email": "hello@refuelcreative.com.au",
+    "url": "https://refuelcreative.com.au"
+  },
+  "responsive_breakpoints": [
+    { "name": "mobile", "mediaQuery": "(max-width: 767px)", "previewWidth": { "value": 375, "units": "px" } }
+  ],
+  "global_settings_path": "./fields.json",
+  "theme_options": {
+    "default_module_icon": "./assets/img/icons/wrench.svg",
+    "label_paths": {
+      "danger": "./assets/img/icons/danger.svg"
+    }
+  }
+}

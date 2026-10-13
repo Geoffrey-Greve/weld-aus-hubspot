@@ -1,0 +1,91 @@
+<!--
+  templateType: page
+  label: Resources Hub
+  isAvailableForNewContent: true
+-->
+{#
+  Resources Hub listing page.
+  HubDB table: resources (read-only from this template/module).
+#}
+{% set page_title = 'Welding Resources & Technical Documents' %}
+{% set page_description = "Browse Weld Australia's library of welding resources, including technical notes, standards guidance, fact sheets, webinars and industry publications." %}
+
+{% set page_title_exact = page_title ~ ' | Weld Australia' %}
+{% set page_description = page_description %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body %}
+{# Instance key is deliberately "resources_hero" (not "resources_landing_hero").
+   The retired resources-landing-hero saved body used `lead` (and a dead search
+   field); hero.module reads `subheadline`. Re-keying avoids overlaying that
+   incompatible schema onto the shared hero. show_breadcrumb stays false: the
+   retired module was passed show_breadcrumb=true but never rendered one. The
+   hero search form was dead code behind `{% if false %}` and is not carried
+   over - the resource-library module owns search. #}
+{% module
+  "resources_hero"
+  path="../../modules/hero"
+  label="Resources landing hero"
+  background="primary"
+  height="medium"
+  spacing="default"
+  alignment="left"
+  accent_bar=true
+  media_type="none"
+  show_breadcrumb=false
+  breadcrumb_parent_label="Home"
+  breadcrumb_parent_link={"url": {"href": "/", "type": "EXTERNAL"}, "open_in_new_tab": false}
+  breadcrumb_current_label="Resources"
+  eyebrow="Resources Hub"
+  headline="Welding resources & technical documents"
+  subheadline="<p>A comprehensive library of technical notes, guidance documents, fact sheets and industry publications. Many are free for everyone - others are available to Weld Australia members.</p>"
+%}
+
+{% module
+  "resources_library"
+  path="../../modules/resource-library"
+  label="Resources library"
+  section_heading="Browse resources"
+  intro="<p>Use the search and filters to find technical guidance, reports, webinars and practical tools. Access badges show which membership level is required.</p>"
+  default_filter_category="all"
+  show_file_type_filter=true
+  show_member_only_filter=true
+  page_size=9
+  locked_overlay_message="<p>This resource is available to active Weld Australia members.</p>"
+  locked_cta_label="Become a member to access"
+  locked_cta_link={
+    "url": { "type": "EXTERNAL", "href": "/membership/" },
+    "open_in_new_tab": false,
+    "no_follow": false
+  }
+  section_id="resources-library"
+%}
+
+{% module
+  "resources_membership_cta"
+  path="../../modules/cta-banner-conditional"
+  label="Resources membership CTA"
+  visitor_state="logged_out"
+  align="split"
+  section_id="resources-membership-cta"
+  eyebrow="Member resources"
+  headline="Unlock the full resource library"
+  body_text="<p>Members can access exclusive technical publications, research and practical tools. Join Weld Australia or log in to your member portal to get started.</p>"
+  cta_label="Become a member"
+  cta_link={
+    "url": { "type": "EXTERNAL", "href": "/membership/" },
+    "open_in_new_tab": false,
+    "no_follow": false
+  }
+  secondary_cta_label="Member login"
+  secondary_cta_link={
+    "url": { "type": "EXTERNAL", "href": "/_hcms/mem/login" },
+    "open_in_new_tab": false,
+    "no_follow": false
+  }
+  image_position="none"
+  background="primary"
+  spacing="spacious"
+%}
+{% endblock %}

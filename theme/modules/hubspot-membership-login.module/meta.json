@@ -1,0 +1,14 @@
+{
+  "label": "Auth - Membership login form",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Custom-styled wrapper around HubSpot's native membership login widget. Pair with auth-split-layout on login.html.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": false,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["auth", "login", "portal", "membership"]
+}

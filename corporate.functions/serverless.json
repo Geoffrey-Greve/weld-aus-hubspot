@@ -1,0 +1,15 @@
+{
+  "runtime": "nodejs20.x",
+  "version": "1.0",
+  "secrets": ["hubspot_service_key"],
+  "endpoints": {
+    "corporate/add-employee": {
+      "method": "POST",
+      "file": "add-employee.js"
+    },
+    "corporate/remove-employee": {
+      "method": "POST",
+      "file": "remove-employee.js"
+    }
+  }
+}

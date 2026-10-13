@@ -1,0 +1,109 @@
+/*
+ * hubspot-form-embed.module/module.css
+ * Generic HubSpot form embed styles.
+ */
+
+.wa-form-embed__inner {
+  max-width: 700px;
+  margin-inline: auto;
+}
+
+.wa-form-embed__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl, 1.75rem);
+  font-weight: 700;
+  color: var(--wa-color-text);
+  margin-bottom: var(--wa-space-4, 1rem);
+}
+
+.wa-section.wa-bg--primary .wa-form-embed__heading,
+.wa-section.wa-bg--primary_dark .wa-form-embed__heading {
+  color: var(--wa-color-on-primary, #fff);
+}
+
+.wa-form-embed__intro {
+  color: var(--wa-color-text-muted);
+  margin-bottom: var(--wa-space-8, 2rem);
+  line-height: 1.6;
+}
+
+.wa-section.wa-bg--primary .wa-form-embed__intro,
+.wa-section.wa-bg--primary_dark .wa-form-embed__intro {
+  color: var(--wa-color-on-primary, #fff);
+  opacity: 0.9;
+}
+
+/* ── Success state ─────────────────────────────────────────────────────── */
+.wa-form-embed__success {
+  padding: var(--wa-space-8, 2rem);
+  background-color: color-mix(in srgb, var(--wa-color-success, #1f8a4d) 10%, transparent);
+  border: 1px solid var(--wa-color-success, #1f8a4d);
+  border-radius: var(--wa-radius-md, 8px);
+  color: var(--wa-color-text);
+}
+
+/* ── HubSpot form overrides within this module ─────────────────────────── */
+.wa-form-embed__form .hs-form fieldset {
+  max-width: 100% !important;
+}
+
+.wa-form-embed__form .hs-form .hs-submit .hs-button {
+  min-height: var(--wa-touch-min, 44px);
+  padding-inline: var(--wa-space-8, 2rem);
+  background-color: var(--wa-color-primary);
+  border-color: var(--wa-color-primary);
+  border-radius: var(--wa-radius-md, 8px);
+  font-family: var(--wa-font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.wa-form-embed__form .hs-form .hs-submit .hs-button:hover,
+.wa-form-embed__form .hs-form .hs-submit .hs-button:focus-visible {
+  background-color: var(--wa-color-primary-dark, color-mix(in srgb, var(--wa-color-primary) 80%, black));
+  border-color: var(--wa-color-primary-dark, color-mix(in srgb, var(--wa-color-primary) 80%, black));
+}
+
+.wa-form-embed__form .hs-form-field label {
+  font-weight: 600;
+  color: var(--wa-color-text);
+  margin-bottom: var(--wa-space-1, 0.25rem);
+  display: block;
+}
+
+.wa-form-embed__form .hs-form input[type="email"],
+.wa-form-embed__form .hs-form input[type="text"],
+.wa-form-embed__form .hs-form input[type="tel"],
+.wa-form-embed__form .hs-form textarea,
+.wa-form-embed__form .hs-form select {
+  width: 100%;
+  min-height: var(--wa-touch-min, 44px);
+  padding: var(--wa-space-2, 0.5rem) var(--wa-space-3, 0.75rem);
+  border: 1px solid var(--wa-color-border, #d1d5db);
+  border-radius: var(--wa-radius-sm, 4px);
+  font-family: var(--wa-font-body);
+  font-size: 1rem;
+  color: var(--wa-color-text);
+  background-color: var(--wa-color-surface);
+}
+
+.wa-form-embed__form .hs-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.wa-form-embed__form .hs-form input:focus-visible,
+.wa-form-embed__form .hs-form textarea:focus-visible,
+.wa-form-embed__form .hs-form select:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+}
+
+.wa-form-embed__form .hs-error-msgs {
+  list-style: none;
+  padding: 0;
+  margin: var(--wa-space-1, 0.25rem) 0 0;
+  color: var(--wa-color-danger, #dc2626);
+  font-size: 0.875rem;
+}

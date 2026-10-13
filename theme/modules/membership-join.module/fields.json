@@ -1,0 +1,202 @@
+[
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": "Membership application"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Complete your membership application"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext",
+    "default": "<p>Review your selected membership tier, then continue to the secure payment or application step.</p>"
+  },
+  {
+    "name": "support_email",
+    "label": "Support email",
+    "type": "text",
+    "default": "membership@weldaustralia.com.au"
+  },
+  {
+    "name": "payment_unavailable_message",
+    "label": "Payment unavailable message",
+    "type": "richtext",
+    "default": "<p>The online payment link for this membership tier is not connected yet. Please contact the Weld Australia membership team and include the selected tier shown on this page.</p>"
+  },
+  {
+    "name": "application_unavailable_message",
+    "label": "Free application unavailable message",
+    "type": "richtext",
+    "default": "<p>The online application form for this free membership is not connected yet. Please contact the Weld Australia membership team and include the selected tier shown on this page.</p>",
+    "help_text": "Shown when a free/eligibility tier has no HubSpot form selected."
+  },
+  {
+    "name": "application_success_message",
+    "label": "Free application success message",
+    "type": "richtext",
+    "default": "<p>Thanks — your membership application has been received. The Weld Australia membership team will review it and be in touch within 2 business days.</p>",
+    "help_text": "Replaces the form after a successful free-tier application submit."
+  },
+  {
+    "name": "individual_price_label",
+    "label": "Individual price label",
+    "type": "text",
+    "default": "Price to be confirmed"
+  },
+  {
+    "name": "student_apprentice_price_label",
+    "label": "Student / Apprentice price label",
+    "type": "text",
+    "default": "Free"
+  },
+  {
+    "name": "reciprocal_price_label",
+    "label": "Reciprocal price label",
+    "type": "text",
+    "default": "By agreement"
+  },
+  {
+    "name": "tafe_rto_price_label",
+    "label": "TAFE / RTO price label",
+    "type": "text",
+    "default": "By agreement"
+  },
+  {
+    "name": "corporate_gold_price_label",
+    "label": "Corporate Gold price label",
+    "type": "text",
+    "default": "Price to be confirmed"
+  },
+  {
+    "name": "corporate_silver_price_label",
+    "label": "Corporate Silver price label",
+    "type": "text",
+    "default": "Price to be confirmed"
+  },
+  {
+    "name": "corporate_bronze_price_label",
+    "label": "Corporate Bronze price label",
+    "type": "text",
+    "default": "Price to be confirmed"
+  },
+  {
+    "name": "supplier_gold_price_label",
+    "label": "Supplier Gold price label",
+    "type": "text",
+    "default": "Price to be confirmed"
+  },
+  {
+    "name": "supplier_silver_price_label",
+    "label": "Supplier Silver price label",
+    "type": "text",
+    "default": "Price to be confirmed"
+  },
+  {
+    "name": "supplier_bronze_price_label",
+    "label": "Supplier Bronze price label",
+    "type": "text",
+    "default": "Price to be confirmed"
+  },
+  {
+    "name": "individual_payment_link",
+    "label": "Individual payment link",
+    "type": "link",
+    "help_text": "HubSpot payment link (or Event Engine membership checkout URL) for this paid tier. Leave blank to keep the 'request payment link' email fallback."
+  },
+  {
+    "name": "corporate_gold_payment_link",
+    "label": "Corporate Gold payment link",
+    "type": "link",
+    "help_text": "HubSpot payment link (or Event Engine membership checkout URL) for this paid tier. Leave blank to keep the 'request payment link' email fallback."
+  },
+  {
+    "name": "corporate_silver_payment_link",
+    "label": "Corporate Silver payment link",
+    "type": "link",
+    "help_text": "HubSpot payment link (or Event Engine membership checkout URL) for this paid tier. Leave blank to keep the 'request payment link' email fallback."
+  },
+  {
+    "name": "corporate_bronze_payment_link",
+    "label": "Corporate Bronze payment link",
+    "type": "link",
+    "help_text": "HubSpot payment link (or Event Engine membership checkout URL) for this paid tier. Leave blank to keep the 'request payment link' email fallback."
+  },
+  {
+    "name": "supplier_gold_payment_link",
+    "label": "Supplier Gold payment link",
+    "type": "link",
+    "help_text": "HubSpot payment link (or Event Engine membership checkout URL) for this paid tier. Leave blank to keep the 'request payment link' email fallback."
+  },
+  {
+    "name": "supplier_silver_payment_link",
+    "label": "Supplier Silver payment link",
+    "type": "link",
+    "help_text": "HubSpot payment link (or Event Engine membership checkout URL) for this paid tier. Leave blank to keep the 'request payment link' email fallback."
+  },
+  {
+    "name": "supplier_bronze_payment_link",
+    "label": "Supplier Bronze payment link",
+    "type": "link",
+    "help_text": "HubSpot payment link (or Event Engine membership checkout URL) for this paid tier. Leave blank to keep the 'request payment link' email fallback."
+  },
+  {
+    "name": "student_apprentice_application_form",
+    "label": "Student / Apprentice application form",
+    "type": "form",
+    "required": false,
+    "help_text": "Issue 251: free tiers cannot use Revenue Hub payment links. Select the HubSpot form for Student / Apprentice applications. A workflow should create/update the contact and route for eligibility review before activating membership.",
+    "default": {
+      "form_id": "842ea403-aeec-4cea-b2f6-d0a22ce8db35",
+      "response_type": "inline",
+      "message": "Thanks — your membership application has been received."
+    }
+  },
+  {
+    "name": "reciprocal_application_form",
+    "label": "Reciprocal application form",
+    "type": "form",
+    "required": false,
+    "help_text": "Issue 251: free / by-agreement tiers cannot use Revenue Hub payment links. Select the HubSpot form for Reciprocal applications.",
+    "default": {
+      "form_id": "1c03846a-c399-4750-a58d-fb735a1b18d2",
+      "response_type": "inline",
+      "message": "Thanks — your membership application has been received."
+    }
+  },
+  {
+    "name": "tafe_rto_application_form",
+    "label": "TAFE / RTO application form",
+    "type": "form",
+    "required": false,
+    "help_text": "Issue 251: free / by-agreement tiers cannot use Revenue Hub payment links. Select the HubSpot form for TAFE / Government RTO applications.",
+    "default": {
+      "form_id": "93662621-fb14-4fc1-ad52-79dd463c4c7e",
+      "response_type": "inline",
+      "message": "Thanks — your membership application has been received."
+    }
+  },
+  {
+    "name": "student_apprentice_payment_link",
+    "label": "Student / Apprentice payment link (unused)",
+    "type": "link",
+    "help_text": "Deprecated for free tiers (issue 251). Revenue Hub cannot check out $0 products. Use the Student / Apprentice application form field instead. Kept only so existing page instances do not lose the field."
+  },
+  {
+    "name": "reciprocal_payment_link",
+    "label": "Reciprocal payment link (unused)",
+    "type": "link",
+    "help_text": "Deprecated for free / by-agreement tiers (issue 251). Use the Reciprocal application form field instead."
+  },
+  {
+    "name": "tafe_rto_payment_link",
+    "label": "TAFE / RTO payment link (unused)",
+    "type": "link",
+    "help_text": "Deprecated for free / by-agreement tiers (issue 251). Use the TAFE / RTO application form field instead."
+  }
+]

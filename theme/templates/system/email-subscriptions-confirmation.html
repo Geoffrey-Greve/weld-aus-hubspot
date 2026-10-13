@@ -1,0 +1,331 @@
+<!--
+  templateType: email_subscriptions_confirmation_page
+  label: Email Subscription Confirmation
+  isAvailableForNewContent: true
+-->
+{#
+  email-subscriptions-confirmation.html - Email Subscription Preferences Confirmation Page
+  Assign in: HubSpot Settings → Website → Pages → System pages → Subscription Confirmation Page
+
+  HubSpot redirects to this page after a contact saves their subscription preferences
+  via the subscription_preferences_module. The built-in `subscription_update_module`
+  renders a confirmation message and (optionally) a link back to the site.
+
+  Variables available (HubSpot):
+    subscription_status  - "resubscribed" | "unsubscribed" | "updated"
+    updated_subscriptions - list of subscription names that were changed
+
+  Sections:
+    1. Confirmation hero - clear visual success state
+    2. Subscription update module - HubSpot built-in confirmation copy
+    3. Next steps - links back to site, portal, and popular pages
+
+  Fixed layout - no dnd_area.
+#}
+{% set page_title = "Preferences Updated" %}
+{% set page_description = "Your email preferences have been saved. Manage your Weld Australia membership, training, and certifications from the member portal." %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body_class %}page-email-subscriptions-confirmation{% endblock %}
+
+{% block body %}
+<section class="subs-confirm-page" aria-labelledby="subs-confirm-heading">
+
+  {# ── Success hero ─────────────────────────────────────────────────────────── #}
+  {% set _subscription_confirm_extra %}
+    <div class="subs-confirm-page__check-icon" aria-hidden="true">
+      <svg
+        viewBox="0 0 56 56"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        width="64"
+        height="64"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="28" cy="28" r="28" fill="currentColor" opacity="0.15"/>
+        <path
+          d="M16 28.5L23.5 36L40 20"
+          stroke="currentColor"
+          stroke-width="3.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+  {% endset %}
+
+  {% set _shared_hero_id = 'email-preferences-confirmation-hero' %}
+  {% set _shared_hero_section_id = 'subs-confirm' %}
+  {% set _shared_hero_background = 'primary' %}
+  {% set _shared_hero_height = 'compact' %}
+  {% set _shared_hero_spacing = 'spacious' %}
+  {% set _shared_hero_alignment = 'center' %}
+  {% set _shared_hero_accent_bar = true %}
+  {% set _shared_hero_media_type = 'none' %}
+  {% set _shared_hero_eyebrow = 'Email preferences' %}
+  {% set _shared_hero_headline = 'Preferences saved' %}
+  {% set _shared_hero_subheadline = "<p>Your email preferences have been updated. Changes take effect immediately - you'll only receive communications matching your selected categories.</p>" %}
+  {% set _shared_hero_extra = _subscription_confirm_extra %}
+  {% include "../partials/shared-hero.html" %}
+
+  {% if false %}
+  {# Legacy hero markup replaced by shared-hero in Batch 4. #}
+  <div class="subs-confirm-page__hero">
+    <div class="container container-narrow" style="text-align: center;">
+
+      <div class="subs-confirm-page__check-icon" aria-hidden="true">
+        <svg
+          viewBox="0 0 56 56"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          width="64"
+          height="64"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="28" cy="28" r="28" fill="currentColor" opacity="0.15"/>
+          <path
+            d="M16 28.5L23.5 36L40 20"
+            stroke="currentColor"
+            stroke-width="3.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+
+      <h1 id="subs-confirm-heading" class="subs-confirm-page__heading">
+        Preferences saved
+      </h1>
+
+      <p class="subs-confirm-page__lead">
+        Your email preferences have been updated. Changes take effect immediately -
+        you'll only receive communications matching your selected categories.
+      </p>
+
+    </div>
+  </div>
+
+  {# ── HubSpot confirmation module ──────────────────────────────────────────── #}
+  {#
+    `subscription_update_module` renders HubSpot's built-in confirmation
+    copy and any re-subscribe / change-your-mind prompts. Required for
+    HubSpot's compliance flow. Rendered below the custom hero so the
+    page structure is brand-consistent while meeting platform requirements.
+  #}
+  {% endif %}
+
+  <div class="subs-confirm-page__module-wrap">
+    <div class="container container-narrow">
+{# HubSpot requires the built-in email_subscriptions_confirmation module on this templateType. #}
+      {% module "email_subscriptions_confirmation"
+        path="@hubspot/email_subscriptions_confirmation"
+        label="Subscription confirmation"
+      %}
+    </div>
+  </div>
+
+  {# ── Next-step cards ──────────────────────────────────────────────────────── #}
+  <div class="subs-confirm-page__next-steps">
+    <div class="container container-narrow">
+      <h2 class="subs-confirm-page__section-heading">What would you like to do next?</h2>
+
+      <div class="subs-confirm-page__cards">
+
+        <a href="/" class="subs-confirm-card" aria-label="Return to the Weld Australia home page">
+          <span class="subs-confirm-card__icon" aria-hidden="true">🏠</span>
+          <span class="subs-confirm-card__label">Home</span>
+          <span class="subs-confirm-card__desc">Return to the Weld Australia home page</span>
+        </a>
+
+        <a href="/portal/" class="subs-confirm-card" aria-label="Go to your member dashboard">
+          <span class="subs-confirm-card__icon" aria-hidden="true">👤</span>
+          <span class="subs-confirm-card__label">Member Dashboard</span>
+          <span class="subs-confirm-card__desc">View your membership, certifications, and upcoming courses</span>
+        </a>
+
+        <a href="/portal/profile/" class="subs-confirm-card" aria-label="Update your profile details">
+          <span class="subs-confirm-card__icon" aria-hidden="true">✏️</span>
+          <span class="subs-confirm-card__label">Edit Profile</span>
+          <span class="subs-confirm-card__desc">Update your contact details and personal information</span>
+        </a>
+
+        <a href="/resources/" class="subs-confirm-card" aria-label="Browse resources hub">
+          <span class="subs-confirm-card__icon" aria-hidden="true">📚</span>
+          <span class="subs-confirm-card__label">Resources Hub</span>
+          <span class="subs-confirm-card__desc">Access standards, guides, and technical publications</span>
+        </a>
+
+      </div>
+
+      {# Manage-again link ─────────────────────────────────────────────────── #}
+      {#- Editable from the page editor so this back-link can be repointed if the
+          Subscription Preferences Page is published at a different slug. System
+          templates only support inline text fields - the page-picker dropdown
+          lives on profile-form.module, which is where members start from. -#}
+      {% text "manage_again_url" label="Preferences page URL", value="/email-subscriptions/", export_to_template_context=True %}
+      <p class="subs-confirm-page__manage-again">
+        Changed your mind?
+        <a href="{{ widget_data.manage_again_url.value | default('/email-subscriptions/', true) }}" class="subs-confirm-page__manage-link">
+          Update preferences again
+        </a>
+      </p>
+
+    </div>
+  </div>
+
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── Subscription Confirmation Page Styles ───────────────────────────────── */
+
+  .subs-confirm-page {
+    background-color: var(--wa-color-surface);
+    min-height: 60vh;
+  }
+
+  /* Success hero */
+  .subs-confirm-page__hero {
+    background-color: var(--wa-color-primary-dark);
+    color: var(--wa-color-text-inverse);
+    padding: var(--wa-space-16) var(--wa-space-4) var(--wa-space-12);
+  }
+
+  .subs-confirm-page__check-icon {
+    color: var(--wa-color-success);
+    margin-bottom: var(--wa-space-5);
+    display: flex;
+    justify-content: center;
+  }
+
+  .subs-confirm-page__heading {
+    font-family: var(--wa-font-heading);
+    font-size: clamp(var(--wa-text-2xl), 4vw, var(--wa-text-3xl));
+    font-weight: var(--wa-weight-bold);
+    color: var(--wa-color-text-inverse);
+    margin: 0 0 var(--wa-space-5);
+    line-height: var(--wa-leading-tight);
+  }
+
+  .subs-confirm-page__lead {
+    font-size: var(--wa-text-md);
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 54ch;
+    margin-inline: auto;
+    line-height: var(--wa-leading-relaxed);
+    margin-bottom: 0;
+  }
+
+  /* HubSpot module wrapper */
+  .subs-confirm-page__module-wrap {
+    padding: var(--wa-space-8) var(--wa-space-4) 0;
+  }
+
+  /* Style the built-in module's rendered output to match brand */
+  .subs-confirm-page__module-wrap .hs-confirmation-wrapper,
+  .subs-confirm-page__module-wrap p {
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-text-muted);
+    line-height: var(--wa-leading-relaxed);
+  }
+
+  .subs-confirm-page__module-wrap a {
+    color: var(--wa-color-primary);
+    text-decoration: underline;
+  }
+
+  /* Next steps */
+  .subs-confirm-page__next-steps {
+    padding: var(--wa-space-10) var(--wa-space-4) var(--wa-space-16);
+  }
+
+  .subs-confirm-page__section-heading {
+    font-family: var(--wa-font-heading);
+    font-size: var(--wa-text-xl);
+    font-weight: var(--wa-weight-semibold);
+    color: var(--wa-color-text);
+    margin: 0 0 var(--wa-space-6);
+    text-align: center;
+  }
+
+  /* Next-step card grid */
+  .subs-confirm-page__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+    gap: var(--wa-space-4);
+    margin-bottom: var(--wa-space-8);
+  }
+
+  .subs-confirm-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--wa-space-5);
+    border: 1px solid var(--wa-color-border);
+    border-radius: var(--wa-radius-md);
+    background-color: var(--wa-color-surface);
+    box-shadow: var(--wa-shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    transition:
+      border-color var(--wa-duration-fast) var(--wa-ease-default),
+      box-shadow var(--wa-duration-fast) var(--wa-ease-default),
+      transform var(--wa-duration-fast) var(--wa-ease-default);
+    min-height: var(--wa-touch-min);
+  }
+
+  .subs-confirm-card:hover {
+    border-color: var(--wa-color-primary);
+    box-shadow: var(--wa-shadow-card);
+    transform: translateY(-2px);
+  }
+
+  .subs-confirm-card:focus-visible {
+    outline: 3px solid var(--wa-color-primary);
+    outline-offset: 2px;
+    border-radius: var(--wa-radius-md);
+  }
+
+  .subs-confirm-card__icon {
+    font-size: 1.75rem;
+    line-height: 1;
+    margin-bottom: var(--wa-space-3);
+  }
+
+  .subs-confirm-card__label {
+    display: block;
+    font-size: var(--wa-text-base);
+    font-weight: var(--wa-weight-semibold);
+    color: var(--wa-color-primary);
+    margin-bottom: var(--wa-space-1);
+  }
+
+  .subs-confirm-card__desc {
+    display: block;
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-text-muted);
+    line-height: var(--wa-leading-normal);
+  }
+
+  /* Manage-again link */
+  .subs-confirm-page__manage-again {
+    text-align: center;
+    font-size: var(--wa-text-sm);
+    color: var(--wa-color-text-muted);
+    margin: 0;
+  }
+
+  .subs-confirm-page__manage-link {
+    color: var(--wa-color-primary);
+    font-weight: var(--wa-weight-medium);
+    text-decoration: underline;
+  }
+
+  .subs-confirm-page__manage-link:hover {
+    color: var(--wa-color-primary-dark);
+  }
+</style>
+{% endblock %}

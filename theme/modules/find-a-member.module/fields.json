@@ -1,0 +1,108 @@
+[
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Find a Member"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext"
+  },
+  {
+    "name": "default_sort",
+    "label": "Default sort",
+    "type": "choice",
+    "choices": [
+      ["tier", "By tier (Gold first)"],
+      ["name_asc", "Name A→Z"],
+      ["state", "By state"]
+    ],
+    "default": "tier"
+  },
+  {
+    "name": "tiers_visible",
+    "label": "Tiers to show",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["gold", "Gold"],
+      ["silver", "Silver"],
+      ["bronze", "Bronze"],
+      ["reciprocal", "Reciprocal"],
+      ["industry_supplier", "Industry Supplier"]
+    ],
+    "default": ["gold", "silver", "bronze", "reciprocal", "industry_supplier"]
+  },
+  {
+    "name": "page_size",
+    "label": "Results per page",
+    "type": "number",
+    "default": 24
+  },
+  {
+    "name": "show_state_filter",
+    "label": "Show state filter",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_search",
+    "label": "Show search input",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

@@ -1,0 +1,197 @@
+[
+  {
+    "id": "worker",
+    "name": "worker",
+    "label": "Worker connection",
+    "type": "group",
+    "expanded": true,
+    "children": [
+      {
+        "id": "worker_base_url",
+        "name": "worker_base_url",
+        "label": "Worker base URL (override)",
+        "help_text": "Base URL of the Event Engine worker. Leave blank to inherit the theme-wide setting at Design Manager → Theme settings → Integrations → Event Engine worker base URL, which selects the Worker. Keep that on `Production`, which is event-engine.refuel-creative.workers.dev. The Worker formerly deployed as event-engine-staging was RENAMED to it and that hostname no longer resolves, so do not put it back. Only set a value here to override that for this one module.",
+        "required": false,
+        "type": "text",
+        "default": ""
+      },
+      {
+        "id": "portal_id",
+        "name": "portal_id",
+        "label": "Portal id override",
+        "help_text": "Sent to the worker as the X-Portal-Id header. Defaults to this HubSpot account's Hub ID (Weld Australia = 441838610). Set only if the worker keys tenants on a different id.",
+        "required": false,
+        "type": "text",
+        "default": ""
+      },
+      {
+        "id": "worker_event_id",
+        "name": "worker_event_id",
+        "label": "Worker event id override",
+        "help_text": "Overrides the Worker event id for ALL events on this template. Normally left blank - the per-event id comes from the HubDB row's worker_event_id column (or the row slug). Use only for a single-event demo placement.",
+        "required": false,
+        "type": "text",
+        "default": "0x4AAAAAAEc5Ght-uaiSDdAa"
+      }
+    ]
+  },
+  {
+    "id": "security",
+    "name": "security",
+    "label": "Security",
+    "type": "group",
+    "expanded": false,
+    "children": [
+      {
+        "id": "turnstile_site_key",
+        "name": "turnstile_site_key",
+        "label": "Cloudflare Turnstile site key",
+        "help_text": "Public site key only. Used to show Turnstile on free public Event Engine registrations. The secret key must stay in Cloudflare Worker secrets, never in HubSpot.",
+        "required": false,
+        "type": "text",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "id": "ticket_types",
+    "name": "ticket_types",
+    "label": "Ticket types (fallback)",
+    "help_text": "Fallback ticket types for non-dynamic placements (e.g. a single-event landing page). On the dynamic event detail page these are IGNORED in favour of the event row's `ticket_types_json` HubDB column (because one template serves every event). The Worker ticket type id must match the id provisioned in the Event Engine for this event - ask the backend (Ollie/Ryan). Price here is display-only; the Worker is authoritative.",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 20,
+      "default": 1,
+      "sorting_label_field": "ticket_name"
+    },
+    "expanded": true,
+    "children": [
+      {
+        "id": "worker_ticket_type_id",
+        "name": "worker_ticket_type_id",
+        "label": "Worker ticket type id",
+        "help_text": "The ticket type id from the Event Engine (e.g. tt_abc123). Required for the row to render.",
+        "required": false,
+        "type": "text",
+        "default": ""
+      },
+      {
+        "id": "ticket_name",
+        "name": "ticket_name",
+        "label": "Display name",
+        "required": false,
+        "type": "text",
+        "default": "General admission"
+      },
+      {
+        "id": "price_dollars",
+        "name": "price_dollars",
+        "label": "Display price (AUD, dollars)",
+        "help_text": "Display only. 0 = Free. The Worker is authoritative for the charged amount.",
+        "required": false,
+        "type": "number",
+        "default": 0,
+        "min": 0,
+        "step": 0.01
+      },
+      {
+        "id": "member_only",
+        "name": "member_only",
+        "label": "Members only",
+        "required": false,
+        "type": "boolean",
+        "display": "toggle",
+        "default": false
+      },
+      {
+        "id": "max_per_order",
+        "name": "max_per_order",
+        "label": "Max per order",
+        "required": false,
+        "type": "number",
+        "default": 10,
+        "min": 1,
+        "step": 1
+      }
+    ]
+  },
+  {
+    "id": "registration",
+    "name": "registration",
+    "label": "Registration options",
+    "type": "group",
+    "expanded": true,
+    "children": [
+      {
+        "id": "capture_abn",
+        "name": "capture_abn",
+        "label": "Capture buyer ABN (optional field)",
+        "help_text": "Show an optional ABN field for company orders. The worker stamps it on the invoice; the ATO requires it for invoices >= AUD 1,000.",
+        "required": false,
+        "type": "boolean",
+        "display": "toggle",
+        "default": true
+      },
+      {
+        "id": "allow_group",
+        "name": "allow_group",
+        "label": "Allow group registration",
+        "help_text": "Let the buyer register multiple attendees in one order, each with their own name/email/ticket type.",
+        "required": false,
+        "type": "boolean",
+        "display": "toggle",
+        "default": true
+      },
+      {
+        "id": "max_attendees",
+        "name": "max_attendees",
+        "label": "Max attendees per order",
+        "required": false,
+        "type": "number",
+        "default": 10,
+        "min": 1,
+        "step": 1,
+        "visibility": {
+          "controlling_field": "allow_group",
+          "controlling_value_regex": "true",
+          "operator": "EQUAL"
+        }
+      }
+    ]
+  },
+  {
+    "id": "copy",
+    "name": "copy",
+    "label": "Copy",
+    "help_text": "Optional copy overrides.",
+    "type": "group",
+    "expanded": false,
+    "children": [
+      {
+        "id": "submit_label",
+        "name": "submit_label",
+        "label": "Submit button label",
+        "type": "text",
+        "required": false,
+        "default": "Register"
+      },
+      {
+        "id": "waitlist_message",
+        "name": "waitlist_message",
+        "label": "Waitlisted message",
+        "type": "text",
+        "required": false,
+        "default": "This event is full - you've been added to the waitlist. We'll email you if a place opens up."
+      },
+      {
+        "id": "confirmed_message",
+        "name": "confirmed_message",
+        "label": "Confirmed (free) message",
+        "type": "text",
+        "required": false,
+        "default": "You're registered. A confirmation email is on its way."
+      }
+    ]
+  }
+]

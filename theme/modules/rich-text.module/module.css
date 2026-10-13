@@ -1,0 +1,60 @@
+/* rich-text.module/module.css */
+
+.wa-rich-text__heading {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-6);
+}
+
+.wa-rich-text__body {
+  color: var(--wa-color-text);
+  line-height: 1.7;
+}
+
+/* Width modifiers */
+.wa-rich-text__body--narrow {
+  max-width: 65ch;
+}
+
+.wa-rich-text__body--medium {
+  max-width: 80ch;
+}
+
+/* Prose typography for rich text content */
+.wa-rich-text__body h2,
+.wa-rich-text__body h3,
+.wa-rich-text__body h4 {
+  font-family: var(--wa-font-heading);
+  margin-top: var(--wa-space-8);
+  margin-bottom: var(--wa-space-3);
+  color: var(--wa-color-text);
+}
+
+.wa-rich-text__body p {
+  margin-bottom: var(--wa-space-4);
+}
+
+.wa-rich-text__body ul,
+.wa-rich-text__body ol {
+  padding-left: var(--wa-space-6);
+  margin-bottom: var(--wa-space-4);
+}
+
+.wa-rich-text__body li {
+  margin-bottom: var(--wa-space-2);
+}
+
+.wa-rich-text__body strong {
+  font-weight: 600;
+  color: var(--wa-color-text);
+}
+
+.wa-rich-text__body a {
+  color: var(--wa-color-primary);
+  text-decoration: underline;
+}
+
+.wa-rich-text__body a:hover {
+  text-decoration: none;
+}

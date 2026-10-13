@@ -1,0 +1,9 @@
+{
+  "label": "Checklist",
+  "css_assets": [], "external_js": [], "global": false,
+  "help_text": "Checklist of items in list or card layout.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "is_available_for_new_content": true,
+  "js_assets": [], "other_assets": [], "smart_objects": [],
+  "tags": ["checklist", "list", "content"]
+}

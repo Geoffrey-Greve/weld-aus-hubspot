@@ -1,0 +1,29 @@
+<!--
+  templateType: none
+-->
+{#
+  Shared click handler for obfuscated Apply CTAs (defect 68).
+  Joins data-job-apply-u + data-job-apply-d into a mailto: only on click, so
+  scrapers reading static HTML never see a contiguous employer address.
+  Safe to include more than once - binds a single document listener.
+#}
+<script>
+(function () {
+  if (window.__waJobApplyBound) return;
+  window.__waJobApplyBound = true;
+  document.addEventListener('click', function (event) {
+    var el = event.target && event.target.closest
+      ? event.target.closest('[data-job-apply]')
+      : null;
+    if (!el) return;
+    var local = el.getAttribute('data-job-apply-u');
+    var domain = el.getAttribute('data-job-apply-d');
+    if (!local || !domain) return;
+    event.preventDefault();
+    var href = 'mailto:' + local + '@' + domain;
+    var subject = el.getAttribute('data-job-apply-subject');
+    if (subject) href += '?subject=' + encodeURIComponent(subject);
+    window.location.href = href;
+  });
+})();
+</script>

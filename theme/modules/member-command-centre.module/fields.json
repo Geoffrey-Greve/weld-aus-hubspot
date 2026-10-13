@@ -1,0 +1,199 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section ID",
+    "type": "text",
+    "default": "member-command-centre"
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "display": "select",
+    "choices": [
+      ["surface", "Surface"],
+      ["surface_alt", "Surface alt"],
+      ["white", "White"]
+    ],
+    "default": "surface_alt"
+  },
+  {
+    "name": "spacing",
+    "label": "Spacing",
+    "type": "choice",
+    "display": "select",
+    "choices": [
+      ["compact", "Compact"],
+      ["normal", "Normal"],
+      ["spacious", "Spacious"]
+    ],
+    "default": "spacious"
+  },
+  {
+    "name": "layout_variant",
+    "label": "Dashboard layout",
+    "type": "choice",
+    "display": "select",
+    "choices": [
+      ["two_column", "Two column"],
+      ["wide_main", "Wide main"],
+      ["balanced", "Balanced"],
+      ["single_column", "Single column"]
+    ],
+    "default": "two_column",
+    "help_text": "Design only. Changes how the dynamic dashboard tiles are arranged."
+  },
+  {
+    "name": "card_style",
+    "label": "Card style",
+    "type": "choice",
+    "display": "select",
+    "choices": [
+      ["elevated", "Elevated"],
+      ["bordered", "Bordered"],
+      ["flat", "Flat"]
+    ],
+    "default": "elevated",
+    "help_text": "Design only. This does not change member, finance, course or event information."
+  },
+  {
+    "name": "dashboard_density",
+    "label": "Dashboard density",
+    "type": "choice",
+    "display": "select",
+    "choices": [
+      ["comfortable", "Comfortable"],
+      ["compact", "Compact"]
+    ],
+    "default": "comfortable"
+  },
+  {
+    "name": "hero_style",
+    "label": "Hero style",
+    "type": "choice",
+    "display": "select",
+    "choices": [
+      ["standard", "Standard"],
+      ["compact", "Compact"]
+    ],
+    "default": "standard"
+  },
+  {
+    "name": "show_header_actions",
+    "label": "Show header action buttons",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_alert_banner",
+    "label": "Show dashboard alert banner",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_data_note",
+    "label": "Show dynamic data note",
+    "type": "boolean",
+    "default": false,
+    "help_text": "Shows a short note explaining that dashboard values are populated dynamically."
+  },
+  {
+    "name": "show_preview_bar",
+    "label": "Show preview status bar",
+    "type": "boolean",
+    "default": false,
+    "help_text": "Optional preview/design helper. Keep off on the live member dashboard unless needed."
+  },
+  {
+    "name": "show_profile_selector",
+    "label": "Show matched profile selector",
+    "type": "boolean",
+    "default": false,
+    "help_text": "Optional preview helper if more than one member profile is available. Keep off for normal member use."
+  },
+  {
+    "name": "show_certification_tile",
+    "label": "Show certification tile",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_courses_events_tile",
+    "label": "Show courses and events tile",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_membership_tile",
+    "label": "Show membership tile",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_financials_tile",
+    "label": "Show financials tile",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_team_tile",
+    "label": "Show team tile",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_resources_tile",
+    "label": "Show resources tile",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "training_url",
+    "label": "Training URL",
+    "type": "text",
+    "default": "/courses"
+  },
+  {
+    "name": "profile_url",
+    "label": "Profile/details URL",
+    "type": "text",
+    "default": "/portal/profile/"
+  },
+  {
+    "name": "membership_url",
+    "label": "Membership URL",
+    "type": "text",
+    "default": "/membership"
+  },
+  {
+    "name": "resources_url",
+    "label": "Resources URL",
+    "type": "text",
+    "default": "/resources"
+  },
+  {
+    "name": "team_url",
+    "label": "Team management URL",
+    "type": "text",
+    "default": "/membership"
+  },
+  {
+    "name": "support_phone",
+    "label": "Support phone",
+    "type": "text",
+    "default": "1300 660 660"
+  },
+  {
+    "name": "support_url",
+    "label": "Support URL",
+    "type": "text",
+    "default": "/contact"
+  },
+  {
+    "name": "editor_preview_contact_email",
+    "label": "Editor preview member email",
+    "type": "text",
+    "default": "",
+    "help_text": "Editor/preview only. Use this to preview a specific member dashboard while editing. Leave blank for a generic member preview."
+  }
+]

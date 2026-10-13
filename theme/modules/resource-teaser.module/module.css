@@ -1,0 +1,168 @@
+/* resource-teaser.module/module.css */
+
+/* ── Section header ─────────────────────────────────────────────────────────── */
+
+.wa-resource-teaser__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl, 1.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--wa-space-2, 0.5rem);
+}
+
+.wa-resource-teaser__intro {
+  margin-bottom: var(--wa-space-6, 1.5rem);
+  color: var(--wa-color-text-muted);
+}
+
+.wa-resource-teaser__intro > *:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Cards grid ─────────────────────────────────────────────────────────────── */
+
+.wa-resource-teaser__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: var(--wa-space-6, 1.5rem);
+}
+
+/* ── Individual card ────────────────────────────────────────────────────────── */
+
+.wa-resource-teaser__card {
+  position: relative;
+  background: #fff;
+  border-radius: var(--wa-radius-md, 8px);
+  overflow: hidden;
+  box-shadow: var(--wa-shadow-card, 0 2px 8px rgba(0, 0, 0, 0.08));
+  display: flex;
+  flex-direction: column;
+  /* Ensure the locked overlay can fill the card */
+  isolation: isolate;
+}
+
+/* Thumbnail */
+.wa-resource-teaser__card-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+/* Placeholder when no thumbnail is supplied */
+.wa-resource-teaser__card-img-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--wa-color-surface-alt, #f3f4f6);
+}
+
+/* Card body */
+.wa-resource-teaser__card-body {
+  padding: var(--wa-space-4, 1rem);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-2, 0.5rem);
+}
+
+/* File-type badge */
+.wa-resource-teaser__file-type {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--wa-color-primary);
+  line-height: 1;
+}
+
+/* Resource title */
+.wa-resource-teaser__title {
+  font-family: var(--wa-font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  color: var(--wa-color-text);
+}
+
+/* Abstract / short description */
+.wa-resource-teaser__abstract {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted);
+  flex: 1;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Download CTA - push to bottom of card body */
+.wa-resource-teaser__download {
+  align-self: flex-start;
+  /* Minimum 44×44px touch target per § 5.4 rule 2 */
+  min-height: var(--wa-touch-min, 44px);
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--wa-space-2, 0.5rem);
+}
+
+/* ── Locked overlay ──────────────────────────────────────────────────────────── */
+
+.wa-resource-teaser__locked {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--wa-space-4, 1rem);
+  gap: var(--wa-space-3, 0.75rem);
+  z-index: 1;
+}
+
+.wa-resource-teaser__lock-icon {
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--wa-color-text-muted);
+  /* Prevent emoji from rendering as text on some platforms */
+  font-style: normal;
+}
+
+.wa-resource-teaser__locked-message {
+  font-size: 0.9rem;
+  color: var(--wa-color-text);
+  margin: 0;
+  max-width: 22ch;
+}
+
+.wa-resource-teaser__locked-cta {
+  /* Minimum 44×44px touch target */
+  min-height: var(--wa-touch-min, 44px);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* ── View-all link row ───────────────────────────────────────────────────────── */
+
+.wa-resource-teaser__view-all {
+  margin-top: var(--wa-space-8, 2rem);
+  text-align: center;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────────── */
+
+.wa-resource-teaser__empty {
+  color: var(--wa-color-text-muted);
+  text-align: center;
+  padding: var(--wa-space-8, 2rem) 0;
+}
+
+/* ── Mobile: single-column stack ────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .wa-resource-teaser__grid {
+    grid-template-columns: 1fr;
+  }
+}

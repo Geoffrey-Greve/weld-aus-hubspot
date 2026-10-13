@@ -1,0 +1,14 @@
+{
+  "label": "News Article Hero Settings",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Editor controls for the News & Publications article hero. Blog post title, author, date, tags and body content still come from the HubSpot blog post fields.",
+  "content_types": ["BLOG_POST"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["blog", "article", "hero"]
+}

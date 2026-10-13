@@ -1,0 +1,77 @@
+{
+  "name": "people",
+  "label": "People - Board, Team, Committees & Ambassadors",
+  "useForPages": false,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": true,
+  "columns": [
+    {
+      "name": "name",
+      "label": "Full name",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "role",
+      "label": "Title / role",
+      "type": "TEXT"
+    },
+    {
+      "name": "org",
+      "label": "Organisation",
+      "type": "TEXT"
+    },
+    {
+      "name": "quals",
+      "label": "Qualifications (e.g. IWE, FIEAust)",
+      "type": "TEXT"
+    },
+    {
+      "name": "group",
+      "label": "Group",
+      "type": "SELECT",
+      "options": [
+        { "name": "Board", "type": "option" },
+        { "name": "Team", "type": "option" },
+        { "name": "Committee", "type": "option" },
+        { "name": "Ambassador", "type": "option" }
+      ]
+    },
+    {
+      "name": "photo",
+      "label": "Headshot",
+      "type": "IMAGE"
+    }
+  ],
+  "rows": [
+    {
+      "name": "John Smith",
+      "role": "Chair",
+      "org": "Weld Australia",
+      "quals": "IWE, FIEAust",
+      "group": "Board"
+    },
+    {
+      "name": "Jane Brown",
+      "role": "Deputy Chair",
+      "org": "Weld Australia",
+      "quals": "IWE",
+      "group": "Board"
+    },
+    {
+      "name": "David Wilson",
+      "role": "Chief Executive Officer",
+      "org": "Weld Australia",
+      "quals": "IWE, MAIW",
+      "group": "Team"
+    },
+    {
+      "name": "Sarah Lee",
+      "role": "Engineering Manager",
+      "org": "Weld Australia",
+      "quals": "IWE",
+      "group": "Team"
+    }
+  ]
+}

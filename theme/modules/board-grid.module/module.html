@@ -1,0 +1,207 @@
+{#
+  board-grid.module/module.html
+  Server-rendered people grid (board / leadership / team).
+  Optional left intro block + right checklist, then a card grid.
+  Pure HubL - no React island.
+
+  Data sources (mirrors team-grid.module):
+    • module_fields → module.people[] repeater (default)
+    • hubdb         → "team_and_board" table (is_active=true), narrowed by
+                      board_source (flag and/or category "Board") and then by
+                      category_filter / category_exclude - both of which accept a
+                      comma-separated list.
+
+  Profile links (HubDB only):
+    • Cards link to profile_url_base ~ the row's built-in page path (hs_path),
+      giving /about/team/{person-name}. A row with a blank page path renders as a
+      plain card plus an HTML comment saying so - run `pnpm backfill:paths` to fill
+      them in. HubSpot only serves a detail URL for rows that have a page path.
+
+  Fields: overline, heading, intro, checklist[], columns, data_source,
+          board_source, category_filter, category_exclude, max_count,
+          profile_url_base, people[], section_id, background, spacing, visibility
+#}
+
+{%- set _bg   = module.background | default('surface') -%}
+{%- set _sp   = module.spacing    | default('default') -%}
+{%- set _cols = module.columns    | default('3') -%}
+{%- set _dark = _bg in ['primary', 'primary_dark'] -%}
+{%- set _vis  = module.visibility | default(['mobile','tablet','desktop']) -%}
+{%- set _data_source  = module.data_source | default('module_fields') -%}
+{%- set _profile_base = module.profile_url_base | default('/about/team/') -%}
+{%- set _request_path = request.path | default('', true) | lower | split('?') | first | split('#') | first -%}
+{%- set _section_id_key = module.section_id | default('', true) | lower | trim -%}
+{%- set _heading_key = module.heading | default('', true) | lower | trim -%}
+{%- set _suppress_about_duplicate = (_request_path == '/about' or _request_path == '/about/') and (_section_id_key == 'our-board' or _heading_key == 'our board') -%}
+
+{% if _suppress_about_duplicate %}
+<!-- board-grid: suppressed on About page because team-grid now renders the Board preview with the shared people-card component. -->
+{% else %}
+
+{%- set _section_classes = 'wa-board wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-' ~ _sp ~ ' wa-board--cols-' ~ _cols -%}
+{%- if _dark -%}{%- set _section_classes = _section_classes ~ ' wa-board--dark' -%}{%- endif -%}
+{%- if 'mobile'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{# ── Build the rows list from the chosen data source ──────────────────────── #}
+{%- set ns = namespace(rows=[]) -%}
+
+{% if _data_source == 'hubdb' %}
+  {# Categories are normalised on both sides (lower / no spaces / no '&') so the
+     filter works against the SELECT labels and against plain choice keys alike. #}
+  {%- set _cf_raw  = module.category_filter | default('any') -%}
+  {%- set _cf_norm = _cf_raw | lower | replace(' ', '') | replace('&', '') -%}
+  {%- set _cf_list = _cf_norm | split(',') -%}
+  {%- set _cx_norm = module.category_exclude | default('') | lower | replace(' ', '') | replace('&', '') -%}
+  {%- set _cx_list = _cx_norm | split(',') -%}
+  {# Board membership is decided here in HubL, not in the HubDB query. Filtering on
+     is_board_member at query level takes the whole section down if that column is
+     ever missing from the table - which is exactly how this grid disappeared the
+     first time round.
+
+     Default rule: a row is on the board if the is_board_member flag is ticked OR
+     its category is Board. The category half makes the existing hand-entered data
+     work with no re-tagging; the flag half lets someone in a staff category (the
+     CEO) also appear here. board_source narrows it if you want one or the other. #}
+  {%- set _board_source = module.board_source | default('flag_or_category') -%}
+  {% set _hubdb_rows = hubdb_table_rows('team_and_board', 'is_active__eq=true', 'display_order,name') %}
+  {% for row in _hubdb_rows %}
+    {%- set _cat_key = row.category.name | default('') | lower | replace(' ', '') | replace('&', '') -%}
+    {%- set _is_flagged = row.is_board_member -%}
+    {%- set _is_board_cat = _cat_key == 'board' -%}
+    {%- if _board_source == 'flag_only' -%}
+      {%- set _on_board = _is_flagged -%}
+    {%- elif _board_source == 'category_only' -%}
+      {%- set _on_board = _is_board_cat -%}
+    {%- else -%}
+      {%- set _on_board = _is_flagged or _is_board_cat -%}
+    {%- endif -%}
+    {% if _on_board %}
+    {% if not _cx_norm or _cat_key not in _cx_list %}
+    {% if _cf_raw == 'any' or not _cf_raw or _cat_key in _cf_list %}
+      {% if not module.max_count or module.max_count == 0 or ns.rows | length < module.max_count %}
+      {%- set ns.rows = ns.rows + [{
+        'name':  row.name | default(''),
+        'role':  row.role | default(''),
+        'org':   row.org  | default(''),
+        'path':  row.hs_path | default(''),
+        'row_id': row.hs_id | default(''),
+        'photo_url': row.headshot.url | default(''),
+        'photo_alt': row.headshot.alt | default(row.name | default('')),
+        'photo_width':  row.headshot.width  | default(''),
+        'photo_height': row.headshot.height | default('')
+      }] -%}
+      {% endif %}
+    {% endif %}
+    {% endif %}
+    {% endif %}
+  {% endfor %}
+{% else %}
+  {% if module.people %}
+    {% for p in module.people %}
+      {% if p.name_text %}
+      {# No 'path': hand-entered people have no HubDB row, so no profile page. #}
+      {%- set ns.rows = ns.rows + [{
+        'name':  p.name_text,
+        'role':  p.role | default(''),
+        'org':   p.org  | default(''),
+        'path':  '',
+        'row_id': '',
+        'photo_url': p.photo.src | default(''),
+        'photo_alt': p.photo.alt | default(p.name_text),
+        'photo_width':  p.photo.width  | default(''),
+        'photo_height': p.photo.height | default('')
+      }] -%}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endif %}
+
+{# A HubDB-driven grid with no matching rows renders nothing at all. An "Our board"
+   heading over empty space is worse on a public page than an absent section, and
+   the HTML comment below tells whoever is debugging why it vanished. #}
+{% if _data_source == 'hubdb' and not ns.rows %}
+<!-- board-grid: no rows in team_and_board matched board_source="{{ _board_source }}" (active rows with the "Sits on the Board" flag or category "Board") -->
+{% else %}
+
+<section
+  class="{{ _section_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {# ── Header: intro (left) + checklist (right) ─────────────────────────── #}
+    {% if module.overline or module.heading or module.intro or module.checklist %}
+    <div class="wa-board__head">
+      <div class="wa-board__head-intro">
+        {% if module.overline %}
+        <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+          <span class="wa-overline__text">{{ module.overline }}</span>
+        </div>
+        {% endif %}
+        {% if module.heading %}
+        <h2 class="wa-board__heading">{{ module.heading }}</h2>
+        {% endif %}
+        {% if module.intro %}
+        <div class="wa-board__intro wa-richtext">{{ module.intro }}</div>
+        {% endif %}
+      </div>
+
+      {% if module.checklist %}
+      <ul class="wa-board__checklist" role="list">
+        {% for c in module.checklist %}
+        {% if c.item_text %}
+        <li class="wa-board__check">
+          <span class="wa-board__check-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </span>
+          <span class="wa-board__check-text">{{ c.item_text }}</span>
+        </li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# ── People cards ─────────────────────────────────────────────────────── #}
+    {% if ns.rows %}
+    <div class="wa-board__grid">
+      {% for p in ns.rows %}
+      {% if p.name %}
+      {% if p.row_id and not p.path %}<!-- board-grid: HubDB row {{ p.row_id }} ({{ p.name }}) has no page path, so this card cannot link to a profile. Run `pnpm backfill:paths --table=team_and_board`. -->{% endif %}
+      <article class="wa-board__card{% if p.path %} wa-board__card--linked{% endif %}">
+        {% if p.path %}<a class="wa-board__card-link" href="{{ _profile_base }}{{ p.path }}">{% endif %}
+        <div class="wa-board__photo-wrap">
+          {% if p.photo_url %}
+          <img
+            src="{{ p.photo_url }}"
+            alt="{{ p.photo_alt }}"
+            class="wa-board__photo"
+            loading="lazy"
+            decoding="async"
+            {% if p.photo_width  %}width="{{ p.photo_width }}"{% endif %}
+            {% if p.photo_height %}height="{{ p.photo_height }}"{% endif %}
+          >
+          {% else %}
+          <span class="wa-board__photo-fallback" aria-hidden="true">{{ p.name | truncate(1, true, '') | upper }}</span>
+          {% endif %}
+        </div>
+        <div class="wa-board__body">
+          <h3 class="wa-board__name">{{ p.name }}</h3>
+          {% if p.role %}<p class="wa-board__role">{{ p.role }}</p>{% endif %}
+          {% if p.org %}<p class="wa-board__org">{{ p.org }}</p>{% endif %}
+        </div>
+        {% if p.path %}</a>{% endif %}
+      </article>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}{# end empty-hubdb guard #}
+{% endif %}{# end about duplicate suppression #}

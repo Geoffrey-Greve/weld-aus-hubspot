@@ -1,0 +1,90 @@
+[
+  {
+    "name": "form",
+    "label": "Application form",
+    "type": "form",
+    "required": false,
+    "help_text": "The HubSpot form applicants complete for jobs that apply by email. A workflow forwards the submission to the employer, so the employer's address is never published. Leave blank to fall back to the Contact Us CTA below.",
+    "default": {
+      "form_id": "",
+      "response_type": "inline",
+      "message": "Thanks - your application has been sent to the employer."
+    }
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Apply for this role"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext",
+    "default": "<p>Submit your application below and Weld Australia will pass it straight to the employer.</p>"
+  },
+  {
+    "name": "success_message",
+    "label": "Success message",
+    "type": "richtext",
+    "default": "<p>Thanks - your application has been sent to the employer. They will contact you directly.</p>"
+  },
+  {
+    "name": "fallback_heading",
+    "label": "Fallback heading (no form selected)",
+    "type": "text",
+    "default": "Apply for this role"
+  },
+  {
+    "name": "fallback_text",
+    "label": "Fallback text (no form selected)",
+    "type": "richtext",
+    "default": "<p>This employer takes applications through Weld Australia. Send us your details and we will pass them straight on.</p>"
+  },
+  {
+    "name": "fallback_cta_label",
+    "label": "Fallback CTA label",
+    "type": "text",
+    "default": "Apply via Weld Australia"
+  },
+  {
+    "name": "job_title",
+    "label": "Job title (template override)",
+    "type": "text",
+    "locked": true,
+    "help_text": "Set by the job detail template per HubDB row. Do not edit in the page editor.",
+    "default": ""
+  },
+  {
+    "name": "job_reference",
+    "label": "Job reference (template override)",
+    "type": "text",
+    "locked": true,
+    "help_text": "Set by the job detail template per HubDB row. Do not edit in the page editor.",
+    "default": ""
+  },
+  {
+    "name": "job_slug",
+    "label": "Job slug (template override)",
+    "type": "text",
+    "locked": true,
+    "help_text": "Routing key for the apply-forwarding workflow. Set by the job detail template.",
+    "default": ""
+  },
+  {
+    "name": "employer_name",
+    "label": "Employer name (template override)",
+    "type": "text",
+    "locked": true,
+    "help_text": "Set by the job detail template per HubDB row. Do not edit in the page editor.",
+    "default": ""
+  },
+  {
+    "name": "fallback_url",
+    "label": "Fallback URL (template override)",
+    "type": "text",
+    "locked": true,
+    "help_text": "Where to send applicants when no form is configured. Set by the job detail template.",
+    "default": "/contact-us?topic=job-board"
+  }
+]

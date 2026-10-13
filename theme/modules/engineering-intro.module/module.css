@@ -1,0 +1,243 @@
+.wa-engineering-section {
+  padding: clamp(60px, 7vw, 88px) 0;
+}
+
+.wa-engineering-section--surface_alt {
+  background: #f5f7f9;
+}
+
+.wa-engineering-section--surface {
+  background: #fff;
+}
+
+.wa-engineering-heading {
+  margin: 0 0 20px;
+  color: #1c1e4c;
+  font-size: clamp(1.55rem, 3vw, 2.06rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.wa-engineering-richtext {
+  color: #5b6770;
+  font-size: 0.95rem;
+  line-height: 1.78;
+}
+
+.wa-engineering-richtext > * + * {
+  margin-top: 15px;
+}
+
+.wa-engineering-richtext > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-engineering-intro__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr);
+  gap: clamp(40px, 6vw, 72px);
+  align-items: start;
+}
+
+.wa-engineering-intro__industries {
+  margin-top: 28px;
+}
+
+.wa-engineering-intro__industries-label {
+  margin: 0 0 12px;
+  color: #5b6770;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.wa-engineering-intro__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wa-engineering-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 14px;
+  border: 1px solid #dde0e5;
+  border-radius: 999px;
+  background: #fff;
+  color: #1c1e4c;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.wa-engineering-intro__video {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.wa-engineering-intro__video iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+
+.wa-engineering-intro__video-facade {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 0;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  overflow: hidden;
+}
+
+.wa-engineering-intro__video-thumbnail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.82;
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+.wa-engineering-intro__video-facade:hover .wa-engineering-intro__video-thumbnail,
+.wa-engineering-intro__video-facade:focus-visible .wa-engineering-intro__video-thumbnail {
+  transform: scale(1.025);
+  opacity: 0.92;
+}
+
+.wa-engineering-intro__video-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, rgba(28, 30, 76, 0.08), rgba(28, 30, 76, 0.42)),
+    linear-gradient(to top, rgba(28, 30, 76, 0.66), transparent 58%);
+}
+
+.wa-engineering-intro__video-play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 74px;
+  height: 74px;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  border-radius: 999px;
+  background: rgba(254, 207, 5, 0.96);
+  color: #1c1e4c;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  transform: translate(-50%, -50%);
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.wa-engineering-intro__video-facade:hover .wa-engineering-intro__video-play,
+.wa-engineering-intro__video-facade:focus-visible .wa-engineering-intro__video-play {
+  background: #fff;
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.wa-engineering-intro__video-label {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.wa-engineering-download {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-top: 20px;
+  padding: 18px 20px;
+  border: 1px solid #dde0e5;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.wa-engineering-download__icon {
+  display: inline-flex;
+  flex: 0 0 46px;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: #fdf6e3;
+  color: #c9a227;
+}
+
+.wa-engineering-download__copy {
+  flex: 1 1 auto;
+}
+
+.wa-engineering-download__copy h3 {
+  margin: 0 0 2px;
+  color: #1c1e4c;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.wa-engineering-download__copy p {
+  margin: 0;
+  color: #5b6770;
+  font-size: 0.75rem;
+}
+
+.wa-engineering-download__cta {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: #1c1e4c;
+  color: #fff !important;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.wa-engineering-download__cta:hover,
+.wa-engineering-download__cta:focus,
+.wa-engineering-download__cta:focus-visible,
+.wa-engineering-download__cta:active,
+.wa-engineering-download__cta:visited {
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
+@media (max-width: 900px) {
+  .wa-engineering-intro__inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .wa-engineering-download {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .wa-engineering-download__cta {
+    width: 100%;
+  }
+}

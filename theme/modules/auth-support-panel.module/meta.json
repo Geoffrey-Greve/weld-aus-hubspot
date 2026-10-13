@@ -1,0 +1,13 @@
+{
+  "label": "Auth Support Panel",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Editable support panel for member login/signup pages.",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["auth", "membership", "support"]
+}

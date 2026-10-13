@@ -1,0 +1,168 @@
+<!--
+  templateType: page
+  label: Technology
+  isAvailableForNewContent: true
+-->
+﻿{#
+  technology.html - Weld Australia Technology Page
+  URL: /technology/
+  Template type: drag-and-drop page
+
+  Sections (§ 3.13 of docs/01-sitemap.md):
+    1. Hero - title, intro
+    2. Simulators feature section (anchored: #simulators)
+    3. Cobots feature section (anchored: #cobots)
+    4. Xiris Cameras feature section (anchored: #xiris-cameras)
+    5. Camera booking promo - CTA banner "Book a camera trial"
+    6. Contact form - technology/demo inquiry
+
+  Anchor deep-links:
+    /technology/simulators/    → #simulators
+    /technology/cobots/        → #cobots
+    /technology/xiris-cameras/ → #xiris-cameras
+
+  Modules used:
+    hero, feature-section (×3), cta-banner, hubspot-form-embed
+#}
+{% set page_title_exact = page_meta.html_title | default('Technology - Weld Australia') %}
+{% set page_description = page_meta.meta_description | default('Weld Australia provides access to cutting-edge welding technology including welding simulators, collaborative robots (cobots), and Xiris weld cameras for Australian industry and training.') %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 1  HERO - Technology hub entry point
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {%- set _technology_contact_form_id = 'a6e4307a-ae36-496b-9039-4fc553e7cb4e' if hub_id|string == '443253065' else '1f11d63a-ca92-4619-a7ec-17a92bb544ac' -%}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero - Technology"
+          background="primary"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+          eyebrow="Welding technology"
+          headline="Advanced welding technology for training and industry"
+          subheadline="<p>Weld Australia provides access to welding simulators, collaborative robots, and Xiris weld cameras to support training excellence and industry innovation.</p>"
+          primary_cta={"label_text": "Request a demo", "link": {"url": {"href": "#technology-enquiry", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "Explore our technology", "link": {"url": {"href": "#simulators", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 2  SIMULATORS - Anchored feature section
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/feature-section"
+          label="Welding simulators"
+          anchor_id="simulators"
+          heading="Welding Simulators"
+          section_id="simulators"
+          image_position="right"
+          cta_label="Book a simulator session"
+          cta_link="#technology-enquiry"
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 3  COBOTS - Anchored feature section
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/feature-section"
+          label="Collaborative robots (cobots)"
+          anchor_id="cobots"
+          heading="Collaborative Robots (Cobots)"
+          section_id="cobots"
+          image_position="left"
+          cta_label="Enquire about cobots"
+          cta_link="#technology-enquiry"
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 4  XIRIS CAMERAS - Anchored feature section
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/feature-section"
+          label="Xiris weld cameras"
+          anchor_id="xiris-cameras"
+          heading="Xiris Weld Cameras"
+          section_id="xiris-cameras"
+          image_position="right"
+          cta_label="Book a camera trial"
+          cta_link="#technology-enquiry"
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 5  CAMERA BOOKING PROMO - Banner with camera trial CTA
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Camera booking promo"
+          headline="See your welds in real time with a Xiris camera trial"
+          body_text="<p>Book a complimentary Xiris weld camera trial and discover how real-time weld monitoring can improve quality and reduce defects at your facility.</p>"
+          cta_label="Book a camera trial"
+          cta_link={"url": {"href": "#technology-enquiry", "type": "EXTERNAL"}}
+          background="primary"
+          spacing="default"
+          align="split"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 6  CONTACT FORM - Technology / demo inquiry form
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hubspot-form-embed"
+          label="Technology enquiry form"
+          section_heading="Request a demo or more information"
+          section_id="technology-enquiry"
+          intro_text="Tell us which technology you're interested in and we'll be in touch to arrange a demonstration."
+          form={"form_id": _technology_contact_form_id}
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

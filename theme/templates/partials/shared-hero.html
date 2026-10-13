@@ -1,0 +1,164 @@
+{#
+  Shared hero renderer for dynamic templates.
+
+  HubSpot module calls are ideal for editor-configured/static pages. Dynamic
+  HubDB/blog templates can be stricter about module parameter values, especially
+  when those values are assembled as HTML. This partial renders the same public
+  .wa-hero markup directly from template variables while still using the shared
+  hero module CSS.
+
+  Expected variables use the _shared_hero_* prefix.
+#}
+{%- set _hero_id = _shared_hero_id | default('shared-hero', true) -%}
+{%- set _hero_section_id = _shared_hero_section_id | default('', true) -%}
+{%- set _hero_heading_id = (_hero_section_id ~ '-heading') if _hero_section_id else (_hero_id ~ '-heading') -%}
+{%- set _hero_bg = _shared_hero_background | default('primary', true) -%}
+{%- set _hero_spacing = _shared_hero_spacing | default('default', true) -%}
+{%- set _hero_height = _shared_hero_height | default('large', true) -%}
+{%- set _hero_alignment = _shared_hero_alignment | default('left', true) -%}
+{%- set _hero_media_type = _shared_hero_media_type | default('none', true) -%}
+{%- set _hero_image = _shared_hero_image | default({}, true) -%}
+{%- set _hero_media_text = _shared_hero_media_text | default('', true) -%}
+{%- set _hero_has_image = _hero_media_type == 'image' and _hero_image.src -%}
+{%- set _hero_has_text = _hero_media_type == 'text' and _hero_media_text -%}
+{%- set _hero_has_media = _hero_has_image or _hero_has_text -%}
+{%- set _hero_dark = _hero_bg in ['primary', 'primary_dark'] -%}
+{%- set _hero_accent = _shared_hero_accent_bar if _shared_hero_accent_bar is defined else true -%}
+{%- set _hero_show_breadcrumb = _shared_hero_show_breadcrumb | default(false) -%}
+{%- set _hero_show_home = _shared_hero_show_breadcrumb_home | default(false) -%}
+{%- set _hero_home_label = _shared_hero_breadcrumb_home_label | default('Home', true) -%}
+{%- set _hero_home_href = _shared_hero_breadcrumb_home_href | default('/', true) -%}
+{%- set _hero_parent_label = _shared_hero_breadcrumb_parent_label | default('', true) -%}
+{%- set _hero_parent_href = _shared_hero_breadcrumb_parent_href | default('/', true) -%}
+{%- set _hero_current_label = _shared_hero_breadcrumb_current_label | default('', true) -%}
+{%- set _hero_breadcrumb_items = _shared_hero_breadcrumb_items | default([], true) -%}
+{%- set _hero_eyebrow = _shared_hero_eyebrow | default('', true) -%}
+{%- set _hero_headline = _shared_hero_headline | default('', true) -%}
+{%- set _hero_subheadline = _shared_hero_subheadline | default('', true) -%}
+{%- set _hero_extra = _shared_hero_extra | default('', true) -%}
+{%- set _primary_label = _shared_hero_primary_label | default('', true) -%}
+{%- set _primary_href = _shared_hero_primary_href | default('#', true) -%}
+{%- set _primary_style = _shared_hero_primary_style | default('gold', true) -%}
+{%- set _primary_new_tab = _shared_hero_primary_new_tab | default(false) -%}
+{%- set _secondary_label = _shared_hero_secondary_label | default('', true) -%}
+{%- set _secondary_href = _shared_hero_secondary_href | default('#', true) -%}
+{%- set _secondary_style = _shared_hero_secondary_style | default('white-outline', true) -%}
+{%- set _secondary_new_tab = _shared_hero_secondary_new_tab | default(false) -%}
+{%- set _section_classes = [
+  'wa-hero',
+  'wa-hero--bg-' ~ _hero_bg,
+  'wa-hero--sp-' ~ _hero_spacing,
+  'wa-hero--h-' ~ _hero_height,
+  'wa-hero--align-' ~ _hero_alignment
+] -%}
+{%- if _hero_has_media -%}{%- set _section_classes = _section_classes + ['wa-hero--has-media'] -%}{%- endif -%}
+{%- if _hero_has_image -%}{%- set _section_classes = _section_classes + ['wa-hero--has-image'] -%}{%- endif -%}
+{%- if _hero_has_text -%}{%- set _section_classes = _section_classes + ['wa-hero--has-text'] -%}{%- endif -%}
+{%- if _hero_accent -%}{%- set _section_classes = _section_classes + ['wa-hero--accent-bar'] -%}{%- endif -%}
+
+<section
+  class="{{ _section_classes | join(' ') }}"
+  {% if _hero_section_id %}id="{{ _hero_section_id }}"{% endif %}
+  aria-labelledby="{{ _hero_heading_id }}"
+>
+  <div class="container wa-hero__inner">
+    <div class="wa-hero__content">
+      {% if _hero_show_breadcrumb and (_hero_breadcrumb_items or _hero_show_home or _hero_parent_label or _hero_current_label) %}
+      <nav class="wa-hero__breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          {% if _hero_breadcrumb_items %}
+          {% for _crumb in _hero_breadcrumb_items %}
+          {% set _crumb_label = _crumb.label | default('', true) %}
+          {% set _crumb_href = _crumb.href | default('', true) %}
+          {% set _crumb_current = _crumb.current | default(false) %}
+          {% if not loop.first %}<li aria-hidden="true">/</li>{% endif %}
+          {% if _crumb_current or not _crumb_href %}
+          <li aria-current="page">{{ _crumb_label }}</li>
+          {% else %}
+          <li><a href="{{ _crumb_href | escape_url }}">{{ _crumb_label }}</a></li>
+          {% endif %}
+          {% endfor %}
+          {% else %}
+          {% if _hero_show_home %}
+          <li><a href="{{ _hero_home_href | escape_url }}">{{ _hero_home_label }}</a></li>
+          {% if _hero_parent_label or _hero_current_label %}<li aria-hidden="true">/</li>{% endif %}
+          {% endif %}
+          {% if _hero_parent_label %}
+          <li><a href="{{ _hero_parent_href | escape_url }}">{{ _hero_parent_label }}</a></li>
+          <li aria-hidden="true">/</li>
+          {% endif %}
+          {% if _hero_current_label %}<li aria-current="page">{{ _hero_current_label }}</li>{% endif %}
+          {% endif %}
+        </ol>
+      </nav>
+      {% endif %}
+
+      {% if _hero_eyebrow %}
+      <div class="wa-overline{% if _hero_dark %} wa-overline--light{% endif %}">
+        <span class="wa-overline__text">{{ _hero_eyebrow }}</span>
+      </div>
+      {% endif %}
+
+      <h1 class="wa-hero__headline" id="{{ _hero_heading_id }}">{{ _hero_headline }}</h1>
+
+      {% if _hero_subheadline %}
+      <div class="wa-hero__subheadline">{{ _hero_subheadline }}</div>
+      {% endif %}
+
+      {% if _hero_extra %}
+      <div class="wa-hero__extra">{{ _hero_extra }}</div>
+      {% endif %}
+
+      {% if _primary_label or _secondary_label %}
+      <div class="wa-hero__ctas">
+        {% if _primary_label %}
+        <a
+          href="{{ _primary_href | escape_url }}"
+          class="btn btn-{{ _primary_style }} wa-hero__cta"
+          {% if _primary_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >
+          <span>{{ _primary_label }}</span>
+          <svg class="wa-btn__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{% if _primary_style == 'gold' %}#1a1a1a{% else %}currentColor{% endif %}"{% if _primary_style == 'gold' %} style="color:#1a1a1a;stroke:#1a1a1a;"{% endif %} stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <line x1="5" y1="12" x2="19" y2="12"{% if _primary_style == 'gold' %} stroke="#1a1a1a" style="stroke:#1a1a1a;"{% endif %}></line>
+            <polyline points="12 5 19 12 12 19"{% if _primary_style == 'gold' %} stroke="#1a1a1a" style="stroke:#1a1a1a;"{% endif %}></polyline>
+          </svg>
+        </a>
+        {% endif %}
+
+        {% if _secondary_label %}
+        <a
+          href="{{ _secondary_href | escape_url }}"
+          class="btn btn-{{ _secondary_style }} wa-hero__cta"
+          {% if _secondary_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ _secondary_label }}</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    {% if _hero_has_media %}
+    <div class="wa-hero__media">
+      {% if _hero_has_image %}
+      <img
+        src="{{ _hero_image.src | escape_url }}"
+        alt="{{ _hero_image.alt | default('', true) | escape_attr }}"
+        class="wa-hero__img"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        {% if _hero_image.width %}width="{{ _hero_image.width }}"{% endif %}
+        {% if _hero_image.height %}height="{{ _hero_image.height }}"{% endif %}
+      >
+      {% elif _hero_has_text %}
+      <div class="wa-hero__media-text">{{ _hero_media_text }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  {% if _hero_accent %}
+  {% set _brand_line_context = 'hero' %}
+  {% set _brand_line_class = 'wa-hero__accent-bar' %}
+  {% include "./brand-line.html" %}
+  {% endif %}
+</section>

@@ -1,0 +1,224 @@
+{#
+  testimonial-slider.module/module.html
+  MTestimonials - two layouts: spotlight (sidebar selector) and grid (card layout).
+  All interaction is handled by module.js (vanilla JS IIFE, no framework).
+
+  Fields:
+    module.section_id   - optional anchor id
+    module.background   - background variant (surface / surface_alt / primary / primary_dark / transparent)
+    module.spacing      - vertical spacing variant (compact / default / spacious)
+    module.members_only - gating flag
+    module.overline     - optional overline text
+    module.heading      - section heading
+    module.layout       - spotlight | grid
+    module.testimonials - repeater group (quote, name, role, company, photo, initials, tier)
+    module.autoplay     - boolean
+#}
+
+{%- set _bg = module.background | default('surface') -%}
+{%- set _sp = module.spacing | default('default') -%}
+{%- set _dark = _bg in ['primary', 'primary_dark'] -%}
+{%- set _layout = module.layout | default('spotlight') -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section
+  class="wa-testimonials wa-testimonials--{{ _layout }} wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {# ── Overline + Heading ───────────────────────────────────────────────── #}
+    {% if module.overline or module.heading %}
+    <div class="wa-testimonials__header">
+      {% if module.overline %}
+      <p class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+        <span class="wa-overline__text">{{ module.overline }}</span>
+      </p>
+      {% endif %}
+      {% if module.heading %}
+      <h2 class="wa-testimonials__heading{% if _dark %} wa-testimonials__heading--light{% endif %}">{{ module.heading }}</h2>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# ══════════════════════════════════════════════════════════════════════ #}
+    {# SPOTLIGHT LAYOUT                                                        #}
+    {# ══════════════════════════════════════════════════════════════════════ #}
+    {% if _layout == 'spotlight' %}
+    {% set _default_moving_items = [
+      'BlueScope Steel',
+      'BHP',
+      'Monadelphous',
+      'CPB Contractors',
+      'Civmec',
+      'Clough',
+      'UGL',
+      'GHD',
+      'Thiess',
+      'Lendlease'
+    ] %}
+    <div class="wa-testimonials__trusted-marquee" aria-label="Trusted by industry leaders">
+      <ul class="wa-testimonials__trusted-track" role="list">
+        {% for _rep in range(2) %}
+          {% if module.moving_items and module.moving_items|length %}
+            {% for item in module.moving_items %}
+              {% if item.company_name %}
+              <li class="wa-testimonials__trusted-card"{% if _rep > 0 %} aria-hidden="true"{% endif %}>
+                {{ item.company_name }}
+              </li>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {% for company in _default_moving_items %}
+            <li class="wa-testimonials__trusted-card"{% if _rep > 0 %} aria-hidden="true"{% endif %}>
+              {{ company }}
+            </li>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div
+      class="wa-testimonials__spotlight"
+      data-autoplay="{{ module.autoplay | lower }}"
+      data-count="{{ module.testimonials | length }}"
+    >
+
+      {# Sidebar selector buttons #}
+      <div class="wa-testimonials__sidebar" role="tablist" aria-label="Testimonials">
+        {% for t in module.testimonials %}
+        <button
+          class="wa-testimonials__selector{% if loop.first %} is-active{% endif %}"
+          role="tab"
+          aria-selected="{{ 'true' if loop.first else 'false' }}"
+          aria-controls="wa-test-panel-{{ loop.index0 }}"
+          data-index="{{ loop.index0 }}"
+          type="button"
+        >
+          {% if t.name_text %}<span class="wa-testimonials__sel-name">{{ t.name_text }}</span>{% endif %}
+          {% if t.company %}<span class="wa-testimonials__sel-company">{{ t.company }}</span>{% endif %}
+        </button>
+        {% endfor %}
+      </div>
+
+      {# Quote panels #}
+      <div class="wa-testimonials__panels">
+        {% for t in module.testimonials %}
+        <div
+          class="wa-testimonials__panel{% if loop.first %} is-active{% endif %}"
+          role="tabpanel"
+          id="wa-test-panel-{{ loop.index0 }}"
+          aria-hidden="{{ 'false' if loop.first else 'true' }}"
+        >
+          {# Large decorative quotemark #}
+          <svg class="wa-testimonials__quotemark" width="64" height="48" viewBox="0 0 64 48" fill="none" aria-hidden="true" focusable="false">
+            <path d="M0 48V29.3C0 13.1 10.7 4 32 0l4.3 7C24.5 9.8 18.3 15.7 17 24h9V48H0zm35 0V29.3C35 13.1 45.7 4 67 0l4.3 7C59.5 9.8 53.3 15.7 52 24h9V48H35z" fill="currentColor"/>
+          </svg>
+
+          <blockquote class="wa-testimonials__quote">{{ t.quote }}</blockquote>
+
+          <div class="wa-testimonials__author">
+            {# Avatar: photo if provided, else initials circle #}
+            {% if t.photo and t.photo.src %}
+            <img
+              src="{{ t.photo.src }}"
+              alt="{{ t.photo.alt | default(t.name_text | default('')) }}"
+              class="wa-testimonials__avatar"
+              width="48"
+              height="48"
+              loading="lazy"
+            >
+            {% else %}
+            <div class="wa-testimonials__avatar-init" aria-hidden="true">
+              {{ t.initials | default('') | truncate(2, false, '') | upper }}
+            </div>
+            {% endif %}
+
+            <div class="wa-testimonials__author-meta">
+              {% if t.name_text %}
+              <span class="wa-testimonials__author-name">{{ t.name_text }}</span>
+              {% endif %}
+              {% if t.role or t.company %}
+              <span class="wa-testimonials__author-sub">{{ t.role }}{% if t.role and t.company %}, {% endif %}{{ t.company }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {# Mobile dot chips #}
+      {% if module.testimonials | length > 1 %}
+      <div class="wa-testimonials__dots" role="tablist" aria-label="Testimonial navigation">
+        {% for t in module.testimonials %}
+        <button
+          class="wa-testimonials__dot{% if loop.first %} is-active{% endif %}"
+          role="tab"
+          aria-selected="{{ 'true' if loop.first else 'false' }}"
+          aria-label="Testimonial {{ loop.index }}"
+          data-index="{{ loop.index0 }}"
+          type="button"
+        ></button>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+    </div>{# /.wa-testimonials__spotlight #}
+
+    {# ══════════════════════════════════════════════════════════════════════ #}
+    {# GRID LAYOUT                                                             #}
+    {# ══════════════════════════════════════════════════════════════════════ #}
+    {% elif _layout == 'grid' %}
+    <div class="wa-testimonials__grid">
+      {% for t in module.testimonials %}
+      <article class="wa-testimonials__card">
+
+        {# Decorative opening quotemark #}
+        <span class="wa-testimonials__card-quote-char" aria-hidden="true">&ldquo;</span>
+
+        <blockquote class="wa-testimonials__quote">{{ t.quote }}</blockquote>
+
+        <hr class="wa-testimonials__card-rule">
+
+        <div class="wa-testimonials__author">
+          {# Avatar #}
+          {% if t.photo and t.photo.src %}
+          <img
+            src="{{ t.photo.src }}"
+            alt="{{ t.photo.alt | default(t.name_text | default('')) }}"
+            class="wa-testimonials__avatar wa-testimonials__avatar--sm"
+            width="44"
+            height="44"
+            loading="lazy"
+          >
+          {% else %}
+          <div class="wa-testimonials__avatar-init wa-testimonials__avatar-init--sm" aria-hidden="true">
+            {{ t.initials | default('') | truncate(2, false, '') | upper }}
+          </div>
+          {% endif %}
+
+          <div class="wa-testimonials__author-meta">
+            {% if t.name_text %}
+            <span class="wa-testimonials__author-name">{{ t.name_text }}</span>
+            {% endif %}
+            {% if t.role or t.company %}
+            <span class="wa-testimonials__author-sub">{{ t.role }}{% if t.role and t.company %}, {% endif %}{{ t.company }}</span>
+            {% endif %}
+          </div>
+
+          {# Optional tier badge #}
+          {% if t.tier and t.tier != '' %}
+          <span class="wa-testimonials__tier-badge wa-testimonials__tier-badge--{{ t.tier }}">{{ t.tier | capitalize }}</span>
+          {% endif %}
+        </div>
+
+      </article>
+      {% endfor %}
+    </div>{# /.wa-testimonials__grid #}
+
+    {% endif %}{# end layout switch #}
+
+  </div>{# /.container #}
+</section>
+{% endif %}

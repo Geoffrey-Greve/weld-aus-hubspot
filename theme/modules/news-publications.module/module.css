@@ -1,0 +1,12 @@
+/*
+ * Styling for this module lives in theme/assets/css/blog.css because the
+ * News & Publications listing and article templates share that stylesheet.
+ */
+
+.wa-publication-card__actions .btn-navy,
+.wa-publication-card__actions .btn-navy:link,
+.wa-publication-card__actions .btn-navy:visited,
+.wa-publication-card__actions .btn-navy:hover,
+.wa-publication-card__actions .btn-navy:focus-visible {
+  color: #fff;
+}

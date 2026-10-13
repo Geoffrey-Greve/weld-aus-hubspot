@@ -1,0 +1,131 @@
+/*
+ * category-cards-3up.module/module.css
+ * Category cards with 16:9 hero image.
+ * Mobile-first: 1-col → 3-col at 1024px.
+ */
+
+.wa-category-cards__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-10);
+  text-align: center;
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+
+.wa-category-cards__grid {
+  display: grid;
+  gap: var(--wa-space-6);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .wa-category-cards__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-category-cards__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .wa-category-cards__grid--4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.wa-category-cards__card {
+  background-color: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--wa-shadow-card);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.wa-category-cards__card:hover {
+  box-shadow: var(--wa-shadow-md);
+  transform: translateY(-2px);
+}
+
+/* ── Image ───────────────────────────────────────────────────────────────── */
+
+.wa-category-cards__image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--wa-color-surface-2);
+  flex-shrink: 0;
+}
+
+.wa-category-cards__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.wa-category-cards__card:hover .wa-category-cards__image {
+  transform: scale(1.03);
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+
+.wa-category-cards__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3);
+  padding: var(--wa-space-6);
+  flex: 1;
+}
+
+.wa-category-cards__card-heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.wa-category-cards__card-body {
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text-muted);
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ── CTA ─────────────────────────────────────────────────────────────────── */
+
+.wa-category-cards__cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--wa-touch-min);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  color: var(--wa-color-primary);
+  text-decoration: none;
+  padding: var(--wa-space-2) 0;
+  align-self: flex-start;
+  transition: color 0.15s ease;
+}
+
+.wa-category-cards__cta:hover {
+  text-decoration: underline;
+}
+
+.wa-category-cards__cta:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+}

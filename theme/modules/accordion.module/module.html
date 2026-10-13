@@ -1,0 +1,86 @@
+{# accordion.module/module.html Expandable accordion using native HTML
+<details>
+  /
+  <summary>
+    elements. No JavaScript required - browser handles open/close natively. Fields:
+    module.section_id - optional anchor id module.background - background variant module.spacing -
+    vertical spacing variant module.members_only - gating flag module.section_heading - optional
+    heading above accordion module.items - repeater group (title, body, is_open_default) #} {% if
+    not module.members_only or request_contact.is_logged_in %}
+    <section
+      class="wa-accordion wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+      {%
+      if
+      module.section_id
+      %}id="{{ module.section_id }}"
+      {%
+      endif
+      %}
+    >
+      <div class="container">
+        {% if module.section_heading %}
+        <h2 class="wa-accordion__heading">{{ module.section_heading }}</h2>
+        {% endif %}
+
+        {% set _items_ns = namespace(has_content=false) %}
+        {% for item in module.items %}
+          {% if item.title or item.body_text %}
+            {% set _items_ns.has_content = true %}
+          {% endif %}
+        {% endfor %}
+
+        <div class="wa-accordion__list">
+          {% if not _items_ns.has_content %}
+          <details class="wa-accordion__item" open>
+            <summary class="wa-accordion__summary">
+              <span class="wa-accordion__title">Course overview</span>
+              <span class="wa-accordion__chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="wa-accordion__body">
+              <p>Add the core topics, delivery structure and learning activities for this course in the page editor.</p>
+            </div>
+          </details>
+          <details class="wa-accordion__item">
+            <summary class="wa-accordion__summary">
+              <span class="wa-accordion__title">Assessment and completion</span>
+              <span class="wa-accordion__chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="wa-accordion__body">
+              <p>Add assessment requirements, attendance expectations and completion outcomes here.</p>
+            </div>
+          </details>
+          {% else %}
+          {% for item in module.items %}
+          {% if item.title or item.body_text %}
+          <details class="wa-accordion__item" {% if item.is_open_default %}open{% endif %}>
+            <summary class="wa-accordion__summary">
+              <span class="wa-accordion__title">{{ item.title }}</span>
+              <span class="wa-accordion__chevron" aria-hidden="true">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path
+                    d="M5 7.5L10 12.5L15 7.5"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </summary>
+            <div class="wa-accordion__body">{{ item.body_text }}</div>
+          </details>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+  </summary>
+</details>

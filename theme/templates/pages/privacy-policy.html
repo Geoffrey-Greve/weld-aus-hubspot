@@ -1,0 +1,206 @@
+<!--
+  templateType: "page"
+  isAvailableForNewContent: true
+-->
+{#
+  privacy-policy.html — shared legal / terms page template.
+
+  Several published legal pages were created from an older saved DnD hero state
+  where the eyebrow parameter was stored as `true\n          eyebrow`, so the
+  active module did not receive a real `eyebrow` value. Render a clean,
+  source-controlled hero above the DnD content and hide the stale saved hero.
+#}
+{# The legal-page title and description are derived ABOVE the extends:
+   layouts/base.html renders partials/_head.html, and an assignment made
+   after the extends lands too late for it. #}
+{%- set _legal_content_name = content.name | default('', true) | striptags | trim -%}
+{%- set _legal_html_title = page_meta.html_title | default('', true) | striptags | trim -%}
+{%- set _legal_source_title = _legal_content_name if _legal_content_name else _legal_html_title -%}
+{%- set _legal_page_title = _legal_source_title
+  | replace('Terms | ', '')
+  | replace(' | Terms and Conditions | Weld Australia', '')
+  | replace(' | Entry Conditions & Guidelines | Weld Australia', '')
+  | replace(' | Weld Australia', '')
+  | trim
+-%}
+{%- if not _legal_page_title -%}
+  {%- set _legal_page_title = 'Privacy Policy' -%}
+{%- endif -%}
+{%- set _legal_meta_title = _legal_html_title if _legal_html_title else (_legal_page_title ~ ' | Weld Australia') -%}
+{%- set _legal_title_key = _legal_page_title | lower -%}
+{%- if 'privacy' in _legal_title_key -%}
+  {%- set _legal_meta_description = "Read Weld Australia's privacy policy to understand how we collect, use, and protect your personal information." -%}
+  {%- set _legal_subheadline = '<p>Weld Australia is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information.</p>' -%}
+{%- else -%}
+  {%- set _legal_meta_description = 'Read the ' ~ _legal_page_title ~ ' for Weld Australia.' -%}
+  {%- set _legal_subheadline = '' -%}
+{%- endif -%}
+{% set page_title_exact = _legal_meta_title %}
+{% set page_description = _legal_meta_description | escape_attr %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<meta name="robots" content="index, follow">
+<link rel="stylesheet" href="{{ get_asset_url('../../modules/hero.module/module.css') }}">
+<style>
+  .is-privacy-policy-page .dnd-section:has(.wa-hero) {
+    display: none !important;
+  }
+
+  .is-privacy-policy-page .privacy-policy-content {
+    max-width: var(--wa-container-wide, 900px);
+    margin: 0 auto;
+    padding: 0 20px;
+    color: var(--wa-color-text, #1c1e4c);
+  }
+
+  .is-privacy-policy-page .privacy-policy-content h2 {
+    font-size: clamp(24px, 2.2vw, 32px);
+    line-height: 1.2;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    color: var(--wa-color-primary, #1c1e4c);
+  }
+
+  .is-privacy-policy-page .privacy-policy-content h2:first-of-type {
+    margin-top: 0;
+  }
+
+  .is-privacy-policy-page .privacy-policy-content h3 {
+    font-size: clamp(18px, 1.4vw, 22px);
+    line-height: 1.3;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    color: var(--wa-color-primary, #1c1e4c);
+  }
+
+  .is-privacy-policy-page .privacy-policy-content p {
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    color: var(--wa-color-text-secondary, #4a4a6a);
+  }
+
+  .is-privacy-policy-page .privacy-policy-content ul {
+    margin: 12px 0 24px 0;
+    padding-left: 24px;
+  }
+
+  .is-privacy-policy-page .privacy-policy-content ul li {
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 8px;
+    color: var(--wa-color-text-secondary, #4a4a6a);
+  }
+
+  .is-privacy-policy-page .privacy-policy-content ul li strong {
+    color: var(--wa-color-primary, #1c1e4c);
+  }
+
+  .is-privacy-policy-page .privacy-policy-content a {
+    color: var(--wa-color-accent, #c9a84c);
+    text-decoration: underline;
+    transition: color 0.2s ease;
+  }
+
+  .is-privacy-policy-page .privacy-policy-content a:hover {
+    color: var(--wa-color-primary, #1c1e4c);
+  }
+
+  .is-privacy-policy-page .privacy-policy-content em {
+    display: block;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(28, 30, 76, 0.1);
+    font-style: normal;
+    font-size: 14px;
+    color: var(--wa-color-text-secondary, #4a4a6a);
+  }
+
+  @media (max-width: 768px) {
+    .is-privacy-policy-page .privacy-policy-content {
+      padding: 0 20px;
+    }
+
+    .is-privacy-policy-page .privacy-policy-content ul {
+      padding-left: 20px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}is-privacy-policy-page{% endblock %}
+
+{% block body %}
+  {%- set _shared_hero_id = 'legal-page-hero' -%}
+  {%- set _shared_hero_section_id = 'legal-page-hero' -%}
+  {%- set _shared_hero_background = 'primary' -%}
+  {%- set _shared_hero_height = 'compact' -%}
+  {%- set _shared_hero_alignment = 'left' -%}
+  {%- set _shared_hero_accent_bar = true -%}
+  {%- set _shared_hero_eyebrow = _legal_page_title -%}
+  {%- set _shared_hero_headline = _legal_page_title -%}
+  {%- set _shared_hero_subheadline = _legal_subheadline -%}
+  {% include "../partials/shared-hero.html" %}
+
+  <style>
+    .is-privacy-policy-page #legal-page-hero ~ .container-fluid .row-number-1.dnd-section {
+      display: none !important;
+    }
+
+    @supports selector(:has(*)) {
+      .is-privacy-policy-page #legal-page-hero ~ .container-fluid .dnd-section:has(.wa-hero) {
+        display: none !important;
+      }
+    }
+  </style>
+
+{% dnd_area "main_content" label="Main content" %}
+
+  {# Default hero for new editor instances. Hidden on rendered pages because the
+     source-controlled hero above handles published-page drift safely. #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero"
+          background="primary"
+          height="compact"
+          alignment="left"
+          accent_bar=true
+          eyebrow="Legal"
+          headline="Privacy Policy"
+          subheadline="<p>Weld Australia is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information.</p>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {% dnd_section
+    padding={
+      "top": 60,
+      "bottom": 80
+    }
+  %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/rich-text"
+          label="Privacy Policy Content"
+        %}
+          {% module_attribute "html" %}
+            <!-- Add your privacy policy content here -->
+            <div class="privacy-policy-content">
+              <h2>Privacy Policy</h2>
+              <p><em>Last updated: 20 July 2026</em></p>
+              <!-- Your content goes here -->
+            </div>
+          {% end_module_attribute %}
+        {% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

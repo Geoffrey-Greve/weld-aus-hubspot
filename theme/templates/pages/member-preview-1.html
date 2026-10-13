@@ -1,0 +1,404 @@
+<!--
+  templateType: page
+  label: Member Preview 1 - Command Centre (Staging)
+  isAvailableForNewContent: true
+-->
+{#
+  member-preview-1.html - staging dashboard prototype page.
+
+  Intended URL: /member-preview-1
+
+  Safety model:
+    - Does not write HubSpot CRM contact/deal data.
+    - Reads active member rows from the real HubDB table `members`.
+    - Reads existing courses/events/resources HubDB rows for live-style cards.
+    - Kept separate from /member-preview so both dashboard designs can be reviewed.
+
+  Why this extends base.html and NOT portal.html:
+  this is a public staging-review page that must render for reviewers who are not
+  logged-in members. portal.html gates its body behind the member auth gate,
+  which would hide this preview. So this page keeps the base.html "demo-bypass"
+  and renders the portal sub-nav directly (see the portal_nav block below).
+  The sub-nav renders for authenticated members and in editor/preview; a live
+  portal page relies on its Private Content audience to make member visitors
+  logged-in so the sub-nav appears.
+#}
+{% set page_title_exact = 'Member Command Centre Preview - Weld Australia' %}
+{% set page_description = 'A staging-only HubDB-backed preview of the Weld Australia member command centre dashboard.' %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<meta name="robots" content="noindex, nofollow">
+<style>
+  body.is-member-preview-command-centre-page .wa-portal-tab-panel[hidden] {
+    display: none !important;
+  }
+
+  body.is-member-preview-command-centre-page .wa-portal-tab-panel {
+    min-height: 420px;
+  }
+
+  body.is-member-preview-command-centre-page #courses-events-near-you,
+  body.is-member-preview-command-centre-page .wa-portal-tab-panel,
+  body.is-member-preview-command-centre-page .wa-portal-tab-panel > .wa-section {
+    scroll-margin-top: calc(var(--wa-site-header-offset, 112px) + 128px);
+  }
+
+  body.is-member-preview-command-centre-page #portal-profile #portal-profile-hero.wa-hero,
+  body.is-member-preview-command-centre-page #portal-certifications #portal-certifications-hero.wa-hero,
+  body.is-member-preview-command-centre-page #portal-team #portal-team-hero.wa-hero,
+  body.is-member-preview-command-centre-page #portal-invoices #portal-invoices-hero.wa-hero {
+    min-height: clamp(460px, 42vw, 540px);
+    padding-block-start: calc(var(--wa-site-header-offset, 112px) + 96px);
+  }
+
+  body.is-member-preview-command-centre-page #portal-profile #portal-profile-hero .wa-hero__content,
+  body.is-member-preview-command-centre-page #portal-certifications #portal-certifications-hero .wa-hero__content,
+  body.is-member-preview-command-centre-page #portal-team #portal-team-hero .wa-hero__content,
+  body.is-member-preview-command-centre-page #portal-invoices #portal-invoices-hero .wa-hero__content {
+    max-width: 680px;
+  }
+
+  body.is-member-preview-command-centre-page #portal-profile #portal-profile-hero .wa-hero__cta.btn-white-outline,
+  body.is-member-preview-command-centre-page #portal-profile #portal-profile-hero .wa-hero__cta.btn-white-outline:link,
+  body.is-member-preview-command-centre-page #portal-profile #portal-profile-hero .wa-hero__cta.btn-white-outline:visited {
+    background: #ffffff;
+    border-color: #ffffff;
+    color: var(--wa-color-primary, #1c1e4c);
+  }
+
+  body.is-member-preview-command-centre-page #portal-profile #portal-profile-hero .wa-hero__cta.btn-white-outline:hover,
+  body.is-member-preview-command-centre-page #portal-profile #portal-profile-hero .wa-hero__cta.btn-white-outline:focus-visible {
+    background: var(--wa-color-accent, #fecf05);
+    border-color: var(--wa-color-accent, #fecf05);
+    color: var(--wa-color-primary, #1c1e4c);
+  }
+
+  body.is-member-preview-command-centre-page #portal-profile .wa-profile-form,
+  body.is-member-preview-command-centre-page #portal-certifications .wa-certifications-section,
+  body.is-member-preview-command-centre-page #portal-invoices .wa-my-invoices-section {
+    background: linear-gradient(180deg, #f5f7fb 0%, #ffffff 100%);
+    padding-block-start: clamp(48px, 6vw, 72px);
+  }
+
+  @media (max-width: 767px) {
+    body.is-member-preview-command-centre-page #portal-profile #portal-profile-hero.wa-hero,
+    body.is-member-preview-command-centre-page #portal-certifications #portal-certifications-hero.wa-hero,
+    body.is-member-preview-command-centre-page #portal-team #portal-team-hero.wa-hero,
+    body.is-member-preview-command-centre-page #portal-invoices #portal-invoices-hero.wa-hero {
+      min-height: auto;
+      padding-block-start: calc(var(--wa-site-header-offset, 112px) + 72px);
+      padding-block-end: 56px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}is-member-preview-command-centre-page is-membership-page{% endblock %}
+
+{# ── Portal sub-nav - consistent member navigation on the command centre ── #}
+{% block portal_nav %}
+  {% set _portal_preview = is_in_editor or (is_in_previewer | default(false)) or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+  {% if request_contact.is_logged_in or _portal_preview %}
+    {% include "../partials/portal-nav.html" %}
+  {% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="wa-portal-tabs" data-portal-tabs>
+  <section
+    id="portal-dashboard"
+    class="wa-portal-tab-panel"
+    data-portal-panel="dashboard"
+    aria-label="Member dashboard"
+  >
+    {% module "member_preview_1_command_centre" path="../../modules/member-command-centre"
+      label="Member command centre preview"
+      section_id="member-command-centre-preview"
+      background="surface_alt"
+      spacing="spacious"
+      training_url="/courses"
+      profile_url="/portal/#portal-profile"
+      membership_url="/membership"
+      resources_url="/resources"
+      team_url="#portal-team"
+      support_phone="1300 660 660"
+      support_url="/contact-us"
+      editor_preview_contact_email="melwyn@refuelcreative.com.au"
+    %}
+  </section>
+
+  <section
+    id="portal-profile"
+    class="wa-portal-tab-panel"
+    data-portal-panel="profile"
+    aria-label="My profile"
+    hidden
+  >
+    {% module "portal_profile_hero" path="../../modules/hero"
+      label="Portal profile hero"
+      section_id="portal-profile-hero"
+      background="primary"
+      spacing="default"
+      height="compact"
+      alignment="left"
+      media_type="none"
+      eyebrow="Member portal"
+      headline="My profile"
+      subheadline="<p>Keep your contact details, membership information, security settings, and communication preferences up to date.</p>"
+      accent_bar=true
+    %}
+
+    {#- Form chosen from the module's form picker, not a hardcoded GUID param
+        (a param here would lock the field in the page editor). -#}
+    {% module "portal_profile_form" path="../../modules/profile-form"
+      label="Portal profile form"
+      section_id="profile-details"
+      heading="Profile & details"
+      portal_id="441838610"
+      editable_fields=["firstname", "lastname", "phone", "mobile", "address", "job_title", "date_of_birth", "primary_discipline"]
+      show_password_change_link=true
+      password_change_label="Change password"
+      password_change_link={ "url": { "type": "EXTERNAL", "href": "/_hcms/mem/reset/request?redirect_url=/portal" } }
+      background="surface"
+      spacing="default"
+      members_only=true
+    %}
+  </section>
+
+  <section
+    id="portal-certifications"
+    class="wa-portal-tab-panel"
+    data-portal-panel="certifications"
+    aria-label="My certifications"
+    hidden
+  >
+    {% module "portal_certifications_hero" path="../../modules/hero"
+      label="Portal certifications hero"
+      section_id="portal-certifications-hero"
+      background="primary"
+      spacing="default"
+      height="compact"
+      alignment="left"
+      eyebrow="Member portal"
+      headline="My certifications"
+      subheadline="<p>View your Weld Australia certification records, progress, expiry dates, and available certificate downloads.</p>"
+      primary_cta={ "label_text": "View certifications", "link": { "url": { "type": "EXTERNAL", "href": "#certification-records" } }, "style": "gold" }
+      secondary_cta={ "label_text": "Explore pathways", "link": { "url": { "type": "EXTERNAL", "href": "/certification/" } }, "style": "white-outline" }
+      accent_bar=true
+    %}
+
+    {% module "portal_certifications_list" path="../../modules/certifications-list"
+      label="Portal certifications"
+      section_id="certification-records"
+      heading=""
+      show_lapsed=true
+      empty_state_cta_label="Explore certification pathways"
+      empty_state_cta_link={ "url": { "type": "CONTENT", "href": "/certification/" } }
+      background="surface"
+      spacing="default"
+      members_only=true
+    %}
+  </section>
+
+  <section
+    id="portal-team"
+    class="wa-portal-tab-panel"
+    data-portal-panel="team"
+    aria-label="Manage my team"
+    hidden
+  >
+    {% module "portal_team_hero" path="../../modules/hero"
+      label="Portal team hero"
+      section_id="portal-team-hero"
+      background="primary"
+      spacing="default"
+      height="compact"
+      alignment="left"
+      eyebrow="Corporate membership"
+      headline="Manage my team"
+      subheadline="<p>Review the people linked to your corporate membership, manage team changes, and bulk book training from one private member portal area.</p>"
+      primary_cta={ "label_text": "View team members", "link": { "url": { "type": "EXTERNAL", "href": "#team-members" } }, "style": "gold" }
+      secondary_cta={ "label_text": "Bulk book training", "link": { "url": { "type": "EXTERNAL", "href": "#bulk-booking" } }, "style": "white-outline" }
+      accent_bar=true
+    %}
+
+    {% module "portal_corporate_admin_team" path="../../modules/corporate-admin"
+      courses_table="courses"
+      office_email="office@weldaustralia.com.au"
+      show_access_notice=true
+      background="white"
+    %}
+  </section>
+
+  <section
+    id="portal-invoices"
+    class="wa-portal-tab-panel"
+    data-portal-panel="invoices"
+    aria-label="My invoices and receipts"
+    hidden
+  >
+    {% module "portal_invoices_hero" path="../../modules/hero"
+      label="Portal invoices hero"
+      section_id="portal-invoices-hero"
+      background="primary"
+      spacing="default"
+      height="compact"
+      alignment="left"
+      eyebrow="Member portal"
+      headline="My invoices"
+      subheadline="<p>Review your Weld Australia payment records and download invoice PDFs when they are available.</p>"
+      primary_cta={ "label_text": "View invoices", "link": { "url": { "type": "EXTERNAL", "href": "#invoice-records" } }, "style": "gold" }
+      secondary_cta={ "label_text": "Contact finance", "link": { "url": { "type": "EXTERNAL", "href": "mailto:finance@weldaustralia.com.au" } }, "style": "white-outline" }
+      accent_bar=true
+    %}
+
+    {% module "portal_my_invoices" path="../../modules/my-invoices"
+      label="Portal invoices and receipts"
+      section_id="invoice-records"
+      heading=""
+      intro=""
+      finance_email="finance@weldaustralia.com.au"
+      support_email="office@weldaustralia.com.au"
+      background="surface"
+      spacing="default"
+      members_only=true
+    %}
+  </section>
+</div>
+
+{% raw %}
+<script>
+  (function () {
+    var root = document.querySelector('[data-portal-tabs]');
+    if (!root) return;
+
+    var panelByHash = {
+      '#portal-dashboard': 'dashboard',
+      '#portal-profile': 'profile',
+      '#portal-certifications': 'certifications',
+      '#portal-team': 'team',
+      '#portal-invoices': 'invoices',
+      '#courses-events-near-you': 'dashboard'
+    };
+
+    var targetByHash = {
+      '#portal-dashboard': 'portal-dashboard',
+      '#portal-profile': 'portal-profile',
+      '#portal-certifications': 'portal-certifications',
+      '#portal-team': 'portal-team',
+      '#portal-invoices': 'portal-invoices',
+      '#courses-events-near-you': 'courses-events-near-you'
+    };
+
+    function normaliseHash(hash) {
+      return panelByHash[hash] ? hash : '#portal-dashboard';
+    }
+
+    function updateNav(hash) {
+      var activeHash = hash === '#courses-events-near-you' ? hash : hash;
+      var links = document.querySelectorAll('.wa-portal-nav__link[data-portal-target]');
+      for (var i = 0; i < links.length; i += 1) {
+        var link = links[i];
+        var href = link.getAttribute('href') || '';
+        var isActive = href.indexOf(activeHash) !== -1;
+        if (hash === '#courses-events-near-you') {
+          isActive = link.getAttribute('data-portal-target') === 'courses-events';
+        }
+        link.classList.toggle('is-active', isActive);
+        if (isActive) {
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      }
+    }
+
+    function getStickyOffset() {
+      var header = document.getElementById('wa-site-header');
+      var portalNav = document.querySelector('.wa-portal-nav');
+      var cssHeaderOffset = 0;
+
+      try {
+        cssHeaderOffset = parseInt(
+          window.getComputedStyle(document.documentElement).getPropertyValue('--wa-site-header-offset'),
+          10
+        ) || 0;
+      } catch (error) {
+        cssHeaderOffset = 0;
+      }
+
+      var headerHeight = header ? Math.ceil(header.getBoundingClientRect().height) : cssHeaderOffset || 112;
+      var navHeight = portalNav ? Math.ceil(portalNav.getBoundingClientRect().height) : 64;
+
+      return headerHeight + navHeight + 24;
+    }
+
+    function scrollToTarget(hash, attempt) {
+      if (hash !== '#courses-events-near-you') {
+        window.scrollTo({
+          top: 0,
+          behavior: attempt ? 'smooth' : 'auto'
+        });
+        return;
+      }
+
+      var id = targetByHash[hash];
+      if (!id) return;
+      var target = document.getElementById(id);
+      if (target) {
+        var scrollTarget = target.querySelector ? (target.querySelector('.wa-section') || target) : target;
+        var top = scrollTarget.getBoundingClientRect().top + window.pageYOffset - getStickyOffset();
+        window.scrollTo({
+          top: Math.max(0, top),
+          behavior: attempt ? 'smooth' : 'auto'
+        });
+        return;
+      }
+      if (attempt < 6) {
+        window.setTimeout(function () {
+          scrollToTarget(hash, attempt + 1);
+        }, 150);
+      }
+    }
+
+    function activate(hash, shouldScroll) {
+      var activeHash = normaliseHash(hash);
+      var activePanel = panelByHash[activeHash];
+      var panels = root.querySelectorAll('[data-portal-panel]');
+      for (var i = 0; i < panels.length; i += 1) {
+        var panel = panels[i];
+        var isActive = panel.getAttribute('data-portal-panel') === activePanel;
+        panel.hidden = !isActive;
+      }
+      updateNav(activeHash);
+      if (shouldScroll) {
+        scrollToTarget(activeHash, 0);
+      }
+    }
+
+    document.addEventListener('click', function (event) {
+      var link = event.target.closest ? event.target.closest('.wa-portal-nav__link[data-portal-target]') : null;
+      if (!link) return;
+      var url;
+      try {
+        url = new URL(link.href, window.location.origin);
+      } catch (error) {
+        return;
+      }
+      if (url.pathname.replace(/\/$/, '') !== window.location.pathname.replace(/\/$/, '')) return;
+      if (!panelByHash[url.hash]) return;
+      event.preventDefault();
+      window.history.pushState(null, '', url.hash);
+      activate(url.hash, true);
+    });
+
+    window.addEventListener('hashchange', function () {
+      activate(window.location.hash, true);
+    });
+
+    activate(window.location.hash || '#portal-dashboard', Boolean(window.location.hash));
+  }());
+</script>
+{% endraw %}
+{% endblock body %}

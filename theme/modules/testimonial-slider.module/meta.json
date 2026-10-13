@@ -1,0 +1,14 @@
+{
+  "label": "Testimonial Slider",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Auto-playing testimonial carousel with prev/next buttons, dot indicators, and accessible aria-live region.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["content", "testimonials", "slider"]
+}

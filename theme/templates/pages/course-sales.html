@@ -1,0 +1,153 @@
+<!--
+  templateType: page
+  label: Course Detail (sales partial - included by course-router)
+  isAvailableForNewContent: false
+-->
+{#
+  course-sales.html - High-Polish Sales Course Page
+  URL: /courses/{course_slug}  (served via course-router.html when parent_template = "sales")
+  Target courses: IIW International Welding Inspector, AS1796 Cert 10
+
+  ⚠️  PARTIAL - not a standalone page template.
+      This file is included by course-router.html using {% include "./course-sales.html" %}.
+      Do NOT assign directly to a page in the HubSpot CMS editor.
+
+  Sections (§ 3.9 of docs/01-sitemap.md):
+    1.  Hero             - course title from HubDB, dual CTA
+    2.  Pricing panel    - pricing-table (Member vs Non-Member + discount callout)
+    3.  Session selector - course-filter React island
+
+  Dynamic data (from HubDB via dynamic_page_hubdb_row):
+    course_name  - static hero heading
+    course_id    - consumed by course-filter.module
+
+  Template variables available (set by course-router.html context):
+    dynamic_page_hubdb_row - the HubDB row for this course
+    request_contact        - logged-in member properties
+    hub_id                 - portal ID
+#}
+
+{# ── Resolve row data once for use in the static hero ──────────────────────── #}
+{% set _row = dynamic_page_hubdb_row %}
+{% set _course_name = _row.course_name | default('Course') %}
+
+{% require_css %}
+<style>
+  .wa-hero-video,
+  .wa-stat-tiles,
+  #why,
+  #outcomes,
+  #syllabus,
+  #audience,
+  #trainer,
+  .wa-team,
+  .wa-testimonials,
+  .wa-logo-strip,
+  #faq,
+  .wa-cta-banner {
+    display: none !important;
+  }
+</style>
+{% end_require_css %}
+
+{% require_js position="footer" %}
+<script>
+(function () {
+  var staleSelectors = [
+    '.wa-hero-video',
+    '.wa-stat-tiles',
+    '#why',
+    '#outcomes',
+    '#syllabus',
+    '#audience',
+    '#trainer',
+    '.wa-team',
+    '.wa-testimonials',
+    '.wa-logo-strip',
+    '#faq',
+    '.wa-cta-banner'
+  ];
+
+  function hideStaleCourseSections() {
+    staleSelectors.forEach(function (selector) {
+      document.querySelectorAll(selector).forEach(function (el) {
+        el.setAttribute('hidden', 'hidden');
+        el.setAttribute('aria-hidden', 'true');
+        el.style.display = 'none';
+      });
+    });
+  }
+
+  hideStaleCourseSections();
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hideStaleCourseSections);
+  } else {
+    hideStaleCourseSections();
+  }
+
+  window.setTimeout(hideStaleCourseSections, 250);
+  window.setTimeout(hideStaleCourseSections, 1000);
+}());
+</script>
+{% end_require_js %}
+
+{# § 1 SHARED HERO - retains the dynamic HubDB course title by default. #}
+{% set _shared_hero_id = 'sales-course-hero' %}
+{% set _shared_hero_section_id = 'course-detail-hero' %}
+{% set _shared_hero_background = 'primary' %}
+{% set _shared_hero_height = 'tall' %}
+{% set _shared_hero_spacing = 'default' %}
+{% set _shared_hero_alignment = 'left' %}
+{% set _shared_hero_accent_bar = true %}
+{% set _shared_hero_media_type = 'none' %}
+{% set _shared_hero_show_breadcrumb = true %}
+{% set _shared_hero_breadcrumb_items = [
+  {"label": "Training", "href": "/training/"},
+  {"label": "Course timetable", "href": "/courses/"},
+  {"label": _course_name, "current": true}
+] %}
+{% set _shared_hero_eyebrow = 'Professional qualification' %}
+{% set _shared_hero_headline = _course_name %}
+{% set _shared_hero_subheadline = "<p>Build practical capability with training developed and delivered by Australia's peak welding industry body.</p>" %}
+{% set _shared_hero_primary_label = 'View sessions' %}
+{% set _shared_hero_primary_href = '#sessions' %}
+{% set _shared_hero_primary_style = 'gold' %}
+{% set _shared_hero_secondary_label = 'Course fees' %}
+{% set _shared_hero_secondary_href = '#pricing' %}
+{% set _shared_hero_secondary_style = 'white-outline' %}
+{% include "../partials/shared-hero.html" %}
+
+{% include "../partials/course-overview.html" %}
+
+{# HubDB-powered fees + sessions. These are rendered as direct modules instead
+   of a DnD area so older saved page DnD content cannot reappear here. #}
+{% module
+  "sales_course_pricing"
+  path="../../modules/pricing-table"
+  label="Pricing panel"
+  section_heading="Course fees"
+  section_id="pricing"
+  show_member_discount_callout=true
+  member_savings_message="Weld Australia members save significantly on this course. Join today to access member pricing."
+  background="surface"
+  spacing="spacious"
+%}
+
+{% include "../partials/course-modules.html" %}
+
+{% module
+  "sales_course_sessions"
+  path="../../modules/course-filter"
+  label="Session selector"
+  section_id="sessions"
+  section_eyebrow="Course sessions"
+  default_city="auto"
+  show_pricing=true
+  show_seats_remaining=true
+  register_cta_label="Apply now"
+  eoi_heading="Register your interest"
+  eoi_message="<p>We don&#39;t have a session scheduled in your city yet. Register your interest and we&#39;ll be in touch when one is added.</p>"
+  background="surface_alt"
+  spacing="spacious"
+%}

@@ -1,0 +1,282 @@
+<!--
+  templateType: page
+  label: Home
+  isAvailableForNewContent: true
+-->
+﻿{#
+  home.html - Weld Australia Home Page
+  URL: /
+  Modules: hero → stat-band → split-feature (IIW callout) → card-grid (services, 2-col overlay) →
+           tiers (primary_dark) → icon-grid (why join) → testimonial-slider (spotlight) →
+           logo-strip (Gold HubDB) → split-feature (doc-list resources) →
+           card-grid (news, 3-col clean) → cta-banner
+#}
+{% set page_title_exact = 'Welding Australia | Training, Certification, Engineering Industry Body' %}
+{% set page_description = 'Weld Australia is the peak body for welding in Australia, offering training, certification, engineering services and industry advocacy. Build skills, ensure compliance and grow your business.' %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body_class %}is-home-page{% endblock %}
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ── § 1  HERO ────────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero"
+          background="primary"
+          height="tall"
+          alignment="left"
+          accent_bar=true
+          media_type="video"
+          eyebrow="Australian representative to the IIW"
+          headline="Securing the Future of Australia's Welding Industry"
+          subheadline="<p><strong>Weld Australia is the peak body representing the welding industry in Australia.</strong></p><p>As a not-for-profit, membership-based organisation, we are dedicated to building a world-class, competitive, and future-ready welding and fabrication sector through training, certification, engineering expertise, and industry advocacy.</p>"
+          video_embed_url="https://www.youtube.com/embed/kOF0aJGBJ0o"
+          primary_cta={"label_text": "Become a member", "link": {"url": {"href": "/membership", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "Find a course", "link": {"url": {"href": "/courses", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 2  STAT BAND ───────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/stat-band"
+          label="Our Impact"
+          background="surface"
+          heading="Building a stronger welding industry"
+          stats=[
+            {"value_text": "10,000+", "label_text": "Industry members",          "accent_color": "gold"},
+            {"value_text": "40,000+", "label_text": "Welders on the AWCR",       "accent_color": "navy"},
+            {"value_text": "50+",     "label_text": "Industries represented",    "accent_color": "gold"},
+            {"value_text": "2,000+",  "label_text": "Annual training attendees", "accent_color": "navy"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 3  SPLIT FEATURE - IIW CALLOUT ────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="About Weld Australia"
+          background="surface_alt"
+          media_type="image_callout"
+          media_side="right"
+          overline="International connections"
+          heading="Connecting industry to lift capability, quality and safety"
+          body_text="<p>We connect industry, education, research, and government to lift capability, quality, and safety across the sector.</p><p>As the Australian representative to the International Institute of Welding (IIW), we provide access to global best practice, internationally recognised qualifications, and a powerful international network spanning 60+ countries.</p>"
+          callout_title="International Institute of Welding"
+          callout_sub="Australian representative body - access to global standards, qualifications and network"
+          highlight={"text": "International Institute of Welding (IIW)"}
+          buttons=[
+            {"label_text": "About Weld Australia", "url": {"url": {"href": "/about", "type": "EXTERNAL"}}, "style": "primary"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 4  CARD GRID - SERVICES ────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/card-grid"
+          label="What We Offer"
+          background="surface"
+          overline="What we offer"
+          heading="Training, certification & industry support"
+          card_style="photo_overlay"
+          columns="2"
+          cards=[
+            {"tag_text": "Training",     "tag_color": "navy",    "title": "Welding Training Courses",       "body_text": "Industry-leading training and globally recognised qualifications designed to build capability - from welders and inspectors through to engineers and supervisors.",                                                                                "link_url": {"url": {"href": "/courses",       "type": "EXTERNAL"}}, "link_label": "Find a course",         "link_style": "arrow"},
+            {"tag_text": "Engineering",  "tag_color": "gold",    "title": "Welding Engineering Services",   "body_text": "With the largest team of expert International Welding Engineers in Australia, we provide high-level technical support - from design and inspection through to automation and failure analysis.",                                              "link_url": {"url": {"href": "/engineering",   "type": "EXTERNAL"}}, "link_label": "Engineering services",  "link_style": "arrow"},
+            {"tag_text": "Certification","tag_color": "green",   "title": "Welding Certification",          "body_text": "Australia's leading welding certification body, delivering internationally recognised certification for both companies and individuals to improve quality, ensure compliance and win work.",                                                     "link_url": {"url": {"href": "/certification", "type": "EXTERNAL"}}, "link_label": "Certification pathways","link_style": "arrow"},
+            {"tag_text": "Advocacy",     "tag_color": "magenta", "title": "Welding Industry Advocacy",      "body_text": "The voice of the welding and fabrication industry, working with government and stakeholders to strengthen sovereign manufacturing capability, address the skills shortage and improve safety standards.",                                   "link_url": {"url": {"href": "/advocacy",      "type": "EXTERNAL"}}, "link_label": "Our advocacy",          "link_style": "arrow"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 5  TIERS ───────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/tiers"
+          label="Membership Tiers"
+          background="primary_dark"
+          overline="Welding Membership"
+          heading="Join Australia's largest welding network"
+          intro="<p>Join Australia's largest welding network and unlock tangible value from day one. Weld Australia membership provides access to technical expertise, industry insights, training discounts, and a strong advocacy voice. We're here to help you grow your business, develop your people, and deliver to the highest standards.</p>"
+          tiers=[
+            {"badge_text": "Gold Member",   "badge_color": "gold",   "name_text": "Gold",       "price": "From $2,400", "price_sub": "/yr", "description": "Training vouchers, Gold directory priority, advocacy representation and premium technical support.", "link": {"url": {"href": "/membership#membership-options", "type": "EXTERNAL"}}},
+            {"badge_text": "Silver Member", "badge_color": "silver", "name_text": "Silver",     "price": "From $1,200", "price_sub": "/yr", "description": "Member pricing on training, resources hub access, directory listing and industry publications.", "link": {"url": {"href": "/membership#membership-options", "type": "EXTERNAL"}}},
+            {"badge_text": "Bronze Member", "badge_color": "bronze", "name_text": "Bronze",     "price": "From $600",   "price_sub": "/yr", "description": "Member discounts, certification support, training news and basic directory listing.", "link": {"url": {"href": "/membership#membership-options", "type": "EXTERNAL"}}},
+            {"badge_text": "Individual",    "badge_color": "navy",   "name_text": "Individual", "price": "From $220",   "price_sub": "/yr", "description": "Personal membership with training discounts, resources access and industry connection.", "link": {"url": {"href": "/membership#membership-individual", "type": "EXTERNAL"}}}
+          ]
+          cta_label="Explore membership options"
+          cta_link={"url": {"href": "/membership", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 6  ICON GRID - WHY JOIN ────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/icon-grid"
+          label="Why Join Weld Australia"
+          background="surface"
+          overline="Why join"
+          heading="Why join Weld Australia?"
+          section_align="left"
+          card_style="row"
+          columns="3"
+          features=[
+            {"heading": "Training discounts",    "body_text": "Significant savings on all Weld Australia training programs, courses and events.",           "accent_color": "gold"},
+            {"heading": "Technical expertise",   "body_text": "Direct access to Australia's largest team of International Welding Engineers on call.",      "accent_color": "magenta"},
+            {"heading": "Industry advocacy",     "body_text": "A powerful voice in government to strengthen Australia's welding and fabrication industry.",  "accent_color": "gold"},
+            {"heading": "National network",      "body_text": "Connect with welding professionals, companies and educators across Australia and globally.",   "accent_color": "magenta"},
+            {"heading": "Technical resources",   "body_text": "Full access to our library of technical notes, guidance documents and publications.",         "accent_color": "gold"},
+            {"heading": "Certification support", "body_text": "Streamlined access to internationally recognised individual and company certification.",       "accent_color": "magenta"}
+          ]
+          cta_label="Become a member"
+          cta_link={"url": {"href": "/membership", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 7  TESTIMONIAL SLIDER ──────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/testimonial-slider"
+          label="Member Testimonials"
+          background="surface_alt"
+          overline="Trusted by industry"
+          heading="Trusted by industry leaders across Australia"
+          layout="spotlight"
+          autoplay=true
+          testimonials=[
+            {"quote": "<p>Weld Australia's training programs have been instrumental in upskilling our workforce. The quality and relevance is unmatched in the industry.</p>", "name": "James Okafor",  "role": "Operations Manager",     "company": "Pacific Steel Fabricators", "initials": "JO", "tier": "gold"},
+            {"quote": "<p>The IIW Inspector qualification opened doors globally. Weld Australia made the pathway clear and the support throughout was exceptional.</p>",      "name": "Sarah Chen",    "role": "Senior Welding Inspector", "company": "BHP Engineering",          "initials": "SC", "tier": "silver"},
+            {"quote": "<p>As a Gold member, the training vouchers alone pay for membership many times over. The advocacy work and technical support are a genuine bonus.</p>","name": "Michael Tran",  "role": "Chief Executive Officer",  "company": "ACME Welding Pty Ltd",    "initials": "MT", "tier": "gold"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 8  LOGO STRIP ──────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/logo-strip"
+          label="Gold Member Logos"
+          background="surface_alt"
+          section_heading=""
+          source="hubdb_members_gold"
+          animation="marquee"
+          max_logos_from_hubdb=12
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 9  SPLIT FEATURE - RESOURCES ───────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Technical Resources"
+          background="surface"
+          media_type="document_list"
+          media_side="right"
+          overline="Resources"
+          heading="Welding Resources & Technical Documents"
+          body_text="<p>A comprehensive library of technical notes, guidance documents and industry publications to support best practice across the welding and fabrication industry - helping individuals and businesses improve quality, safety and compliance.</p>"
+          items=[
+            {"title": "Technical Note TN 01 - Qualification of welding procedures", "desc": "PDF · Free download"},
+            {"title": "Weld Australia Membership Benefits Guide 2026", "desc": "PDF · Free download"},
+            {"title": "IIW Welding Inspector Study Guide", "desc": "PDF · Members only"},
+            {"title": "AS/NZS 1665 Welded aluminium structures", "desc": "PDF · Members only"}
+          ]
+          buttons=[
+            {"label_text": "Browse the resource library", "url": {"url": {"href": "/resources", "type": "EXTERNAL"}}, "style": "primary"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 10  CARD GRID - NEWS ───────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/card-grid"
+          label="Latest News"
+          background="surface_alt"
+          overline="Latest News"
+          heading="Industry news & updates"
+          card_style="clean_white"
+          columns="3"
+          cards=[
+            {"tag_text": "Advocacy",     "tag_color": "magenta", "date_text": "22 May 2026", "title": "Weld Australia submission to Senate inquiry on sovereign manufacturing capability",       "body_text": "Weld Australia has submitted a comprehensive paper to the Senate Standing Committee on Economics, urging targeted investment in welding workforce development.", "link_url": {"url": {"href": "/news/", "type": "EXTERNAL"}}, "link_label": "Read more"},
+            {"tag_text": "Training",     "tag_color": "navy",    "date_text": "15 May 2026", "title": "New IIW International Welding Inspector course dates announced for 2026",                  "body_text": "Registration is now open for the second round of IIW Inspector courses across Sydney, Melbourne and Brisbane. Early bird pricing available until 30 June.",      "link_url": {"url": {"href": "/news/", "type": "EXTERNAL"}}, "link_label": "Read more"},
+            {"tag_text": "Certification","tag_color": "green",   "date_text": "8 May 2026",  "title": "ISO 3834 certification helps Queensland firm win major LNG contract",                     "body_text": "A Weld Australia member company credits its ISO 3834 certification as a key factor in securing a significant contract for a major LNG facility expansion.",       "link_url": {"url": {"href": "/news/", "type": "EXTERNAL"}}, "link_label": "Read more"}
+          ]
+          news_source="blog"
+          news_post_count=3
+          news_read_label="Read more"
+          cta_label="View all news"
+          cta_link={"url": {"href": "/news/", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 11  CTA BANNER ─────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA"
+          background="primary"
+          align="split"
+          headline="Ready to advance your welding career?"
+          body_text="<p>Find a course, earn a certification, or become a member today.</p>"
+          cta_label="Become a member"
+          cta_link={"url": {"href": "/membership", "type": "EXTERNAL"}}
+          secondary_cta_label="Find a course"
+          secondary_cta_link={"url": {"href": "/courses", "type": "EXTERNAL"}}
+          tertiary_cta_label="Get certified"
+          tertiary_cta_link={"url": {"href": "/certification", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

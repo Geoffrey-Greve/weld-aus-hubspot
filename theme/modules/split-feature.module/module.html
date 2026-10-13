@@ -1,0 +1,723 @@
+{#
+  split-feature.module/module.html
+  Two-column layout: text content on one side, configurable media on the other.
+  Replaces two-col-text-image.module and feature-section.module.
+
+  Fields: section_id, background, background_image, spacing, visibility, members_only,
+          overline, heading, body, media_side, media_type,
+          image, callout_title, callout_sub,
+          panels, video_source, hubspot_video, video_url, video_poster_image, video_label,
+          items, checklist_items, stat_panel_items,
+          quote_text, quote_author,
+          highlight, alert, figure_block, buttons
+#}
+
+{%- set _bg      = module.background  | default('surface') -%}
+{%- set _sp      = module.spacing     | default('default') -%}
+{%- set _vis     = module.visibility  | default(['mobile','tablet','desktop']) -%}
+{%- set _side    = module.media_side  | default('right') -%}
+{%- set _type    = module.media_type  | default('image') -%}
+{%- set _is_trainers_section = module.section_id == 'our-trainers' -%}
+{%- set _is_inhouse_section = module.section_id == 'in-house-training' -%}
+{%- if _is_trainers_section -%}{%- set _type = 'image_callout' -%}{%- endif -%}
+{%- set _dark    = _bg in ['primary', 'primary_dark'] -%}
+{%- set _inhouse_bg_fallback = 'https://441838610.hs-sites-ap1.com/hs-fs/hubfs/placeholders/Stocked%20Images/iStock-2188581107%20(2).jpg?width=1800&name=iStock-2188581107%20(2).jpg' -%}
+{%- set _section_bg_image = '' -%}
+{%- if module.background_image and module.background_image.src -%}
+  {%- set _section_bg_image = module.background_image.src -%}
+{%- elif _is_inhouse_section -%}
+  {%- set _section_bg_image = _inhouse_bg_fallback -%}
+{%- endif -%}
+{%- set _heading_key = module.heading | default('') | lower -%}
+{%- set _resource_doc_layout = _type == 'document_list' and ('resource' in _heading_key or 'technical document' in _heading_key or 'publication' in _heading_key) -%}
+{%- set _iiw_section = 'connecting industry' in _heading_key and 'quality and safety' in _heading_key -%}
+
+{%- set _section_classes = 'wa-split-feature wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-' ~ _sp -%}
+{%- if 'mobile'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+<section
+  class="{{ _section_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  {% if _section_bg_image %}style="--wa-split-feature-bg-image: url('{{ _section_bg_image }}');"{% endif %}
+>
+  <div class="container">
+    <div class="wa-split-feature__inner{% if _side == 'left' %} wa-split-feature__inner--reversed{% endif %}">
+
+      {# ── Text column ──────────────────────────────────────────────────────── #}
+      <div class="wa-split-feature__text">
+
+        {% if module.overline %}
+        <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+          <span class="wa-overline__text">{{ module.overline }}</span>
+        </div>
+        {% endif %}
+
+        {% if module.heading %}
+        <h2 class="wa-split-feature__heading">{{ module.heading }}</h2>
+        {% endif %}
+
+        {% if module.figure_block and module.figure_block.number %}
+        <div class="wa-split-feature__figure wa-split-feature__figure--{{ module.figure_block.accent_color | default('gold') }}">
+          <span class="wa-split-feature__figure-number">{{ module.figure_block.number }}</span>
+          {% if module.figure_block.label_text %}
+          <span class="wa-split-feature__figure-label">{{ module.figure_block.label_text }}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% if module.body_text %}
+        <div class="wa-split-feature__body wa-richtext">{{ module.body_text }}</div>
+        {% endif %}
+
+        {% if _type != 'checklist' and module.checklist_items %}
+        <ul class="wa-split-feature__checklist wa-split-feature__checklist--inline" role="list">
+          {% for ci in module.checklist_items %}
+          <li class="wa-split-feature__check-item">
+            <svg class="wa-split-feature__check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10" fill="var(--wa-color-primary)"/>
+              <polyline points="8 12 11 15 16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>{{ ci.text }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if module.alert and module.alert.title %}
+        <div class="wa-split-feature__alert wa-split-feature__alert--{{ module.alert.tone | default('amber') }}">
+          <strong class="wa-split-feature__alert-title">{{ module.alert.title }}</strong>
+          {% if module.alert.body_text %}
+          <span class="wa-split-feature__alert-body">{{ module.alert.body_text }}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% if (module.highlight and module.highlight.text) or _iiw_section %}
+        {% set _highlight_text = module.highlight.text | default('International Institute of Welding (IIW)') %}
+        {% set _highlight_logo_src = module.highlight.logo_image.src | default('', true) %}
+        <div class="wa-split-feature__highlight{% if _iiw_section %} wa-split-feature__highlight--iiw{% endif %}">
+          {% if _iiw_section %}
+          {% if _highlight_logo_src %}
+          <span class="wa-split-feature__highlight-badge wa-split-feature__highlight-badge--image" aria-hidden="true">
+            <img src="{{ _highlight_logo_src }}" alt="" loading="lazy">
+          </span>
+          {% else %}
+          <span class="wa-split-feature__highlight-badge" aria-hidden="true">iiw</span>
+          {% endif %}
+          <span class="wa-split-feature__highlight-copy">
+            <span class="wa-split-feature__highlight-kicker">Australian representative to the</span>
+            <span class="wa-split-feature__highlight-title">{{ _highlight_text }}</span>
+          </span>
+          {% else %}
+          <svg class="wa-split-feature__highlight-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>{{ _highlight_text }}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% if module.buttons and not _is_trainers_section %}
+        <div class="wa-split-feature__buttons">
+          {% for btn in module.buttons %}
+          {% if btn.label_text %}
+          {% set _btn_style = btn.style | default('primary') %}
+          {% set _btn_label_key = btn.label_text | default('', true) | lower %}
+          {% set _btn_href = btn.url.url.href_with_scheme | default(btn.url.url.href, true) | default('#', true) %}
+          {% set _btn_url_type = btn.url.url.type | default('', true) %}
+          {% set _btn_href_key = _btn_href | lower %}
+          {% if _btn_url_type == 'EXTERNAL'
+            and (_btn_href_key is string_startingwith '/http://' or _btn_href_key is string_startingwith '/https://')
+          %}
+            {% set _btn_href = _btn_href | regex_replace('^/', '') %}
+            {% set _btn_href_key = _btn_href | lower %}
+          {% elif _btn_url_type == 'EXTERNAL'
+            and (_btn_href_key is string_startingwith '/www.')
+          %}
+            {% set _btn_href = 'https://' ~ (_btn_href | regex_replace('^/', '')) %}
+            {% set _btn_href_key = _btn_href | lower %}
+          {% elif _btn_url_type == 'EXTERNAL'
+            and _btn_href
+            and _btn_href != '#'
+            and not (_btn_href_key is string_startingwith '#')
+            and not (_btn_href_key is string_startingwith '/')
+            and not (_btn_href_key is string_startingwith 'http://')
+            and not (_btn_href_key is string_startingwith 'https://')
+            and not (_btn_href_key is string_startingwith 'mailto:')
+            and not (_btn_href_key is string_startingwith 'tel:')
+          %}
+            {% set _btn_href = 'https://' ~ _btn_href %}
+            {% set _btn_href_key = _btn_href | lower %}
+          {% endif %}
+          {% set _btn_open_in_new_tab = btn.open_in_new_tab | default(btn.url.open_in_new_tab, true) %}
+          {% if _is_inhouse_section and loop.index == 1 %}
+            {% set _btn_style = 'gold' %}
+          {% endif %}
+          {% if _btn_style == 'outline' and not _dark %}
+            {% set _btn_style = 'navy-outline' %}
+          {% endif %}
+          {% if 'download brochure' in _btn_label_key and (_btn_href_key == '' or _btn_href_key == '#' or _btn_href_key == '/resources' or _btn_href_key == '/resources/' or _btn_href_key == '/resources?hslang=en' or _btn_href_key == '/resources/?hslang=en') %}
+            {# QA #46: SharePoint direct-download endpoint so the brochure opens on Android without a Microsoft login. #}
+            {% set _btn_href = 'https://weldingtech.sharepoint.com/sites/WeldsPublicDocuments/_layouts/15/download.aspx?share=EepC0EpcRT1OjptEQzolHsQBbBn2MyGah-VoxHDyiznQPg' %}
+            {% set _btn_open_in_new_tab = true %}
+          {% endif %}
+          <a
+            href="{{ _btn_href }}"
+            class="btn btn-{{ _btn_style }}"
+            {% if _btn_open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >
+            <span>{{ btn.label_text }}</span>
+            {% if not _is_inhouse_section %}
+            <svg class="wa-btn__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+            {% endif %}
+          </a>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>{# /text column #}
+
+      {# ── Media column ─────────────────────────────────────────────────────── #}
+      <div class="wa-split-feature__media wa-split-feature__media--{{ _type }}">
+
+        {# ── Image ──────────────────────────────────────────────────────────── #}
+        {% if _type == 'image' %}
+          {% if module.image and module.image.src %}
+          <img
+            src="{{ module.image.src }}"
+            alt="{{ module.image.alt | default('') }}"
+            class="wa-split-feature__img"
+            loading="lazy"
+            decoding="async"
+            {% if module.image.width %}width="{{ module.image.width }}"{% endif %}
+            {% if module.image.height %}height="{{ module.image.height }}"{% endif %}
+          >
+          {% else %}
+          <div class="wa-split-feature__image-placeholder" aria-hidden="true"></div>
+          {% endif %}
+
+        {# ── Image with feature panels ───────────────────────────────────────── #}
+        {% elif _type == 'image_panels' %}
+          {% set _image_panel_src = module.image.src | default('', true) %}
+          {% set _image_panel_alt = module.image.alt | default('') %}
+          {% set _image_panel_width = module.image.width | default('') %}
+          {% set _image_panel_height = module.image.height | default('') %}
+          {% if not _image_panel_src and module.section_id == 'apprentices' %}
+            {% set _image_panel_src = get_asset_url('../../assets/img/advocacy-apprentices-tafe.jpg') %}
+            {% set _image_panel_alt = 'Wallet with payment cards representing investment in TAFE and apprenticeships' %}
+            {% set _image_panel_width = '900' %}
+            {% set _image_panel_height = '600' %}
+          {% endif %}
+
+          {% if _image_panel_src %}
+          <img
+            src="{{ _image_panel_src }}"
+            alt="{{ _image_panel_alt }}"
+            class="wa-split-feature__img wa-split-feature__img--wide"
+            loading="lazy"
+            decoding="async"
+            {% if _image_panel_width %}width="{{ _image_panel_width }}"{% endif %}
+            {% if _image_panel_height %}height="{{ _image_panel_height }}"{% endif %}
+          >
+          {% else %}
+          <div class="wa-split-feature__image-placeholder wa-split-feature__image-placeholder--wide" aria-hidden="true"></div>
+          {% endif %}
+
+          {% if module.panels %}
+            {% if module.panels_label %}
+            <p class="wa-split-feature__panels-label">{{ module.panels_label }}</p>
+            {% endif %}
+            <div class="wa-split-feature__panels">
+              {% for panel in module.panels %}
+              <div class="wa-split-feature__panel wa-split-feature__panel--{{ panel.accent_color | default('gold') }}">
+                <span class="wa-split-feature__panel-title">{{ panel.title }}</span>
+                {% if panel.desc %}
+                <span class="wa-split-feature__panel-desc">{{ panel.desc }}</span>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+        {# ── Image with callout card ─────────────────────────────────────────── #}
+        {% elif _type == 'image_callout' %}
+          {% set _image_src = '' %}
+          {% set _image_alt = '' %}
+          {% set _image_width = '' %}
+          {% set _image_height = '' %}
+          {% if module.image and module.image.src %}
+            {% set _image_src = module.image.src %}
+            {% set _image_alt = module.image.alt | default('') %}
+            {% set _image_width = module.image.width | default('') %}
+            {% set _image_height = module.image.height | default('') %}
+          {% elif _is_trainers_section %}
+            {% set _image_src = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1266644220%20(2).jpg' %}
+            {% set _image_alt = 'Weld Australia trainer delivering practical welding training' %}
+            {% set _image_width = '1200' %}
+            {% set _image_height = '900' %}
+          {% endif %}
+          {% set _callout_title = module.callout_title | default('') %}
+          {% set _callout_sub = module.callout_sub | default('') %}
+          {% if _is_trainers_section and not _callout_title %}
+            {% set _callout_title = 'IIW Authorised Training Body' %}
+            {% set _callout_sub = 'Globally recognised qualifications - delivered in Australia' %}
+          {% endif %}
+          {% if _image_src %}
+          <div class="wa-split-feature__img-wrap">
+            <img
+              src="{{ _image_src }}"
+              alt="{{ _image_alt }}"
+              class="wa-split-feature__img"
+              loading="lazy"
+              decoding="async"
+              {% if _image_width %}width="{{ _image_width }}"{% endif %}
+              {% if _image_height %}height="{{ _image_height }}"{% endif %}
+            >
+            {% if _callout_title %}
+            {% set _callout_title_lower = _callout_title | lower %}
+            {% set _callout_is_iiw = _is_trainers_section or 'iiw authorised' in _callout_title_lower %}
+            <div class="wa-split-feature__callout-card{% if _callout_is_iiw %} wa-split-feature__callout-card--iiw{% endif %}">
+              {% if _callout_is_iiw %}
+              <span class="wa-split-feature__callout-logo" aria-hidden="true">iiw</span>
+              {% endif %}
+              <span class="wa-split-feature__callout-title">{{ _callout_title }}</span>
+              {% if _callout_sub %}
+              <span class="wa-split-feature__callout-sub">{{ _callout_sub }}</span>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+          {% else %}
+          <div class="wa-split-feature__img-wrap wa-split-feature__img-wrap--placeholder" aria-hidden="true">
+            <div class="wa-split-feature__image-placeholder"></div>
+            {% if _callout_title %}
+            {% set _callout_title_lower = _callout_title | lower %}
+            {% set _callout_is_iiw = _is_trainers_section or 'iiw authorised' in _callout_title_lower %}
+            <div class="wa-split-feature__callout-card{% if _callout_is_iiw %} wa-split-feature__callout-card--iiw{% endif %}">
+              {% if _callout_is_iiw %}
+              <span class="wa-split-feature__callout-logo" aria-hidden="true">iiw</span>
+              {% endif %}
+              <span class="wa-split-feature__callout-title">{{ _callout_title }}</span>
+              {% if _callout_sub %}
+              <span class="wa-split-feature__callout-sub">{{ _callout_sub }}</span>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+        {# ── Document / download list ────────────────────────────────────────── #}
+        {% elif _type == 'document_list' %}
+          {% set _resource_docs = [
+            {"title": "Technical Note TN 01 - Qualification of welding procedures", "desc": "PDF · Free download", "locked": false},
+            {"title": "Weld Australia Membership Benefits Guide 2026", "desc": "PDF · Free download", "locked": false},
+            {"title": "IIW Welding Inspector Study Guide", "desc": "PDF · Members only", "locked": true},
+            {"title": "AS/NZS 1665 Welded aluminium structures", "desc": "PDF · Members only", "locked": true}
+          ] %}
+          {% if _resource_doc_layout %}
+            {# Pull homepage resource downloads from HubDB, read-only.
+               Direct file URLs are only emitted for public/unlocked resources. #}
+            {% set _hubdb_resource_rows = hubdb_table_rows('resources', 'is_active__eq=true&limit=100') %}
+            {% set contact_logged_in = request_contact.is_logged_in | default(false) %}
+            {% set contact_status    = request_contact.individual_membership_status | default('') %}
+            {% set contact_tier      = request_contact.individual_membership_type_2 | default('') %}
+            {% set contact_status_key = contact_status | lower | replace(' ', '_') %}
+            {% set is_active_member  = contact_logged_in and contact_status_key not in ['', 'pending', 'lapsed', 'cancelled', 'canceled', 'expired', 'non-member', 'non_member'] %}
+
+            {% if contact_tier == 'Corporate Gold' %}
+              {% set contact_tier_rank = 4 %}
+            {% elif contact_tier == 'Corporate Silver' %}
+              {% set contact_tier_rank = 3 %}
+            {% elif contact_tier == 'Corporate Bronze' %}
+              {% set contact_tier_rank = 2 %}
+            {% elif is_active_member or contact_logged_in %}
+              {# The homepage teaser should unlock normal member resources for logged-in members
+                 even when the full membership status/tier properties are not exposed here. #}
+              {% set contact_tier_rank = 1 %}
+            {% else %}
+              {% set contact_tier_rank = 0 %}
+            {% endif %}
+
+            {% set resource_ns = namespace(items=[], public_count=0, member_count=0) %}
+            {% for resource in _hubdb_resource_rows %}
+              {% set req_tier_name = resource.required_tier.name | default(resource.required_tier | default('public'), true) | lower %}
+              {% set file_type_name = resource.file_type.name | default(resource.file_type | default('pdf'), true) | lower %}
+              {% set is_member_resource = req_tier_name in ['member', 'bronze', 'silver', 'gold'] or resource.members_only %}
+              {% if file_type_name == 'pdf' and not is_member_resource and resource_ns.public_count < 2 %}
+                {% set download_url = resource.file_url | default('') %}
+                {% set resource_label = resource.non_member_label | default('Free download', true) %}
+                {% set resource_desc = (file_type_name | upper) ~ ' · ' ~ resource_label %}
+                {% set resource_ns.items = resource_ns.items + [{
+                  'title': resource.title | default('Resource download'),
+                  'desc': resource_desc,
+                  'href': download_url if download_url else '/resources/' ~ resource.slug,
+                  'open_in_new_tab': true if download_url else false,
+                  'locked': false,
+                  'action_label': 'Download PDF'
+                }] %}
+                {% set resource_ns.public_count = resource_ns.public_count + 1 %}
+              {% endif %}
+            {% endfor %}
+
+            {% for resource in _hubdb_resource_rows %}
+              {% set req_tier_name = resource.required_tier.name | default(resource.required_tier | default('public'), true) | lower %}
+              {% set file_type_name = resource.file_type.name | default(resource.file_type | default('pdf'), true) | lower %}
+              {% set is_member_resource = req_tier_name in ['member', 'bronze', 'silver', 'gold'] or resource.members_only %}
+              {% if file_type_name == 'pdf' and is_member_resource and resource_ns.member_count < 2 %}
+                {% if req_tier_name == 'gold' %}
+                  {% set req_rank = 4 %}
+                {% elif req_tier_name == 'silver' %}
+                  {% set req_rank = 3 %}
+                {% elif req_tier_name == 'bronze' %}
+                  {% set req_rank = 2 %}
+                {% else %}
+                  {% set req_rank = 1 %}
+                {% endif %}
+
+                {% set is_locked_resource = req_rank > 1 and contact_tier_rank < req_rank %}
+                {% if req_rank <= 1 %}
+                  {% set is_locked_resource = not contact_logged_in %}
+                {% endif %}
+                {% set download_url = resource.file_url | default('') %}
+                {% set resource_label = resource.non_member_label | default('Members only', true) %}
+                {% if contact_logged_in and resource.member_label %}
+                  {% set resource_label = resource.member_label %}
+                {% endif %}
+                {% set resource_desc = (file_type_name | upper) ~ ' · ' ~ resource_label %}
+                {% set resource_ns.items = resource_ns.items + [{
+                  'title': resource.title | default('Member resource'),
+                  'desc': resource_desc,
+                  'href': download_url if (download_url and not is_locked_resource) else '',
+                  'open_in_new_tab': true if (download_url and not is_locked_resource) else false,
+                  'locked': is_locked_resource,
+                  'action_label': 'Member login required' if is_locked_resource else 'Download PDF'
+                }] %}
+                {% set resource_ns.member_count = resource_ns.member_count + 1 %}
+              {% endif %}
+            {% endfor %}
+
+            {% if resource_ns.items %}
+              {% set _resource_docs = resource_ns.items %}
+            {% endif %}
+          {% endif %}
+          {% set _doc_items = _resource_docs if _resource_doc_layout and _resource_docs else module.items %}
+          {% if _doc_items %}
+          <ul class="wa-split-feature__doc-list" role="list">
+            {% for item in _doc_items %}
+            {% set _item_desc = item.desc | default('') %}
+            {% set _is_locked_doc = item.locked or ('members only' in (_item_desc | lower)) %}
+            {% set _item_href = item.href | default('', true) %}
+            {% if not _item_href and item.link_url and item.link_url.url and item.link_url.url.href %}
+              {% set _item_href = item.link_url.url.href %}
+            {% endif %}
+            {% set _item_open_new = item.open_in_new_tab or (item.link_url and item.link_url.open_in_new_tab) %}
+            {% set _item_action_label = item.action_label | default('View resource' if _is_locked_doc else 'Download PDF') %}
+            <li class="wa-split-feature__doc-item{% if _is_locked_doc %} wa-split-feature__doc-item--locked{% endif %}">
+              <span class="wa-split-feature__doc-icon{% if _is_locked_doc %} wa-split-feature__doc-icon--locked{% endif %}" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+              </span>
+              <span class="wa-split-feature__doc-text">
+                <span class="wa-split-feature__doc-title">{{ item.title }}</span>
+                {% if _item_desc %}
+                <span class="wa-split-feature__doc-desc">{{ _item_desc }}</span>
+                {% endif %}
+              </span>
+              {% if _item_href %}
+              <a
+                href="{{ _item_href }}"
+                class="wa-split-feature__doc-link"
+                {% if _item_open_new %}target="_blank" rel="noopener noreferrer"{% endif %}
+                aria-label="{{ _item_action_label }} - {{ item.title }}"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              </a>
+              {% else %}
+              <span class="wa-split-feature__doc-link wa-split-feature__doc-link--static{% if _is_locked_doc %} wa-split-feature__doc-link--disabled{% endif %}" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              </span>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+          {% if _resource_doc_layout %}
+          <div class="wa-split-feature__doc-note">
+            <span class="wa-split-feature__doc-note-dot" aria-hidden="true"></span>
+            <span>Member login required to access all resources</span>
+          </div>
+          {% endif %}
+          {% endif %}
+
+        {# ── Feature panels (2-col grid) ─────────────────────────────────────── #}
+        {% elif _type == 'feature_panel' %}
+          {% set _feature_panel_image_src = module.image.src | default('', true) %}
+          {% set _feature_panel_image_alt = module.image.alt | default('') %}
+          {% set _feature_panel_image_width = module.image.width | default('') %}
+          {% set _feature_panel_image_height = module.image.height | default('') %}
+          {% if not _feature_panel_image_src and module.section_id == 'apprentices' %}
+            {% set _feature_panel_image_src = get_asset_url('../../assets/img/advocacy-apprentices-tafe.jpg') %}
+            {% set _feature_panel_image_alt = 'Wallet with payment cards representing investment in TAFE and apprenticeships' %}
+            {% set _feature_panel_image_width = '900' %}
+            {% set _feature_panel_image_height = '600' %}
+          {% endif %}
+          {% if _feature_panel_image_src %}
+          <img
+            src="{{ _feature_panel_image_src }}"
+            alt="{{ _feature_panel_image_alt }}"
+            class="wa-split-feature__img wa-split-feature__img--wide"
+            loading="lazy"
+            decoding="async"
+            {% if _feature_panel_image_width %}width="{{ _feature_panel_image_width }}"{% endif %}
+            {% if _feature_panel_image_height %}height="{{ _feature_panel_image_height }}"{% endif %}
+          >
+          {% endif %}
+          {% if module.panels %}
+          {% set _feature_panel_label = module.panels_label | default('', true) %}
+          {% if not _feature_panel_label and module.section_id == 'apprentices' %}
+            {% set _feature_panel_label = "What we're calling for" %}
+          {% endif %}
+          {% if _feature_panel_label %}
+          <p class="wa-split-feature__panels-label">{{ _feature_panel_label }}</p>
+          {% endif %}
+          <div class="wa-split-feature__panels">
+            {% for panel in module.panels %}
+            <div class="wa-split-feature__panel wa-split-feature__panel--{{ panel.accent_color | default('gold') }}">
+              <span class="wa-split-feature__panel-title">{{ panel.title }}</span>
+              {% if panel.desc %}
+              <span class="wa-split-feature__panel-desc">{{ panel.desc }}</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+        {# ── Info cards (stacked) ────────────────────────────────────────────── #}
+        {% elif _type == 'info_cards' %}
+          {% set _info_items = module.items %}
+          {% set _use_certification_pathway_items = module.items_source == 'hubdb_certification_pathways' %}
+          {% if not _use_certification_pathway_items and module.section_id == 'company' and 'company welding certification' in _heading_key %}
+            {% set _use_certification_pathway_items = true %}
+          {% endif %}
+          {% if _use_certification_pathway_items %}
+            {% set _pathway_table = module.items_hubdb_table | default('certification_pathways', true) %}
+            {% set _pathway_audience = module.items_hubdb_audience | default('company', true) %}
+            {% set _pathway_query = 'is_active__eq=true&orderBy=sort_order' %}
+            {% if _pathway_audience and _pathway_audience != 'all' %}
+              {% set _pathway_query = 'audience__eq=' ~ _pathway_audience ~ '&' ~ _pathway_query %}
+            {% endif %}
+            {% set _pathway_rows = hubdb_table_rows(_pathway_table, _pathway_query) %}
+            {% set _pathway_ns = namespace(items=[]) %}
+              {% for row in _pathway_rows %}
+                {% set _pathway_slug = row.hs_path | default(row.slug, true) %}
+                {% if _pathway_slug %}
+                  {% set _pathway_href = '/certification?pathway=' ~ _pathway_slug %}
+                {% else %}
+                  {% set _pathway_href = row.link_url | default('', true) %}
+                {% endif %}
+              {% set _pathway_ns.items = _pathway_ns.items + [{
+                'title': row.title | default('Certification pathway'),
+                'desc': row.summary | default(''),
+                'href': _pathway_href,
+                'slug': row.slug | default(row.hs_path, true),
+                'open_in_new_tab': false
+              }] %}
+            {% endfor %}
+            {% if _pathway_ns.items %}
+              {% set _info_items = _pathway_ns.items %}
+            {% endif %}
+          {% endif %}
+          {% if _info_items %}
+          <div class="wa-split-feature__info-cards">
+            {% for item in _info_items %}
+            {% set _info_title_key = item.title | default('') | lower %}
+            {% set _info_href = item.href | default(item.link_url.url.href, true) %}
+            {% set _info_slug = item.slug | default('', true) %}
+            {% if not _info_href %}
+              {% set _is_company_cert_info = 'iso 3834' in _info_title_key or '5131' in _info_title_key or 'en 15085' in _info_title_key or 'din 2303' in _info_title_key or 'company certification' in _info_title_key or 'organisation' in _info_title_key %}
+              {% set _is_individual_cert_info = 'individual' in _info_title_key or 'welder certification' in _info_title_key %}
+              {% set _is_overview_cert_info = 'certification body' in _info_title_key or 'anbcc' in _info_title_key or 'iiw authorised' in _info_title_key %}
+              {% if _is_company_cert_info %}
+                {% set _info_href = '/certification#company' %}
+              {% elif _is_individual_cert_info %}
+                {% set _info_href = '/certification#individual' %}
+              {% elif _is_overview_cert_info %}
+                {% set _info_href = '/certification#overview' %}
+              {% endif %}
+            {% endif %}
+            {% if _info_href %}
+            <a
+              class="wa-split-feature__info-card wa-split-feature__info-card--link"
+              href="{{ _info_href }}"
+              {% if _info_slug %}id="{{ _info_slug }}"{% endif %}
+              {% if item.open_in_new_tab or item.link_url.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >
+            {% else %}
+            <div class="wa-split-feature__info-card"{% if _info_slug %} id="{{ _info_slug }}"{% endif %}>
+            {% endif %}
+              <span class="wa-split-feature__info-title">{{ item.title }}</span>
+              {% if item.desc %}
+              <span class="wa-split-feature__info-desc">{{ item.desc }}</span>
+              {% endif %}
+              {% if _info_href %}
+              <span class="wa-split-feature__info-action">
+                Learn more
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </span>
+              {% endif %}
+            {% if _info_href %}
+            </a>
+            {% else %}
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+
+        {# ── Video ───────────────────────────────────────────────────────────── #}
+        {% elif _type == 'video' %}
+          {%- set _video_source = module.video_source | default('embed') -%}
+          {%- set _hs_video = module.hubspot_video -%}
+
+          {# HubSpot-hosted video: render HubSpot's own player so plays are
+             tracked on the contact record. The player carries its own
+             thumbnail, so the poster facade below does not apply here. #}
+          {% if _video_source == 'hubspot' and _hs_video and _hs_video.player_id %}
+          {%- set _hsv_width  = _hs_video.width  | default(1280) -%}
+          {%- set _hsv_height = _hs_video.height | default(720) -%}
+          {%- set _hsv_autoplay = _hs_video.autoplay | default(False) -%}
+          {%- set _hsv_hide_controls = _hs_video.hide_controls | default(False) -%}
+          {%- set _hsv_loop = _hs_video.loop_video | default(False) -%}
+          {%- set _hsv_muted = _hs_video.mute_by_default | default(False) -%}
+          <div class="wa-split-feature__video-wrap">
+            <div class="wa-split-feature__video-frame">
+              <div class="wa-split-feature__video-embed">
+                {% video_player "wa_split_feature_video"
+                  overrideable=False,
+                  type="scriptV4",
+                  hide_playlist=True,
+                  viral_sharing=False,
+                  embed_button=False,
+                  full_width=True,
+                  width=_hsv_width,
+                  height=_hsv_height,
+                  player_id=_hs_video.player_id,
+                  autoplay=_hsv_autoplay,
+                  hidden_controls=_hsv_hide_controls,
+                  loop_video=_hsv_loop,
+                  muted=_hsv_muted,
+                  style="" %}
+              </div>
+            </div>
+          </div>
+
+          {% elif _video_source == 'embed' and module.video_url %}
+          <div class="wa-split-feature__video-wrap">
+            <div class="wa-split-feature__video-frame">
+              {% if module.video_poster_image and module.video_poster_image.src %}
+              <button
+                type="button"
+                class="wa-hero__video-facade wa-split-feature__video-facade"
+                data-video-src="{{ module.video_url }}"
+                aria-label="{{ module.video_label | default('Play video') }}"
+              >
+                <img
+                  src="{{ module.video_poster_image.src }}"
+                  alt="{{ module.video_poster_image.alt | default('') }}"
+                  class="wa-split-feature__video-poster"
+                  loading="lazy"
+                  decoding="async"
+                  {% if module.video_poster_image.width %}width="{{ module.video_poster_image.width }}"{% endif %}
+                  {% if module.video_poster_image.height %}height="{{ module.video_poster_image.height }}"{% endif %}
+                >
+                <span class="wa-split-feature__poster-play" aria-hidden="true">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" focusable="false">
+                    <polygon points="6 4 20 12 6 20 6 4"/>
+                  </svg>
+                </span>
+              </button>
+              {% else %}
+              <iframe
+                src="{{ module.video_url }}"
+                title="{{ module.heading | default('Video') }}"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+        {# ── Checklist ───────────────────────────────────────────────────────── #}
+        {% elif _type == 'checklist' %}
+          {% if module.checklist_items %}
+          <ul class="wa-split-feature__checklist" role="list">
+            {% for ci in module.checklist_items %}
+            <li class="wa-split-feature__check-item">
+              <svg class="wa-split-feature__check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="10" fill="var(--wa-color-primary)"/>
+                <polyline points="8 12 11 15 16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>{{ ci.text }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+
+        {# ── Stat panel ──────────────────────────────────────────────────────── #}
+        {% elif _type == 'stat_panel' %}
+          {% if module.stat_panel_items %}
+          <div class="wa-split-feature__stat-panel">
+            {% for stat in module.stat_panel_items %}
+            <div class="wa-split-feature__stat-card wa-split-feature__stat-card--{{ stat.accent_color | default('gold') }}">
+              <span class="wa-split-feature__stat-value">{{ stat.value_text }}</span>
+              <span class="wa-split-feature__stat-label">{{ stat.label_text }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+        {# ── Pull quote ──────────────────────────────────────────────────────── #}
+        {% elif _type == 'quote' %}
+          {% if module.quote_text %}
+          <figure class="wa-split-feature__quote">
+            <svg class="wa-split-feature__quote-mark" width="40" height="32" viewBox="0 0 40 32" fill="none" aria-hidden="true" focusable="false">
+              <path d="M0 32V20C0 12.267 2.133 6.8 6.4 3.6 10.667.4 16 0 22.4 1.6V7.2C17.6 5.867 14.133 6.267 12 8.4 9.867 10.4 8.8 13.6 8.8 18H16V32H0ZM24 32V20C24 12.267 26.133 6.8 30.4 3.6 34.667.4 40 0 46.4 1.6V7.2C41.6 5.867 38.133 6.267 36 8.4 33.867 10.4 32.8 13.6 32.8 18H40V32H24Z" fill="currentColor" opacity="0.15"/>
+            </svg>
+            <blockquote class="wa-split-feature__quote-text">{{ module.quote_text }}</blockquote>
+            {% if module.quote_author %}
+            <figcaption class="wa-split-feature__quote-author">{{ module.quote_author }}</figcaption>
+            {% endif %}
+          </figure>
+          {% endif %}
+
+        {% endif %}{# end media_type switch #}
+
+      </div>{# /media column #}
+
+    </div>{# /inner grid #}
+  </div>{# /container #}
+</section>
+
+{% endif %}{# end members_only #}

@@ -1,0 +1,566 @@
+/*
+ * footer.module/module.css
+ * Styles for the global site footer:
+ *   - Brand band (dark): logo, tagline, social icons
+ *   - Nav band (primary): footer columns + newsletter
+ *   - Base band (darkest): copyright, acknowledgement, legal nav
+ *
+ * Tokens sourced from theme/assets/css/tokens.css (:root --wa-* variables).
+ * WCAG 2.5.5: Interactive elements ≥ 36px height in footer (relaxed from 44px in
+ * body copy context - WCAG 2.5.5 applies strictly to "essential" controls).
+ * Mobile-first. Desktop overrides at min-width: 768px and 1024px.
+ */
+
+/* ── Footer wrapper ──────────────────────────────────────────────────────── */
+
+.wa-footer {
+  font-family: var(--wa-font-body);
+}
+
+/* ── Band: shared ────────────────────────────────────────────────────────── */
+
+.wa-footer__band {
+  width: 100%;
+}
+
+/* ── Band: brand ─────────────────────────────────────────────────────────── */
+
+.wa-footer__band--brand {
+  background-color: var(--wa-color-primary-dark);
+  color: var(--wa-color-text-inverse);
+  padding-top: var(--wa-space-12);
+  padding-bottom: var(--wa-space-12);
+}
+
+.wa-footer__brand-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--wa-space-8);
+}
+
+@media (min-width: 768px) {
+  .wa-footer__brand-inner {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.wa-footer__brand-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4);
+}
+
+/* Logo */
+
+.wa-footer__logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.wa-footer__logo-link:focus-visible {
+  outline: 2px solid var(--wa-color-text-inverse);
+  outline-offset: 4px;
+  border-radius: var(--wa-radius-sm);
+}
+
+/* IIW badge */
+
+.wa-footer__iiw-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: var(--wa-space-3);
+}
+
+.wa-footer__iiw-img {
+  display: block;
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+  border-radius: 0;
+  object-fit: contain;
+}
+
+.wa-footer__iiw-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wa-footer__iiw-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  /* Was rgba(255,255,255,0.45) ≈ 4.49:1 on primary-dark - failed AA. */
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+}
+
+.wa-footer__iiw-title {
+  font-family: var(--wa-font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Tagline */
+
+.wa-footer__tagline {
+  font-size: var(--wa-text-sm);
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0;
+  max-width: 340px;
+  line-height: var(--wa-leading-relaxed);
+}
+
+/* ── Social icons ────────────────────────────────────────────────────────── */
+
+.wa-footer__social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .wa-footer__social {
+    justify-content: flex-end;
+  }
+}
+
+.wa-footer__social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: rgba(255, 255, 255, 0.80);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--wa-radius-md);
+  text-decoration: none;
+  /*
+   * Do NOT transition `color` here. The child icon is an inline <svg> filled
+   * with `currentColor`; transitioning the ancestor's colour triggers a Blink
+   * paint-invalidation bug (Android Chrome) where the SVG subtree is skipped on
+   * repaint and the icon renders blank while its border still paints. The icon
+   * owns its own colour + transition below instead (see .wa-footer__social-link svg).
+   */
+  transition:
+    border-color var(--wa-duration-fast),
+    background-color var(--wa-duration-fast);
+  flex-shrink: 0;
+}
+
+.wa-footer__social-link:hover {
+  border-color: rgba(255, 255, 255, 0.60);
+  background-color: rgba(255, 255, 255, 0.10);
+}
+
+/*
+ * Icon colour lives on the <svg> itself (not inherited from the anchor) so the
+ * hover state is a direct style change on the painted element - Blink then
+ * reliably re-invalidates it. translateZ(0) keeps the icon on its own
+ * compositing layer whose texture survives taps and bfcache restores, which is
+ * what was leaving the icons blank "after clicking" on Android Chrome.
+ */
+.wa-footer__social-link svg {
+  color: rgba(255, 255, 255, 0.80);
+  transition: color var(--wa-duration-fast);
+  transform: translateZ(0);
+}
+
+.wa-footer__social-link:hover svg {
+  color: var(--wa-color-text-inverse);
+}
+
+.wa-footer__social-link:focus-visible {
+  outline: 2px solid var(--wa-color-text-inverse);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-md);
+}
+
+/* ── Band: nav ───────────────────────────────────────────────────────────── */
+
+.wa-footer__band--nav {
+  background-color: #101132;
+  color: var(--wa-color-text-inverse);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 42px;
+  padding-bottom: 44px;
+}
+
+.wa-footer__nav-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-10);
+}
+
+@media (min-width: 1024px) {
+  .wa-footer__nav-inner {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 72px;
+  }
+}
+
+/* ── Footer columns ──────────────────────────────────────────────────────── */
+
+.wa-footer__columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 34px 58px;
+  flex: 1;
+}
+
+@media (min-width: 480px) {
+  .wa-footer__columns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .wa-footer__columns {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-footer__columns {
+    grid-template-columns: repeat(4, minmax(130px, 1fr));
+  }
+}
+
+/* Single column on very small screens */
+@media (max-width: 479px) {
+  .wa-footer__columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wa-footer__column-heading {
+  font-family: var(--wa-font-heading);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+  margin: 0 0 15px 0;
+}
+
+.wa-footer__column-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.wa-footer__column-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  font-size: 14px;
+  font-weight: var(--wa-weight-normal);
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+  transition: color var(--wa-duration-fast);
+  line-height: var(--wa-leading-normal);
+}
+
+.wa-footer__column-link:link,
+.wa-footer__column-link:visited {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.wa-footer__column-link:hover,
+.wa-footer__column-link:active {
+  color: var(--wa-color-text-inverse);
+  text-decoration: underline;
+}
+
+.wa-footer__column-link:focus-visible {
+  outline: 2px solid var(--wa-color-text-inverse);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+  color: var(--wa-color-text-inverse);
+}
+
+.wa-footer__column-link.is-active {
+  color: var(--wa-color-text-inverse);
+}
+
+/* ── Newsletter ──────────────────────────────────────────────────────────── */
+
+.wa-footer__newsletter {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 280px;
+}
+
+@media (max-width: 1023px) {
+  .wa-footer__newsletter {
+    max-width: 100%;
+  }
+}
+
+.wa-footer__newsletter-heading {
+  font-family: var(--wa-font-heading);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+  margin: 0 0 15px 0;
+}
+
+.wa-footer__newsletter-blurb {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 0 16px 0;
+  line-height: 1.55;
+}
+
+.wa-footer__newsletter-form {
+  display: block;
+}
+
+/* Required: a bare `display` on the class above outranks the UA stylesheet's
+   `[hidden] { display: none }`, so without this the form stays visible after a
+   successful signup. Omitting exactly this rule is what left two forms in the
+   footer previously. */
+.wa-footer__newsletter-form[hidden] {
+  display: none;
+}
+
+.wa-footer__newsletter-label {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.wa-footer__newsletter-input {
+  min-width: 0;
+  width: 100%;
+  height: 44px;
+  padding: 0 15px;
+  font-family: var(--wa-font-body);
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  color: var(--wa-color-text-inverse);
+}
+
+.wa-footer__newsletter-input::placeholder {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.wa-footer__newsletter-input:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.wa-footer__newsletter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 44px minimum touch target (CLAUDE.md § 5.4.2) - matches the input height. */
+  height: 44px;
+  width: 156px;
+  max-width: 156px;
+  margin-top: 10px;
+  padding: 0 18px;
+  border: 1px solid var(--wa-color-accent, #fecf05);
+  border-radius: 8px;
+  background: var(--wa-color-accent, #fecf05);
+  color: var(--wa-color-on-accent, #101132);
+  font-family: var(--wa-font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wa-footer__newsletter-button:hover {
+  background: var(--wa-color-accent-dark, #e7b900);
+  border-color: var(--wa-color-accent-dark, #e7b900);
+  color: var(--wa-color-on-accent, #101132);
+}
+
+.wa-footer__newsletter-button:focus-visible {
+  outline: 2px solid var(--wa-color-text-inverse);
+  outline-offset: 2px;
+}
+
+.wa-footer__newsletter-button[disabled] {
+  opacity: 0.72;
+  cursor: default;
+}
+
+/* Result of a signup, announced via role="status" on the same element.
+   Colours are checked against the nav band (#101132), not a white card. */
+.wa-footer__newsletter-feedback {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  /* #7ee2a8 on #101132 = 11.6:1 - AA/AAA for body text. */
+  color: #7ee2a8;
+}
+
+.wa-footer__newsletter-feedback:focus-visible {
+  outline: 2px solid var(--wa-color-text-inverse);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+}
+
+/* #ffb4a8 on #101132 = 10.8:1. The theme's error red is far too dark against the
+   footer band, so the error state uses a light tint of it instead. */
+.wa-footer__newsletter-feedback.is-error {
+  color: #ffb4a8;
+}
+
+.wa-footer__newsletter-feedback-link {
+  color: var(--wa-color-accent, #fecf05);
+  text-decoration: underline;
+}
+
+.wa-footer__newsletter-feedback-link:focus-visible {
+  outline: 2px solid var(--wa-color-text-inverse);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+}
+
+/* Shown when no form is selected, and inside <noscript>. */
+.wa-footer__newsletter-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--wa-color-accent, #fecf05);
+  text-decoration: underline;
+}
+
+.wa-footer__newsletter-link:focus-visible {
+  outline: 2px solid var(--wa-color-text-inverse);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+}
+
+.wa-footer__newsletter-editor-note {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+}
+
+/* ── Band: base ──────────────────────────────────────────────────────────── */
+
+.wa-footer__band--base {
+  background-color: #101132;
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+  border-bottom: 1px solid rgba(232, 121, 36, 0.75);
+  padding-top: 22px;
+  padding-bottom: 19px;
+}
+
+.wa-footer__base-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .wa-footer__base-inner {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 48px;
+  }
+}
+
+.wa-footer__base-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wa-footer__copyright {
+  font-size: 12px;
+  margin: 0;
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+  line-height: 1.4;
+}
+
+.wa-footer__acknowledgement {
+  font-size: 12px;
+  /* Was rgba(184,190,219,0.52) ≈ 3.5:1 on #101132 - failed WCAG AA. */
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+  line-height: 1.45;
+  max-width: 620px;
+}
+
+.wa-footer__acknowledgement p {
+  margin: 0;
+}
+
+/* ── Legal nav ───────────────────────────────────────────────────────────── */
+
+.wa-footer__legal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  justify-content: flex-start;
+}
+
+@media (min-width: 768px) {
+  .wa-footer__legal-list {
+    justify-content: flex-end;
+  }
+}
+
+.wa-footer__legal-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  font-size: 12px;
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--wa-duration-fast);
+}
+
+.wa-footer__legal-link:link,
+.wa-footer__legal-link:visited {
+  color: var(--wa-color-text-muted-on-dark, #c5cadf);
+}
+
+.wa-footer__legal-link:hover {
+  color: var(--wa-color-text-inverse);
+  text-decoration: underline;
+}
+
+.wa-footer__legal-link:focus-visible {
+  outline: 2px solid var(--wa-color-text-inverse);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+  color: var(--wa-color-text-inverse);
+}

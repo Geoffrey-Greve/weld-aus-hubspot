@@ -1,0 +1,80 @@
+{#
+  hubspot-membership-reset.module/module.html
+  Password reset request form + success state for HubSpot membership.
+
+  Important: HubSpot's password reset request widget must be submitted from the
+  Private Content system route. This module sends users there instead of
+  embedding the widget on normal CMS pages, where HubSpot can reject the CSRF
+  token.
+#}
+
+{%- set _success = request.query_dict.membershipforgotpasswordsuccess
+                   or request.query_dict.forgotPasswordSuccess
+                   or request.query_dict.passwordResetEmailSent
+                   or request.query_dict.membershipResetRequestSuccess -%}
+{%- set _member_dashboard_redirect = '/portal' -%}
+{%- set _raw_return = request.query_dict.redirect | default(request.query_dict.redirect_url, true) | default(_member_dashboard_redirect, true) -%}
+{%- if _raw_return and _raw_return[0:1] == '/' and _raw_return[0:2] != '//' -%}
+  {%- set _redirect = _raw_return -%}
+{%- else -%}
+  {%- set _redirect = _member_dashboard_redirect -%}
+{%- endif -%}
+{%- if _redirect == '/portal/' or _redirect == '/portal' or _redirect == '/membership/' or _redirect == '/membership' -%}
+  {%- set _redirect = _member_dashboard_redirect -%}
+{%- endif -%}
+{%- set _back_href = module.back_to_login_link.url.href | default('/login/') -%}
+{%- set _back_label = module.back_to_login_label | default('Back to sign in') -%}
+{%- set _reset_url = '/_hcms/mem/reset/request?redirect_url=' ~ (_redirect|urlencode) -%}
+
+<div class="auth-reset">
+
+  {% if _success %}
+  <div class="auth-reset__success" role="status" aria-live="polite">
+
+    <div class="auth-reset__success-icon" aria-hidden="true">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <h2 class="auth-reset__success-heading">
+      {{ module.success_heading | default('Check your inbox') }}
+    </h2>
+
+    <div class="auth-reset__success-body">
+      {{ module.success_body | default('<p>If an account exists for that email address, you\'ll receive a reset link shortly.</p>') }}
+    </div>
+
+    <a href="{{ _back_href }}?redirect={{ _redirect|urlencode }}" class="btn btn-secondary auth-reset__back-btn">
+      {{ _back_label }}
+    </a>
+
+  </div>
+
+  {% else %}
+  <h2 class="auth-reset__heading" id="password-reset-heading">{{ module.heading | default('Reset your password') }}</h2>
+
+  {% if module.intro %}
+  <div class="auth-reset__intro">{{ module.intro }}</div>
+  {% endif %}
+
+  <div class="auth-reset__intro">
+    <p>For your security, password reset requests are handled through Weld Australia’s secure reset process.</p>
+  </div>
+
+  <div class="auth-reset__action">
+    <a class="btn btn-primary auth-reset__button" href="{{ _reset_url }}">
+      {{ module.submit_label | default('Open password reset page') }}
+    </a>
+  </div>
+
+  <div class="auth-reset__back">
+    <a href="{{ _back_href }}?redirect={{ _redirect|urlencode }}" class="auth-reset__back-link">
+      ← {{ _back_label }}
+    </a>
+  </div>
+
+  {% endif %}
+
+</div>

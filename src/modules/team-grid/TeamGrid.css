@@ -1,0 +1,189 @@
+/* team-grid - styles for the TeamGrid React island */
+
+.wa-tg {
+  container-type: inline-size;
+}
+
+/* Header */
+.wa-tg__header {
+  margin-block-end: var(--wa-space-8, 2rem);
+  text-align: center;
+}
+
+.wa-tg__heading {
+  margin-block-end: var(--wa-space-4, 1rem);
+}
+
+.wa-tg__intro {
+  color: var(--wa-color-text-muted);
+  max-inline-size: 60ch;
+  margin-inline: auto;
+}
+
+/* Category tabs */
+.wa-tg__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-block-end: var(--wa-space-6, 1.5rem);
+}
+
+.wa-tg__tab {
+  padding: 0.5rem 1rem;
+  min-block-size: var(--wa-touch-min, 44px);
+  border: 1px solid var(--wa-color-border, #d1d5db);
+  border-radius: var(--wa-radius-md, 8px);
+  background: transparent;
+  color: var(--wa-color-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.wa-tg__tab:hover {
+  border-color: var(--wa-color-primary);
+  color: var(--wa-color-primary);
+}
+
+.wa-tg__tab--active {
+  background: var(--wa-color-primary);
+  border-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary, #fff);
+}
+
+/* Grid - mobile: 2 columns; tablet+: 3 columns; wide: 4 columns */
+.wa-tg__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@container (min-width: 640px) {
+  .wa-tg__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@container (min-width: 900px) {
+  .wa-tg__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.wa-tg__grid-item {
+  display: contents;
+}
+
+/* Card */
+.wa-tg__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.25rem;
+  background: var(--wa-color-surface, #fff);
+  border-radius: var(--wa-radius-lg, 16px);
+  box-shadow: var(--wa-shadow-card, 0 1px 3px rgb(0 0 0 / 0.1));
+  gap: 0.75rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.wa-tg__card--clickable {
+  cursor: pointer;
+}
+
+.wa-tg__card--clickable:hover {
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+  transform: translateY(-2px);
+}
+
+.wa-tg__card--clickable:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+}
+
+/* Photo */
+.wa-tg__card-photo {
+  inline-size: 100px;
+  block-size: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.wa-tg__photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wa-tg__photo-initials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wa-color-primary);
+  color: var(--wa-color-on-primary, #fff);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Card info */
+.wa-tg__card-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--wa-color-text);
+}
+
+.wa-tg__card-role {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted);
+  margin: 0;
+}
+
+.wa-tg__card-category {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.2em 0.6em;
+  border-radius: var(--wa-radius-sm, 4px);
+  background: var(--wa-color-surface-alt, #f3f4f6);
+  color: var(--wa-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wa-tg__card-bio-hint {
+  font-size: 0.8125rem;
+  color: var(--wa-color-primary);
+}
+
+/* Modal body */
+.wa-tg__modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.wa-tg__modal-role {
+  font-size: 1rem;
+  color: var(--wa-color-text-muted);
+  margin: 0;
+}
+
+.wa-tg__modal-bio {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--wa-color-text);
+}
+
+.wa-tg__modal-bio p:first-child {
+  margin-block-start: 0;
+}

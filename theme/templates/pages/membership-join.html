@@ -1,0 +1,33 @@
+<!--
+  templateType: page
+  label: Membership Join
+  isAvailableForNewContent: true
+-->
+{#
+  membership-join.html - Membership application/payment handoff
+  Suggested URL: /membership/join/
+
+  Receives ?tier=<membership-slug> from membership option CTAs.
+  Paid tiers → configured HubSpot payment links.
+  Free / by-agreement tiers → per-tier HubSpot application forms (issue 251).
+  This page does not write CRM state; payment + form workflows activate membership.
+#}
+{% set page_title_exact = page_meta.html_title | default('Join Weld Australia - Membership Application') %}
+{% set page_description = page_meta.meta_description | default('Select your Weld Australia membership tier and continue your membership application.') %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+  {% dnd_section padding={ "top": 0, "bottom": 0 } %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/membership-join"
+          label="Membership Join"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+{% end_dnd_area %}
+{% endblock %}

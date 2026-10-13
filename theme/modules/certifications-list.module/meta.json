@@ -1,0 +1,15 @@
+{
+  "label": "Certifications List",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Server-rendered list of a logged-in member's certifications (AS1796, IIW Inspector, ISO 3834). Reads from contact CRM properties. Use on the /portal/certifications/ page.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "award",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["portal", "certifications", "member", "server-rendered"],
+  "categories": ["functionality"]
+}

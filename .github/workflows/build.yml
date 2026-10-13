@@ -1,0 +1,63 @@
+name: Build & Test
+
+# Full build-verification gate on every PR and push to main. Unlike validate.yml
+# (spec compliance only, no build), this runs the REAL build the deploy uses:
+#   - pnpm build  → compiles every React island, regenerates critical.css, and
+#                   runs validate-theme (incl. asset-reference integrity) +
+#                   the bundle-size budget.
+#   - pnpm typecheck / pnpm test.
+# This catches the classes of regression that only showed up after upload:
+# a stale/dangling bundle reference, an "uploaded without building" theme, a
+# type error, or a failing test - all before the change can merge.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable corepack (pnpm)
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build theme (islands + critical.css + validate + bundle size)
+        run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Tests (unit + a11y)
+        run: pnpm test
+
+      - name: Fail if the build mutated committed files
+        # The build must be idempotent: it patches module.html/templates with
+        # STABLE bundle names, so a clean checkout + build should leave the git
+        # tree unchanged. A diff here means a source file drifted from its
+        # generated output (e.g. someone hand-edited a generated block) - which
+        # is exactly the "my fix got reverted on the next build" trap.
+        run: |
+          if ! git diff --quiet; then
+            echo "::error::pnpm build changed committed files - the tree is not idempotent."
+            git --no-pager diff --stat
+            exit 1
+          fi

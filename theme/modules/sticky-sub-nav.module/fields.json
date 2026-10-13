@@ -1,0 +1,133 @@
+[
+  {
+    "name": "show_on_scroll_after_px",
+    "label": "Stick after scroll (px)",
+    "type": "number",
+    "default": 200,
+    "help_text": "The nav becomes sticky after the user scrolls this many pixels from the top of the page."
+  },
+  {
+    "name": "links",
+    "label": "Anchor links",
+    "type": "group",
+    "occurrence": {
+      "min": 2,
+      "max": 8,
+      "default": 2
+    },
+    "children": [
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "anchor_id",
+        "label": "Anchor ID (no #)",
+        "type": "text",
+        "required": true,
+        "default": ""
+      }
+    ]
+  },
+  {
+    "name": "primary_cta_label",
+    "label": "Primary CTA label",
+    "type": "text"
+  },
+  {
+    "name": "primary_cta_link",
+    "label": "Primary CTA link",
+    "type": "link"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "compact"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

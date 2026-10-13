@@ -1,0 +1,345 @@
+/*
+ * compare-table.module/module.css
+ * Feature comparison table for membership tiers.
+ * Mobile: horizontal scroll, sticky first column.
+ * Desktop: full-width table.
+ */
+
+/* ── Section heading ─────────────────────────────────────────────────────── */
+
+.wa-compare-table-section__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl, 2rem);
+  font-weight: var(--wa-weight-bold, 700);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-10, 2.5rem);
+  line-height: 1.2;
+  text-align: left;
+}
+
+.wa-section--bg-primary .wa-compare-table-section__heading,
+.wa-section--bg-primary_dark .wa-compare-table-section__heading {
+  color: var(--wa-color-on-primary, #fff);
+}
+
+/* ── Wrapper: enables horizontal scroll on small screens ─────────────────── */
+
+/* No inline padding here: this element IS the scrollport, and `left: 0` on the
+   sticky feature column anchors to its padding box. Any padding-inline leaves a
+   gutter down the left edge that scrolled value text stays visible through
+   (QA defect: "wordings peeking through the gaps"). */
+.wa-compare-table__wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Table base ──────────────────────────────────────────────────────────── */
+
+.wa-compare-table {
+  /* Shared by the feature column and the sticky group headings so the frozen
+     strip stays one consistent width. Below 560px the table sits exactly at its
+     min-width, so ratio × min-width is the frozen column's real pixel width. */
+  --wa-compare-min-width: 560px;
+  --wa-compare-feature-ratio: 0.4;
+  /* The frozen column's opaque fill and its hover tint, declared once per
+     section background (see the dark overrides below) and consumed by every
+     rule that paints the column. The fill MUST stay fully opaque — the value
+     cells scroll underneath it — so it is restated on hover rather than being
+     left to a lower-specificity rule that `:hover td` would outrank. */
+  --wa-compare-frozen-bg: var(--wa-color-surface, #fff);
+  --wa-compare-hover-tint: rgba(0, 0, 0, 0.02);
+  width: 100%;
+  /* `separate` (not `collapse`) is required: Chromium composites sticky table
+     cells unreliably in collapsed-border tables and drops their background on
+     repaint — a tap was enough to make the frozen column go see-through
+     (QA defect: overlapping text). border-spacing: 0 keeps the visual result
+     identical to the collapsed model. */
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: var(--wa-compare-min-width);
+  font-size: var(--wa-text-sm, 0.875rem);
+  color: var(--wa-color-text);
+}
+
+/* ── Column headers ──────────────────────────────────────────────────────── */
+
+.wa-compare-table thead th {
+  padding: var(--wa-space-4, 1rem) var(--wa-space-5, 1.25rem);
+  text-align: center;
+  font-weight: 700;
+  font-family: var(--wa-font-heading);
+  border-bottom: 2px solid var(--wa-color-border, #e5e7eb);
+  background-color: var(--wa-compare-frozen-bg);
+  white-space: nowrap;
+}
+
+/* Feature column: left-aligned, 40% wide */
+.wa-compare-table .wa-compare-table__feature-col {
+  text-align: left;
+  width: calc(var(--wa-compare-feature-ratio) * 100%);
+  /* Sticky on mobile so the feature labels stay visible while scrolling.
+     Opaque background + higher z-index so horizontally-scrolled value cells
+     never peek through or overlap the label (see QA defect: mobile scroll). */
+  position: sticky;
+  left: 0;
+  background-color: var(--wa-compare-frozen-bg);
+  z-index: 4;
+}
+
+/* Tier column accent colours via top border on highlighted */
+.wa-compare-table__col--highlighted {
+  background-color: rgba(28, 30, 76, 0.04);
+  border-top: 3px solid var(--wa-color-primary, #1c1e4c);
+}
+
+/* Per-accent header styles (top border colour when NOT highlighted) */
+.wa-compare-table__tier-col--gold    { border-top: 3px solid var(--wa-color-accent, #fecf05); }
+.wa-compare-table__tier-col--silver  { border-top: 3px solid #a0a0a0; }
+.wa-compare-table__tier-col--bronze  { border-top: 3px solid #b27330; }
+.wa-compare-table__tier-col--navy    { border-top: 3px solid var(--wa-color-primary, #1c1e4c); }
+.wa-compare-table__tier-col--green   { border-top: 3px solid var(--wa-color-success, #1f8a4d); }
+
+/* ── Group divider rows ──────────────────────────────────────────────────── */
+
+.wa-compare-table__group-row td {
+  background-color: var(--wa-color-surface-2, #f3f4f6);
+  padding: var(--wa-space-3, 0.75rem) var(--wa-space-5, 1.25rem);
+  font-weight: 600;
+  font-size: var(--wa-text-xs, 0.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wa-color-text-muted);
+}
+
+/* ── Collapsible group button ────────────────────────────────────────────── */
+
+.wa-compare-table__group-btn {
+  all: unset;
+  cursor: pointer;
+  font-weight: inherit;
+  font-size: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-2, 0.5rem);
+  width: 100%;
+  min-height: var(--wa-touch-min, 44px);
+  box-sizing: border-box;
+}
+
+.wa-compare-table__group-btn:focus-visible {
+  outline: 2px solid var(--wa-color-primary, #1c1e4c);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm, 4px);
+}
+
+.wa-compare-table__group-static {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-2, 0.5rem);
+  width: 100%;
+  min-height: var(--wa-touch-min, 44px);
+  box-sizing: border-box;
+  cursor: default;
+}
+
+/* Chevron rotation when collapsed */
+.wa-compare-table__chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  margin-left: auto;
+}
+
+.wa-compare-table__group-btn[aria-expanded="false"] .wa-compare-table__chevron {
+  transform: rotate(-90deg);
+}
+
+/* Below 768px the table scrolls horizontally (min-width: 560px). Pin the group
+   heading to the left edge alongside the frozen feature column so it doesn't
+   slide out of view mid-scroll and leave the frozen column looking broken.
+   The heading's containing block is the full-width colspan cell, so a
+   fit-content box has room to travel. */
+@media (max-width: 767px) {
+  /* Inline padding moves from the cell to the sticky heading so the heading's
+     text keeps the frozen column's indent once it's pinned. */
+  .wa-compare-table__group-row td {
+    padding-inline: 0;
+  }
+
+  .wa-compare-table__group-btn,
+  .wa-compare-table__group-static {
+    position: sticky;
+    left: 0;
+    box-sizing: border-box;
+    /* Must be narrower than the full-width colspan cell, otherwise there is no
+       room for sticky to shift it and the heading scrolls away. */
+    width: fit-content;
+    max-width: calc(var(--wa-compare-min-width) * var(--wa-compare-feature-ratio));
+    padding-inline: var(--wa-space-5, 1.25rem);
+    /* Deliberately no background: the group row is a single colspan cell whose
+       background already spans the full table width, so the strip behind this
+       heading is the same colour at every scroll position and nothing can show
+       through. Painting one here would mean hard-coding a colour that has to
+       track the section theme (primary vs primary_dark vs a customised
+       palette) — and get it wrong the moment one of those changes. */
+  }
+
+  .wa-compare-table__chevron {
+    margin-left: 0;
+  }
+}
+
+/* ── Feature rows ────────────────────────────────────────────────────────── */
+
+.wa-compare-table__row td {
+  padding: var(--wa-space-3, 0.75rem) var(--wa-space-5, 1.25rem);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+  vertical-align: middle;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Feature label cell: left-aligned, sticky on mobile.
+   Opaque background + higher z-index than the value cells so the label never
+   becomes see-through when tapped/scrolled (QA defect: overlapping text). */
+.wa-compare-table__row .wa-compare-table__feature-label {
+  text-align: left;
+  color: var(--wa-color-text);
+  background-color: var(--wa-compare-frozen-bg);
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+
+/* Frozen-column edge. Only below 768px, where the table actually scrolls
+   (min-width: 560px) — above that there is nothing to freeze and the divider
+   would just be visual noise. Gives a clear seam so the value cells passing
+   underneath read as intentional rather than as a rendering fault. */
+@media (max-width: 767px) {
+  .wa-compare-table .wa-compare-table__feature-col,
+  .wa-compare-table__row .wa-compare-table__feature-label {
+    border-right: 1px solid var(--wa-color-border, #dde0e5);
+    box-shadow: 4px 0 8px -4px rgba(0, 0, 0, 0.12);
+  }
+
+  .wa-section--bg-primary .wa-compare-table .wa-compare-table__feature-col,
+  .wa-section--bg-primary .wa-compare-table__row .wa-compare-table__feature-label,
+  .wa-section--bg-primary_dark .wa-compare-table .wa-compare-table__feature-col,
+  .wa-section--bg-primary_dark .wa-compare-table__row .wa-compare-table__feature-label {
+    border-right-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 4px 0 8px -4px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* Highlighted column value cells */
+.wa-compare-table__value--highlighted {
+  background-color: rgba(28, 30, 76, 0.03);
+}
+
+/* Row hover — pointer devices only. Chrome for Android latches :hover after a
+   tap and holds it until the user taps elsewhere, which is how a tap on a
+   feature row ended up repainting the frozen column (QA defect). */
+@media (hover: hover) and (pointer: fine) {
+  /* :not() keeps these value-cell rules off the frozen label entirely, so the
+     label's single theme-agnostic hover rule below can't be outranked by a
+     variant-scoped `:hover td` selector. */
+  .wa-compare-table__row:hover td:not(.wa-compare-table__feature-label) {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  /* The frozen label must stay opaque on hover or the value cells scrolled
+     underneath show through it. `:hover td` above outranks the base rule, so
+     the opaque fill is restated here and the tint layered over it as an image
+     — both derived from the section's theme rather than hard-coded, so this
+     one rule covers every background variant. */
+  .wa-compare-table__row:hover .wa-compare-table__feature-label {
+    background-color: var(--wa-compare-frozen-bg);
+    background-image: linear-gradient(var(--wa-compare-hover-tint), var(--wa-compare-hover-tint));
+  }
+}
+
+/* ── Check / cross icons ─────────────────────────────────────────────────── */
+
+.wa-compare-table__check,
+.wa-compare-table__cross {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ── Dark background overrides ───────────────────────────────────────────── */
+
+/* Each variant only has to restate the two custom properties; every rule that
+   paints the frozen column reads them. primary and primary_dark are DIFFERENT
+   colours (#1c1e4c vs #0f1030) — sharing one value left the frozen column a
+   visibly lighter stripe on primary_dark sections. */
+.wa-section--bg-primary .wa-compare-table {
+  --wa-compare-frozen-bg: var(--wa-color-primary, #1c1e4c);
+  --wa-compare-hover-tint: rgba(255, 255, 255, 0.04);
+}
+
+.wa-section--bg-primary_dark .wa-compare-table {
+  --wa-compare-frozen-bg: var(--wa-color-primary-dark, #0f1030);
+  --wa-compare-hover-tint: rgba(255, 255, 255, 0.04);
+}
+
+.wa-section--bg-primary .wa-compare-table,
+.wa-section--bg-primary_dark .wa-compare-table {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.wa-section--bg-primary .wa-compare-table thead th,
+.wa-section--bg-primary_dark .wa-compare-table thead th {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.wa-section--bg-primary .wa-compare-table__col--highlighted,
+.wa-section--bg-primary_dark .wa-compare-table__col--highlighted {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-top-color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-section--bg-primary .wa-compare-table__group-row td,
+.wa-section--bg-primary_dark .wa-compare-table__group-row td {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.wa-section--bg-primary .wa-compare-table__row td,
+.wa-section--bg-primary_dark .wa-compare-table__row td {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.wa-section--bg-primary .wa-compare-table__row .wa-compare-table__feature-label,
+.wa-section--bg-primary_dark .wa-compare-table__row .wa-compare-table__feature-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* The frozen label's own hover is handled by the theme-agnostic rule above,
+   which reads --wa-compare-hover-tint; only the value cells need a variant
+   override here. */
+@media (hover: hover) and (pointer: fine) {
+  .wa-section--bg-primary .wa-compare-table__row:hover td:not(.wa-compare-table__feature-label),
+  .wa-section--bg-primary_dark .wa-compare-table__row:hover td:not(.wa-compare-table__feature-label) {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+}
+
+/* On dark bg, invert the check icon circle to white tint */
+.wa-section--bg-primary .wa-compare-table__check circle,
+.wa-section--bg-primary_dark .wa-compare-table__check circle {
+  fill: rgba(255, 255, 255, 0.15);
+  opacity: 1;
+}
+
+.wa-section--bg-primary .wa-compare-table__check polyline,
+.wa-section--bg-primary_dark .wa-compare-table__check polyline {
+  stroke: rgba(255, 255, 255, 0.9);
+}
+
+.wa-section--bg-primary .wa-compare-table__cross,
+.wa-section--bg-primary_dark .wa-compare-table__cross {
+  stroke: rgba(255, 255, 255, 0.3);
+}

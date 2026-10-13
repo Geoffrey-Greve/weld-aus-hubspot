@@ -1,0 +1,45 @@
+<!--
+  templateType: page
+  label: Checkout Confirmation
+  isAvailableForNewContent: true
+-->
+{#
+  checkout-confirmation.html - Post-payment registration confirmation page.
+  URL: /checkout/confirmation/
+
+  ── Layout ───────────────────────────────────────────────────────────────────
+  Extends the distraction-free checkout.html LAYOUT.
+  The layout's minimal header still shows the Weld Australia logo (no steps
+  indicator on this page - step indicator is cleared after payment).
+
+  ── Module ───────────────────────────────────────────────────────────────────
+  A single checkout-confirmation module handles receipt display.
+  Receipt data is read from sessionStorage (written by checkout-tunnel before
+  the payment redirect). If sessionStorage is empty (e.g. page refresh after
+  clearing session), the module degrades to editor-configured copy only.
+
+  ── HubSpot configuration ────────────────────────────────────────────────────
+  • Assign this template to a page at /checkout/confirmation/
+  • Private Content: NONE - intentionally public (guests + members both land here).
+  • noindex - transactional page; should not appear in search results.
+  • The URL configured as confirmation_redirect in the checkout-tunnel module
+    must match the URL of this page.
+#}
+{% extends "../layouts/checkout-layout.html" %}
+
+{% block checkout_content %}
+
+  {% module "checkout_confirmation"
+    path="../../modules/checkout-confirmation"
+    heading="You're registered!"
+    body_text="<p>We've sent a confirmation email to your inbox with the registration details.</p>"
+    show_calendar_buttons=true
+    show_zoom_link=true
+    next_step_cta_label="Back to dashboard"
+    next_step_cta_link={ "url": { "type": "CONTENT", "href": "/portal/" } }
+    background="surface"
+    spacing="default"
+    members_only=false
+  %}
+
+{% endblock %}

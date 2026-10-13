@@ -1,0 +1,226 @@
+[
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Course timetable"
+  },
+  {
+    "name": "default_city",
+    "label": "Default city",
+    "type": "choice",
+    "choices": [
+      [
+        "any",
+        "Any"
+      ],
+      [
+        "sydney",
+        "Sydney"
+      ],
+      [
+        "melbourne",
+        "Melbourne"
+      ],
+      [
+        "brisbane",
+        "Brisbane"
+      ],
+      [
+        "perth",
+        "Perth"
+      ],
+      [
+        "adelaide",
+        "Adelaide"
+      ],
+      [
+        "canberra",
+        "Canberra"
+      ],
+      [
+        "darwin",
+        "Darwin"
+      ],
+      [
+        "hobart",
+        "Hobart"
+      ],
+      [
+        "newcastle",
+        "Newcastle"
+      ],
+      [
+        "wollongong",
+        "Wollongong"
+      ],
+      [
+        "geelong",
+        "Geelong"
+      ],
+      [
+        "mackay",
+        "Mackay"
+      ],
+      [
+        "maryborough",
+        "Maryborough"
+      ],
+      [
+        "online",
+        "Online"
+      ]
+    ],
+    "default": "any",
+    "help_text": "Locations come from the courses HubDB \"city\" SELECT. Add a town there (hubdb/courses.json, then pnpm seed:hubdb) and it shows in the visitor-facing selector whether or not it is listed here."
+  },
+  {
+    "name": "default_category",
+    "label": "Default training division",
+    "type": "choice",
+    "choices": [
+      ["any", "Any"],
+      ["welding-inspection", "Welding Inspection"],
+      ["welding-supervision", "Welding Supervision"],
+      ["welding-coordination", "Welding Coordination"],
+      ["short-courses", "Short Courses"]
+    ],
+    "default": "any",
+    "help_text": "Divisions group the courses HubDB 'category' values - defined in config/course-categories.json. A ?category= URL param overrides this when it names a division."
+  },
+  {
+    "name": "default_delivery_mode",
+    "label": "Default delivery type",
+    "type": "choice",
+    "choices": [
+      ["any", "Any"],
+      ["Face-to-Face", "Face-to-Face"],
+      ["Online", "Online"],
+      ["Blended", "Blended"],
+      ["In-House", "In-House"]
+    ],
+    "default": "any",
+    "help_text": "Values must match the 'delivery_mode' Select options in the courses HubDB table."
+  },
+  {
+    "name": "show_seats_remaining",
+    "label": "Show 'seats remaining'",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "page_size",
+    "label": "Cards to show / sessions per page",
+    "type": "number",
+    "default": 25,
+    "min": 1,
+    "max": 100,
+    "help_text": "On the Training page, this controls how many course cards are shown. On timetable pages, it controls how many sessions appear per page."
+  },
+  {
+    "name": "eoi_form",
+    "label": "EOI form (used when no sessions match filters)",
+    "type": "form",
+    "required": false,
+    "help_text": "Select the HubSpot expression-of-interest form to show when no sessions match.",
+    "default": {
+      "form_id": "",
+      "response_type": "inline",
+      "message": "Thanks for your interest."
+    }
+  },
+  {
+    "name": "eoi_message",
+    "label": "EOI message",
+    "type": "richtext",
+    "default": "<p>We don't have a session scheduled for these filters yet - register your interest and we'll let you know.</p>"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

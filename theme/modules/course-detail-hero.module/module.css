@@ -1,0 +1,174 @@
+.wa-course-detail-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  min-height: 600px;
+  color: #fff;
+  font-family: var(--wa-font-body, "Poppins", system-ui, sans-serif);
+  background:
+    linear-gradient(90deg, rgba(15, 16, 48, 0.98) 0%, rgba(28, 30, 76, 0.92) 52%, rgba(28, 30, 76, 0.78) 100%),
+    radial-gradient(circle at 86% 18%, rgba(254, 207, 5, 0.16), transparent 28%),
+    radial-gradient(circle at 76% 76%, rgba(237, 18, 141, 0.18), transparent 30%),
+    var(--wa-color-primary, #1c1e4c);
+}
+
+.wa-course-detail-hero--compact { min-height: 430px; }
+.wa-course-detail-hero--large { min-height: 600px; }
+
+.wa-course-detail-hero--has-image {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(15, 16, 48, var(--wa-course-hero-overlay, 0.84)) 0%,
+      rgba(28, 30, 76, calc(var(--wa-course-hero-overlay, 0.84) * 0.92)) 52%,
+      rgba(28, 30, 76, calc(var(--wa-course-hero-overlay, 0.84) * 0.72)) 100%
+    ),
+    var(--wa-course-hero-image);
+  background-position: center;
+  background-size: cover;
+}
+
+.wa-course-detail-hero__overlay {
+  display: none;
+}
+
+.wa-course-detail-hero__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  padding-block: clamp(72px, 9vw, 112px);
+}
+
+.wa-course-detail-hero__content {
+  max-width: 780px;
+}
+
+.wa-course-detail-hero__breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.wa-course-detail-hero__breadcrumb a {
+  color: rgba(255, 255, 255, 0.68);
+  text-underline-offset: 3px;
+}
+
+.wa-course-detail-hero__breadcrumb a:hover,
+.wa-course-detail-hero__breadcrumb a:focus-visible {
+  color: #fff;
+  text-decoration-color: var(--wa-color-accent, #fecf05);
+}
+
+.wa-course-detail-hero__breadcrumb [aria-current="page"] {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.wa-course-detail-hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 20px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.wa-course-detail-hero__eyebrow::before {
+  content: "";
+  flex: 0 0 24px;
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(254, 207, 5, 0.55);
+}
+
+.wa-course-detail-hero h1 {
+  max-width: 780px;
+  margin: 0;
+  color: #fff;
+  font-family: var(--wa-font-heading, "Poppins", system-ui, sans-serif);
+  font-size: clamp(2.75rem, 5.2vw, 3.375rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.wa-course-detail-hero__summary {
+  max-width: 640px;
+  margin-top: 22px;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: clamp(1rem, 1.6vw, 1.0625rem);
+  line-height: 1.72;
+}
+
+.wa-course-detail-hero__summary > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-course-detail-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 38px;
+}
+
+.wa-course-detail-hero .btn-primary {
+  background: var(--wa-color-accent, #fecf05);
+  border-color: var(--wa-color-accent, #fecf05);
+  color: var(--wa-color-primary, #1c1e4c);
+}
+
+.wa-course-detail-hero .btn-primary:hover,
+.wa-course-detail-hero .btn-primary:focus-visible {
+  background: #fff;
+  border-color: #fff;
+  color: var(--wa-color-primary, #1c1e4c);
+  text-decoration: none;
+}
+
+.wa-course-detail-hero .btn-outline {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.68);
+}
+
+.wa-course-detail-hero .btn-outline:hover,
+.wa-course-detail-hero .btn-outline:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #fff;
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .wa-course-detail-hero {
+    min-height: 430px;
+  }
+
+  .wa-course-detail-hero__inner {
+    min-height: auto;
+  }
+
+  .wa-course-detail-hero h1 {
+    font-size: clamp(2.35rem, 11vw, 3.35rem);
+  }
+
+  .wa-course-detail-hero__actions .btn {
+    width: 100%;
+  }
+}

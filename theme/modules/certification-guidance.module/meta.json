@@ -1,0 +1,7 @@
+{
+  "label": "Certification Guidance",
+  "icon": "list",
+  "categories": ["functionality"],
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "is_available_for_new_content": true
+}

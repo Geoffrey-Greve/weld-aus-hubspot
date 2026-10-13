@@ -1,0 +1,173 @@
+{#
+  document-list.module/module.html
+  Renders a curated list of resources from HubDB Table "resources" (Table 5),
+  filtered by category server-side. When members_only_filter is enabled,
+  rows with required_tier != "public" are hidden for non-logged-in visitors.
+
+  Fields:
+    module.section_heading    - optional heading
+    module.filter_category    - category key to query (required)
+    module.max_items          - maximum rows to return (default 10)
+    module.members_only_filter - when true, hides member-gated rows
+                                 (required_tier != public) for non-logged-in visitors
+    module.section_id         - anchor ID
+    module.background         - background style
+    module.spacing            - vertical spacing
+    module.visibility         - device visibility
+    module.members_only       - section-level gate (whole module hidden for non-members)
+
+  HubDB Table "resources" columns used:
+    title          (text)     - document title
+    abstract       (richtext) - short description
+    file_url       (url)      - download / view URL
+    file_type      (select)   - pdf | video | link
+    category       (select)   - advocacy | technical | standards | case_study | report | ...
+    required_tier  (select)   - public | member | bronze | silver | gold
+    published_date (date)     - optional, for display only
+    is_active      (boolean)  - exclude inactive rows
+
+  Server-side filter strategy:
+    - When members_only_filter=true AND visitor is NOT logged in:
+        query adds required_tier__eq=public so only freely available rows are returned.
+    - Otherwise (filter off, or visitor is logged in):
+        query returns all active rows for the category; tier badge shown per row.
+#}
+
+{%- if module.members_only and not request_contact.is_logged_in -%}{%- else -%}
+
+{# ── Visibility classes ───────────────────────────────────────────────────── #}
+{%- set vis_classes = [] -%}
+{%- if 'mobile' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-mobile'] -%}{%- endif -%}
+{%- if 'tablet' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-tablet'] -%}{%- endif -%}
+{%- if 'desktop' not in module.visibility -%}{%- set vis_classes = vis_classes + ['wa-hide-desktop'] -%}{%- endif -%}
+
+{# ── HubDB query ─────────────────────────────────────────────────────────── #}
+{%- set max = module.max_items | default(10) -%}
+
+{%- if module.members_only_filter and not request_contact.is_logged_in -%}
+  {# Exclude non-public rows server-side for non-logged-in visitors #}
+  {%- set docs = hubdb_table_rows("resources", "category__eq=" ~ module.filter_category ~ "&required_tier__eq=public&is_active__eq=true&limit=" ~ max) -%}
+{%- else -%}
+  {# Return all active rows for the category #}
+  {%- set docs = hubdb_table_rows("resources", "category__eq=" ~ module.filter_category ~ "&is_active__eq=true&limit=" ~ max) -%}
+{%- endif -%}
+
+<section
+  class="wa-section wa-document-list wa-bg--{{ module.background }} wa-spacing--{{ module.spacing }}{{ ' ' ~ vis_classes | join(' ') if vis_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  aria-label="{% if module.section_heading %}{{ module.section_heading }}{% else %}Documents{% endif %}"
+>
+  <div class="container">
+
+    {# ── Optional section heading ─────────────────────────────────────────── #}
+    {% if module.section_heading %}
+    <h2 class="wa-document-list__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    {%- if docs -%}
+
+    <ul class="wa-document-list__list" role="list" aria-label="Document list">
+      {%- for doc in docs -%}
+      {%- set tier = doc.required_tier | default('public') | lower -%}
+      {%- set is_locked = tier != 'public' and not request_contact.is_logged_in -%}
+      {%- set file_type = doc.file_type | default('link') | lower -%}
+      <li class="wa-document-list__item{% if is_locked %} wa-document-list__item--locked{% endif %}">
+
+        {# ── File type icon ──────────────────────────────────────────────── #}
+        <span class="wa-document-list__icon" aria-hidden="true">
+          {%- if file_type == 'pdf' -%}
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+          {%- elif file_type == 'video' -%}
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+            <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+          {%- else -%}
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+          {%- endif -%}
+        </span>
+
+        {# ── Title + abstract ─────────────────────────────────────────────── #}
+        <div class="wa-document-list__content">
+          <span class="wa-document-list__title">
+            {{ doc.title | default('Untitled document') }}
+          </span>
+          {% if doc.abstract %}
+          <span class="wa-document-list__desc">{{ doc.abstract | striptags }}</span>
+          {% endif %}
+          {% if doc.published_date %}
+          <span class="wa-document-list__date">
+            <time datetime="{{ doc.published_date | datetimeformat('%Y-%m-%d') }}">
+              {{ doc.published_date | datetimeformat('%-d %B %Y') }}
+            </time>
+          </span>
+          {% endif %}
+        </div>
+
+        {# ── Badges ───────────────────────────────────────────────────────── #}
+        <div class="wa-document-list__badges">
+          <span class="wa-document-list__type-badge wa-document-list__type-badge--{{ file_type }}">
+            {{ file_type | upper }}
+          </span>
+          {% if tier != 'public' %}
+          <span class="wa-document-list__tier-badge wa-document-list__tier-badge--{{ tier }}" aria-label="Requires {{ tier }} membership">
+            {%- if tier == 'member' -%}Members
+            {%- elif tier == 'bronze' -%}Bronze+
+            {%- elif tier == 'silver' -%}Silver+
+            {%- elif tier == 'gold' -%}Gold
+            {%- else -%}{{ tier | title }}{%- endif -%}
+          </span>
+          {% endif %}
+        </div>
+
+        {# ── CTA ──────────────────────────────────────────────────────────── #}
+        <div class="wa-document-list__action">
+          {%- if is_locked -%}
+          <a
+            href="/membership/"
+            class="btn btn-outline btn-sm wa-document-list__cta"
+            aria-label="Become a member to access {{ doc.title | default('this document') }}"
+          >
+            <svg class="wa-document-list__lock-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Members only
+          </a>
+          {%- elif doc.file_url -%}
+          <a
+            href="{{ doc.file_url }}"
+            class="btn btn-outline btn-sm wa-document-list__cta"
+            {% if file_type == 'pdf' %}
+              target="_blank"
+              rel="noopener"
+              aria-label="Download {{ doc.title | default('document') }} (opens in new tab)"
+            {% else %}
+              aria-label="View {{ doc.title | default('document') }}"
+            {% endif %}
+          >
+            {%- if file_type == 'pdf' -%}Download{%- else -%}View{%- endif -%}
+          </a>
+          {%- endif -%}
+        </div>
+
+      </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- else -%}
+
+    <p class="wa-document-list__empty">
+      No documents are available in this category at the moment.
+    </p>
+
+    {%- endif -%}
+
+  </div>
+</section>
+
+{%- endif -%}

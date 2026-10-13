@@ -1,0 +1,21 @@
+<!--
+  templateType: page
+  label: Test - Base
+  isAvailableForNewContent: false
+-->
+{#
+  test-base.html - Throwaway validation page for base.html layout.
+  Confirm header + footer render; delete when real pages are built.
+#}
+{% extends "../layouts/base.html" %}
+
+{% block body %}
+<section style="padding: 64px 0;">
+  <div class="container">
+    <h1>Layout Test Page</h1>
+    <p>This page confirms <code>base.html</code> renders correctly with header and footer modules.</p>
+    <p>Logged in: {{ request_contact.is_logged_in | default(false) }}</p>
+    <a href="/login/" class="btn btn-primary">Member Login (test CTA)</a>
+  </div>
+</section>
+{% endblock %}

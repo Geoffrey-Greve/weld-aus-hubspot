@@ -1,0 +1,14 @@
+{
+  "label": "My Invoices & Receipts",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "React island: Member portal My Invoices page. Displays a filterable list of the member's invoices from associated Deals that have a xero_invoice_pdf_url. Missing PDF URLs gracefully show 'Receipt processing - check back shortly' per CLAUDE.md §10.1. Data populated via workflow-synced contact properties. Place on my-invoices.html (portal layout).",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["portal", "react-island", "my-invoices", "members-only"]
+}

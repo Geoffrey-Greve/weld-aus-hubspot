@@ -1,0 +1,14 @@
+{
+  "label": "Category Cards (3-up)",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Three-column category cards each with a 16:9 hero image, heading, body text, and CTA.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["content", "cards"]
+}

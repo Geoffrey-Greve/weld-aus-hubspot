@@ -1,0 +1,9 @@
+{
+  "label": "Member Command Centre",
+  "description": "Member dashboard module for membership, training, financials and resources.",
+  "icon": "membership",
+  "is_available_for_new_content": true,
+  "categories": ["body_content"],
+  "content_types": ["SITE_PAGE"],
+  "tags": ["membership", "portal", "dashboard", "preview", "hubdb", "react-island"]
+}

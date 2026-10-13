@@ -1,0 +1,349 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": "Qualification pathways"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Find your pathway to certification"
+  },
+  {
+    "name": "intro",
+    "label": "Default feature body text",
+    "type": "richtext",
+    "help_text": "Shown below the large pathway image when an individual pathway tab does not have its own Feature body text.",
+    "default": ""
+  },
+  {
+    "name": "default_card_thumbnail",
+    "label": "Default course card thumbnail",
+    "type": "image",
+    "help_text": "Fallback image used on the small course cards when a card-specific thumbnail is empty.",
+    "responsive": false,
+    "default": {
+      "src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-598086822%20(1).jpg",
+      "alt": "Weld Australia course thumbnail",
+      "width": 1200,
+      "height": 675
+    }
+  },
+  {
+    "name": "course_cards_source",
+    "label": "Course cards source",
+    "type": "choice",
+    "help_text": "Use HubDB to populate the small course cards from matching course categories. If no matching HubDB courses are found, the module automatically falls back to the manual Course cards repeater.",
+    "choices": [
+      [
+        "hubdb",
+        "HubDB categories with manual fallback"
+      ],
+      [
+        "manual",
+        "Manual course cards only"
+      ]
+    ],
+    "default": "hubdb"
+  },
+  {
+    "name": "max_dynamic_courses",
+    "label": "Maximum HubDB course cards per tab",
+    "type": "number",
+    "help_text": "Limits how many unique course pages are shown for each selector when using HubDB categories.",
+    "min": 1,
+    "max": 12,
+    "step": 1,
+    "default": 6
+  },
+  {
+    "name": "pathways",
+    "label": "Pathway tabs",
+    "type": "group",
+    "help_text": "Each item controls one tab, its large image/content, and the small course cards shown on the right.",
+    "occurrence": {
+      "min": 1,
+      "max": 6,
+      "default": 1,
+      "sorting_label_field": "label_text"
+    },
+    "expanded": true,
+    "children": [
+      {
+        "name": "label_text",
+        "label": "Tab label",
+        "type": "text",
+        "required": true,
+        "help_text": "Short label shown in the tab strip, e.g. 'Trade to AS1796'",
+        "default": ""
+      },
+      {
+        "name": "pathway_heading",
+        "label": "Pathway heading",
+        "type": "text",
+        "help_text": "Full heading shown inside the tab panel, e.g. 'Welder → AS1796 Certified'"
+      },
+      {
+        "name": "summary",
+        "label": "Short fallback body text",
+        "type": "text",
+        "help_text": "One-line description shown below the panel heading"
+      },
+      {
+        "name": "feature_image",
+        "label": "Feature image",
+        "type": "image",
+        "help_text": "Large image shown on the left of this pathway tab. If empty, a default welding image is used.",
+        "responsive": false
+      },
+      {
+        "name": "feature_caption",
+        "label": "Large image overlay caption",
+        "type": "text",
+        "help_text": "Short label overlaid on the feature image, e.g. Welding inspector courses."
+      },
+      {
+        "name": "feature_body",
+        "label": "Feature body text",
+        "type": "richtext",
+        "help_text": "Body copy shown below the feature image. If empty, the panel summary or section intro is used."
+      },
+      {
+        "name": "course_list_label",
+        "label": "Course list button label",
+        "type": "text",
+        "help_text": "Optional. If empty, the module uses 'View all {tab label} courses'."
+      },
+      {
+        "name": "course_list_link",
+        "label": "Course list button link",
+        "type": "link",
+        "help_text": "Optional. Overrides the destination below with an explicit URL."
+      },
+      {
+        "name": "course_list_division",
+        "label": "Course list button destination",
+        "type": "choice",
+        "display": "select",
+        "default": "auto",
+        "help_text": "Where the “View all … courses” button goes. Auto derives the training division from the selected HubDB categories, falling back to the tab label. Choose “All courses” for pathways that are not a training division (e.g. ISO 3834). A “Course list button link” overrides this.",
+        "choices": [
+          [
+            "auto",
+            "Auto (from categories / label)"
+          ],
+          [
+            "welding-inspection",
+            "Welding Inspection"
+          ],
+          [
+            "welding-supervision",
+            "Welding Supervision"
+          ],
+          [
+            "welding-coordination",
+            "Welding Coordination"
+          ],
+          [
+            "short-courses",
+            "Short Courses"
+          ],
+          [
+            "none",
+            "All courses (/courses/)"
+          ]
+        ]
+      },
+      {
+        "name": "hubdb_categories",
+        "label": "HubDB course categories",
+        "type": "choice",
+        "display": "checkbox",
+        "multiple": true,
+        "help_text": "Optional. Select which HubDB course categories should appear in this tab. Leave empty to infer from the tab label, e.g. Welding Inspector → Welding Inspection.",
+        "choices": [
+          [
+            "Welding Inspection",
+            "Welding Inspection"
+          ],
+          [
+            "Supervision",
+            "Supervision"
+          ],
+          [
+            "Engineering",
+            "Engineering"
+          ],
+          [
+            "Welding Processes",
+            "Welding Processes"
+          ],
+          [
+            "Management",
+            "Management"
+          ]
+        ]
+      },
+      {
+        "name": "steps",
+        "label": "Course cards",
+        "type": "group",
+        "help_text": "Each item controls one small course card on the right: title, badge, duration, thumbnail and link.",
+        "occurrence": {
+          "min": 2,
+          "max": 6,
+          "default": 2,
+          "sorting_label_field": "qualification"
+        },
+        "expanded": true,
+        "children": [
+          {
+            "name": "qualification",
+            "label": "Course card title",
+            "type": "text",
+            "required": true,
+            "help_text": "Main text shown on the course card.",
+            "default": ""
+          },
+          {
+            "name": "description",
+            "label": "Internal short description",
+            "type": "text",
+            "help_text": "Optional. Not shown in the compact card layout; used only to infer the delivery badge if Delivery badge text is empty."
+          },
+          {
+            "name": "duration",
+            "label": "Course duration",
+            "type": "text",
+            "help_text": "e.g. 3-5 days"
+          },
+          {
+            "name": "delivery_mode",
+            "label": "Delivery badge text",
+            "type": "text",
+            "help_text": "e.g. Online, Face-to-face, Blended"
+          },
+          {
+            "name": "thumbnail",
+            "label": "Card thumbnail image",
+            "type": "image",
+            "help_text": "Small image used on the course card. If empty, a fallback course thumbnail is used.",
+            "responsive": false,
+            "default": {
+              "src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-598086822%20(1).jpg",
+              "alt": "Weld Australia course thumbnail",
+              "width": 1200,
+              "height": 675
+            }
+          },
+          {
+            "name": "link_url",
+            "label": "Link URL (optional)",
+            "type": "link"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA button label",
+    "type": "text",
+    "default": "Speak to a trainer"
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA button link",
+    "type": "link"
+  }
+]

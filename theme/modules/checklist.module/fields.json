@@ -1,0 +1,182 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White/Light"
+      ],
+      [
+        "surface_alt",
+        "Alt grey"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text"
+  },
+  {
+    "name": "intro",
+    "label": "Intro text",
+    "type": "richtext"
+  },
+  {
+    "name": "layout",
+    "label": "Layout",
+    "type": "choice",
+    "choices": [
+      [
+        "list",
+        "List"
+      ],
+      [
+        "cards",
+        "Cards"
+      ]
+    ],
+    "default": "list"
+  },
+  {
+    "name": "columns",
+    "label": "Columns",
+    "type": "choice",
+    "choices": [
+      [
+        "1",
+        "1 column"
+      ],
+      [
+        "2",
+        "2 columns"
+      ],
+      [
+        "3",
+        "3 columns"
+      ]
+    ],
+    "default": "2"
+  },
+  {
+    "name": "tick_color",
+    "label": "Tick colour",
+    "type": "choice",
+    "choices": [
+      [
+        "navy",
+        "Navy"
+      ],
+      [
+        "gold",
+        "Gold"
+      ],
+      [
+        "green",
+        "Green"
+      ],
+      [
+        "magenta",
+        "Magenta"
+      ]
+    ],
+    "default": "navy"
+  },
+  {
+    "name": "items",
+    "label": "Items",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 30,
+      "default": 1
+    },
+    "children": [
+      {
+        "name": "text",
+        "label": "Item text",
+        "type": "text"
+      },
+      {
+        "name": "category_label",
+        "label": "Category label (for cards layout)",
+        "type": "text"
+      }
+    ]
+  }
+]

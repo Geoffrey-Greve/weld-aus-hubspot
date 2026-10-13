@@ -1,0 +1,8 @@
+{
+  "label": "Contact Form",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "is_available_for_new_content": true
+}

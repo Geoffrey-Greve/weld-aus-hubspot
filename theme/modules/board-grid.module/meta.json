@@ -1,0 +1,14 @@
+{
+  "label": "Board / People Cards",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Server-rendered grid of people (board, leadership, team). Optional left intro + checklist. No HubDB or JS required.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["team", "board", "people", "cards"]
+}

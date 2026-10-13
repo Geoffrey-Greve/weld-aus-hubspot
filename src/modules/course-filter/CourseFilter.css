@@ -1,0 +1,283 @@
+/* ============================================================
+   course-filter - React island styles
+   Follows the --wa-* design token system from CLAUDE.md §5.3
+   Mobile-first; cards stack vertically below 768px.
+   ============================================================ */
+
+.wa-course-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-6, 24px);
+}
+
+/* Filters ------------------------------------------------------ */
+
+.wa-course-filter__filters {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--wa-space-4, 16px);
+  flex-wrap: wrap;
+}
+
+.wa-course-filter__field {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3, 12px);
+  flex-wrap: wrap;
+}
+
+.wa-course-filter__city-label,
+.wa-course-filter__delivery-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.wa-course-filter__city-select {
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-3, 12px);
+  border: 1.5px solid currentColor;
+  border-radius: var(--wa-radius-md, 8px);
+  background: var(--wa-color-surface, #fff);
+  font-size: 1rem;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+/* Sessions grid ------------------------------------------------ */
+
+.wa-course-filter__sessions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-4, 16px);
+}
+
+@media (min-width: 640px) {
+  .wa-course-filter__sessions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-course-filter__sessions {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Session card ------------------------------------------------- */
+
+.wa-course-filter__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 12px);
+  padding: var(--wa-space-4, 16px);
+  border-radius: var(--wa-radius-md, 8px);
+  background: var(--wa-color-surface, #fff);
+  box-shadow: var(--wa-shadow-card, 0 1px 4px rgba(0, 0, 0, 0.08));
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Mute imagery only - opacity on .media also fades status badges below AA. */
+.wa-course-filter__card--cancelled .wa-course-filter__image,
+.wa-course-filter__card--sold_out .wa-course-filter__image,
+.wa-course-filter__card--registration_closed .wa-course-filter__image,
+.wa-course-filter__card--cancelled .wa-course-filter__media-scrim,
+.wa-course-filter__card--sold_out .wa-course-filter__media-scrim,
+.wa-course-filter__card--registration_closed .wa-course-filter__media-scrim {
+  opacity: 0.65;
+}
+
+.wa-course-filter__card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--wa-space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.wa-course-filter__dates {
+  font-weight: 600;
+  font-size: 0.975rem;
+}
+
+/* Status badges ------------------------------------------------ */
+
+.wa-course-filter__badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--wa-radius-sm, 4px);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.wa-course-filter__badge--cancelled {
+  background: #fef3f2;
+  color: #b91c1c;
+}
+
+.wa-course-filter__badge--sold-out {
+  background: #fefce8;
+  color: #92400e;
+}
+
+/* Ref 74c. `closed` is staff shutting registrations on an upcoming course, or the Worker's
+   own cutoff - one sentence, one treatment. `paused` is reversible, so it reads softer, and
+   `not-bookable` is a session not on sale yet. */
+.wa-course-filter__badge--closed,
+.wa-course-filter__badge--not-bookable {
+  background: #fef3f2;
+  color: #b91c1c;
+}
+
+.wa-course-filter__badge--paused {
+  background: #fefce8;
+  color: #92400e;
+}
+
+/* Pricing ------------------------------------------------------ */
+
+.wa-course-filter__pricing {
+  display: flex;
+  align-items: baseline;
+  gap: var(--wa-space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.wa-course-filter__price {
+  font-size: 1rem;
+}
+
+/* Member price - success-text (AA on white); keep bold green cue per §5.4 rule 4 */
+.wa-course-filter__price--member {
+  color: var(--wa-color-success-text, #146c39);
+  font-weight: 700;
+}
+
+.wa-course-filter__price-tag {
+  font-size: 0.8em;
+  font-weight: 400;
+}
+
+/* Non-member price struck through when a member is viewing */
+.wa-course-filter__price--struck {
+  text-decoration: line-through;
+  color: var(--wa-color-text-muted, #6b7280);
+  font-size: 0.9rem;
+}
+
+.wa-course-filter__price--public {
+  font-weight: 600;
+}
+
+/* Seats remaining ---------------------------------------------- */
+
+.wa-course-filter__seats {
+  font-size: 0.85rem;
+  color: #92400e;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* CTA button --------------------------------------------------- */
+
+.wa-course-filter__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-4, 16px);
+  border-radius: var(--wa-radius-md, 8px);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* Sits directly above the CTA - the button must stay the card's last child so
+   it lines up with the neighbouring cards. */
+.wa-course-filter__note {
+  margin: 0;
+  color: var(--wa-color-text-muted, #6b7280);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+/* EOI form ----------------------------------------------------- */
+
+.wa-course-filter__eoi {
+  padding: var(--wa-space-6, 24px);
+  border-radius: var(--wa-radius-lg, 16px);
+  background: var(--wa-color-surface-alt, #f9fafb);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.wa-course-filter__eoi--success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #14532d;
+}
+
+.wa-course-filter__eoi-heading {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 var(--wa-space-3, 12px);
+}
+
+.wa-course-filter__eoi-message {
+  margin-bottom: var(--wa-space-4, 16px);
+}
+
+.wa-course-filter__eoi-message p:last-child {
+  margin-bottom: 0;
+}
+
+.wa-course-filter__eoi-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-3, 12px);
+}
+
+.wa-course-filter__eoi-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wa-course-filter__eoi-field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.wa-course-filter__eoi-field input {
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 var(--wa-space-3, 12px);
+  border: 1.5px solid rgba(0, 0, 0, 0.2);
+  border-radius: var(--wa-radius-md, 8px);
+  font-size: 1rem;
+  background: var(--wa-color-surface, #fff);
+}
+
+.wa-course-filter__eoi-field input:focus {
+  outline: 2px solid var(--wa-color-primary, #003087);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+.wa-course-filter__eoi-error {
+  color: #b91c1c;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.wa-course-filter__eoi-fallback {
+  margin: 0;
+  color: var(--wa-color-text-muted, #6b7280);
+}
+
+.wa-course-filter__eoi-contact {
+  display: inline-flex;
+  margin-top: var(--wa-space-4, 16px);
+}

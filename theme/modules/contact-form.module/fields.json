@@ -1,0 +1,455 @@
+[
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": "Get in touch"
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Send us a message"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext"
+  },
+  {
+    "name": "form",
+    "label": "General enquiry form",
+    "type": "form",
+    "required": true,
+    "embed_versions": ["v2", "v4"],
+    "disable_inline_form_editing": true,
+    "help_text": "Submission target for the General enquiry tab (v2 or v4 forms). The form UI is theme-styled; include matching properties on the HubSpot form (firstname, lastname, email, phone, company, message, hs_ticket_category).",
+    "default": {
+      "form_id": "",
+      "response_type": "inline",
+      "message": "Thanks for getting in touch."
+    }
+  },
+  {
+    "name": "enable_soldamatic_selector",
+    "label": "Enable Soldamatic support selector",
+    "type": "boolean",
+    "default": true,
+    "help_text": "Adds a top-level General enquiry / Soldamatic support selector and swaps the form fields/sidebar for Soldamatic support requests."
+  },
+  {
+    "name": "soldamatic_form",
+    "label": "Soldamatic support form",
+    "type": "form",
+    "embed_versions": ["v2", "v4"],
+    "disable_inline_form_editing": true,
+    "help_text": "Submission target for the Soldamatic tab. Leave blank to submit Soldamatic requests to the General enquiry form instead.",
+    "default": {
+      "form_id": "",
+      "response_type": "inline",
+      "message": "Thanks for your support request."
+    },
+    "visibility": {
+      "controlling_field": "enable_soldamatic_selector",
+      "controlling_value_regex": "true",
+      "operator": "EQUAL"
+    }
+  },
+  {
+    "name": "general_form_label",
+    "label": "General form selector label",
+    "type": "text",
+    "default": "General enquiry"
+  },
+  {
+    "name": "soldamatic_form_label",
+    "label": "Soldamatic form selector label",
+    "type": "text",
+    "default": "Soldamatic support"
+  },
+  {
+    "name": "soldamatic_submit_label",
+    "label": "Soldamatic submit button label",
+    "type": "text",
+    "default": "Submit support request"
+  },
+  {
+    "name": "soldamatic_success_title",
+    "label": "Soldamatic success title",
+    "type": "text",
+    "default": "Support request received"
+  },
+  {
+    "name": "soldamatic_success_body",
+    "label": "Soldamatic success message",
+    "type": "richtext",
+    "default": "<p>A member of our Soldamatic team will be in touch as soon as possible.</p>"
+  },
+  {
+    "name": "soldamatic_reset_label",
+    "label": "Soldamatic reset link label",
+    "type": "text",
+    "default": "Submit another request"
+  },
+  {
+    "name": "soldamatic_machine_label",
+    "label": "Soldamatic machine number label",
+    "type": "text",
+    "default": "Soldamatic machine number"
+  },
+  {
+    "name": "soldamatic_machine_hint",
+    "label": "Soldamatic machine number hint",
+    "type": "text",
+    "default": "Found on the label on the back of your simulator unit."
+  },
+  {
+    "name": "soldamatic_machine_placeholder",
+    "label": "Soldamatic machine number placeholder",
+    "type": "text",
+    "default": "e.g. SM-2024-XXXX"
+  },
+  {
+    "name": "soldamatic_message_label",
+    "label": "Soldamatic message label",
+    "type": "text",
+    "default": "Brief description of the issue"
+  },
+  {
+    "name": "soldamatic_message_placeholder",
+    "label": "Soldamatic message placeholder",
+    "type": "text",
+    "default": "Describe the issue with your Soldamatic simulator…"
+  },
+  {
+    "name": "soldamatic_sidebar_heading",
+    "label": "Soldamatic sidebar heading",
+    "type": "text",
+    "default": "About Soldamatic support"
+  },
+  {
+    "name": "soldamatic_sidebar_body",
+    "label": "Soldamatic sidebar body",
+    "type": "richtext",
+    "default": "<p>Need assistance with your Soldamatic augmented reality welding simulator? Complete the form and our dedicated team will respond as soon as possible.</p>"
+  },
+  {
+    "name": "enquiry_types",
+    "label": "Ticket category options",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 20,
+      "default": 1
+    },
+    "help_text": "Options for the hs_ticket_category dropdown. Labels must match the CRM values on your HubSpot form.",
+    "children": [
+      {
+        "name": "type",
+        "label": "Category label (CRM value)",
+        "type": "text",
+        "default": "General enquiry"
+      }
+    ],
+    "default": [
+      { "type": "New business" },
+      { "type": "Training & courses" },
+      { "type": "Machine repair & servicing" },
+      { "type": "Qualification, certification & exams" },
+      { "type": "Engineering services" },
+      { "type": "Membership" },
+      { "type": "Marketing, communications & events" },
+      { "type": "Finance" },
+      { "type": "General enquiry" }
+    ]
+  },
+  {
+    "name": "show_phone",
+    "label": "Show phone field",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_company",
+    "label": "Show company / organisation field",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_company_on_general",
+    "label": "Show company field on general form",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When the Soldamatic selector is enabled, this can hide company / organisation from the general enquiry form while keeping it visible on Soldamatic support."
+  },
+  {
+    "name": "submit_label",
+    "label": "Submit button label",
+    "type": "text",
+    "default": "Send enquiry"
+  },
+  {
+    "name": "success_title",
+    "label": "Success title",
+    "type": "text",
+    "default": "Enquiry received"
+  },
+  {
+    "name": "success_body",
+    "label": "Success message",
+    "type": "richtext",
+    "default": "Thank you for contacting Weld Australia. Our team will be in touch within 1–2 business days."
+  },
+  {
+    "name": "enable_conditional",
+    "label": "Enable conditional follow-up block",
+    "type": "boolean",
+    "default": false,
+    "help_text": "Reveals an extra question + field when a specific enquiry topic is selected."
+  },
+  {
+    "name": "conditional",
+    "label": "Conditional block",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 1
+    },
+    "help_text": "Only applies when 'Enable conditional follow-up block' is on.",
+    "children": [
+      {
+        "name": "trigger_type",
+        "label": "Trigger topic",
+        "type": "text",
+        "default": "Soldamatic AR welding simulator",
+        "help_text": "The enquiry type label that triggers this block."
+      },
+      {
+        "name": "question_heading",
+        "label": "Follow-up question",
+        "type": "text",
+        "default": "How can we help with Soldamatic?"
+      },
+      {
+        "name": "options",
+        "label": "Options",
+        "type": "group",
+        "occurrence": {
+          "min": 1,
+          "max": 4,
+          "default": 1
+        },
+        "children": [
+          {
+            "name": "value_text",
+            "label": "Value (internal)",
+            "type": "text",
+            "default": "new"
+          },
+          {
+            "name": "title",
+            "label": "Title",
+            "type": "text",
+            "default": "New purchase"
+          },
+          {
+            "name": "sub",
+            "label": "Subtext",
+            "type": "text",
+            "default": "Pricing, demos & buying a simulator"
+          }
+        ]
+      },
+      {
+        "name": "reveal_on",
+        "label": "Reveal extra field on option value",
+        "type": "text",
+        "default": "existing",
+        "help_text": "The option 'Value' that causes the extra field to appear."
+      },
+      {
+        "name": "extra_field_label",
+        "label": "Extra field label",
+        "type": "text",
+        "default": "Soldamatic machine number"
+      },
+      {
+        "name": "extra_field_hint",
+        "label": "Extra field hint",
+        "type": "text",
+        "default": "Found on the label on the back of your simulator unit."
+      },
+      {
+        "name": "extra_field_placeholder",
+        "label": "Extra field placeholder",
+        "type": "text",
+        "default": "e.g. SM-2024-XXXX"
+      },
+      {
+        "name": "cond_success_body",
+        "label": "Conditional success message",
+        "type": "richtext",
+        "help_text": "Replaces the default success message when this block is triggered."
+      },
+      {
+        "name": "cond_sidebar_heading",
+        "label": "Conditional sidebar heading",
+        "type": "text",
+        "help_text": "Sidebar heading shown when this block is active (replaces the phone/list sidebar)."
+      },
+      {
+        "name": "cond_sidebar_body",
+        "label": "Conditional sidebar body",
+        "type": "richtext"
+      }
+    ]
+  },
+  {
+    "name": "show_sidebar",
+    "label": "Show sidebar",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "sidebar_phone_number",
+    "label": "Sidebar phone number",
+    "type": "text",
+    "default": "1800 189 900"
+  },
+  {
+    "name": "sidebar_phone_sub",
+    "label": "Sidebar phone subtext",
+    "type": "text",
+    "default": "Free call within Australia"
+  },
+  {
+    "name": "sidebar_list_heading",
+    "label": "Sidebar list heading",
+    "type": "text",
+    "default": "We work with"
+  },
+  {
+    "name": "sidebar_list_items",
+    "label": "Sidebar list items",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 8
+    },
+    "children": [
+      {
+        "name": "item",
+        "label": "Item",
+        "type": "text"
+      }
+    ],
+    "default": [
+      {
+        "item": "Individuals & apprentices"
+      },
+      {
+        "item": "Businesses & fabricators"
+      },
+      {
+        "item": "Training organisations"
+      },
+      {
+        "item": "Engineering firms"
+      }
+    ]
+  },
+  {
+    "name": "response_time",
+    "label": "Response time note",
+    "type": "text",
+    "default": "We aim to respond to all enquiries within 1–2 business days."
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links (e.g. /contact-us?enquiry=Membership#enquiry). Lower-case, hyphenated.",
+    "default": "enquiry"
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "white",
+        "White"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

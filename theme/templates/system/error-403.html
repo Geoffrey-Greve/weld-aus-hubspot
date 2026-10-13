@@ -1,0 +1,503 @@
+<!--
+  templateType: membership_access_denied_page
+  label: Weld Australia 403 Access Denied Page
+  isAvailableForNewContent: true
+-->
+{#
+  error-403.html - Weld Australia themed private content access-denied page
+  Assign in: HubSpot Settings > Content > Private content > Access denied page
+
+  This template intentionally mirrors error-404.html so private-content access
+  issues feel like part of the same Weld Australia system-page experience.
+#}
+{% set page_title = "Member access required" %}
+{% set page_description = "This Weld Australia page is private. Sign in with your member account, review membership options, or contact the team if you need help accessing member content." %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body_class %}is-error-403-page{% endblock %}
+
+{% block body %}
+<section class="wa-error-403" aria-labelledby="wa-error-403-heading">
+  {% set _error_403_panel %}
+    <div class="wa-error-403__panel" aria-hidden="true">
+      <span class="wa-error-403__code">403</span>
+      <span class="wa-error-403__panel-line"></span>
+      <span class="wa-error-403__panel-text">Member access required</span>
+    </div>
+  {% endset %}
+
+  {% set _shared_hero_id = 'wa-error-403-hero' %}
+  {% set _shared_hero_section_id = 'wa-error-403' %}
+  {% set _shared_hero_background = 'primary' %}
+  {% set _shared_hero_height = 'large' %}
+  {% set _shared_hero_spacing = 'default' %}
+  {% set _shared_hero_alignment = 'left' %}
+  {% set _shared_hero_accent_bar = true %}
+  {% set _shared_hero_media_type = 'text' %}
+  {% set _shared_hero_media_text = _error_403_panel %}
+  {% set _shared_hero_eyebrow = '403 access denied' %}
+  {% set _shared_hero_headline = 'This page is for Weld Australia members.' %}
+  {% set _shared_hero_subheadline = '<p>You may need to sign in, use a different member account, or have your membership access updated before you can view this private content.</p>' %}
+  {% set _shared_hero_primary_label = 'Sign in to continue' %}
+  {% set _shared_hero_primary_href = '/_hcms/mem/login' %}
+  {% set _shared_hero_primary_style = 'gold' %}
+  {% include "../partials/shared-hero.html" %}
+
+  {% if false %}
+  {# Legacy hero markup replaced by shared-hero in Batch 4. #}
+  <div class="wa-error-403__hero">
+    <div class="container">
+      <div class="wa-error-403__hero-grid">
+        <div class="wa-error-403__copy">
+          <div class="wa-overline wa-overline--light wa-error-403__overline">
+            <span class="wa-overline__text">403 access denied</span>
+          </div>
+          <h1 id="wa-error-403-heading" class="wa-error-403__heading">
+            This page is for Weld Australia members.
+          </h1>
+          <p class="wa-error-403__lead">
+            You may need to sign in, use a different member account, or have
+            your membership access updated before you can view this private
+            content.
+          </p>
+
+          <div class="wa-error-403__actions" aria-label="Primary access links">
+            <a class="wa-btn wa-btn--gold wa-error-403__primary-cta" href="/_hcms/mem/login">
+              Sign in to continue
+            </a>
+          </div>
+        </div>
+
+        <div class="wa-error-403__panel" aria-hidden="true">
+          <span class="wa-error-403__code">403</span>
+          <span class="wa-error-403__panel-line"></span>
+          <span class="wa-error-403__panel-text">Member access required</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
+
+  <div class="wa-error-403__body">
+    <div class="container">
+      <div class="wa-error-403__intro">
+        <div class="wa-overline wa-error-403__overline">
+          <span class="wa-overline__text">What would you like to do next?</span>
+        </div>
+        <h2 class="wa-error-403__section-heading">Access and member support</h2>
+        <p class="wa-error-403__section-copy">
+          Use these shortcuts to sign in, return to member areas, or contact
+          Weld Australia if your account should already have access.
+        </p>
+      </div>
+
+      <ul class="wa-error-403__cards" role="list">
+        <li class="wa-error-403__card">
+          <a class="wa-error-403__card-link" href="/_hcms/mem/login">
+            <span class="wa-error-403__card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M15 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4"/>
+                <path d="M10 17l5-5-5-5M15 12H3"/>
+              </svg>
+            </span>
+            <span class="wa-error-403__card-title">Sign in</span>
+            <span class="wa-error-403__card-text">Use your HubSpot member portal account to continue.</span>
+          </a>
+        </li>
+
+        <li class="wa-error-403__card">
+          <a class="wa-error-403__card-link" href="/portal">
+            <span class="wa-error-403__card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>
+              </svg>
+            </span>
+            <span class="wa-error-403__card-title">Member Command Centre</span>
+            <span class="wa-error-403__card-text">Return to your member dashboard and account tools.</span>
+          </a>
+        </li>
+
+        <li class="wa-error-403__card">
+          <a class="wa-error-403__card-link" href="/membership">
+            <span class="wa-error-403__card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 3 4 7l8 4 8-4-8-4Z"/>
+                <path d="M4 11l8 4 8-4M4 15l8 4 8-4"/>
+              </svg>
+            </span>
+            <span class="wa-error-403__card-title">Membership</span>
+            <span class="wa-error-403__card-text">Explore membership options and member benefits.</span>
+          </a>
+        </li>
+
+        <li class="wa-error-403__card">
+          <a class="wa-error-403__card-link" href="/resources">
+            <span class="wa-error-403__card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M5 4h10l4 4v12H5z"/>
+                <path d="M15 4v4h4M8 13h8M8 16h6"/>
+              </svg>
+            </span>
+            <span class="wa-error-403__card-title">Resources</span>
+            <span class="wa-error-403__card-text">Browse welding resources and member-access downloads.</span>
+          </a>
+        </li>
+
+        <li class="wa-error-403__card">
+          <a class="wa-error-403__card-link" href="/courses">
+            <span class="wa-error-403__card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/>
+                <path d="M8 2v4M16 2v4M4 9h16M8 13h3M8 16h6"/>
+              </svg>
+            </span>
+            <span class="wa-error-403__card-title">Course timetable</span>
+            <span class="wa-error-403__card-text">Find upcoming training sessions and course dates.</span>
+          </a>
+        </li>
+
+        <li class="wa-error-403__card">
+          <a class="wa-error-403__card-link" href="/contact-us">
+            <span class="wa-error-403__card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M4 5h16v12H5l-1 3z"/>
+                <path d="M8 9h8M8 13h5"/>
+              </svg>
+            </span>
+            <span class="wa-error-403__card-title">Contact us</span>
+            <span class="wa-error-403__card-text">Ask the Weld Australia team for help with access.</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  {% module "error_403_member_access_cta" path="../../modules/cta-banner"
+    label="403 Member Access CTA"
+    section_id="member-access-support"
+    background="primary"
+    spacing="default"
+    align="split"
+    image_position="none"
+    headline="Need help accessing member content?"
+    body_text="<p>If your membership is current but you still cannot access this page, contact Weld Australia and we can help confirm your account details.</p>"
+    cta_label="Contact our team"
+    cta_link={"url": {"href": "/contact-us", "type": "EXTERNAL"}}
+    secondary_cta_label="View membership options"
+    secondary_cta_link={"url": {"href": "/membership", "type": "EXTERNAL"}}
+  %}
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<meta name="robots" content="noindex, nofollow">
+<style>
+  body.is-error-403-page {
+    background: var(--wa-color-surface-2, #f5f7fb);
+  }
+
+  .wa-error-403 {
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, var(--wa-color-surface, #fff) 0%, var(--wa-color-surface-2, #f5f7fb) 100%);
+  }
+
+  .wa-error-403__hero {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    min-height: 600px;
+    color: var(--wa-color-text-inverse, #fff);
+    background-color: var(--wa-color-primary-dark, #0f1030);
+    background-image: none;
+    padding: var(--wa-space-16, 4rem) 0;
+  }
+
+  @media (min-width: 1024px) {
+    .wa-error-403__hero {
+      min-height: 620px;
+    }
+  }
+
+  .wa-error-403__hero::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 5px;
+    background: var(--wa-gradient-flame, linear-gradient(90deg, #ed128d 0%, #f04828 40%, #fecf05 100%));
+    z-index: -1;
+  }
+
+  .wa-error-403__hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 4.5rem);
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .wa-error-403__hero-grid {
+      grid-template-columns: minmax(0, 1.18fr) minmax(20rem, 0.82fr);
+    }
+
+    .wa-error-403__panel {
+      order: 0;
+      justify-self: end;
+      width: min(100%, 390px);
+    }
+  }
+
+  /* Panel above copy so the error code is visible first on small screens */
+  @media (max-width: 899px) {
+    .wa-error-403__panel {
+      order: -1;
+      justify-self: stretch;
+      width: 100%;
+      min-height: 14rem;
+    }
+  }
+
+  .wa-error-403__copy {
+    max-width: 820px;
+  }
+
+  .wa-error-403__overline {
+    margin-bottom: var(--wa-space-4, 1rem);
+  }
+
+  .wa-error-403__heading {
+    max-width: 620px;
+    margin: 0;
+    color: var(--wa-color-text-inverse, #fff);
+    font-family: var(--wa-font-heading, inherit);
+    font-size: var(--wa-text-3xl, 2.25rem);
+    font-weight: var(--wa-weight-extrabold, 800);
+    line-height: 1.08;
+  }
+
+  .wa-error-403__lead {
+    max-width: 60ch;
+    margin: 18px 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: var(--wa-text-base, 1rem);
+    line-height: 1.7;
+  }
+
+  .wa-error-403__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wa-space-3, 0.75rem);
+    margin-top: var(--wa-space-8, 2rem);
+  }
+
+  .wa-error-403__primary-cta {
+    box-shadow: 0 18px 36px rgba(254, 207, 5, 0.18);
+  }
+
+  .wa-error-403__panel {
+    position: relative;
+    justify-self: end;
+    width: min(100%, 390px);
+    min-height: 19rem;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: var(--wa-radius-xl, 24px);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+    overflow: hidden;
+  }
+
+  .wa-error-403__code {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.96);
+    font-family: var(--wa-font-heading, inherit);
+    font-size: clamp(5rem, 9vw, 7.75rem);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+    text-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+  }
+
+  .wa-error-403__panel-line {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 14rem);
+    height: 4px;
+    margin: var(--wa-space-4, 1rem) auto;
+    border-radius: 999px;
+    background: var(--wa-gradient-flame, linear-gradient(90deg, #ed128d 0%, #f04828 40%, #fecf05 100%));
+  }
+
+  .wa-error-403__panel-text {
+    position: relative;
+    z-index: 1;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .wa-error-403__body {
+    padding: clamp(3.5rem, 7vw, 6rem) 0;
+  }
+
+  .wa-error-403__intro {
+    max-width: 720px;
+    margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
+  }
+
+  .wa-error-403__section-heading {
+    margin: 0;
+    color: var(--wa-color-primary-dark, #0f1030);
+    font-family: var(--wa-font-heading, inherit);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .wa-error-403__section-copy {
+    max-width: 58ch;
+    margin: var(--wa-space-4, 1rem) 0 0;
+    color: var(--wa-color-text-muted, #5f6674);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .wa-error-403__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--wa-space-5, 1.25rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .wa-error-403__card {
+    min-width: 0;
+  }
+
+  .wa-error-403__card-link {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: var(--wa-space-3, 0.75rem);
+    min-height: 100%;
+    padding: clamp(1.25rem, 3vw, 1.65rem);
+    color: inherit;
+    text-decoration: none;
+    border: 1px solid rgba(15, 16, 48, 0.1);
+    border-radius: var(--wa-radius-lg, 16px);
+    background: var(--wa-color-surface, #fff);
+    box-shadow: var(--wa-shadow-card, 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+    transition:
+      border-color var(--wa-duration-fast, 150ms) var(--wa-ease-default, ease),
+      box-shadow var(--wa-duration-fast, 150ms) var(--wa-ease-default, ease),
+      transform var(--wa-duration-fast, 150ms) var(--wa-ease-default, ease);
+  }
+
+  .wa-error-403__card-link::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    border-radius: var(--wa-radius-lg, 16px) var(--wa-radius-lg, 16px) 0 0;
+    background: var(--wa-gradient-flame, linear-gradient(90deg, #ed128d 0%, #f04828 40%, #fecf05 100%));
+    opacity: 0;
+    transition: opacity var(--wa-duration-fast, 150ms) var(--wa-ease-default, ease);
+  }
+
+  .wa-error-403__card-link:hover {
+    border-color: rgba(28, 30, 76, 0.22);
+    box-shadow: var(--wa-shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.14));
+    transform: translateY(-4px);
+  }
+
+  .wa-error-403__card-link:hover::before {
+    opacity: 1;
+  }
+
+  .wa-error-403__card-link:focus-visible {
+    outline: 3px solid var(--wa-color-accent, #fecf05);
+    outline-offset: 3px;
+  }
+
+  .wa-error-403__card-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    color: var(--wa-color-primary, #1c1e4c);
+    border-radius: var(--wa-radius-md, 8px);
+    background: rgba(28, 30, 76, 0.07);
+  }
+
+  .wa-error-403__card-icon svg {
+    width: 1.45rem;
+    height: 1.45rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  .wa-error-403__card-title {
+    color: var(--wa-color-primary-dark, #0f1030);
+    font-size: 1.08rem;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .wa-error-403__card-text {
+    color: var(--wa-color-text-muted, #5f6674);
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  @media (min-width: 768px) {
+    .wa-error-403__heading {
+      font-size: var(--wa-text-4xl, 3rem);
+      max-width: 760px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .wa-error-403__heading {
+      font-size: 54px;
+      max-width: 780px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .wa-error-403__hero {
+      min-height: 560px;
+      padding: var(--wa-space-12, 3rem) 0;
+    }
+
+    .wa-error-403__heading {
+      max-width: 100%;
+    }
+
+    .wa-error-403__actions {
+      align-items: stretch;
+    }
+
+    .wa-error-403__actions .wa-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %}

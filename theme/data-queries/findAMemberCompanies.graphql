@@ -1,0 +1,46 @@
+# label: "Find a Member - CRM companies"
+# description: "Current corporate and industry supplier members for the public Find a Member directory."
+query FindAMemberCompanies {
+  CRM {
+    corporate: company_collection(
+      limit: 200
+      filter: { corporate_membership_status__eq: "Current" }
+    ) {
+      total
+      items {
+        hs_object_id
+        name
+        hs_logo_url
+        website
+        state
+        city
+        about_us
+        description
+        corporate_membership_status
+        corporate_membership_level_2
+        industry_supplier_membership_status
+        industry_supplier_membership_level_2
+      }
+    }
+    supplier: company_collection(
+      limit: 100
+      filter: { industry_supplier_membership_status__eq: "Current" }
+    ) {
+      total
+      items {
+        hs_object_id
+        name
+        hs_logo_url
+        website
+        state
+        city
+        about_us
+        description
+        corporate_membership_status
+        corporate_membership_level_2
+        industry_supplier_membership_status
+        industry_supplier_membership_level_2
+      }
+    }
+  }
+}

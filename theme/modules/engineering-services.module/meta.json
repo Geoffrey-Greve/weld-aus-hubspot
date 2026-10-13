@@ -1,0 +1,14 @@
+{
+  "label": "Engineering Services",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Editable Engineering services card grid with service images, descriptions and CTAs.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["engineering", "services", "cards"]
+}

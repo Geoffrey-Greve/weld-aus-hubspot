@@ -1,0 +1,262 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": "magazine-connect"
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      ["white", "White"],
+      ["surface", "Light grey"]
+    ],
+    "default": "white"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact"],
+      ["default", "Default"],
+      ["spacious", "Spacious"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "header",
+    "label": "Section header",
+    "type": "group",
+    "children": [
+      {
+        "name": "overline",
+        "label": "Overline",
+        "type": "text",
+        "default": "Our publications"
+      },
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text",
+        "default": "Australian Welding & Weld Connect"
+      },
+      {
+        "name": "intro",
+        "label": "Intro text",
+        "type": "richtext",
+        "default": "<p>Our flagship publications offer expert analysis, technical guidance and industry news for Australia&apos;s welding and fabrication sectors.</p>"
+      },
+      {
+        "name": "alignment",
+        "label": "Header alignment",
+        "type": "choice",
+        "choices": [
+          ["left", "Left"],
+          ["center", "Centre"]
+        ],
+        "default": "left"
+      }
+    ]
+  },
+  {
+    "name": "layout",
+    "label": "Desktop layout",
+    "type": "choice",
+    "choices": [
+      ["default", "Publication card left, newsletter right"],
+      ["reverse", "Newsletter left, publication card right"],
+      ["stacked", "Stacked full width"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "publication",
+    "label": "Australian Welding card",
+    "type": "group",
+    "children": [
+      {
+        "name": "cover_image",
+        "label": "Poster / cover image",
+        "type": "image",
+        "responsive": false
+      },
+      {
+        "name": "cover_image_opacity",
+        "label": "Cover image visibility",
+        "type": "number",
+        "default": 35,
+        "min": 0,
+        "max": 100,
+        "suffix": "%"
+      },
+      {
+        "name": "cover_tint",
+        "label": "Cover tint",
+        "type": "choice",
+        "choices": [
+          ["navy", "Navy"],
+          ["blue", "Blue"],
+          ["magenta", "Magenta"],
+          ["gold", "Gold"]
+        ],
+        "default": "navy"
+      },
+      {
+        "name": "cover_kicker",
+        "label": "Cover kicker",
+        "type": "text",
+        "default": "Bi-annual magazine"
+      },
+      {
+        "name": "cover_title",
+        "label": "Cover title",
+        "type": "text",
+        "default": "Australian Welding"
+      },
+      {
+        "name": "cover_issue",
+        "label": "Cover issue label",
+        "type": "text",
+        "default": "Latest edition"
+      },
+      {
+        "name": "cover_subtitle",
+        "label": "Cover subtitle",
+        "type": "text",
+        "default": "Industry insights and technical updates"
+      },
+      {
+        "name": "title",
+        "label": "Card title",
+        "type": "text",
+        "default": "Australian Welding magazine"
+      },
+      {
+        "name": "body_text",
+        "label": "Card body",
+        "type": "richtext",
+        "default": "<p>A bi-annual publication covering welding technology, standards, infrastructure, defence, energy, skills and member stories.</p>"
+      },
+      {
+        "name": "primary_cta_label",
+        "label": "Primary CTA label",
+        "type": "text",
+        "default": "Read the latest edition"
+      },
+      {
+        "name": "primary_cta_link",
+        "label": "Primary CTA link",
+        "type": "link"
+      },
+      {
+        "name": "primary_cta_style",
+        "label": "Primary CTA style",
+        "type": "choice",
+        "choices": [
+          ["navy", "Navy"],
+          ["gold", "Gold"],
+          ["navy-outline", "Navy outline"]
+        ],
+        "default": "navy"
+      },
+      {
+        "name": "secondary_cta_label",
+        "label": "Secondary CTA label",
+        "type": "text",
+        "default": "Browse the archive"
+      },
+      {
+        "name": "secondary_cta_link",
+        "label": "Secondary CTA link",
+        "type": "link"
+      },
+      {
+        "name": "secondary_cta_style",
+        "label": "Secondary CTA style",
+        "type": "choice",
+        "choices": [
+          ["navy", "Navy"],
+          ["gold", "Gold"],
+          ["navy-outline", "Navy outline"]
+        ],
+        "default": "navy-outline"
+      }
+    ]
+  },
+  {
+    "name": "newsletter",
+    "label": "Weld Connect card",
+    "type": "group",
+    "children": [
+      {
+        "name": "show",
+        "label": "Show Weld Connect card",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "name": "anchor_id",
+        "label": "Card anchor ID",
+        "type": "text",
+        "default": "weld-connect"
+      },
+      {
+        "name": "card_style",
+        "label": "Card style",
+        "type": "choice",
+        "choices": [
+          ["navy", "Navy"],
+          ["deep", "Deep navy"],
+          ["gradient", "Navy gradient"]
+        ],
+        "default": "navy"
+      },
+      {
+        "name": "kicker",
+        "label": "Kicker",
+        "type": "text",
+        "default": "Monthly e-newsletter"
+      },
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text",
+        "default": "Weld Connect"
+      },
+      {
+        "name": "body_text",
+        "label": "Body",
+        "type": "richtext",
+        "default": "<p>Get policy updates, technical articles, training news and upcoming events delivered to your inbox.</p>"
+      },
+      {
+        "name": "form",
+        "label": "Subscription form",
+        "type": "form",
+        "required": false,
+        "help_text": "Select the HubSpot form to embed for Weld Connect signups. Replaces the old subscribe form action URL - submissions are captured by HubSpot instead of redirecting.",
+        "default": {
+          "form_id": "",
+          "response_type": "inline",
+          "message": "Thanks for subscribing to Weld Connect."
+        }
+      },
+      {
+        "name": "submit_label",
+        "label": "Submit button label",
+        "type": "text",
+        "default": "Subscribe to Weld Connect",
+        "help_text": "Overrides the HubSpot form's own submit button label on this card."
+      },
+      {
+        "name": "note",
+        "label": "Small note",
+        "type": "text",
+        "default": "Join 10,000+ industry professionals. Unsubscribe anytime."
+      }
+    ]
+  }
+]

@@ -1,0 +1,858 @@
+/* ─── Checkout Tunnel ──────────────────────────────────────────────────────── */
+
+.wa-checkout-tunnel {
+  min-height: 55vh;
+  padding-block: 0;
+}
+
+.wa-checkout-tunnel__body {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+/* ─── Step indicator (in checkout header portal) ─────────────────────────── */
+
+.wa-checkout-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wa-checkout-steps__item {
+  display: flex;
+  align-items: center;
+  color: var(--wa-color-text-muted, #6b7280);
+  white-space: nowrap;
+}
+
+.wa-checkout-steps__item + .wa-checkout-steps__item::before {
+  content: '';
+  display: inline-block;
+  width: clamp(22px, 3.6vw, 54px);
+  height: 2px;
+  background: rgba(28, 30, 76, 0.16);
+  margin-inline: clamp(6px, 1.2vw, 12px);
+  border-radius: var(--wa-radius-full, 9999px);
+}
+
+.wa-checkout-steps__item--done + .wa-checkout-steps__item::before {
+  background: var(--wa-color-success, #1f8a4d);
+}
+
+.wa-checkout-steps__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wa-space-2, 8px);
+  min-height: var(--wa-touch-min, 44px);
+  padding: var(--wa-space-1, 4px) var(--wa-space-3, 12px) var(--wa-space-1, 4px)
+    var(--wa-space-1, 4px);
+  color: inherit;
+  font: inherit;
+  font-size: var(--wa-text-sm, 0.875rem);
+  font-weight: var(--wa-weight-semibold, 600);
+  line-height: 1.2;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--wa-radius-full, 9999px);
+  cursor: pointer;
+  transition:
+    color var(--wa-duration-fast, 100ms) var(--wa-ease-default, ease),
+    background-color var(--wa-duration-fast, 100ms) var(--wa-ease-default, ease),
+    border-color var(--wa-duration-fast, 100ms) var(--wa-ease-default, ease),
+    box-shadow var(--wa-duration-fast, 100ms) var(--wa-ease-default, ease);
+}
+
+.wa-checkout-steps__button:disabled {
+  cursor: not-allowed;
+}
+
+.wa-checkout-steps__button:not(:disabled):hover {
+  color: var(--wa-color-primary-dark, #0f1030);
+  background: rgba(28, 30, 76, 0.06);
+}
+
+.wa-checkout-steps__button:focus-visible {
+  outline: none;
+  border-color: rgba(28, 30, 76, 0.32);
+  box-shadow: 0 0 0 4px rgba(254, 207, 5, 0.34);
+}
+
+.wa-checkout-steps__item--current {
+  color: var(--wa-color-primary, #003087);
+  font-weight: 700;
+}
+
+.wa-checkout-steps__item--done {
+  color: var(--wa-color-success-text, #146c39); /* WCAG 1.4.3 */
+}
+
+.wa-checkout-steps__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 0.8125rem;
+  font-weight: var(--wa-weight-bold, 700);
+  background: #edf0f4;
+  border: 1px solid rgba(28, 30, 76, 0.1);
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.wa-checkout-steps__item--done .wa-checkout-steps__num {
+  font-size: 0;
+}
+
+.wa-checkout-steps__item--done .wa-checkout-steps__num::before {
+  content: '✓';
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.wa-checkout-steps__item--current .wa-checkout-steps__num {
+  background: var(--wa-color-primary, #003087);
+  color: #fff;
+  border-color: var(--wa-color-primary, #003087);
+  box-shadow: 0 0 0 5px rgba(28, 30, 76, 0.1);
+}
+
+.wa-checkout-steps__item--done .wa-checkout-steps__num {
+  background: var(--wa-color-success, #1f8a4d);
+  color: #fff;
+  border-color: var(--wa-color-success, #1f8a4d);
+}
+
+.wa-checkout-steps__label {
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .wa-checkout-steps {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-block-end: 2px;
+    scrollbar-width: none;
+  }
+
+  .wa-checkout-steps::-webkit-scrollbar {
+    display: none;
+  }
+
+  .wa-checkout-steps__button {
+    padding-inline-end: var(--wa-space-2, 8px);
+  }
+
+  .wa-checkout-steps__label {
+    display: none;
+  }
+
+  .wa-checkout-steps__item + .wa-checkout-steps__item::before {
+    width: 18px;
+    margin-inline: 4px;
+  }
+}
+
+/* ─── Individual step wrapper ────────────────────────────────────────────── */
+
+.wa-checkout-step {
+  background: #fff;
+  border: 1px solid rgba(28, 30, 76, 0.1);
+  border-radius: var(--wa-radius-xl, 24px);
+  box-shadow: 0 24px 70px rgba(15, 16, 48, 0.12);
+  padding: clamp(28px, 5vw, 48px);
+  overflow: hidden;
+  position: relative;
+}
+
+.wa-checkout-step::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: var(
+    --wa-gradient-flame,
+    linear-gradient(90deg, #ed2a7b 0%, #f15a29 52%, #ffc400 100%)
+  );
+}
+
+.wa-checkout-step > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 640px) {
+  .wa-checkout-step {
+    border-radius: var(--wa-radius-md, 8px);
+    padding: var(--wa-space-6, 24px) var(--wa-space-4, 16px);
+  }
+}
+
+.wa-checkout-step__heading {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--wa-color-primary-dark, #0f1030);
+  margin-block: 0 var(--wa-space-6, 24px);
+  letter-spacing: -0.035em;
+}
+
+.wa-checkout-step__actions {
+  display: flex;
+  gap: 12px;
+  margin-block-start: var(--wa-space-6, 24px);
+  flex-wrap: wrap;
+}
+
+.wa-checkout-step__actions--single {
+  justify-content: flex-end;
+}
+
+.wa-checkout-step__sub {
+  margin-block-start: var(--wa-space-4, 16px);
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  text-align: center;
+}
+
+/* ─── Session summary card ───────────────────────────────────────────────── */
+
+.wa-checkout-session-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(245, 247, 249, 0.94)), #f6f7fb;
+  border: 1px solid rgba(28, 30, 76, 0.1);
+  border-radius: var(--wa-radius-lg, 16px);
+  padding: clamp(18px, 4vw, 26px);
+  margin-block-end: var(--wa-space-6, 24px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.wa-checkout-session-card__title {
+  font-size: clamp(1.125rem, 2vw, 1.35rem);
+  font-weight: var(--wa-weight-bold, 700);
+  color: var(--wa-color-primary-dark, #0f1030);
+  margin: 0 0 var(--wa-space-4, 16px);
+  letter-spacing: -0.02em;
+}
+
+.wa-checkout-session-card__meta {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.34fr) minmax(0, 1fr);
+  gap: var(--wa-space-3, 12px) var(--wa-space-5, 20px);
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .wa-checkout-session-card__meta {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wa-checkout-session-card__row {
+  display: contents;
+}
+
+.wa-checkout-session-card__meta dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--wa-color-text-muted, #6b7280);
+}
+
+.wa-checkout-session-card__meta dd {
+  font-size: var(--wa-text-base, 1rem);
+  color: var(--wa-color-primary-dark, #0f1030);
+  font-weight: var(--wa-weight-semibold, 600);
+  margin: 0;
+}
+
+.wa-checkout-selected-modules {
+  margin-block-start: var(--wa-space-5, 20px);
+  padding-block-start: var(--wa-space-4, 16px);
+  border-block-start: 1px solid rgba(28, 30, 76, 0.1);
+}
+
+.wa-checkout-selected-modules__heading {
+  margin: 0 0 var(--wa-space-2, 8px);
+  color: var(--wa-color-primary-dark, #0f1030);
+  font-weight: var(--wa-weight-bold, 700);
+}
+
+.wa-checkout-selected-modules__list {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+  color: var(--wa-color-text, #1f2933);
+}
+
+.wa-checkout-selected-modules__list li + li {
+  margin-block-start: 0.35rem;
+}
+
+/* ─── Notices ────────────────────────────────────────────────────────────── */
+
+.wa-checkout-notice {
+  padding: 12px 16px;
+  border-radius: var(--wa-radius-md, 8px);
+  font-size: 0.9375rem;
+  margin-block: 0 var(--wa-space-5, 20px);
+}
+
+.wa-checkout-notice--warning {
+  background: #fff8e1;
+  border: 1px solid #f9c74f;
+  color: #7b4f00;
+}
+
+/* ─── Form fields ────────────────────────────────────────────────────────── */
+
+.wa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-block-end: var(--wa-space-4, 16px);
+}
+
+.wa-field label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--wa-color-text, #1a1a2e);
+}
+
+.wa-field input {
+  height: var(--wa-touch-min, 44px);
+  padding: 0 14px;
+  border: 1.5px solid var(--wa-color-border, #d1d5db);
+  border-radius: var(--wa-radius-md, 8px);
+  font-size: 1rem;
+  color: var(--wa-color-text, #1a1a2e);
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.wa-field input:focus {
+  outline: none;
+  border-color: var(--wa-color-primary, #003087);
+  box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.12);
+}
+
+/* ─── Identify step ──────────────────────────────────────────────────────── */
+
+.wa-checkout-identify-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-5, 20px);
+}
+
+.wa-checkout-guest-form__divider {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  text-align: center;
+  position: relative;
+  margin-block: 0 var(--wa-space-4, 16px);
+}
+
+.wa-checkout-guest-form__divider::before,
+.wa-checkout-guest-form__divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: var(--wa-color-border, #d1d5db);
+}
+
+.wa-checkout-guest-form__divider::before {
+  left: 0;
+}
+
+.wa-checkout-guest-form__divider::after {
+  right: 0;
+}
+
+/* ─── Member company unlock ──────────────────────────────────────────────── */
+
+.wa-checkout-member-unlock {
+  background: var(--wa-color-surface-alt, #f8fafc);
+  border: 1px solid var(--wa-color-border, #e2e8f0);
+  border-radius: var(--wa-radius-md, 8px);
+  padding: 16px;
+  margin-block: var(--wa-space-5, 20px) var(--wa-space-4, 16px);
+}
+
+.wa-checkout-member-unlock__prompt {
+  font-size: 0.9375rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  margin: 0 0 var(--wa-space-3, 12px);
+}
+
+.wa-checkout-member-unlock__form {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--wa-space-3, 12px);
+}
+
+.wa-checkout-member-unlock__field {
+  flex: 1 1 auto;
+  margin-block-end: 0;
+}
+
+/* The Apply button sits on the field baseline and keeps the 44px touch target. */
+.wa-checkout-member-unlock__form .wa-btn {
+  flex: 0 0 auto;
+  min-height: var(--wa-touch-min, 44px);
+}
+
+/* Applied state - callout + "Change" affordance side by side. */
+.wa-checkout-member-unlock--applied {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-3, 12px);
+}
+
+.wa-checkout-member-unlock--applied .wa-checkout-discount-callout {
+  flex: 1 1 auto;
+}
+
+.wa-checkout-member-unlock__change {
+  flex: 0 0 auto;
+  min-height: var(--wa-touch-min, 44px);
+  padding: 0 12px;
+  background: none;
+  border: none;
+  color: var(--wa-color-primary, #003087);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.wa-checkout-member-unlock__change:hover {
+  text-decoration: none;
+}
+
+.wa-checkout-member-unlock .wa-checkout-error {
+  margin-block: var(--wa-space-3, 12px) 0;
+}
+
+/* Stack the field + button on narrow viewports. */
+@media (max-width: 480px) {
+  .wa-checkout-member-unlock__form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .wa-checkout-member-unlock__form .wa-btn {
+    width: 100%;
+  }
+}
+
+/* ─── Pricing ────────────────────────────────────────────────────────────── */
+
+.wa-checkout-pricing {
+  margin-block: var(--wa-space-5, 20px) var(--wa-space-6, 24px);
+}
+
+.wa-checkout-pricing__lines {
+  border: 1px solid var(--wa-color-border, #e2e8f0);
+  border-radius: var(--wa-radius-md, 8px);
+  overflow: hidden;
+  margin-block-end: var(--wa-space-4, 16px);
+}
+
+.wa-checkout-pricing__line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+  color: var(--wa-color-text, #1a1a2e);
+}
+
+.wa-checkout-pricing__line + .wa-checkout-pricing__line {
+  border-block-start: 1px solid var(--wa-color-border, #e2e8f0);
+}
+
+.wa-checkout-pricing__line--struck {
+  color: var(--wa-color-text-muted, #6b7280);
+}
+
+.wa-checkout-pricing__line--savings {
+  color: var(--wa-color-success-text, #146c39); /* WCAG 1.4.3 */
+  font-weight: 600;
+}
+
+.wa-checkout-pricing__line--total {
+  background: var(--wa-color-surface-alt, #f8f9fb);
+  font-weight: 700;
+  font-size: 1.0625rem;
+}
+
+.wa-checkout-pricing__label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Without flex-shrink:0 a four-figure amount could be compressed and wrap into the
+   label on a narrow phone. The amount is never the thing that should give way. */
+.wa-checkout-pricing__amount {
+  flex: 0 0 auto;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.wa-checkout-pricing__amount--struck {
+  text-decoration: line-through;
+  font-weight: 400;
+  color: var(--wa-color-text-muted, #6b7280);
+}
+
+.wa-checkout-pricing__amount--member {
+  color: var(--wa-color-success-text, #146c39); /* WCAG 1.4.3 */
+  font-weight: 700;
+}
+
+.wa-checkout-pricing__amount--savings {
+  color: var(--wa-color-success-text, #146c39); /* WCAG 1.4.3 */
+}
+
+.wa-checkout-pricing__amount--total {
+  font-size: 1.125rem;
+  color: var(--wa-color-text, #1a1a2e);
+}
+
+/* Member discount callout - green + prominent per CLAUDE.md §5.4 rule 4 */
+.wa-checkout-discount-callout {
+  background: #ecfdf5;
+  border: 1.5px solid var(--wa-color-success, #1f8a4d);
+  border-radius: var(--wa-radius-md, 8px);
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+  color: var(--wa-color-success-text, #146c39); /* WCAG 1.4.3 */
+  font-weight: 600;
+  margin: 0;
+}
+
+.wa-checkout-discount-callout strong {
+  font-weight: 800;
+}
+
+/* ─── Payment summary ────────────────────────────────────────────────────── */
+
+.wa-checkout-payment-summary {
+  margin-block-end: var(--wa-space-5, 20px);
+}
+
+.wa-checkout-payment-summary__total {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--wa-color-text, #1a1a2e);
+  margin-block: var(--wa-space-2, 8px) var(--wa-space-2, 8px);
+}
+
+.wa-checkout-payment-summary__note {
+  font-size: 0.9375rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  margin: 0;
+}
+
+/* ─── Turnstile security check ───────────────────────────────────────────── */
+
+.wa-checkout-turnstile {
+  margin-block-end: var(--wa-space-5, 20px);
+  padding: 16px;
+  border: 1px solid var(--wa-color-border, #d1d5db);
+  border-radius: var(--wa-radius-md, 8px);
+  background: var(--wa-color-surface-alt, #f9fafb);
+}
+
+.wa-checkout-turnstile__label {
+  margin: 0 0 10px;
+  color: var(--wa-color-text, #1a1a2e);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.wa-checkout-turnstile__widget {
+  min-height: 65px;
+}
+
+/* ─── Stripe card element ────────────────────────────────────────────────── */
+
+.wa-checkout-stripe-form .wa-field {
+  margin-block-end: var(--wa-space-5, 20px);
+}
+
+.wa-checkout-card-element {
+  min-height: 44px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--wa-color-border, #d1d5db);
+  border-radius: var(--wa-radius-md, 8px);
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.wa-checkout-card-element:focus-within {
+  border-color: var(--wa-color-primary, #003087);
+  box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.12);
+}
+
+.wa-checkout-card-element__loading {
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+}
+
+/* ─── Error ──────────────────────────────────────────────────────────────── */
+
+.wa-checkout-error {
+  background: #fff1f0;
+  border: 1px solid #ffa39e;
+  border-radius: var(--wa-radius-md, 8px);
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+  color: #cf1322;
+  margin-block: var(--wa-space-4, 16px) 0;
+}
+
+/* ─── Error / no-session state ───────────────────────────────────────────── */
+
+.wa-checkout-error-state {
+  padding-block: var(--wa-space-16, 64px);
+  text-align: center;
+}
+
+.wa-checkout-error-state h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-block-end: var(--wa-space-4, 16px);
+}
+
+/* The paragraph had no rule at all, so it ran the full width of its container and
+   read as a ragged block that didn't line up with the heading above it. */
+.wa-checkout-error-state p {
+  max-width: 52ch;
+  margin-inline: auto;
+  line-height: 1.6;
+  color: var(--wa-color-text-muted, #4b5563);
+  text-wrap: pretty;
+}
+
+@media (max-width: 640px) {
+  .wa-checkout-error-state {
+    padding-block: var(--wa-space-10, 40px);
+  }
+
+  .wa-checkout-error-state h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* ─── Reservation expired state ──────────────────────────────────────────── */
+
+.wa-checkout-expired {
+  padding: var(--wa-space-6, 24px);
+  border: 1px solid var(--wa-color-border, #e5e7eb);
+  border-radius: var(--wa-radius-lg, 16px);
+  background: var(--wa-color-surface, #fff);
+  text-align: center;
+}
+
+.wa-checkout-expired__lead {
+  margin-block: var(--wa-space-3, 12px);
+  font-size: 1.0625rem;
+}
+
+.wa-checkout-expired__sub {
+  color: var(--wa-color-text-muted, #6b7280);
+  font-size: 0.9375rem;
+}
+
+/* ─── Place held (terminal state for a paid booking) ─────────────────────── */
+
+.wa-checkout-held {
+  padding: var(--wa-space-6, 24px);
+  border: 1px solid var(--wa-color-success, #1f8a4d);
+  border-radius: var(--wa-radius-lg, 16px);
+  background: var(--wa-color-surface, #fff);
+  text-align: center;
+}
+
+.wa-checkout-held__lead {
+  margin-block: var(--wa-space-3, 12px) 0;
+  font-size: 1.0625rem;
+}
+
+.wa-checkout-held__sub {
+  margin-block-start: var(--wa-space-3, 12px);
+  color: var(--wa-color-text-muted, #6b7280);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* ─── Support line ───────────────────────────────────────────────────────── */
+
+.wa-checkout-support {
+  margin-block-start: var(--wa-space-5, 20px);
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #6b7280);
+  text-align: center;
+}
+
+.wa-checkout-support a {
+  color: var(--wa-color-primary, #003087);
+}
+
+/* ─── Buttons (local overrides for checkout context) ─────────────────────── */
+
+.wa-checkout-step .wa-btn {
+  min-height: 52px;
+  min-width: 120px;
+  border-radius: var(--wa-radius-md, 8px);
+  padding-inline: 24px;
+  font-weight: 700;
+}
+
+.wa-checkout-step .wa-btn--primary {
+  box-shadow: 0 12px 26px rgba(28, 30, 76, 0.18);
+}
+
+.wa-checkout-step .wa-btn--primary:hover,
+.wa-checkout-step .wa-btn--primary:focus-visible {
+  box-shadow: 0 14px 30px rgba(28, 30, 76, 0.24);
+}
+
+.wa-checkout-step .wa-btn--ghost {
+  color: var(--wa-color-text-muted, #6b7280);
+  background: #fff;
+  border: 1.5px solid var(--wa-color-border, #d1d5db);
+  border-radius: var(--wa-radius-md, 8px);
+  padding: 0 20px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.wa-checkout-step .wa-btn--ghost:hover {
+  border-color: var(--wa-color-primary, #003087);
+  color: var(--wa-color-primary, #003087);
+}
+
+@media (max-width: 640px) {
+  .wa-checkout-tunnel {
+    min-height: auto;
+    padding-block: 0;
+  }
+
+  .wa-checkout-tunnel__body {
+    padding-inline: var(--wa-space-4, 16px);
+  }
+
+  .wa-checkout-step {
+    border-radius: 16px;
+  }
+
+  .wa-checkout-step__actions,
+  .wa-checkout-step__actions--single {
+    flex-direction: column-reverse;
+  }
+
+  .wa-checkout-step .wa-btn {
+    width: 100%;
+  }
+}
+
+/* ─── Custom registration questions (Event Engine Phase 2.3) ─────────────── */
+
+.wa-registration-questions {
+  margin-block: var(--wa-space-5, 20px);
+}
+
+.wa-registration-questions__required {
+  color: var(--wa-color-danger, #b3261e);
+}
+
+.wa-registration-questions__help {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #5b6472);
+}
+
+.wa-registration-questions__error {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--wa-color-danger, #b3261e);
+}
+
+.wa-registration-questions__field textarea,
+.wa-registration-questions__field select {
+  min-height: var(--wa-touch-min, 44px);
+  padding: 10px 14px;
+  border: 1.5px solid var(--wa-color-border, #d1d5db);
+  border-radius: var(--wa-radius-md, 8px);
+  font: inherit;
+  font-size: 1rem;
+  color: var(--wa-color-text, #1a1a2e);
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.wa-registration-questions__field textarea:focus,
+.wa-registration-questions__field select:focus,
+.wa-registration-questions__option input:focus-visible {
+  outline: none;
+  border-color: var(--wa-color-primary, #003087);
+  box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.12);
+}
+
+.wa-field--error input,
+.wa-field--error textarea,
+.wa-field--error select {
+  border-color: var(--wa-color-danger, #b3261e);
+}
+
+/* Checkboxes rather than a native multi-select: a multi-select listbox is close to
+   unusable on a phone, and this form is mobile-first by rule (CLAUDE.md § 5.4). */
+.wa-registration-questions__options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wa-registration-questions__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* 44px minimum touch target, per the mandatory UX rule. */
+  min-height: var(--wa-touch-min, 44px);
+  font-weight: 400;
+  cursor: pointer;
+}
+
+/* The theme's `.wa-field input` rule sets width:100% and appearance:none, which on a
+   checkbox removes the native tick entirely. These restore a real, visibly checkable box —
+   without them a checkbox question renders as a full-width blank control with no feedback. */
+.wa-registration-questions__option input[type='checkbox'] {
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  min-height: 20px;
+  flex: 0 0 auto;
+  padding: 0;
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  accent-color: var(--wa-color-primary, #003087);
+}

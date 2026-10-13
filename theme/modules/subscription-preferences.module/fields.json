@@ -1,0 +1,132 @@
+[
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "Communications preferences"
+  },
+  {
+    "name": "intro",
+    "label": "Intro",
+    "type": "richtext",
+    "default": "<p>Manage which emails you receive from Weld Australia. For your security, you may be asked to confirm your email address before your preferences load.</p>"
+  },
+  {
+    "name": "show_categories",
+    "label": "Show category summary",
+    "type": "boolean",
+    "default": true,
+    "help_text": "Lists the subscription categories members can manage on the preferences page."
+  },
+  {
+    "name": "manage_link",
+    "label": "Preferences page link",
+    "type": "link",
+    "help_text": "Link to HubSpot's Subscription Preferences system page. Defaults to /email-subscriptions/. This page must be assigned + published in HubSpot Settings → Website → Pages → System pages, or the link 404s.",
+    "default": {
+      "url": { "type": "CONTENT", "href": "/email-subscriptions/" },
+      "open_in_new_tab": false,
+      "no_follow": false
+    }
+  },
+  {
+    "name": "manage_label",
+    "label": "Button label",
+    "type": "text",
+    "default": "Manage email preferences"
+  },
+  {
+    "name": "transactional_note",
+    "label": "Transactional-email note",
+    "type": "richtext",
+    "default": "<p><strong>Note:</strong> Unsubscribing from marketing communications does not affect transactional emails - you will always receive emails necessary to deliver services you've purchased (e.g. course confirmations, certificates, and invoices).</p>"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface_alt"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": true,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

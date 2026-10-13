@@ -1,0 +1,1419 @@
+{#
+  featured-courses.module/module.html
+
+  Pure HubL (no React): renders a 3-up card grid of course sessions from HubDB Table 1 (courses).
+
+  Selection modes:
+    - all_courses:   one card per unique course_slug/course_id, for course directory pages.
+    - next_upcoming: the next N upcoming sessions across all courses, sorted soonest first.
+    - manual:        specific sessions by course_id (comma-separated).
+    - category:      upcoming sessions filtered to a specific category.
+
+  In all modes, status__neq=Cancelled filters out cancelled sessions and the result is
+  sliced to max_count.
+
+  Categories: cards, filter chips and badges are grouped into the client's four
+  training divisions (Welding Inspection / Welding Supervision / Welding
+  Coordination / Short Courses) by the generated taxonomy macros in
+  theme/templates/partials/course-taxonomy.html. The HubDB `category` values are
+  unchanged - the grouping is display-only. Edit config/course-categories.json and
+  run `pnpm build` to change it.
+
+  Deep-linking: on browse/directory listings the client-side category filter can be
+  pre-applied via a URL query param, e.g.
+  /courses?category=welding-coordination#all-courses (accepted param names:
+  `category` or `filter`). Bucket slugs, legacy slugs (inspector, supervision,
+  certification, appreciation) and raw HubDB values all resolve, via the taxonomy
+  emitted into data-wa-fc-category-map. If the requested category has no rendered
+  filter button (zero matching courses, or filters hidden) the listing falls back to
+  showing all courses. Used by the certification pathway "Browse courses" link
+  (theme/templates/pages/certification.html) and by the Training menu.
+
+  Defect 51: browse/directory listings expose Sort by (Name / Cost) and Order
+  (Ascending / Descending). Default is Name ascending. Cost sorts by the price
+  the visitor would pay. Compact featured strips (home, etc.) keep their
+  server-side order.
+
+  NOTE: The `category` column referenced in category mode requires a SELECT column
+  named "category" to be present on the HubDB courses table. This is outside the
+  original CLAUDE.md §7.1 schema - coordinate with Ollie to add it when enabling
+  category mode.
+
+  Dependencies:
+    - HubDB table named "courses" (CLAUDE.md §7.1).
+    - Optional: courses table must have a `category` SELECT column for category mode.
+
+  Member pricing:
+    - show_member_pricing field controls whether price_member is displayed.
+    - If the logged-in contact has a membership tier, member price is highlighted in green.
+    - Both prices are shown (member = highlighted, non-member = struck through) when
+      the visitor is a logged-in member and the prices differ.
+#}
+
+{% import "../../templates/partials/course-taxonomy.html" as wa_tax %}
+{% import "../../templates/partials/_member-pricing.html" as wa_price %}
+{% import "../../templates/partials/_member-tier.html" as wa_tier %}
+{% import "../../templates/partials/_session-priceable.html" as wa_session %}
+{% import "../../templates/partials/session-status.html" as wa_status %}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{# ---- 1. Resolve the correct HubDB rows based on selection_mode. ---- #}
+{% set ns = namespace(rows=[]) %}
+{# fc_sessions holds every session row (not just the deduped representative rows
+   in ns.rows) so location/delivery facets can be aggregated per course. #}
+{% set fc_sessions = namespace(rows=[]) %}
+{% set max = module.max_count | int | default(3) %}
+{% set section_id_raw = module.section_id | default('', true) %}
+{% set section_heading_raw = module.section_heading | default('', true) %}
+{% set directory_mode = namespace(enabled=false) %}
+{% set browse_listing = namespace(enabled=false) %}
+{% set pagination_settings = namespace(page_size=max) %}
+{% set _fc_today_iso = local_dt | datetimeformat('%Y-%m-%d') %}
+{% set _fc_today_key = local_dt | datetimeformat('%Y%m%d') %}
+{% if module.selection_mode == 'all_courses' %}
+  {% set directory_mode.enabled = true %}
+{% endif %}
+{% if directory_mode.enabled or section_id_raw == 'all-courses' or section_heading_raw == 'Browse all welding training courses' or section_heading_raw == 'Our welding training courses' %}
+  {% set browse_listing.enabled = true %}
+  {% set pagination_settings.page_size = 12 %}
+{% endif %}
+
+{% if directory_mode.enabled %}
+  {# Course directory mode: one representative row per course slug.
+     Defect 51: assemble in taxonomy division order (Inspection → Supervision →
+     Coordination → Short Courses), not a flat A–Z wall. Within each HubDB
+     category value, HubDB's orderBy=course_name keeps A–Z. #}
+  {% set directory_source = namespace(has_dynamic_paths=false) %}
+  {% set directory = namespace(seen='|') %}
+  {% set all_courses = hubdb_table_rows('courses', 'orderBy=course_name&orderBy=start_date') %}
+  {#
+     A `courses` row flagged `is_module` is one SESSION OF A MODULE, not a course
+     anybody browses to. It exists so the module selector can resolve dates and a
+     price, and so the Worker prices that same row (`hubdb-pricing.ts` finds it by
+     `worker_event_id`). Left in this sweep it becomes a card in its own right, and
+     - if it carries its parent's `course_id` - a bookable "session" of the course
+     and the cheapest row feeding the "From" price. CLAUDE.md § 7.7.
+  #}
+  {% set _fc_dir_rows = namespace(rows=[]) %}
+  {#- Ref 120: a session that has FINISHED leaves the directory (has_ended, § 7.6). A course
+      whose every session has finished therefore has no card at all. -#}
+  {% for _r in all_courses %}{% if not _r.is_module and not wa_session.has_ended(_r, _fc_today_key) | trim %}{% set _fc_dir_rows.rows = _fc_dir_rows.rows + [_r] %}{% endif %}{% endfor %}
+  {% set all_courses = _fc_dir_rows.rows %}
+  {% set fc_sessions.rows = all_courses %}
+  {% for row in all_courses %}
+    {% set row_path = row.hs_path | default(row.path, true) | default('', true) %}
+    {% if row_path %}
+      {% set directory_source.has_dynamic_paths = true %}
+    {% endif %}
+  {% endfor %}
+
+  {% set directory_value_order = namespace(labels=[]) %}
+  {% for _bucket_slug in wa_tax.slugs_csv('') | trim | split(',') %}
+    {% for _value in wa_tax.bucket_values_csv(_bucket_slug) | trim | split(',') %}
+      {% set _label = _value | trim %}
+      {% if _label %}
+        {% set directory_value_order.labels = directory_value_order.labels + [_label] %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+
+  {# Pass 1: canonical dynamic-page rows (path == course_slug) in category order. #}
+  {% for category_label in directory_value_order.labels %}
+    {% for row in all_courses %}
+      {% set directory_slug = row.course_slug | default(row.course_id, true) %}
+      {% set directory_path = row.hs_path | default(row.path, true) | default('', true) %}
+      {% set course_name_key = row.course_name | default('') | lower | trim %}
+      {% set slug_key = directory_slug | default('') | lower | trim %}
+      {% set directory_key = '|' ~ slug_key ~ '|' %}
+      {% set category_name = row.category.name | default('', true) | trim %}
+      {% set is_placeholder_row = course_name_key in ['test', 'dp sample course'] or course_name_key == slug_key %}
+      {% set is_canonical_dynamic_row = not directory_source.has_dynamic_paths or (directory_path and directory_path | lower == slug_key) %}
+      {% if directory_slug and category_name == category_label and is_canonical_dynamic_row and not is_placeholder_row and directory_key not in directory.seen and ns.rows | length < max %}
+        {% set ns.rows = ns.rows + [row] %}
+        {% set directory.seen = directory.seen ~ slug_key ~ '|' %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+
+  {# Pass 2: remaining rows for those categories (no canonical dynamic path). #}
+  {% for category_label in directory_value_order.labels %}
+    {% for row in all_courses %}
+      {% set directory_slug = row.course_slug | default(row.course_id, true) %}
+      {% set course_name_key = row.course_name | default('') | lower | trim %}
+      {% set slug_key = directory_slug | default('') | lower | trim %}
+      {% set directory_key = '|' ~ slug_key ~ '|' %}
+      {% set category_name = row.category.name | default('', true) | trim %}
+      {% set is_placeholder_row = course_name_key in ['test', 'dp sample course'] or course_name_key == slug_key %}
+      {% if directory_slug and category_name == category_label and not is_placeholder_row and directory_key not in directory.seen and ns.rows | length < max %}
+        {% set ns.rows = ns.rows + [row] %}
+        {% set directory.seen = directory.seen ~ slug_key ~ '|' %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+
+  {# Pass 3: uncategorised / new-category leftovers, still A–Z from HubDB. #}
+  {% for row in all_courses %}
+    {% set directory_slug = row.course_slug | default(row.course_id, true) %}
+    {% set directory_path = row.hs_path | default(row.path, true) | default('', true) %}
+    {% set course_name_key = row.course_name | default('') | lower | trim %}
+    {% set slug_key = directory_slug | default('') | lower | trim %}
+    {% set directory_key = '|' ~ slug_key ~ '|' %}
+    {% set is_placeholder_row = course_name_key in ['test', 'dp sample course'] or course_name_key == slug_key %}
+    {% set is_canonical_dynamic_row = not directory_source.has_dynamic_paths or (directory_path and directory_path | lower == slug_key) %}
+    {% if directory_slug and is_canonical_dynamic_row and not is_placeholder_row and directory_key not in directory.seen and ns.rows | length < max %}
+      {% set ns.rows = ns.rows + [row] %}
+      {% set directory.seen = directory.seen ~ slug_key ~ '|' %}
+    {% endif %}
+  {% endfor %}
+  {% for row in all_courses %}
+    {% set directory_slug = row.course_slug | default(row.course_id, true) %}
+    {% set course_name_key = row.course_name | default('') | lower | trim %}
+    {% set slug_key = directory_slug | default('') | lower | trim %}
+    {% set directory_key = '|' ~ slug_key ~ '|' %}
+    {% set is_placeholder_row = course_name_key in ['test', 'dp sample course'] or course_name_key == slug_key %}
+    {% if directory_slug and not is_placeholder_row and directory_key not in directory.seen and ns.rows | length < max %}
+      {% set ns.rows = ns.rows + [row] %}
+      {% set directory.seen = directory.seen ~ slug_key ~ '|' %}
+    {% endif %}
+  {% endfor %}
+
+{% elif module.selection_mode == 'manual' and module.manual_course_ids %}
+  {# Manual mode: split the comma-separated IDs and build course_id__in query. #}
+  {# HubL doesn't have a native split, so we split on ',' using split filter. #}
+  {% set id_list = module.manual_course_ids | replace(' ', '') %}
+  {% set all_manual = hubdb_table_rows('courses', 'course_id__in=' ~ id_list ~ '&status__neq=Cancelled', 'start_date') %}
+  {# Modules are sessions, not courses - see § 7.7. #}
+  {% set _fc_manual_rows = namespace(rows=[]) %}
+  {% for _r in all_manual %}{% if not _r.is_module and not wa_session.has_ended(_r, _fc_today_key) | trim %}{% set _fc_manual_rows.rows = _fc_manual_rows.rows + [_r] %}{% endif %}{% endfor %}
+  {% set all_manual = _fc_manual_rows.rows %}
+  {% for row in all_manual %}
+    {% if ns.rows | length < max %}
+      {% set ns.rows = ns.rows + [row] %}
+    {% endif %}
+  {% endfor %}
+
+{% elif module.selection_mode == 'category' and module.category_filter %}
+  {# Category mode: filter to the HubDB values behind the selected division,
+     upcoming only, soonest first. A division can span several HubDB values
+     (Welding Coordination = Engineering + Management), so this is category__in,
+     not category__eq - the old __eq compared the editor's slug against the HubDB
+     option name and never matched.
+     NOTE: category column must exist on the courses table. #}
+  {% set _cat_values = wa_tax.bucket_values_csv(module.category_filter) | trim %}
+  {% set all_cat = hubdb_table_rows('courses',
+    'category__in=' ~ _cat_values ~ '&status__neq=Cancelled',
+    'start_date') %}
+  {# Modules are sessions, not courses - see § 7.7. #}
+  {% set _fc_cat_rows = namespace(rows=[]) %}
+  {% for _r in all_cat %}{% if not _r.is_module and not wa_session.has_ended(_r, _fc_today_key) | trim %}{% set _fc_cat_rows.rows = _fc_cat_rows.rows + [_r] %}{% endif %}{% endfor %}
+  {% set all_cat = _fc_cat_rows.rows %}
+  {% for row in all_cat %}
+    {% if ns.rows | length < max %}
+      {% set ns.rows = ns.rows + [row] %}
+    {% endif %}
+  {% endfor %}
+
+{% else %}
+  {# Default: next_upcoming - fetch all upcoming non-cancelled sessions, take first N. #}
+  {% set all_upcoming = hubdb_table_rows('courses', 'status__neq=Cancelled', 'start_date') %}
+  {# Modules are sessions, not courses - see § 7.7. #}
+  {% set _fc_upcoming_rows = namespace(rows=[]) %}
+  {% for _r in all_upcoming %}{% if not _r.is_module and not wa_session.has_ended(_r, _fc_today_key) | trim %}{% set _fc_upcoming_rows.rows = _fc_upcoming_rows.rows + [_r] %}{% endif %}{% endfor %}
+  {% set all_upcoming = _fc_upcoming_rows.rows %}
+  {% for row in all_upcoming %}
+    {% if ns.rows | length < max %}
+      {% set ns.rows = ns.rows + [row] %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{# ---- 2. Determine if the current visitor has a membership tier (for pricing highlight). ---- #}
+{% set _member_tier_raw = request_contact.individual_membership_type_2 | default(contact.individual_membership_type_2, true) | default('', true) | string | trim %}
+{% set _member_status_raw = request_contact.individual_membership_status | default(contact.individual_membership_status, true) | default('', true) | string | trim %}
+{% set _member_company_id_raw = request_contact.associatedcompanyid | default(contact.associatedcompanyid, true) | default('', true) | string | trim %}
+{% set _member_company_id = _member_company_id_raw | int | default(0) %}
+
+{% set _member_contact_ns = namespace(tier='', status='', company_id=0, email='', found=false, seen=[]) %}
+{% if request_contact.is_logged_in %}
+  {% set _member_contact_id_candidates = [
+    request_contact.id | default('', true) | string | trim,
+    request_contact.hs_object_id | default('', true) | string | trim,
+    request_contact.vid | default('', true) | string | trim,
+    contact.id | default('', true) | string | trim,
+    contact.hs_object_id | default('', true) | string | trim,
+    contact.vid | default('', true) | string | trim
+  ] %}
+  {% for contact_candidate in _member_contact_id_candidates %}
+    {% set contact_candidate_id = contact_candidate | string | trim %}
+    {% if contact_candidate_id and contact_candidate_id != '[object Object]' and contact_candidate_id != '[object object]' and contact_candidate_id not in _member_contact_ns.seen and not _member_contact_ns.found %}
+      {% set _member_contact_ns.seen = _member_contact_ns.seen + [contact_candidate_id] %}
+      {% set member_contact_record = crm_object('contact', contact_candidate_id, 'email,associatedcompanyid,individual_membership_status,individual_membership_type_2') %}
+      {% if member_contact_record %}
+        {% set member_contact_props = member_contact_record.properties | default({}, true) %}
+        {% set candidate_tier = member_contact_record.individual_membership_type_2 | default(member_contact_props.individual_membership_type_2, true) | default('', true) | string | trim %}
+        {% set candidate_status = member_contact_record.individual_membership_status | default(member_contact_props.individual_membership_status, true) | default('', true) | string | trim %}
+        {% set candidate_company_id = member_contact_record.associatedcompanyid | default(member_contact_props.associatedcompanyid, true) | default(0, true) | int %}
+        {% set candidate_email = member_contact_record.email | default(member_contact_props.email, true) | default('', true) | string | lower | trim %}
+        {% if candidate_tier or candidate_status or candidate_company_id or candidate_email %}
+          {% set _member_contact_ns.tier = candidate_tier %}
+          {% set _member_contact_ns.status = candidate_status %}
+          {% set _member_contact_ns.company_id = candidate_company_id %}
+          {% set _member_contact_ns.email = candidate_email %}
+          {% set _member_contact_ns.found = true %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% if not _member_contact_ns.found %}
+    {% set _member_email_lookup = request_contact.email | default(request_contact.hs_content_membership_email, true) | default(request_contact.member_email, true) | default(contact.email, true) | default(contact.hs_content_membership_email, true) | default(contact.member_email, true) | default('', true) | string | lower | trim %}
+    {% if _member_email_lookup and '@' in _member_email_lookup %}
+      {% set _member_contact_query = crm_objects('contact', 'email=' ~ _member_email_lookup ~ '&limit=1', 'email,associatedcompanyid,individual_membership_status,individual_membership_type_2') %}
+      {% set _member_contact_matches = _member_contact_query.results if _member_contact_query.results else _member_contact_query %}
+      {% for member_contact_match in _member_contact_matches %}
+        {% if member_contact_match and not _member_contact_ns.found %}
+          {% set member_contact_match_props = member_contact_match.properties | default({}, true) %}
+          {% set _member_contact_ns.tier = member_contact_match.individual_membership_type_2 | default(member_contact_match_props.individual_membership_type_2, true) | default('', true) | string | trim %}
+          {% set _member_contact_ns.status = member_contact_match.individual_membership_status | default(member_contact_match_props.individual_membership_status, true) | default('', true) | string | trim %}
+          {% set _member_contact_ns.company_id = member_contact_match.associatedcompanyid | default(member_contact_match_props.associatedcompanyid, true) | default(0, true) | int %}
+          {% set _member_contact_ns.email = member_contact_match.email | default(member_contact_match_props.email, true) | default('', true) | string | lower | trim %}
+          {% set _member_contact_ns.found = true %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% if _member_contact_ns.found %}
+  {% set _member_tier_raw = _member_contact_ns.tier %}
+  {% set _member_status_raw = _member_contact_ns.status %}
+  {% set _member_company_id = _member_contact_ns.company_id %}
+{% else %}
+  {% if not _member_tier_raw and _member_contact_ns.tier %}
+    {% set _member_tier_raw = _member_contact_ns.tier %}
+  {% endif %}
+  {% if not _member_status_raw and _member_contact_ns.status %}
+    {% set _member_status_raw = _member_contact_ns.status %}
+  {% endif %}
+  {% if not _member_company_id and _member_contact_ns.company_id %}
+    {% set _member_company_id = _member_contact_ns.company_id %}
+  {% endif %}
+{% endif %}
+
+{# Company tier/status via the shared resolver: contact mirror, then
+   `associatedcompanyid`, then an association sweep for the corporate employees who
+   have no PRIMARY association - which is most of Weld's. This block used to read
+   `associatedcompanyid` alone, in five identical copies, so those members were
+   quoted the PUBLIC price everywhere except the checkout (QA Ref 72). #}
+{% set wa_company_in_company_id = _member_company_id %}
+{% set wa_company_in_contact_ids = _member_contact_ns.seen %}
+{% include "../../templates/partials/_member-company-resolve.html" %}
+{% if wa_member_company.tier or wa_member_company.status %}
+  {% set _contact_status_is_real = wa_tier.is_real_tier(_member_contact_ns.status) | trim %}
+  {% set _member_tier_raw = wa_tier.prefer_pricing_tier(_member_tier_raw, wa_member_company.tier) | trim %}
+  {% if wa_member_company.status and not _contact_status_is_real %}
+    {% set _member_status_raw = wa_member_company.status %}
+  {% endif %}
+{% endif %}
+{% set _member_tier_raw = wa_tier.scrub(_member_tier_raw) | trim %}
+{% set _member_status_raw = wa_tier.scrub(_member_status_raw) | trim %}
+
+{% set _member_status_key = _member_status_raw | lower | replace(' ', '_') | replace('-', '_') %}
+{% set _member_status_is_active = _member_status_key in ['current', 'active', 'grace', 'grace_period', 'honorary', 'honourary'] %}
+{% set _member_status_is_inactive = _member_status_key in ['lapsed', 'expired', 'inactive', 'cancelled', 'canceled'] %}
+
+{% set _member_email_candidates = [
+  _member_contact_ns.email | default('', true) | string | lower | trim,
+  request_contact.email | default('', true) | string | lower | trim,
+  request_contact.hs_content_membership_email | default('', true) | string | lower | trim,
+  request_contact.member_email | default('', true) | string | lower | trim,
+  contact.email | default('', true) | string | lower | trim,
+  contact.hs_content_membership_email | default('', true) | string | lower | trim,
+  contact.member_email | default('', true) | string | lower | trim
+] %}
+{% set _member_email_ns = namespace(value='') %}
+{% for email_candidate in _member_email_candidates %}
+  {% set normalized_email = email_candidate | default('', true) | string | lower | trim %}
+  {% if not _member_email_ns.value and normalized_email and normalized_email != '[object object]' and normalized_email != '[object Object]' and '@' in normalized_email %}
+    {% set _member_email_ns.value = normalized_email %}
+  {% endif %}
+{% endfor %}
+
+{% set _member_directory_ns = namespace(tier='', active=false) %}
+{% if request_contact.is_logged_in and _member_email_ns.value %}
+  {% for member_row in hubdb_table_rows('members', 'orderBy=company_name&limit=1000') %}
+    {% set member_row_email = member_row.contact_email | default('', true) | string | lower | trim %}
+    {% if not _member_directory_ns.active and member_row_email and member_row_email == _member_email_ns.value %}
+      {% set member_row_active = member_row.is_active | default(false, true) | string | lower | trim %}
+      {% set _member_directory_ns.active = member_row_active in ['true', '1', 'yes'] %}
+      {% if _member_directory_ns.active %}
+        {% set _member_directory_ns.tier = member_row.member_tier.name | default(member_row.member_tier.label, true) | default(member_row.member_tier, true) | default('', true) | string | trim %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% if not _member_tier_raw and _member_directory_ns.tier %}
+  {% set _member_tier_raw = _member_directory_ns.tier %}
+{% endif %}
+{% set _member_tier_key = _member_tier_raw | lower | replace(' ', '_') | replace('-', '_') %}
+{% set _member_tier_is_member = wa_tier.is_real_tier(_member_tier_raw) | trim %}
+{% set visitor_is_member = request_contact.is_logged_in and not _member_status_is_inactive and (_member_status_is_active or _member_directory_ns.active or _member_tier_is_member) %}
+
+{% set qa_persona_email = _member_email_ns.value %}
+{% include '../../templates/partials/_qa-persona-resolve.html' %}
+{% if request_contact.is_logged_in and qa_persona.found %}
+  {% if qa_persona.entitled %}
+    {% set visitor_is_member = true %}
+    {% set _member_tier_raw = qa_persona.pricing_tier %}
+    {% set _member_tier_key = _member_tier_raw | lower | replace(' ', '_') | replace('-', '_') %}
+  {% else %}
+    {% set visitor_is_member = false %}
+    {% set _member_tier_raw = '' %}
+    {% set _member_tier_key = '' %}
+  {% endif %}
+{% endif %}
+
+{# ---- 3. Resolve view-all link. ---- #}
+{% set view_all_href = module.view_all_link.url.href | default('') %}
+{% set fallback_photo_url = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-598086822%20(1).jpg' %}
+{% set heading_text = module.section_heading | default('') %}
+{% set eyebrow_text = module.section_eyebrow | default('') %}
+{% if browse_listing.enabled and heading_text == 'Training courses' %}
+  {% set heading_text = 'Our welding training courses' %}
+{% endif %}
+{% if browse_listing.enabled and not eyebrow_text %}
+  {% set eyebrow_text = 'Our training programs' %}
+{% endif %}
+
+{# ---- 4. Prepare directory filter facets (defects 23/25/103). ----
+   Location (city) and delivery-type filters are derived directly from the HubDB
+   rows on this page, so the controls always mirror the live data.
+
+   Category chips follow the client's four training divisions instead of the raw
+   HubDB Course Categories - the taxonomy partial maps one to the other. Chip
+   order is the taxonomy's display order (not alphabetical) so the site, the
+   Training menu and the footer all read the same way. #}
+{% set fc_total = ns.rows | length %}
+{% set fc_facets = namespace(cities=[], city_seen='|', deliveries=[], delivery_seen='|') %}
+
+{# Location + delivery facets aggregate across EVERY session row (fc_sessions),
+   not just the representative card rows, so a course offered in several cities
+   exposes all of them in the filter (PR #89 review - aggregate before filtering). #}
+{% set fc_facet_source = fc_sessions.rows if fc_sessions.rows | length > 0 else ns.rows %}
+{% for row in fc_facet_source %}
+  {% set _city = row.city.name | default('', true) | trim %}
+  {% if _city and ('|' ~ (_city | lower) ~ '|') not in fc_facets.city_seen %}
+    {% set fc_facets.cities = fc_facets.cities + [_city] %}
+    {% set fc_facets.city_seen = fc_facets.city_seen ~ (_city | lower) ~ '|' %}
+  {% endif %}
+  {% set _delivery = row.delivery_mode.name | default('', true) | trim %}
+  {% if _delivery and ('|' ~ (_delivery | lower) ~ '|') not in fc_facets.delivery_seen %}
+    {% set fc_facets.deliveries = fc_facets.deliveries + [_delivery] %}
+    {% set fc_facets.delivery_seen = fc_facets.delivery_seen ~ (_delivery | lower) ~ '|' %}
+  {% endif %}
+{% endfor %}
+
+{# Category buttons, one per training division, with per-division counts (slug
+   must match the per-card slug built below). A division with no courses on this
+   page is omitted rather than rendered as an empty chip. #}
+{% set fc_cat_buttons = namespace(items=[]) %}
+{% for _bucket_slug in wa_tax.slugs_csv('') | trim | split(',') %}
+  {% set _cat_count = namespace(n=0) %}
+  {% for row in ns.rows %}
+    {% if (wa_tax.bucket_slug(row.category.name) | trim) == _bucket_slug %}
+      {% set _cat_count.n = _cat_count.n + 1 %}
+    {% endif %}
+  {% endfor %}
+  {% if _cat_count.n > 0 %}
+    {% set fc_cat_buttons.items = fc_cat_buttons.items + [{
+      'name':  wa_tax.bucket_label(_bucket_slug) | trim,
+      'slug':  _bucket_slug,
+      'count': _cat_count.n
+    }] %}
+  {% endif %}
+{% endfor %}
+
+{# Location options with session counts - mirrors events-listing location menu. #}
+{% set fc_location_options = namespace(items=[]) %}
+{% for c in fc_facets.cities | sort %}
+  {% set _loc_slug = c | lower | trim | replace(' ', '-') %}
+  {% set _loc_count = namespace(n=0) %}
+  {% for row in fc_facet_source %}
+    {% if (row.city.name | default('', true) | trim) == c %}
+      {% set _loc_count.n = _loc_count.n + 1 %}
+    {% endif %}
+  {% endfor %}
+  {% set fc_location_options.items = fc_location_options.items + [{'label': c, 'key': _loc_slug, 'count': _loc_count.n}] %}
+{% endfor %}
+
+{# Delivery chips with session counts. #}
+{% set fc_delivery_options = namespace(items=[]) %}
+{% for d in fc_facets.deliveries | sort %}
+  {% set _del_slug = d | lower | trim | replace(' ', '-') %}
+  {% set _del_count = namespace(n=0) %}
+  {% for row in fc_facet_source %}
+    {% if (row.delivery_mode.name | default('', true) | trim) == d %}
+      {% set _del_count.n = _del_count.n + 1 %}
+    {% endif %}
+  {% endfor %}
+  {% set fc_delivery_options.items = fc_delivery_options.items + [{'label': d, 'key': _del_slug, 'count': _del_count.n}] %}
+{% endfor %}
+
+{# ---- 5. Render. ---- #}
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  data-wa-fc
+  data-wa-fc-page-size="{{ pagination_settings.page_size }}"
+  {# Directory (all_courses) listings are one card per course_slug. Session-
+     oriented modes (next_upcoming / manual / category) keep every row, so the
+     client must not strip same-slug cards there. #}
+  {% if directory_mode.enabled %}data-wa-fc-directory="true"{% endif %}
+  {# The taxonomy travels to the client here so the deep-link resolver below has
+     one source of truth instead of a hand-maintained alias map. #}
+  data-wa-fc-category-map="{{ wa_tax.taxonomy_json('') | trim | escape_attr }}"
+>
+  <div class="container">
+
+    {# Section heading #}
+    {% if heading_text or eyebrow_text %}
+      <div class="wa-fc__header">
+        <div class="wa-fc__header-copy">
+          {% if eyebrow_text %}
+            <p class="wa-fc__eyebrow">{{ eyebrow_text }}</p>
+          {% endif %}
+          {% if heading_text %}
+            <h2 class="wa-fc__heading">{{ heading_text }}</h2>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# Card grid or empty state #}
+    {% if ns.rows | length > 0 %}
+      {% if browse_listing.enabled %}
+        {# Toolbar mirrors events-listing: type chips + search on top, rule,
+           then location menu + delivery chips underneath. #}
+        <div class="wa-fc__controls wa-fc-filter" data-wa-fc-filters aria-label="Search and filter courses">
+          {% if module.show_filters and fc_cat_buttons.items | length > 0 %}
+            <div class="wa-fc-filter__top" role="group" aria-label="Filter courses by type">
+              <button class="wa-fc__filter wa-fc__filter--all is-active" type="button" data-filter="all" aria-pressed="true">
+                All <span class="wa-fc__filter-count">{{ fc_total }}</span>
+              </button>
+              {% for btn in fc_cat_buttons.items %}
+                <button class="wa-fc__filter" type="button" data-filter="{{ btn.slug }}" aria-pressed="false">
+                  <span class="wa-fc__filter-dot wa-fc__filter-dot--{{ btn.slug }}" aria-hidden="true"></span>{{ btn.name }} <span class="wa-fc__filter-count">{{ btn.count }}</span>
+                </button>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="wa-fc-filter__tools">
+            <label class="wa-fc__search" for="{{ name }}-course-search">
+              <span class="wa-visually-hidden">Search courses</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="{{ name }}-course-search" type="search" placeholder="Search courses..." aria-label="Search courses" data-wa-fc-search autocomplete="off">
+            </label>
+
+            {# Defect 51: visitors can reorder cards by name or cost, asc or desc. #}
+            <div class="wa-fc-sort" role="group" aria-label="Sort courses">
+              <label class="wa-fc-sort__field" for="{{ name }}-course-sort-by">
+                <span class="wa-fc-sort__label">Sort by</span>
+                <select id="{{ name }}-course-sort-by" data-wa-fc-sort-by>
+                  <option value="name" selected>Name</option>
+                  <option value="price">Cost</option>
+                </select>
+              </label>
+              <label class="wa-fc-sort__field" for="{{ name }}-course-sort-dir">
+                <span class="wa-fc-sort__label">Order</span>
+                <select id="{{ name }}-course-sort-dir" data-wa-fc-sort-dir>
+                  <option value="asc" selected>Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          {#- The toggle used to be the one control in this row that ALWAYS rendered,
+              so the row could never be empty. With it gone (ref 107, below) a module
+              offering a single location and a single delivery mode would draw the
+              divider rule and an empty bar, so the row now asks whether it has
+              anything to hold. -#}
+          {% if module.show_filters and (fc_location_options.items | length > 1 or fc_delivery_options.items | length > 1) %}
+            <span class="wa-fc-filter__rule" aria-hidden="true"></span>
+
+            <div class="wa-fc-filter__bottom">
+              {% if fc_location_options.items | length > 1 %}
+                <div class="wa-fc-location" data-wa-fc-location-menu>
+                  <button type="button" class="wa-fc-location__toggle" data-wa-fc-location-toggle aria-expanded="false" aria-label="Filter by location">
+                    <svg class="wa-fc-location__icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"></path>
+                      <circle cx="12" cy="9" r="2.5"></circle>
+                    </svg>
+                    <span data-wa-fc-location-label>All locations</span>
+                    <svg class="wa-fc-location__chevron" viewBox="0 0 20 20" aria-hidden="true">
+                      <path d="m5 7 5 5 5-5"></path>
+                    </svg>
+                  </button>
+                  <div class="wa-fc-location__menu" data-wa-fc-location-options hidden>
+                    <button type="button" class="wa-fc-location__option" data-wa-fc-city="all" data-location-label="All locations" aria-pressed="true">All locations <span>{{ fc_total }}</span></button>
+                    {% for location in fc_location_options.items %}
+                      <button type="button" class="wa-fc-location__option" data-wa-fc-city="{{ location.key|escape_attr }}" data-location-label="{{ location.label|escape_attr }}" aria-pressed="false">{{ location.label }} <span>{{ location.count }}</span></button>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if fc_location_options.items | length > 1 and fc_delivery_options.items | length > 1 %}
+                <span class="wa-fc-filter__separator" aria-hidden="true"></span>
+              {% endif %}
+
+              {% if fc_delivery_options.items | length > 1 %}
+                <div class="wa-fc-filter__group" role="group" aria-label="Filter courses by delivery">
+                  {% for delivery in fc_delivery_options.items %}
+                    <button type="button" class="wa-fc__filter wa-fc__filter--compact" data-wa-fc-delivery="{{ delivery.key|escape_attr }}" aria-pressed="false">{{ delivery.label }}</button>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              {#- QA ref 107: the "Starting from today" toggle is gone.
+
+                  It filtered cards down to those with a start date of today or
+                  later, which sounds like what a course directory wants and was
+                  not. The Online Welding Supervisor course runs all year from a
+                  start date in the past, so the toggle hid a course that is very
+                  much on sale - the defect Weld reported. And a session that HAS
+                  finished is now badged "Registrations closed" on the card
+                  itself (§ 7.6), which is the correctness mechanism: it tells
+                  the visitor the truth without hiding the course from anyone who
+                  followed a link to it.
+
+                  With the badge doing that work the toggle had one remaining
+                  effect, which was the bug. Weld asked what benefit it added;
+                  the honest answer is none, so it is removed rather than
+                  relabelled. Filtering by city and delivery mode is unaffected. -#}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {# Optional promotional callout above the course grid. #}
+      {% if module.promo_banner.enabled and (module.promo_banner.text or module.promo_banner.link_label) %}
+        {% set _promo_href = module.promo_banner.link.url.href | default('', true) %}
+        <div class="wa-fc__promo">
+          <div class="wa-fc__promo-copy">
+            {% if module.promo_banner.eyebrow %}
+              <p class="wa-fc__promo-eyebrow">{{ module.promo_banner.eyebrow }}</p>
+            {% endif %}
+            {% if module.promo_banner.text %}
+              <div class="wa-fc__promo-text">{{ module.promo_banner.text }}</div>
+            {% endif %}
+          </div>
+          {% if module.promo_banner.link_label and _promo_href %}
+            <a
+              class="wa-fc__promo-link"
+              href="{{ _promo_href }}"
+              {% if module.promo_banner.link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ module.promo_banner.link_label }}</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <ul class="wa-fc__grid" role="list">
+        {% for row in ns.rows %}
+          {# Resolve column values. #}
+          {% set course_name    = row.course_name    | default('') %}
+          {% set course_slug    = row.course_slug    | default('') %}
+          {% set city           = row.city.name      | default('') %}
+          {% set start_date     = row.start_date     | datetimeformat('%d %B %Y') | default('') %}
+          {# Defect 213: this was a local copy of the tier -> column chain that had
+             drifted from the other modules (|int truncation, no reciprocal/honorary
+             tiers). One shared resolver now. #}
+          {% set price_member = wa_price.member_price(row, _member_tier_key if visitor_is_member else '') | trim | float %}
+          {% set price_non_member = wa_price.non_member_price(row) | trim | float %}
+          {% set reg_url        = row.registration_url | default('') %}
+          {% set status_name    = row.status.name    | default('Available') %}
+          {% set seats_left     = row.seats_remaining | int | default(0) %}
+          {% set description    = row.description | striptags | truncate(150) if row.description else row.meta_description | default('') %}
+          {% set category_name  = row.category.name | default('') %}
+          {% set duration       = row.duration | default('') %}
+          {% set delivery_mode  = row.delivery_mode.name | default('') %}
+          {% set standards      = row.standards | default('') %}
+          {% set is_free        = row.is_free | default(false) %}
+          {% set photo_url      = row.photo.url | default(row.og_image.url, true) | default(fallback_photo_url, true) %}
+          {# Defect 102: optionally use one representative thumbnail per course type. #}
+          {% if module.use_type_thumbnails %}
+            {% set _cat_l = category_name | lower %}
+            {# Include the course name/slug: "Welding Fundamentals" has no HubDB
+               category of its own (it is filed under Welding Processes), so the
+               fundamentals thumbnail must be matched on course identity too. #}
+            {% set _name_l = (course_name ~ ' ' ~ course_slug) | lower %}
+            {% if 'inspection' in _cat_l or category_name == 'Inspector' %}
+              {% set _type_thumb = module.type_thumbnails.inspector.src %}
+            {% elif 'supervis' in _cat_l %}
+              {% set _type_thumb = module.type_thumbnails.supervisor.src %}
+            {% elif 'fundamental' in _cat_l or 'fundamental' in _name_l %}
+              {% set _type_thumb = module.type_thumbnails.welding_fundamentals.src %}
+            {% elif 'process' in _cat_l or 'robotic' in _cat_l %}
+              {% set _type_thumb = module.type_thumbnails.welding_processes.src %}
+            {% elif 'engineering' in _cat_l %}
+              {% set _type_thumb = module.type_thumbnails.engineering.src %}
+            {% else %}
+              {% set _type_thumb = module.type_thumbnails.other.src %}
+            {% endif %}
+            {% if _type_thumb %}
+              {% set photo_url = _type_thumb %}
+            {% endif %}
+          {% endif %}
+          {% set detail_href    = '/courses/' ~ course_slug if course_slug else '' %}
+          {% set register_href  = detail_href ~ '#sessions' if detail_href else reg_url %}
+          {# Defect: every card leads with a START DATE, never a duration. Directory
+             cards used to show `duration` when the row carried one and a date when it
+             did not, so one grid mixed "4 days" and "20 October 2026" and a visitor
+             could not tell when anything actually ran. Duration is still shown, as a
+             second item on the same meta line, whenever the row has one. #}
+          {% set date_meta      = start_date %}
+          {% set duration_meta  = duration %}
+
+          {# Category slug mirrors the filter-button slug built in section 4 so
+             clicking a filter shows the matching cards (defects 23/103). The
+             badge shows the training division, not the raw HubDB category. #}
+          {% set category_slug = wa_tax.bucket_slug(category_name) | trim %}
+          {% set display_category = wa_tax.bucket_label(category_slug) | trim if category_name else '' %}
+          {% set filter_slug = category_slug %}
+          {% set city_slug = city | lower | trim | replace(' ', '-') %}
+
+          {% if delivery_mode == 'Face-to-Face' %}
+            {% set delivery_slug = 'face-to-face' %}
+          {% elif delivery_mode == 'Blended' %}
+            {% set delivery_slug = 'blended' %}
+          {% elif delivery_mode == 'In-House' %}
+            {% set delivery_slug = 'in-house' %}
+          {% elif delivery_mode == 'Online' %}
+            {% set delivery_slug = 'online' %}
+          {% else %}
+            {% set delivery_slug = 'other' %}
+          {% endif %}
+
+          {# City/delivery match values. In directory mode each card stands in for a
+             whole course, so aggregate the slugs of EVERY session of this course
+             (space-separated token list) - otherwise a course offered in multiple
+             cities would only match its representative session (PR #89 review). #}
+          {% if directory_mode.enabled and fc_sessions.rows | length > 0 %}
+            {% set _card_facets = namespace(cities=' ', deliveries=' ', starts=' ', first_start_label='', next_start_label='', city_labels=[]) %}
+            {#
+              The card's PRICE is a "from" across this course's priceable sessions, not
+              the representative row's own price (Ref 40, pricing defects). The
+              representative row is whichever one HubDB returned first for the slug -
+              arbitrary, and routinely a session that has already run, is cancelled, or
+              is a test row nobody can book. That is how the AS1796 Cert 10 card came to
+              advertise $18,786.36 / $17,281.82 over a course selling at $6,000, and why
+              the card, the upcoming-sessions strip and the course page's fees panel each
+              quoted a different number for one course.
+
+              Same rule as the fees panel, from the same macro, so the two agree by
+              construction rather than by coincidence. When no session qualifies the card
+              shows no price at all: the honest answer, and the same one the panel gives
+              by falling through to "Contact us".
+            #}
+            {% set _card_prices = namespace(member=0, public=0, found=false, has_open=false) %}
+            {#- The card's STATUS is aggregated over the same sessions as its price and
+                dates (Ref 74c). The representative row is arbitrary, so reading its status
+                alone disabled a course whose representative was Closed while another
+                sitting was open, and left "Register now" on one whose only upcoming
+                sitting was Closed behind an Available past representative. -#}
+            {% set _card_status = namespace(upcoming_sold_out=false, upcoming_closed=false, sessions=0, cancelled=0) %}
+            {% set _card_slug_key = course_slug | default(row.course_id, true) | lower | trim %}
+            {% for s in fc_sessions.rows %}
+              {% set _s_slug_key = s.course_slug | default(s.course_id, true) | lower | trim %}
+              {% if _s_slug_key == _card_slug_key %}
+                {# Directory mode is the one selection_mode whose query does NOT carry
+                   status__neq=Cancelled (it must not drop a course whose only row is
+                   cancelled from the directory), so cancelled sessions have to be kept
+                   out of the advertised date here. Facets are left alone - that is
+                   pre-existing behaviour and a filter question, not a date question. #}
+                {% set _s_is_cancelled = (s.status.name | default('Available', true)) == 'Cancelled' %}
+                {% set _s_city_slug = s.city.name | default('', true) | lower | trim | replace(' ', '-') %}
+                {% if _s_city_slug and (' ' ~ _s_city_slug ~ ' ') not in _card_facets.cities %}
+                  {% set _card_facets.cities = _card_facets.cities ~ _s_city_slug ~ ' ' %}
+                {% endif %}
+                {#- The display names behind the slugs, for the card's location line. A
+                    cancelled sitting is not somewhere the course runs, so it is left off. -#}
+                {% set _s_city_label = s.city.name | default('', true) | trim %}
+                {% if _s_city_label and not _s_is_cancelled and _s_city_label not in _card_facets.city_labels %}
+                  {% set _card_facets.city_labels = _card_facets.city_labels + [_s_city_label] %}
+                {% endif %}
+                {% set _s_delivery = s.delivery_mode.name | default('', true) | lower | trim | replace(' ', '-') %}
+                {% if _s_delivery and (' ' ~ _s_delivery ~ ' ') not in _card_facets.deliveries %}
+                  {% set _card_facets.deliveries = _card_facets.deliveries ~ _s_delivery ~ ' ' %}
+                {% endif %}
+                {% set _s_start_iso = s.start_date | datetimeformat('%Y-%m-%d') if s.start_date else '' %}
+                {% if _s_start_iso and (' ' ~ _s_start_iso ~ ' ') not in _card_facets.starts %}
+                  {% set _card_facets.starts = _card_facets.starts ~ _s_start_iso ~ ' ' %}
+                {% endif %}
+                {% if _s_start_iso and not _s_is_cancelled and not _card_facets.first_start_label %}
+                  {% set _card_facets.first_start_label = s.start_date | datetimeformat('%d %B %Y') %}
+                {% endif %}
+                {% if _s_start_iso and not _s_is_cancelled and _s_start_iso >= _fc_today_iso and not _card_facets.next_start_label %}
+                  {% set _card_facets.next_start_label = s.start_date | datetimeformat('%d %B %Y') %}
+                {% endif %}
+                {#- Has this course got ANY session that has not already started?
+                    Asked separately from `priceable`, which also demands a way to buy:
+                    "every session has run" and "no session is wired up to sell" are
+                    different states and only the first is what the closed badge says.
+                    A cancelled session is not evidence the course is still running. -#}
+                {#- Ref 74c: "open" means upcoming AND on sale, so a Sold Out or Closed
+                    sitting no longer counts as one either, through the shared vocabulary. -#}
+                {% set _s_off_sale = wa_status.is_off_sale(s.status.name) | trim %}
+                {% set _s_started = wa_session.has_started(s, _fc_today_key) | trim %}
+                {% set _card_status.sessions = _card_status.sessions + 1 %}
+                {% if _s_is_cancelled %}{% set _card_status.cancelled = _card_status.cancelled + 1 %}{% endif %}
+                {% if not _s_started and not _s_off_sale %}
+                  {% set _card_prices.has_open = true %}
+                {% elif not _s_started %}
+                  {% set _s_status_key = wa_status.status_of(s.status.name) | trim %}
+                  {% if _s_status_key == 'sold_out' %}{% set _card_status.upcoming_sold_out = true %}{% endif %}
+                  {% if _s_status_key == 'registration_closed' %}{% set _card_status.upcoming_closed = true %}{% endif %}
+                {% endif %}
+                {% if wa_session.priceable(s, _fc_today_key) | trim %}
+                  {% set _s_member = wa_price.member_price(s, _member_tier_key if visitor_is_member else '') | trim | float %}
+                  {% set _s_public = wa_price.non_member_price(s) | trim | float %}
+                  {% if _s_member > 0 and (_card_prices.member == 0 or _s_member < _card_prices.member) %}
+                    {% set _card_prices.member = _s_member %}
+                    {% set _card_prices.found = true %}
+                  {% endif %}
+                  {% if _s_public > 0 and (_card_prices.public == 0 or _s_public < _card_prices.public) %}
+                    {% set _card_prices.public = _s_public %}
+                    {% set _card_prices.found = true %}
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            {% set price_member = _card_prices.member %}
+            {% set price_non_member = _card_prices.public %}
+            {% set card_city_value = _card_facets.cities | trim %}
+            {% set card_city_labels = _card_facets.city_labels %}
+            {% set card_delivery_value = _card_facets.deliveries | trim %}
+            {% set card_start_value = _card_facets.starts | trim %}
+            {# The representative row's own start_date is arbitrary in directory mode -
+               prefer this course's next upcoming session, then its first, then the
+               representative row. Not gated on `duration` any more: the date is shown
+               either way. #}
+            {% set _fallback_start = start_date if status_name != 'Cancelled' else '' %}
+            {% set date_meta = _card_facets.next_start_label | default(_card_facets.first_start_label, true) | default(_fallback_start, true) %}
+            {#- One status for the whole course. Any upcoming sitting on sale makes it
+                bookable. Otherwise an upcoming Sold Out one wins (it invites a waitlist
+                enquiry), then an upcoming Closed one. A course whose every row is
+                Cancelled says Cancelled. Anything else - every sitting has already run -
+                is "available" here and left to the date-based Registrations closed badge
+                below, exactly as before. -#}
+            {% if _card_prices.has_open %}
+              {% set _card_status_key = 'available' %}
+            {% elif _card_status.upcoming_sold_out %}
+              {% set _card_status_key = 'sold_out' %}
+            {% elif _card_status.upcoming_closed %}
+              {% set _card_status_key = 'registration_closed' %}
+            {% elif _card_status.sessions > 0 and _card_status.cancelled == _card_status.sessions %}
+              {% set _card_status_key = 'cancelled' %}
+            {% else %}
+              {% set _card_status_key = 'available' %}
+            {% endif %}
+          {% else %}
+            {% set card_city_value = city_slug %}
+            {% set card_city_labels = [city | trim] if city | trim else [] %}
+            {% set card_delivery_value = delivery_slug %}
+            {% set card_start_value = row.start_date | datetimeformat('%Y-%m-%d') if row.start_date else '' %}
+          {% endif %}
+
+          {# Status, through the one vocabulary the React islands use (Ref 74c). The ladder
+             that sat here knew only 'Sold Out' and 'Cancelled', so a row staff marked
+             Closed rendered as an ordinary card with a working "Register now". #}
+          {#  In directory mode the key is the course-wide one computed above, never the
+              representative row's own status. #}
+          {% if directory_mode.enabled and fc_sessions.rows | length > 0 %}
+            {% set status_key = _card_status_key %}
+          {% else %}
+            {% set status_key = wa_status.status_of(status_name) | trim %}
+          {% endif %}
+          {% set status_slug = wa_status.status_slug(status_key) | trim %}
+          {% set status_label = wa_status.status_label(status_key) | trim %}
+          {% set status_bookable = wa_status.status_is_bookable(status_key) | trim == 'true' %}
+
+          {#- Registrations closed: every session this card stands for has already
+              STARTED. CLAUDE.md § 7.6 - the Worker's own default cutoff
+              (`registration_closes_at` NULL resolves to `starts_at`) said one page
+              earlier, and said in the card's own words. Nothing is hidden: the course
+              still lists, badged, because dropping it would leave anyone following a
+              link to it on a page that never mentions it.
+
+              This card had no notion of a finished session at all, so /courses listed
+              one as ordinary and bookable (QA ref 120) and the only escape was the
+              "Starting from today" toggle, which also hid a rolling all-year course
+              (QA ref 107). The badge is the correctness mechanism; the toggle is now
+              only a convenience.
+
+              "Sold out", "Cancelled" and "Closed" are EDITORIAL decisions (§ 7.6) and outrank
+              this: they already have their own badge and say something a date cannot.
+              A course with no dated session at all is left alone - "we cannot tell when
+              this runs" is not evidence that it is over. -#}
+          {% if module.selection_mode == 'all_courses' %}
+            {% set registrations_closed = card_start_value and not _card_prices.has_open %}
+          {% else %}
+            {% set registrations_closed = wa_session.has_started(row, _fc_today_key) | trim %}
+          {% endif %}
+          {% if not status_bookable %}{% set registrations_closed = false %}{% endif %}
+
+          {# Pricing: determine whether to show member and non-member prices. #}
+          {% set show_member_price = module.show_member_pricing and price_member > 0 and price_non_member > price_member %}
+          {% set price_member_label = (price_member | format_currency('AUD')) | replace('.00', '') if price_member > 0 else '' %}
+          {% set price_non_member_label = (price_non_member | format_currency('AUD')) | replace('.00', '') if price_non_member > 0 else '' %}
+          {# Sort key = the price this visitor would pay (member rate when entitled). #}
+          {% if visitor_is_member and price_member > 0 %}
+            {% set sort_price = price_member %}
+          {% elif price_non_member > 0 %}
+            {% set sort_price = price_non_member %}
+          {% else %}
+            {% set sort_price = 0 %}
+          {% endif %}
+
+          <li class="wa-fc__grid-item" data-course-filter="{{ filter_slug }}" data-course-slug="{{ course_slug | lower | trim | escape_attr }}" data-course-name="{{ course_name|striptags|lower|escape_attr }}" data-course-price="{{ sort_price }}" data-course-city="{{ card_city_value }}" data-course-delivery="{{ card_delivery_value }}" data-course-start="{{ card_start_value|escape_attr }}" data-course-search="{{ course_name|striptags|lower|escape_attr }} {{ description|striptags|lower|escape_attr }} {{ standards|striptags|lower|escape_attr }} {{ display_category|lower|escape_attr }} {{ category_name|lower|escape_attr }} {{ delivery_mode|lower|escape_attr }} {{ city|lower|escape_attr }} {{ duration|lower|escape_attr }}">
+            <article class="wa-fc__card wa-fc__card--{{ status_slug }}">
+
+              <div class="wa-fc__media">
+                <img
+                  class="wa-fc__image"
+                  src="{{ photo_url }}"
+                  alt="{{ course_name|escape_attr }}"
+                  loading="lazy"
+                >
+                <span class="wa-fc__media-scrim" aria-hidden="true"></span>
+
+                <div class="wa-fc__badges" aria-label="Course labels">
+                  {% if display_category %}
+                    <span class="wa-fc__badge wa-fc__badge--{{ category_slug }}">{{ display_category }}</span>
+                  {% endif %}
+                  {% if is_free %}
+                    <span class="wa-fc__badge wa-fc__badge--free">Free</span>
+                  {% endif %}
+                  {% if not status_bookable %}
+                    <span class="wa-fc__badge wa-fc__badge--status wa-fc__status-badge--{{ status_slug }}">
+                      {{ status_label }}
+                    </span>
+                  {% elif registrations_closed %}
+                    <span class="wa-fc__badge wa-fc__badge--status wa-fc__status-badge--closed">
+                      Registrations closed
+                    </span>
+                  {% endif %}
+                </div>
+
+              </div>
+
+              <div class="wa-fc__body">
+                {% if delivery_mode %}
+                  <span class="wa-fc__delivery wa-fc__delivery--{{ delivery_slug }}">{{ delivery_mode }}</span>
+                {% elif city %}
+                  <span class="wa-fc__delivery wa-fc__delivery--other">{{ city }}</span>
+                {% endif %}
+
+                {# Course name #}
+                <h3 class="wa-fc__card-title">
+                  {% if detail_href %}
+                    <a href="{{ detail_href }}" class="wa-fc__card-title-link">
+                      {{ course_name }}
+                    </a>
+                  {% else %}
+                    {{ course_name }}
+                  {% endif %}
+                </h3>
+
+                {#- Where the course runs. Every sitting of a course shares its name, photo
+                    and price, so without this a visitor cannot tell which location they are
+                    about to book. A directory card stands for every session of the course,
+                    so it names up to three cities and counts the rest. Skipped when the
+                    delivery pill above already fell back to showing the one city. -#}
+                {% set _loc_labels = card_city_labels %}
+                {% if not delivery_mode and _loc_labels | length == 1 %}{% set _loc_labels = [] %}{% endif %}
+                {% if _loc_labels | length > 0 %}
+                  <span class="wa-fc__location">
+                    <svg class="wa-fc__date-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path>
+                      <circle cx="12" cy="9.5" r="2.5"></circle>
+                    </svg>
+                    <span class="visually-hidden">{{ 'Locations: ' if _loc_labels | length > 1 else 'Location: ' }}</span>
+                    <span class="wa-fc__location-names">{% for _loc in _loc_labels %}{% if loop.index <= 3 %}{% if not loop.first %}, {% endif %}{{ _loc }}{% endif %}{% endfor %}{% if _loc_labels | length > 3 %} +{{ _loc_labels | length - 3 }} more{% endif %}</span>
+                  </span>
+                {% endif %}
+
+                {# Always rendered, so every card in the grid carries the same line.
+                   A course with no scheduled session says so rather than silently
+                   dropping to duration or to nothing. #}
+                <span class="wa-fc__date">
+                  <svg class="wa-fc__date-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 7v5l3 2"></path>
+                  </svg>
+                  <span class="wa-fc__date-start">{{ date_meta | default('Dates to be confirmed', true) }}</span>
+                  {% if duration_meta %}
+                    <span class="wa-fc__date-duration">{{ duration_meta }}</span>
+                  {% endif %}
+                </span>
+
+                {% if description %}
+                  <p class="wa-fc__summary">{{ description }}</p>
+                {% endif %}
+
+                {% if standards %}
+                  <p class="wa-fc__standards">{{ standards }}</p>
+                {% endif %}
+
+              {# Seats remaining social proof (if ≤ 5 and > 0) #}
+              {% if seats_left > 0 and seats_left <= 5 %}
+                <p class="wa-fc__seats">Only {{ seats_left }} spot{% if seats_left != 1 %}s{% endif %} left</p>
+              {% endif %}
+
+              {# Pricing #}
+              <div class="wa-fc__pricing">
+                {# Every HubDB course price column is AUD ex GST (CLAUDE.md 7.1), so the
+                   card says so once, against the headline figure the visitor reads. #}
+                {# A directory card stands for a whole COURSE, and its figure is the
+                   minimum across that course's priceable sessions, so it is labelled
+                   "From" - the same word, and the same number, as the fees panel on the
+                   course page it links to. #}
+                {% set price_prefix = 'From ' if directory_mode.enabled else '' %}
+                {% if show_member_price and visitor_is_member %}
+                  {# Member is logged in: show their price highlighted, non-member struck through. #}
+                  <span class="wa-fc__price wa-fc__price--member">
+                    {{ price_prefix }}{{ price_member_label }} <span class="wa-fc__price-label">ex GST (member)</span>
+                  </span>
+                  <span class="wa-fc__price wa-fc__price--non-member wa-fc__price--struck">
+                    {{ price_non_member_label }}
+                  </span>
+                {% elif show_member_price %}
+                  {# Non-member: show both prices, non-member prominent. #}
+                  <span class="wa-fc__price wa-fc__price--non-member">
+                    {{ price_prefix }}{{ price_non_member_label }} <span class="wa-fc__price-label">ex GST</span>
+                  </span>
+                  <span class="wa-fc__price-note">from {{ price_member_label }} ex GST for members</span>
+                {% else %}
+                  {# show_member_pricing is off or prices are identical. #}
+                  {% if price_non_member %}
+                    <span class="wa-fc__price wa-fc__price--non-member">
+                      {{ price_prefix }}{{ price_non_member_label }} <span class="wa-fc__price-label">ex GST</span>
+                    </span>
+                  {% endif %}
+                {% endif %}
+              </div>
+              </div>
+
+              {# CTA #}
+              <div class="wa-fc__actions">
+                {% if detail_href %}
+                  <a href="{{ detail_href }}" class="wa-fc__action wa-fc__action--outline">
+                    View details
+                  </a>
+                {% endif %}
+
+                {# Gated on BOOKABLE, not on one status name: the old test named 'Sold Out'
+                   alone, so a Cancelled or Closed row was handed "Register now". And on the
+                   date: a card badged "Registrations closed" because every sitting has
+                   started still carried a working "Register now" (QA ref 87, 22 Sep),
+                   because only the HubDB status reached this gate. #}
+                {% if not status_bookable %}
+                  <span class="wa-fc__action wa-fc__action--disabled" aria-disabled="true">
+                    {{ status_label }}
+                  </span>
+                {% elif registrations_closed %}
+                  <span class="wa-fc__action wa-fc__action--disabled" aria-disabled="true">
+                    Registrations closed
+                  </span>
+                {% elif detail_href %}
+                  <a href="{{ register_href }}" class="wa-fc__action wa-fc__action--primary">
+                    Register now
+                  </a>
+                {% elif reg_url and status_bookable %}
+                  <a
+                    href="{{ reg_url }}"
+                    class="wa-fc__action wa-fc__action--primary"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Register now
+                  </a>
+                {% endif %}
+              </div>
+
+            </article>
+          </li>
+        {% endfor %}
+      </ul>
+      <nav class="wa-fc__pagination" data-wa-fc-pagination aria-label="Course pagination" hidden></nav>
+      <div class="wa-fc__empty wa-fc__empty--filtered" data-wa-fc-empty hidden>
+        <p>No courses match your search or filters.</p>
+      </div>
+    {% else %}
+      {# Empty state #}
+      <div class="wa-fc__empty">
+        <p>No courses scheduled currently. Check back soon.</p>
+      </div>
+    {% endif %}
+
+    {# View all CTA #}
+    {% if module.show_view_all_cta and view_all_href %}
+      <div class="wa-fc__view-all">
+        <a href="{{ view_all_href }}" class="wa-btn wa-btn--secondary">
+          {{ module.view_all_label | default('View all courses') }}
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% if ns.rows | length > 0 %}
+<script>
+  (function () {
+    var sections = document.querySelectorAll('[data-wa-fc]:not([data-wa-fc-ready])');
+    sections.forEach(function (section) {
+      section.setAttribute('data-wa-fc-ready', 'true');
+      var filtersRoot = section.querySelector('[data-wa-fc-filters]');
+      var filters = Array.prototype.slice.call(section.querySelectorAll('[data-filter]'));
+      var grid = section.querySelector('.wa-fc__grid');
+      var cards = Array.prototype.slice.call(section.querySelectorAll('[data-course-filter]'));
+      var searchInput = section.querySelector('[data-wa-fc-search]');
+      var sortBySelect = section.querySelector('[data-wa-fc-sort-by]');
+      var sortDirSelect = section.querySelector('[data-wa-fc-sort-dir]');
+      var sortingEnabled = !!(sortBySelect || sortDirSelect);
+      var deliveryButtons = Array.prototype.slice.call(section.querySelectorAll('[data-wa-fc-delivery]'));
+      var locationMenu = section.querySelector('[data-wa-fc-location-menu]');
+      var locationToggle = section.querySelector('[data-wa-fc-location-toggle]');
+      var locationLabel = section.querySelector('[data-wa-fc-location-label]');
+      var locationOptions = section.querySelector('[data-wa-fc-location-options]');
+      var locationButtons = Array.prototype.slice.call(section.querySelectorAll('[data-wa-fc-city]'));
+      var pagination = section.querySelector('[data-wa-fc-pagination]');
+      var emptyState = section.querySelector('[data-wa-fc-empty]');
+      var pageSize = parseInt(section.getAttribute('data-wa-fc-page-size'), 10);
+      var activeFilter = 'all';
+      var activeCity = 'all';
+      var activeDelivery = 'all';
+      var searchQuery = '';
+      var sortBy = (sortBySelect && sortBySelect.value) || 'name';
+      var sortDir = (sortDirSelect && sortDirSelect.value) || 'asc';
+      var currentPage = 1;
+
+      if (!Number.isFinite(pageSize) || pageSize < 1) {
+        pageSize = cards.length || 12;
+      }
+
+      function setPressed(buttons, activeButton) {
+        buttons.forEach(function (item) {
+          item.setAttribute('aria-pressed', item === activeButton ? 'true' : 'false');
+        });
+      }
+
+      function normaliseText(value) {
+        return String(value || '')
+          .toLowerCase()
+          .normalize('NFKD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/&/g, ' and ')
+          .replace(/[^a-z0-9]+/g, ' ')
+          .trim();
+      }
+
+      // Client-side safety net for duplicate course cards (same course_slug from
+      // overlapping HubDB rows). Only for all_courses/directory listings — session
+      // modes intentionally render multiple dates/locations per course.
+      function dedupeCardsByCourseSlug() {
+        var seenSlugs = new Set();
+        var dedupedCards = [];
+
+        cards.forEach(function (card) {
+          var slug = (card.getAttribute('data-course-slug') || '').toLowerCase().trim();
+          if (slug && seenSlugs.has(slug)) {
+            if (card.parentNode) card.parentNode.removeChild(card);
+            return;
+          }
+          if (slug) seenSlugs.add(slug);
+          dedupedCards.push(card);
+        });
+
+        cards = dedupedCards;
+      }
+
+      if (section.getAttribute('data-wa-fc-directory') === 'true') {
+        dedupeCardsByCourseSlug();
+      }
+
+      var cardSearchIndex = new Map(cards.map(function (card) {
+        return [card, normaliseText((card.getAttribute('data-course-search') || '') + ' ' + (card.textContent || ''))];
+      }));
+
+      function hasToken(attr, value) {
+        if (!value || value === 'all') return true;
+        if (!attr) return false;
+        return (' ' + attr + ' ').indexOf(' ' + value + ' ') !== -1;
+      }
+
+      function closeLocationMenu() {
+        if (!locationOptions || !locationToggle) return;
+        locationOptions.hidden = true;
+        locationToggle.setAttribute('aria-expanded', 'false');
+      }
+
+      function toggleLocationMenu() {
+        if (!locationOptions || !locationToggle) return;
+        var willOpen = locationOptions.hidden;
+        locationOptions.hidden = !willOpen;
+        locationToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      }
+
+      function getMatches() {
+        return cards.filter(function (card) {
+          var filterMatch = activeFilter === 'all' || card.getAttribute('data-course-filter') === activeFilter;
+          var cityMatch = activeCity === 'all' || hasToken(card.getAttribute('data-course-city'), activeCity);
+          var deliveryMatch = activeDelivery === 'all' || hasToken(card.getAttribute('data-course-delivery'), activeDelivery);
+          var searchMatch = !searchQuery || (cardSearchIndex.get(card) || '').indexOf(searchQuery) !== -1;
+          return filterMatch && cityMatch && deliveryMatch && searchMatch;
+        });
+      }
+
+      function compareCards(a, b) {
+        var direction = sortDir === 'desc' ? -1 : 1;
+        if (sortBy === 'price') {
+          var priceA = parseFloat(a.getAttribute('data-course-price'));
+          var priceB = parseFloat(b.getAttribute('data-course-price'));
+          if (!Number.isFinite(priceA)) priceA = Number.POSITIVE_INFINITY;
+          if (!Number.isFinite(priceB)) priceB = Number.POSITIVE_INFINITY;
+          if (priceA !== priceB) return (priceA - priceB) * direction;
+        }
+        var nameA = a.getAttribute('data-course-name') || '';
+        var nameB = b.getAttribute('data-course-name') || '';
+        var nameDiff = nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+        if (nameDiff !== 0) {
+          return sortBy === 'name' ? nameDiff * direction : nameDiff;
+        }
+        return 0;
+      }
+
+      function sortMatches(matches) {
+        if (!sortingEnabled) return matches;
+        return matches.slice().sort(compareCards);
+      }
+
+      function createPageButton(label, page, isActive, disabled, ariaLabel) {
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'wa-fc__pagination-btn' + (isActive ? ' is-active' : '');
+        button.textContent = label;
+        button.disabled = !!disabled;
+        if (ariaLabel) button.setAttribute('aria-label', ariaLabel);
+        if (isActive) button.setAttribute('aria-current', 'page');
+        button.addEventListener('click', function () {
+          if (disabled || page === currentPage) return;
+          currentPage = page;
+          render();
+          var grid = section.querySelector('.wa-fc__grid');
+          if (grid && typeof grid.scrollIntoView === 'function') {
+            grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+        return button;
+      }
+
+      function renderPagination(totalPages) {
+        if (!pagination) return;
+        pagination.innerHTML = '';
+        pagination.hidden = totalPages <= 1;
+        if (totalPages <= 1) return;
+
+        pagination.appendChild(createPageButton('Previous', Math.max(1, currentPage - 1), false, currentPage === 1, 'Previous page'));
+        for (var page = 1; page <= totalPages; page += 1) {
+          pagination.appendChild(createPageButton(String(page), page, page === currentPage, false, 'Page ' + page));
+        }
+        pagination.appendChild(createPageButton('Next', Math.min(totalPages, currentPage + 1), false, currentPage === totalPages, 'Next page'));
+      }
+
+      function render() {
+        var matches = sortMatches(getMatches());
+        var totalPages = Math.max(1, Math.ceil(matches.length / pageSize));
+        if (currentPage > totalPages) currentPage = totalPages;
+        var start = (currentPage - 1) * pageSize;
+        var end = start + pageSize;
+        var matchSet = new Set(matches);
+
+        if (grid) {
+          matches.forEach(function (card) {
+            grid.appendChild(card);
+          });
+          cards.forEach(function (card) {
+            if (!matchSet.has(card)) grid.appendChild(card);
+          });
+        }
+
+        cards.forEach(function (card) {
+          card.hidden = true;
+          card.style.display = 'none';
+        });
+
+        matches.forEach(function (card, index) {
+          var isVisible = index >= start && index < end;
+          card.hidden = !isVisible;
+          card.style.display = isVisible ? '' : 'none';
+        });
+
+        if (emptyState) emptyState.hidden = matches.length !== 0;
+        renderPagination(totalPages);
+      }
+
+      function setFilter(filter) {
+        activeFilter = filter || 'all';
+        currentPage = 1;
+        filters.forEach(function (button) {
+          var isActive = button.getAttribute('data-filter') === activeFilter;
+          button.classList.toggle('is-active', isActive);
+          button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+        render();
+      }
+
+      filters.forEach(function (button) {
+        button.addEventListener('click', function () {
+          setFilter(button.getAttribute('data-filter') || 'all');
+        });
+      });
+
+      if (searchInput) {
+        var updateSearch = function () {
+          searchQuery = normaliseText(searchInput.value);
+          currentPage = 1;
+          render();
+        };
+        searchInput.addEventListener('input', updateSearch);
+        searchInput.addEventListener('search', updateSearch);
+      }
+
+      if (sortBySelect) {
+        sortBySelect.addEventListener('change', function () {
+          sortBy = sortBySelect.value || 'name';
+          currentPage = 1;
+          render();
+        });
+      }
+
+      if (sortDirSelect) {
+        sortDirSelect.addEventListener('change', function () {
+          sortDir = sortDirSelect.value || 'asc';
+          currentPage = 1;
+          render();
+        });
+      }
+
+      deliveryButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var value = button.getAttribute('data-wa-fc-delivery') || 'all';
+          activeDelivery = activeDelivery === value ? 'all' : value;
+          currentPage = 1;
+          deliveryButtons.forEach(function (item) {
+            var isActive = (item.getAttribute('data-wa-fc-delivery') || '') === activeDelivery;
+            item.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            item.classList.toggle('is-active', isActive);
+          });
+          render();
+        });
+      });
+
+      if (locationToggle) {
+        locationToggle.addEventListener('click', function (event) {
+          event.stopPropagation();
+          toggleLocationMenu();
+        });
+      }
+
+      locationButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          activeCity = button.getAttribute('data-wa-fc-city') || 'all';
+          currentPage = 1;
+          if (locationLabel) {
+            locationLabel.textContent = button.getAttribute('data-location-label') || 'All locations';
+          }
+          setPressed(locationButtons, button);
+          closeLocationMenu();
+          render();
+        });
+      });
+
+      if (filtersRoot) {
+        document.addEventListener('click', function (event) {
+          if (!locationMenu || locationMenu.contains(event.target)) return;
+          closeLocationMenu();
+        });
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') closeLocationMenu();
+        });
+      }
+
+      // Deep-link support: /courses?category=<slug> (or ?filter=<slug>) pre-applies a
+      // category filter on load - used by the Training menu, the category landing
+      // pages and a certification pathway's "Browse courses" link.
+      //
+      // Accepted values come from data-wa-fc-category-map (generated from
+      // config/course-categories.json): bucket slugs, display labels, raw HubDB
+      // category names, and the legacy slugs those links used to carry.
+      function normaliseCategoryKey(value) {
+        return String(value == null ? '' : value)
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      }
+
+      var categoryKeyToSlug = (function () {
+        var lookup = {};
+        var raw = section.getAttribute('data-wa-fc-category-map');
+        if (!raw) return lookup;
+        var taxonomy;
+        try {
+          taxonomy = JSON.parse(raw);
+        } catch (error) {
+          return lookup;
+        }
+        (taxonomy.buckets || []).forEach(function (bucket) {
+          (bucket.keys || []).forEach(function (key) {
+            lookup[key] = bucket.slug;
+          });
+        });
+        return lookup;
+      })();
+
+      function resolveInitialFilter() {
+        var params;
+        try {
+          params = new URLSearchParams(window.location.search);
+        } catch (error) {
+          return '';
+        }
+        var requested = normaliseCategoryKey(params.get('category') || params.get('filter'));
+        if (!requested || requested === 'all' || requested === 'any') return '';
+        return categoryKeyToSlug[requested] || requested;
+      }
+
+      var initialFilter = resolveInitialFilter();
+      var hasInitialButton = initialFilter && initialFilter !== 'all' && filters.some(function (button) {
+        return button.getAttribute('data-filter') === initialFilter;
+      });
+
+      if (hasInitialButton) {
+        setFilter(initialFilter);
+      } else {
+        render();
+      }
+    });
+  })();
+</script>
+{% endif %}
+
+{% endif %}

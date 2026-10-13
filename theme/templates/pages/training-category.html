@@ -1,0 +1,169 @@
+<!--
+  templateType: page
+  label: Training Category
+  isAvailableForNewContent: true
+-->
+{#
+  training-category.html - Weld Australia Training Category Page
+
+  One template, four pages - one per training division:
+    /training/welding-inspection-courses/
+    /training/welding-supervision-courses/
+    /training/welding-coordination-courses/
+    /training/short-courses/
+
+  The division is derived from the page URL, so a page created at one of the
+  URLs above filters itself correctly with no per-page configuration. The
+  divisions are defined in config/course-categories.json; add a division there,
+  run `pnpm build`, then create a page whose URL contains its slug.
+
+  Fixed editable module instances (same pattern as training-hub.html and
+  advocacy.html) rather than a dnd_area, so a published page is not stuck on
+  stale drag-and-drop layout data and each page keeps its own copy.
+
+  Sections:
+    1. Hero (compact) - division name + intro
+    2. Courses in this division - featured-courses, pre-filtered
+    3. Full division timetable - course-timetable-filter, pre-filtered
+    4. Why this division matters - two-col-text-image
+    5. Final CTA - view all courses / contact the training team
+#}
+{% import "../partials/course-taxonomy.html" as wa_tax %}
+
+{# Everything down to the {% extends %} below runs BEFORE the parent layout, and
+   it has to: layouts/base.html includes partials/_head.html, which emits the
+   document's only <title> and meta description from page_title /
+   page_description. Assignments made after the extends land too late for the
+   parent head, so the division-derived pair would silently lose to the HubSpot
+   editor's content.html_title. Same reason about-team.html and events.html
+   resolve their SEO variables above their extends. #}
+
+{# Resolve the division from the URL: the first division slug that appears in
+   the page path wins. Falls back to an unfiltered listing off /training/.
+
+   Contract: division slugs must not be prefixes of one another - the loop is
+   first-hit-wins in config/course-categories.json order, so a bucket named
+   `welding` would swallow `welding-inspection`.
+
+   content.slug is folded in because request.path is a preview path inside the
+   HubSpot page editor, where it would not match any slug and an editor would
+   see the unfiltered "Training Courses" fallback. Both refer to the same page,
+   so concatenating them cannot produce a false match. #}
+{% set _page_path = ((request.path | default('', true)) ~ '/' ~ (content.slug | default('', true))) | lower %}
+{% set _page_division = namespace(slug='') %}
+{% for _slug in wa_tax.slugs_csv('') | trim | split(',') %}
+  {% if not _page_division.slug and _slug in _page_path %}
+    {% set _page_division.slug = _slug %}
+  {% endif %}
+{% endfor %}
+
+{% set _division_slug = _page_division.slug %}
+{% set _division_label = wa_tax.bucket_label(_division_slug) | trim if _division_slug else 'Training' %}
+{% set _division_label_lower = _division_label | lower %}
+{% set _courses_mode = 'category' if _division_slug else 'all_courses' %}
+
+{# Copy defaults derived from the division - editors can override per page. #}
+{% set _hero_headline = _division_label ~ ' Courses' %}
+{% set _hero_subheadline = '<p>Nationally recognised ' ~ _division_label_lower ~ " training from Australia's IIW Authorised National Body - delivered face-to-face, online and in-house.</p>" %}
+{% set _why_heading = 'Why ' ~ _division_label_lower ~ ' training?' %}
+{# two-col-text-image renders its body div unconditionally and ships an empty
+   default, so without this a new page shows the heading over blank space. #}
+{% set _why_body = '<p>Weld Australia is the IIW Authorised National Body for Australia. Our '
+  ~ _division_label_lower ~ ' training is nationally recognised and internationally portable, '
+  ~ 'delivered by industry-experienced trainers face-to-face, online and in-house.</p>' %}
+
+{# _head.html renders the <title> and <meta description> from these and appends
+   " - Weld Australia" to page_title. Do not emit a second pair from extra_head:
+   _head.html falls back to content.html_title, which HubSpot fills from the
+   page's HTML-title field (defaulting to the page name), so a template-side
+   default emitted later would never win on a real page. #}
+{% set page_title = _division_label ~ ' Courses' %}
+{% set page_description = 'Browse Weld Australia ' ~ _division_label_lower ~ ' training courses. Nationally recognised, delivered face-to-face and online across Australia.' %}
+
+{% extends "../layouts/base.html" %}
+
+{% block body %}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   § 1  HERO - Division title + intro
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% module "category_hero" path="../../modules/hero"
+  label="Hero - Training Category"
+  section_id="category-hero"
+  background="primary"
+  height="medium"
+  spacing="default"
+  alignment="left"
+  accent_bar=true
+  media_type="none"
+  eyebrow="Training"
+  headline=_hero_headline
+  subheadline=_hero_subheadline
+  primary_cta={"label_text": "See upcoming sessions", "link": {"url": {"href": "#category-timetable", "type": "EXTERNAL"}}, "style": "gold"}
+%}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   § 2  COURSES IN THIS DIVISION
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% module "category_courses" path="../../modules/featured-courses"
+  label="Courses in this division"
+  section_id="category-courses"
+  section_eyebrow="Our training programs"
+  section_heading="Courses in this division"
+  selection_mode=_courses_mode
+  category_filter=_division_slug
+  max_count=12
+  show_member_pricing=true
+  show_filters=false
+  show_view_all_cta=true
+  view_all_label="Browse all courses"
+  view_all_link={"url": {"href": "/courses", "type": "EXTERNAL"}}
+  background="surface"
+  spacing="spacious"
+%}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   § 3  DIVISION TIMETABLE - Full filterable session list
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% module "category_timetable" path="../../modules/course-timetable-filter"
+  label="Division course timetable"
+  section_id="category-timetable"
+  section_heading="Upcoming sessions"
+  default_category=_division_slug
+  default_city="any"
+  default_delivery_mode="any"
+  show_seats_remaining=true
+  page_size=25
+  background="surface_alt"
+  spacing="spacious"
+%}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   § 4  WHY THIS DIVISION - Two-col text + image
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% module "category_why" path="../../modules/two-col-text-image"
+  label="Why this division"
+  section_id="category-why"
+  heading=_why_heading
+  body_text=_why_body
+  image_position="right"
+  background="surface"
+  spacing="spacious"
+%}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   § 5  FINAL CTA
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% module "category_cta" path="../../modules/cta-banner"
+  label="Final CTA - Explore all courses"
+  background="primary"
+  spacing="default"
+  align="split"
+  headline="Not sure which course is right for you?"
+  body_text="<p>Browse the full course timetable or talk to our training team about the right pathway for you or your team.</p>"
+  cta_label="View full timetable"
+  cta_link={"url": {"href": "/courses", "type": "EXTERNAL"}}
+  secondary_cta_label="Contact us"
+  secondary_cta_link={"url": {"href": "/contact-us?topic=training#enquiry", "type": "EXTERNAL"}}
+%}
+{% endblock %}

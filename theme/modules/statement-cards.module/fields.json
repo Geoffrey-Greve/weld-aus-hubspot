@@ -1,0 +1,151 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White / Light (default)"
+      ],
+      [
+        "surface_alt",
+        "Surface alt"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "feature_image",
+    "label": "Feature image (left panel)",
+    "type": "image",
+    "help_text": "Large image shown on the left with a quote overlaid. When set, the Mission/Vision cards stack on the right. Leave blank to show the cards side by side without the image panel."
+  },
+  {
+    "name": "feature_quote",
+    "label": "Feature quote",
+    "type": "text",
+    "help_text": "Quote text shown over the bottom of the feature image.",
+    "default": ""
+  },
+  {
+    "name": "feature_attribution",
+    "label": "Feature attribution",
+    "type": "text",
+    "help_text": "Small label under the quote, e.g. the person or organisation.",
+    "default": ""
+  },
+  {
+    "name": "cards",
+    "label": "Cards",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 2,
+      "default": 1
+    },
+    "children": [
+      {
+        "name": "overline",
+        "label": "Overline",
+        "type": "text"
+      },
+      {
+        "name": "heading",
+        "label": "Heading",
+        "type": "text"
+      },
+      {
+        "name": "body_text",
+        "label": "Body copy",
+        "type": "richtext"
+      },
+      {
+        "name": "card_style",
+        "label": "Card style",
+        "type": "choice",
+        "choices": [
+          [
+            "navy",
+            "Navy (dark)"
+          ],
+          [
+            "light",
+            "Light (white)"
+          ]
+        ],
+        "default": "navy"
+      },
+      {
+        "name": "photo",
+        "label": "Pull-quote photo",
+        "type": "image"
+      },
+      {
+        "name": "photo_caption",
+        "label": "Photo caption / attribution",
+        "type": "text"
+      }
+    ]
+  }
+]

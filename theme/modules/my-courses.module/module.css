@@ -1,0 +1,175 @@
+/* my-courses.module/module.css
+   Shared layout for the tab switcher, cards (mobile), and table (desktop).
+   Component-level selectors are prefixed wa-my-courses__ and wa-tab-switcher__. */
+
+/* ── Tab switcher ─────────────────────────────────────────────────────── */
+.wa-tab-switcher {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--wa-color-border, #e0e0e0);
+  margin-bottom: 24px;
+}
+
+.wa-tab-switcher__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  min-height: var(--wa-touch-min, 44px);
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 500;
+  color: var(--wa-color-text-muted, #666);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.wa-tab-switcher__tab:hover {
+  color: var(--wa-color-text, #1a1a1a);
+}
+
+.wa-tab-switcher__tab--active {
+  color: var(--wa-color-primary, #005ca5);
+  border-bottom-color: var(--wa-color-primary, #005ca5);
+  font-weight: 600;
+}
+
+.wa-tab-switcher__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--wa-color-primary, #005ca5);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────── */
+.wa-my-courses__empty {
+  padding: 48px 0;
+  text-align: center;
+}
+
+.wa-my-courses__empty-message {
+  color: var(--wa-color-text-muted, #666);
+  font-size: 1rem;
+}
+
+/* ── Badge ────────────────────────────────────────────────────────────── */
+.wa-my-courses__badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--wa-radius-sm, 4px);
+  background: var(--wa-color-surface-alt, #f5f5f5);
+  color: var(--wa-color-text-muted, #666);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.wa-my-courses__badge--inline {
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* ── Mobile cards (default - shown below 768px) ───────────────────────── */
+.wa-my-courses__card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--wa-color-border, #e0e0e0);
+  border-radius: var(--wa-radius-md, 8px);
+  background: var(--wa-color-surface, #fff);
+  margin-bottom: 12px;
+}
+
+.wa-my-courses__card-name {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--wa-color-text, #1a1a1a);
+}
+
+.wa-my-courses__card-meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #666);
+}
+
+.wa-my-courses__card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wa-my-courses__table-wrap {
+  display: none;
+}
+
+/* ── Desktop table (shown at 768px+) ─────────────────────────────────── */
+@media (min-width: 768px) {
+  .wa-my-courses__cards {
+    display: none;
+  }
+
+  .wa-my-courses__table-wrap {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .wa-my-courses__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .wa-my-courses__th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--wa-color-text-muted, #666);
+    border-bottom: 2px solid var(--wa-color-border, #e0e0e0);
+    white-space: nowrap;
+  }
+
+  .wa-my-courses__row:not(:last-child) .wa-my-courses__cell {
+    border-bottom: 1px solid var(--wa-color-border, #e0e0e0);
+  }
+
+  .wa-my-courses__cell {
+    padding: 14px 16px;
+    vertical-align: middle;
+    font-size: 0.9375rem;
+    color: var(--wa-color-text, #1a1a1a);
+  }
+
+  .wa-my-courses__cell--actions {
+    white-space: nowrap;
+  }
+
+  .wa-my-courses__name {
+    font-weight: 600;
+  }
+}
+
+/* ── Footnote ─────────────────────────────────────────────────────────── */
+.wa-my-courses__footnote {
+  margin-top: 24px;
+  font-size: 0.875rem;
+  color: var(--wa-color-text-muted, #666);
+}

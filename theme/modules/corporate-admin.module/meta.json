@@ -1,0 +1,14 @@
+{
+  "label": "Corporate Admin - Manage My Team",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Visible only to contacts with the Primary Admin association label. Shows employee list, voucher tracker, and bulk course registration.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "groups",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_type": "NOT_SMART",
+  "tags": ["portal", "member", "admin"]
+}

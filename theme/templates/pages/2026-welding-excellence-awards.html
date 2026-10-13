@@ -1,0 +1,413 @@
+<!--
+  templateType: page
+  isAvailableForNewContent: true
+  label: 2026 Welding Excellence Awards
+-->
+{#
+  2026-welding-excellence-awards.html — Weld Australia 2026 Welding Excellence Awards
+  URL: /2026-welding-excellence-awards/
+  Order: hero → be part of → tickets → how to enter → award categories (1 col) →
+         judges → sponsors (1 col, tier + logo) → further information → CTA
+  Data to confirm: judge "Simon Doe" (placeholder?); Project of the Year "1 August 2025"
+  date (likely stale).
+
+  Modules reused: hero, split-feature, card-grid, team-grid, contact-methods-grid, cta-banner
+#}
+{% set page_title_exact = page_meta.html_title | default('2026 Welding Excellence Awards - Weld Australia') %}
+{% set page_description = page_meta.meta_description | default('The 2026 Welding Excellence Awards celebrate craftsmanship, quality and professionalism across the Australian welding industry. Entries close midnight Friday 4 September 2026.') %}
+{% extends "../layouts/base.html" %}
+{% block extra_head %}
+<style>
+  body.is-awards-page #tickets,
+  body.is-awards-page #enter,
+  body.is-awards-page #categories,
+  body.is-awards-page #judges,
+  body.is-awards-page #info,
+  body.is-awards-page #sponsors { scroll-margin-top: 130px; }
+
+  /* Hero fallback: if a saved page instance has a blank/missing eyebrow field,
+     still show the Awards overline in the shared hero style. */
+  body.is-awards-page .wa-hero__content:not(:has(.wa-overline))::before {
+    content: "Industry recognition";
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: var(--wa-space-4);
+    padding-left: 34px;
+    background: linear-gradient(rgba(254, 207, 5, 0.85), rgba(254, 207, 5, 0.85)) 0 center / 24px 2px no-repeat;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: var(--wa-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Cards: padding + content pinned to the TOP */
+  body.is-awards-page .wa-card-grid__card { padding: clamp(20px, 2vw, 28px); text-align: left; }
+  body.is-awards-page .wa-card-grid__card,
+  body.is-awards-page .wa-card-grid__card > div,
+  body.is-awards-page .wa-card-grid__card [class*="body"],
+  body.is-awards-page .wa-card-grid__card [class*="content"],
+  body.is-awards-page .wa-card-grid__card [class*="inner"] {
+    justify-content: flex-start !important;
+    align-content: flex-start !important;
+  }
+  body.is-awards-page .wa-card-grid__card > *,
+  body.is-awards-page .wa-card-grid__card [class*="body"],
+  body.is-awards-page .wa-card-grid__card [class*="content"],
+  body.is-awards-page .wa-card-grid__card [class*="inner"] {
+    margin-top: 0 !important;
+    margin-block-start: 0 !important;
+  }
+
+  /* Force a SINGLE column in the How-to-Enter, categories + sponsors grids
+     (the module's columns="1" setting isn't being honoured). */
+  body.is-awards-page #enter [class*="card-grid__grid"],
+  body.is-awards-page #enter [class*="card-grid__cards"],
+  body.is-awards-page #enter [class*="card-grid__items"],
+  body.is-awards-page #enter [class*="card-grid__list"],
+  body.is-awards-page #categories [class*="card-grid__grid"],
+  body.is-awards-page #categories [class*="card-grid__cards"],
+  body.is-awards-page #categories [class*="card-grid__items"],
+  body.is-awards-page #categories [class*="card-grid__list"],
+  body.is-awards-page #sponsors [class*="card-grid__grid"],
+  body.is-awards-page #sponsors [class*="card-grid__cards"],
+  body.is-awards-page #sponsors [class*="card-grid__items"],
+  body.is-awards-page #sponsors [class*="card-grid__list"] {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+  body.is-awards-page #enter .wa-card-grid__card,
+  body.is-awards-page #categories .wa-card-grid__card,
+  body.is-awards-page #sponsors .wa-card-grid__card {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  /* Ticket sales: two columns */
+  body.is-awards-page #tickets [class*="card-grid__grid"],
+  body.is-awards-page #tickets [class*="card-grid__cards"],
+  body.is-awards-page #tickets [class*="card-grid__items"],
+  body.is-awards-page #tickets [class*="card-grid__list"] {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Entering the Awards: plain full-width text, NOT a card */
+  body.is-awards-page #enter .wa-card-grid__card {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  /* Award category cards: image floated to the RIGHT of the text.
+     To use a real image, add <img class='category-image' src='...' alt='...'>
+     at the start of that card's body_text and the placeholder auto-hides. */
+  body.is-awards-page #categories .wa-card-grid__card { display: block !important; }
+  body.is-awards-page #categories .wa-card-grid__card::before {
+    content: "Image";
+    float: right;
+    display: flex; align-items: center; justify-content: center;
+    width: 38%; max-width: 320px; aspect-ratio: 16 / 9;
+    margin: 0 0 16px 24px;
+    background: #e6e8ec; color: #9aa0ab; font-weight: 700; letter-spacing: .05em; border-radius: 6px;
+  }
+  body.is-awards-page #categories .wa-card-grid__card:has(img.category-image)::before { display: none; }
+  body.is-awards-page #categories .wa-card-grid__card img.category-image {
+    float: right;
+    width: 38%; max-width: 320px; aspect-ratio: 16 / 9; object-fit: cover;
+    margin: 0 0 16px 24px; border-radius: 6px;
+  }
+  /* Contain the float within each card */
+  body.is-awards-page #categories .wa-card-grid__card::after { content: ""; display: block; clear: both; }
+
+  /* Category CTAs as buttons — Enter (Jotform) = filled dark blue; Criteria (.pdf) = white/outline */
+  body.is-awards-page #categories .wa-card-grid__card a[href*="jotform.com"] {
+    display: inline-block; margin: 8px 8px 0 0; padding: 10px 18px; border-radius: 4px;
+    background: var(--wa-color-primary, #1c1e4c); color: #fff !important;
+    border: 2px solid var(--wa-color-primary, #1c1e4c); text-decoration: none; font-weight: 700;
+  }
+  body.is-awards-page #categories .wa-card-grid__card a[href*="jotform.com"]:hover { filter: brightness(1.12); }
+  body.is-awards-page #categories .wa-card-grid__card a[href$=".pdf"] {
+    display: inline-block; margin: 8px 8px 0 0; padding: 10px 18px; border-radius: 4px;
+    background: #fff; color: var(--wa-color-primary, #1c1e4c) !important;
+    border: 2px solid var(--wa-color-primary, #1c1e4c); text-decoration: none; font-weight: 700;
+  }
+  body.is-awards-page #categories .wa-card-grid__card a[href$=".pdf"]:hover { background: var(--wa-color-primary, #1c1e4c); color: #fff !important; }
+
+  /* Ticket "Register" links as buttons */
+  body.is-awards-page #tickets .wa-card-grid__card a[href*="trybooking.com"] {
+    display: inline-block; margin-top: 6px; padding: 10px 18px; border-radius: 4px;
+    background: var(--wa-color-primary, #1c1e4c); color: #fff !important; border: 2px solid transparent;
+    text-decoration: none; font-weight: 700;
+  }
+  body.is-awards-page #tickets .wa-card-grid__card a[href*="trybooking.com"]:hover { filter: brightness(1.12); }
+
+  /* Sponsor cards: coloured border by tier (4px), tier label + logo pinned to top */
+  body.is-awards-page #sponsors .wa-card-grid__card { border: 4px solid #d7dae1; }
+  body.is-awards-page #sponsors .wa-card-grid__card:has(.sponsor-tier--gold)   { border-color: #d4af37; }
+  body.is-awards-page #sponsors .wa-card-grid__card:has(.sponsor-tier--silver) { border-color: #9aa0ab; }
+  body.is-awards-page #sponsors .wa-card-grid__card:has(.sponsor-tier--bronze) { border-color: #b08d57; }
+  body.is-awards-page .sponsor-tier { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: 13px; margin: 0 0 12px; }
+  body.is-awards-page .sponsor-tier--gold   { color: #7a5c00; }
+  body.is-awards-page .sponsor-tier--silver { color: #555555; }
+  body.is-awards-page .sponsor-tier--bronze { color: #5c2d00; }
+  /* Logo: keep original aspect ratio (never stretch), capped height */
+  body.is-awards-page .sponsor-logo {
+    display: block;
+    height: auto !important;
+    width: auto !important;
+    max-height: 72px;
+    max-width: 220px;
+    object-fit: contain;
+    margin: 0 0 14px;
+  }
+
+  @media (max-width: 767px) {
+    body.is-awards-page #tickets [class*="card-grid__grid"],
+    body.is-awards-page #tickets [class*="card-grid__cards"],
+    body.is-awards-page #tickets [class*="card-grid__items"],
+    body.is-awards-page #tickets [class*="card-grid__list"] {
+      grid-template-columns: 1fr !important;
+    }
+    body.is-awards-page #categories .wa-card-grid__card::before,
+    body.is-awards-page #categories .wa-card-grid__card img.category-image {
+      float: none;
+      width: 100%;
+      max-width: none;
+      margin: 0 0 16px;
+    }
+  }
+</style>
+{% endblock %}
+{% block body_class %}is-awards-page{% endblock %}
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ── § 1  HERO ────────────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero"
+          background="primary"
+          height="tall"
+          alignment="left"
+          accent_bar=true
+          eyebrow="Industry recognition"
+          headline="2026 Welding Excellence Awards"
+          subheadline="<p><strong>Weld Australia's Welding Excellence Awards are the most prestigious event on the welding industry calendar. The Awards embody and promote the highest standards of craftsmanship, quality and professionalism.</strong></p><p>The 2026 Welding Excellence Awards are a fantastic opportunity for welders, fabricators and educators across Australia to showcase their people and their operations. Winners will be awarded in each state for each of the award categories listed below.</p><p><strong>Entries for the 2026 Awards are now open. All entries must be submitted online by midnight Friday 4 September 2026.</strong></p>"
+          primary_cta={"label_text": "How to enter", "link": {"url": {"href": "#enter", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "Register for tickets", "link": {"url": {"href": "#tickets", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 2  SPLIT FEATURE — BE PART OF THE AWARDS ───────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/split-feature"
+          label="Be part of the 2026 Awards"
+          background="surface"
+          media_type="image"
+          media_side="right"
+          overline="A night of industry"
+          heading="Be part of the 2026 Welding Excellence Awards"
+          body_text="<p>The Weld Australia Welding Excellence awards are celebrated across five states in October and November. The awards celebrate the industry's top talent, innovation, and achievements. The awards are a great opportunity to network with industry leaders, recognise exceptional work, and explore insights into the latest welding advancements. Book your spot today and be inspired by the best in the field.</p><p><strong>All tickets include a two course meal and drinks throughout the evening.</strong></p><p>We welcome everyone to the awards so bring your partner, family and your colleagues and celebrate a night of industry. Many of last year's events sold out, so be sure to register early to avoid disappointment.</p><p>Plus, eligible Corporate Members and Industry Supplier Members are entitled to complimentary tickets to the Weld Australia Excellence Awards as part of their membership benefits. Members should have received a dedicated booking code shortly, which can be used to redeem their allocated complimentary tickets when registering for the event. Need help? Email <a href='mailto:membership@weldaustralia.com.au'>membership@weldaustralia.com.au</a></p>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 3  CARD GRID — TICKET SALES BY STATE ───────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/card-grid"
+          label="Ticket sales"
+          section_id="tickets"
+          background="surface_alt"
+          overline="Ticket sales are now open"
+          heading="Register for your state's Awards evening"
+          card_style="clean_white"
+          columns="2"
+          cards=[
+            {"tag_text": "QLD & NT", "tag_color": "gold", "title": "Queensland & Northern Territory", "body_text": "<p>Thursday 1 October 2026</p><p><a href='https://www.trybooking.com/DNMQM'>Register for the QLD &amp; NT Awards →</a></p>"},
+            {"tag_text": "SA", "tag_color": "navy", "title": "South Australia", "body_text": "<p>Thursday 15 October 2026</p><p><a href='https://www.trybooking.com/DNMQP'>Register for the SA Awards →</a></p>"},
+            {"tag_text": "VIC & TAS", "tag_color": "magenta", "title": "Victoria & Tasmania", "body_text": "<p>Thursday 29 October 2026</p><p><a href='https://www.trybooking.com/DNMQR'>Register for the VIC &amp; TAS Awards →</a></p>"},
+            {"tag_text": "WA", "tag_color": "gold", "title": "Western Australia", "body_text": "<p>Tuesday 10 November 2026</p><p><a href='https://www.trybooking.com/DNMQV'>Register for the WA Awards →</a></p>"},
+            {"tag_text": "NSW & ACT", "tag_color": "navy", "title": "New South Wales & ACT", "body_text": "<p>Thursday 26 November 2026</p><p><a href='https://www.trybooking.com/DNMQX'>Register for the NSW &amp; ACT Awards →</a></p>"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 4  CARD GRID — HOW TO ENTER (+ full Award Criteria list) ────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/card-grid"
+          label="How to Enter"
+          section_id="enter"
+          background="surface"
+          overline="Entering the awards"
+          heading="How to Enter the 2026 Welding Excellence Awards"
+          card_style="clean_white"
+          columns="2"
+          cards=[
+            {"body_text": "<p>Entries must be submitted via the specific online form for each category by <strong>midnight on Friday 4 September 2026</strong>. These forms can be found below, by clicking on the relevant red button.</p><p>You must be a Weld Australia member* to enter the Awards. If you would like to be involved in the awards, please contact David Choudry for information on our current membership offer via <a href='mailto:d.choudry@weldaustralia.com.au'>d.choudry@weldaustralia.com.au</a> or 0417 878 104.</p><p>The full <a href='https://weldaustralia.com.au/2026-welding-excellence-awards-conditions-of-entry/'>Conditions of Entry can be viewed here</a>.</p><p>Before starting your entry, it is recommended that you download the Award Criteria. You will need the information outlined in the Award Criteria on hand to complete your online entry form. The Award Criteria can be downloaded via:</p><ul><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Company-of-the-Year-Fabrication-Award-Criteria.pdf'>Company of the Year – Fabrication</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Company-of-the-Year-Supplier.pdf'>Company of the Year – Supplier</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Indigenous-Company-of-the-Year.pdf'>Company of the Year – Indigenous</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Pipe-Fabricator-of-the-Year-Award-Criteria.pdf'>Pipe Fabricator of the Year</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Indigenous-Contribution-to-Welding-Award-Criteria.pdf'>Indigenous Contribution to Welding Award</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Health-Safety.pdf'>Health &amp; Safety in Welding</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Women-in-Welding-Award-Criteria.pdf'>Esther Porter Women in Welding Award</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Project-of-the-Year-Award-Criteria.pdf'>Project of the Year</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Welding-Professional-of-the-Year-Award-Criteria.pdf'>Welding Professional of the Year</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Apprentice-of-the-Year-Award-Criteria-Under-25.pdf'>Apprentice of the Year (under 25 years of age)</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Apprentice-of-the-Year-Award-Criteria-Over-25.pdf'>Apprentice of the Year (over 25 years of age)</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Trades-Persons-of-the-Year-Award-Criteria.pdf'>Trades Person of the Year (over 25 years of age)</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Young-Indigenous-Trades-Persons-of-the-Year-Award-Criteria.pdf'>Young Indigenous Trades Person of the Year</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-VET-in-Schools-Student-of-the-Year-Award-Criteria.pdf'>VET in Schools Student of the Year</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Training-and-Education-Organisation-Award-Criteria.pdf'>Training and Education Award – Organisation</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Training-and-Education-Individual-Teacher-Award-Criteria.pdf'>Training and Education Award – Individual Teacher</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/06/Weld-Australia-2026-Peter-Cryer-Award-Criteria.pdf'>Peter Cryer Award – New South Wales Only</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/06/Weld-Australia-2026-Peter-Kuebler-Award-Criteria.pdf'>Peter Kuebler Award – Queensland Only</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Ken-Trevena-Award-Criteria.pdf'>Ken Trevena Award – South Australia Only</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/06/Weld-Australia-2026-Robert-Wiseman-Award-Criteria.pdf'>Robert Wiseman Award – Victoria Only</a></li><li><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Mick-Cudmore-Award-Criteria.pdf'>Mick Cudmore Award – Western Australia Only</a></li></ul><p>*For Company or Organisation award categories (such as Company of the Year, Project of the Year, Training &amp; Education Organisation, Health &amp; Safety in Welding, and so on) – the company or organisation must be a Weld Australia member.</p><p>For Individual award categories (such as Welding Professional, Trades Person, Training &amp; Education Individual, and so on) – the person being nominated needs to be a Weld Australia member, either as an individual or under their company or organisation's corporate membership.</p>"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 5  CARD GRID — 2026 AWARD CATEGORIES (one column, expanded) ─────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/card-grid"
+          label="2026 Award Categories"
+          section_id="categories"
+          background="surface_alt"
+          overline="Award categories"
+          heading="2026 Award Categories"
+          card_style="clean_white"
+          columns="2"
+          cards=[
+            {"title": "Company of the Year", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Company%20of%20the%20Year.jpg' alt='Company of the Year'><p>The Company of the Year Award recognises superior performance across a comprehensive range of business metrics including: innovation, quality assurance, corporate social responsibility, health and safety, and training and development of employees. There are three sub-categories:</p><p><strong>Fabrication</strong><br><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Company-of-the-Year-Fabrication-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/230451301127844'>Enter</a></p><p><strong>Supplier</strong><br><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Company-of-the-Year-Supplier.pdf'>Download criteria</a> <a href='https://form.jotform.com/230467875459875'>Enter</a></p><p><strong>Indigenous</strong><br><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Indigenous-Company-of-the-Year.pdf'>Download criteria</a> <a href='https://form.jotform.com/261531627874867'>Enter</a></p>"},
+            {"title": "Indigenous Contribution to Welding Award", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Indigenous%20Contribution%20to%20Welding%20Award.jpg' alt='Indigenous Contribution to Welding'><p>This Award recognises an individual or organisation that is making a significant contribution to advancing the participation, development, and recognition of Indigenous Australians in the welding and fabrication industry. This may include leadership, advocacy, mentorship, innovation, or the implementation of initiatives that support greater diversity and inclusion.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Indigenous-Contribution-to-Welding-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/261179593240864'>Enter the Award</a></p>"},
+            {"title": "Pipe Fabricator of the Year", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Pipe%20Fabricator%20of%20the%20Year.jpg' alt='Pipe Fabricator of the Year'><p><em>Sponsored by SFE Group</em></p><p>The Pipe Fabricator of the Year Award recognises an outstanding company or individual demonstrating excellence in pipe fabrication across a range of projects and applications. This includes superior workmanship, adherence to standards, innovation, safety, and overall contribution to the welding and fabrication industry.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Pipe-Fabricator-of-the-Year-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/261241364441853'>Enter the Award</a></p>"},
+            {"title": "Esther Porter Women in Welding Award", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Esther%20Porter%20Award.jpg' alt='Esther Porter Award'><p>This Award recognises an individual or organisation that is making a significant contribution to advancing the participation, development, and recognition of women in the Australian welding and fabrication industry. This may include leadership, advocacy, mentorship, innovation, or the implementation of initiatives that support greater diversity and inclusion.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Women-in-Welding-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/261178756139871'>Enter the Award</a></p>"},
+            {"title": "Welding Professional of the Year", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Welding%20Professional%20of%20the%20Year.jpg' alt='Welding Professional of the Year'><p>This Award recognises professionals who are making a valuable contribution to the Australian welding and fabrication industry. The individual should demonstrate a high level of skill, knowledge or craftsmanship, be dedicated to their profession, and have professional development plans in place.</p><p><strong>Welding Engineer / Technologist</strong><br><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Welding-Professional-of-the-Year-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/230498601176862'>Enter</a></p><p><strong>Welding Supervisor</strong><br><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Welding-Professional-of-the-Year-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/230500321777852'>Enter</a></p><p><strong>Welding Inspector</strong><br><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Welding-Professional-of-the-Year-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/230508806648865'>Enter</a></p>"},
+            {"title": "Health & Safety in Welding", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Health%20&%20Safety%20in%20Welding.jpg' alt='Health & Safety in Welding'><p>The Health and Safety in Welding Award recognises organisations that are leading the way in encouraging and promoting health and safety throughout the Australian welding industry, and ensuring the health and safety of their own team. Organisations will be judged on criteria such as design and implementation of innovative programs or initiatives, the outcomes of these programs, and the health and safety of their team.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Health-Safety.pdf'>Download criteria</a> <a href='https://form.jotform.com/231629156755867'>Enter the Award</a></p>"},
+            {"title": "Project of the Year", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Project%20of%20the%20Year.jpg' alt='Project of the Year'><p>The Project of the Year Award recognises excellence in welding and fabrication projects, with a focus on exceptional craftsmanship, a commitment to Australian and International Standards, environmental sustainability and innovation. Projects must have been completed in the 12 months preceding 1 August 2025.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Project-of-the-Year-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/230508748524863'>Enter Project of the Year</a></p>"},
+            {"title": "Apprentice of the Year", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Apprentice%20of%20the%20Year.jpg' alt='Apprentice of the Year'><p>These Awards recognise apprentices who are making a valuable contribution to the Australian welding and fabrication industry. The individual should demonstrate a high level of skill, knowledge or craftsmanship, be dedicated to their profession, and have professional development plans in place.</p><p><strong>Under 25 years of age</strong><br><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Apprentice-of-the-Year-Award-Criteria-Under-25.pdf'>Download criteria</a> <a href='https://form.jotform.com/261161496441860'>Enter</a></p><p><strong>Over 25 years of age</strong><br><a href='https://weldaustralia.com.au/wp-content/uploads/2026/04/Weld-Australia-2026-Apprentice-of-the-Year-Award-Criteria-Over-25.pdf'>Download criteria</a> <a href='https://form.jotform.com/261161558568869'>Enter</a></p>"},
+            {"title": "Trades Person of the Year (over the age of 25)", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Trades%20Person%20of%20the%20Year.jpg' alt='Trades Person of the Year'><p>This Award recognises people over the age of 25 who are making a valuable contribution to the Australian welding and fabrication industry. The individual should demonstrate a high level of skill, knowledge or craftsmanship, be dedicated to their profession, and have professional development plans in place.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Trades-Persons-of-the-Year-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/231717274813861'>Enter the Award</a></p>"},
+
+            {"title": "Young Indigenous Trades Person of the Year", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Young%20Indigenous%20Trades%20Person%20of%20the%20Year.jpg' alt='Young Indigenous Trades Person of the Year'><p>This Award recognises indigenous trades people under the age of 25 who are making a valuable contribution to the Australian welding and fabrication industry. The individual should demonstrate a high level of skill, knowledge or craftsmanship, be dedicated to their profession, and have professional development plans in place.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Young-Indigenous-Trades-Persons-of-the-Year-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/261530877704865'>Enter the Award</a></p>"},
+            {"title": "VET in Schools Student of the Year", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Student%20of%20the%20Year.jpg' alt='Student of the Year Award'><p>This Award recognises a student currently enrolled in a Vocational Education and Training (VET) in Schools welding or metal fabrication program who demonstrates outstanding promise in the field. The nominee should exhibit a high level of enthusiasm, a strong commitment to developing their technical skills, and a proactive attitude towards learning and growth in the welding and fabrication industry.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-VET-in-Schools-Student-of-the-Year-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/251689248144869'>Enter the Award</a></p>"},
+            {"title": "Training and Education Award – Organisation", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Training%20and%20Education%20Award%20-%20Organisation.jpg' alt='Training and Education Award'><p>The Training and Education Award recognises the outstanding achievements of a STEM or VET provider or program. Entrants may include secondary education and tertiary education providers, private companies, TAFEs and RTOs. Criteria include delivery of quality, innovative training programs, involvement with industry, recruitment and retention of students, and corporate social responsibility.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Training-and-Education-Organisation-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/230508238845863'>Enter the Award</a></p>"},
+            {"title": "Training and Education Award – Individual Teacher", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Training%20and%20Education%20Award%20-%20Individual%20Teacher.jpg' alt='Individual Teacher Award'><p>This Award recognises the outstanding achievements of a STEM or VET teacher at TAFEs, independent RTOs and private companies. Entrants will be judged on criteria such as delivery of quality, innovative training programs, high level of knowledge or craftsmanship, strong links with students, and dedication to their profession.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Training-and-Education-Individual-Teacher-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/230509081298862'>Enter the Award</a></p>"},
+            {"title": "Ken Trevena Award – South Australia Only", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Ken%20Trevena%20Award.jpg' alt='Ken Trevena Award'><p>The Ken Trevena Award recognises someone who has demonstrated an outstanding example of welding expertise on a particular project, attained meritorious skill in a Weld Australia Course, has made a contribution to the art and science of welding, or developed a welding principle, technique or process with special merit.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Ken-Trevena-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/230510149763856'>Enter the Award</a></p>"},
+            {"title": "Peter Kuebler Award – Queensland Only", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Peter%20Kuebler%20Award.jpg' alt='Peter Kuebler Award'><p>The Peter Kuebler Award recognises someone who has demonstrated an outstanding example of welding expertise on a particular project, attained meritorious skill in a Weld Australia Course, has made a contribution to the art and science of welding, or developed a welding principle, technique or process with special merit.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/06/Weld-Australia-2026-Peter-Kuebler-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/261797851420867'>Enter the Award</a></p>"},
+            {"title": "Peter Cryer Award – New South Wales Only", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Peter%20Cryer%20Award.jpg' alt='Peter Cryer Award'><p>The Peter Cryer Award recognises someone who has demonstrated an outstanding example of welding expertise on a particular project, attained meritorious skill in a Weld Australia Course, has made a contribution to the art and science of welding, or developed a welding principle, technique or process with special merit.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/06/Weld-Australia-2026-Peter-Cryer-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/261798350268872'>Enter the Award</a></p>"},
+            {"title": "Robert Wiseman Award – Victoria Only", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Robert%20Wiseman%20Award.jpg' alt='Robert Wiseman Award'><p>The Robert Wiseman Award recognises someone who has demonstrated an outstanding example of welding expertise on a particular project, attained meritorious skill in a Weld Australia course, has made a contribution to the art and science of welding, or developed a welding principle, technique or process with special merit. This Award is open to members based in Victoria only.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/06/Weld-Australia-2026-Robert-Wiseman-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/261798405196873'>Enter the Award</a></p>"},
+            {"title": "Mick Cudmore Award – Western Australia Only", "body_text": "<img class='category-image' src='/hubfs/441838610/Imported%20images/Mick%20Cudmore%20Award.jpg' alt='Mick Cudmore Award'><p>The Mick Cudmore Award recognises someone who has demonstrated an outstanding example of welding expertise on a particular project, attained meritorious skill in a Weld Australia course, has made a contribution to the art and science of welding, or developed a welding principle, technique or process with special merit. This Award is open to members based in Western Australia only.</p><p><a href='https://weldaustralia.com.au/wp-content/uploads/2026/03/Weld-Australia-2026-Mick-Cudmore-Award-Criteria.pdf'>Download criteria</a> <a href='https://form.jotform.com/231716497156867'>Enter the Award</a></p>"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 6  TEAM GRID — OUR JUDGES ──────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/team-grid"
+          label="Our Judges"
+          section_id="judges"
+          background="surface"
+          data_source="module_fields"
+          overline="Meet the panel"
+          section_heading="Our Judges"
+          columns="3"
+          people=[
+            {"name_text": "Ben Mitchell", "role": "Director, Strategic Partnerships, Weld Australia", "quals": ""},
+            {"name_text": "Simon Doe", "role": "Director, Engineering, Weld Australia", "quals": ""},
+            {"name_text": "Michael Pitt", "role": "Director, Education & Training, Weld Australia", "quals": ""}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# TODO: "Simon Doe" appears to be placeholder content on the source page — confirm the real judge before publish. #}
+
+  {# ── § 7  CARD GRID — WITH THANKS TO OUR SPONSORS (one column, tier + logo) #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/card-grid"
+          label="With Thanks to Our Sponsors"
+          section_id="sponsors"
+          background="surface_alt"
+          overline="With thanks to our sponsors"
+          heading="Our Sponsors"
+          card_style="clean_white"
+          columns="2"
+          cards=[
+            {"title": "Coregas", "body_text": "<p class='sponsor-tier sponsor-tier--gold'>Gold Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/NS_coregas_Colour.png' alt='Coregas logo'><p>Coregas manufactures and distributes compressed gases and cryogenic liquids to almost all industries, ranging from heavy industry and manufacturing to healthcare and specialty users such as laboratories.</p><p>Welding and cutting is core to our business and our product offerings. With our dedicated technical team and broad range of industrial and specialty products, we can provide expertise and support initiatives to further improve productivity, quality, and safety.</p><p>Coregas is changing gases around the country, seeking to raise the bar in terms of service, quality, and value. We believe that the best way to grow our business is to listen to customers and deliver on our promises to them.</p><p>For further information, visit: <a href='https://www.coregas.com/'>coregas.com</a></p>"},
+            {"title": "Blue Scope", "body_text": "<p class='sponsor-tier sponsor-tier--gold'>Gold Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/images.png' alt='Blue Scope logo'><p>BlueScope is a global leader in steel manufacturing, dedicated to supplying innovative, high-quality steel for some of the world's most beautiful, essential, and enduring structures. Guided by their core purpose, to create and inspire smart solutions in steel, to strengthen communities for the future, the company operates across 15 countries with a strong presence in Australia, New Zealand, Asia, and North America.</p><p>Trusted worldwide for its strength, durability, and recyclability, BlueScope's premium portfolio features iconic brands such as TRUECORE®, ZINCALUME®, LYSAGHT®, BUTLER®, and COLORBOND® steel, which is currently celebrating 60 years as Australia's most preferred roofing material. Beyond producing world-class products, BlueScope is actively transforming the future of steelmaking through a deep commitment to sustainable operations, climate action, and driving positive environmental and economic outcomes in the communities they serve.</p><p>For more information visit <a href='https://www.bluescope.com/'>bluescope.com</a></p>"},
+            {"title": "BOC", "body_text": "<p class='sponsor-tier sponsor-tier--gold'>Gold Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/Screen-Shot-2022-08-09-at-3.54.43-pm.png' alt='BOC logo'><p>For over 100 years, BOC (a Linde company) has been a proud contributor to advances in industry and everyday life, including welding and cutting, steelmaking, refining, chemical processing, environmental protection, wastewater treatment, food processing and distribution, glass production, electronics, and healthcare.</p><p>In welding, BOC's technical experts guide customers through an extensive range of welding and cutting options, including gas mixtures, to help them achieve their budget, productivity and quality demands.</p><p>As the exclusive supplier of EWM digital welding machines in Australia and New Zealand, we help customers with Welding 4.0 via new technology solutions for areas such as robotics and automation saving fabricators time and money.</p><p>For more information visit <a href='https://www.boc.com.au/'>boc.com.au</a></p>"},
+            {"title": "ELLIOTS", "body_text": "<p class='sponsor-tier sponsor-tier--gold'>Gold Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/elliotts-logo.png' alt='ELLIOTS logo'><p>Elliotts is passionate about taking great care in everything they do, ensuring you have the best protection. This shouldn't come as a surprise, after all, for more than 55 years, they have been in the business of manufacturing and supplying specialised personal protective clothing and equipment designed to protect the users of their products better than anything else.</p><p>Their dynamic and positive spirit to do the right thing for their customers, partners and industry sets them apart and nourishes their capacity to deliver quality products with certainty and to take care of every worker without compromise.</p><p>They manufacture and supply a comprehensive range of high-quality specialist safety clothing and gear which includes Safety Gloves &amp; Hand Protection, FR Clothing &amp; Work Wear, Arcflash &amp; Switching Clothing, Protective clothing for Firefighters, Chemical Splash Clothing, Welding Apparel, Furnace Clothing, Wet Weather &amp; Cold Weather Clothing, Welding Screens, Welding Blankets &amp; Drapes, Hi Vis Clothing, and much more.</p><p>For more information, visit: <a href='https://www.elliotts.net/'>elliotts.net</a></p>"},
+            {"title": "SFE Group", "body_text": "<p class='sponsor-tier sponsor-tier--gold'>Gold Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/sfe-group-logo.png' alt='SFE Group logo'><p>SFE Group is a specialist provider of pipe fabrication, orbital welding, portable machining, pipe handling and weld purging solutions. As part of the global SFE Group, we combine the strength of a leading manufacturing, technology and OEM group with local Australian technical support, application engineering, equipment demonstrations, operator training and after-sales service.</p><p>Working closely with a network of authorised distribution partners across Australia, SFE Group supports fabricators, contractors and asset owners with industry-leading technologies including: AXXAIR, Magnatech, CLIMAX Portable Machining &amp; Welding Systems, H&amp;S Tool, TAG Pipe Equipment Specialists, B&amp;B Sumner, PPM Technology, Mathey Dearman, Fit-Up Pro and Calder Testers.</p><p>Combining global knowledge and capability with local expertise, SFE Group helps customers improve productivity, quality and safety across critical fabrication and welding applications.</p><p>For more information, visit <a href='https://sfe-brands.com/'>sfe-brands.com</a></p>"},
+            {"title": "SPW Group", "body_text": "<p class='sponsor-tier sponsor-tier--gold'>Gold Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/SPW-e1739917017562-300x111.png' alt='SPW Group logo'><p>SPW specialises in welding which includes equipment, consumables, service, second hand and hire.</p><p>The group includes Western Welding Services (WA), Townsville Welding Supplies (QLD), Norstate Gas (QLD), Independent Welding Supplies (QLD), The Weld Spot (Victoria), Allweld (NSW), Totalweld (NT) and Southern Cross Industrial Supplies (NSW/ACT and SA).</p><p>Our businesses are able to deliver a national specialised welding supply chain and our trading companies have retained their locations, staff expertise and customer service levels whilst combining buying power and marketing initiatives.</p><p>At SPW we will continue to deliver exceptional service and a comprehensive range of welding products in every location.</p><p>For more information, visit <a href='https://www.spwgroup.com.au/'>spwgroup.com.au</a></p>"},
+            {"title": "KEMPPI", "body_text": "<p class='sponsor-tier sponsor-tier--gold'>Gold Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/2560px-Kemppi_Logo.svg-300x73.png' alt='KEMPPI logo'><p>Kemppi is the design leader of the arc welding industry. For over 70 years we have leveraged our considerable expertise to pioneer the development of both welding equipment and productive welding solutions and services, and introduced many new innovations to the market.</p><p>We remain committed to boosting the quality and productivity of welding by continuous development of the welding arc. Our advanced welding products, digital solutions and services are highly reliable, feature-rich and simple to use, and have been created for professionals from industrial welding companies to single contractors.</p><p>We operate in over 70 countries and are dedicated to empowering welders.</p><p>For more information, visit: <a href='https://www.kemppi.com/en'>kemppi.com/en</a></p>"},
+            {"title": "WIA", "body_text": "<p class='sponsor-tier sponsor-tier--gold'>Gold Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/WIA-logo.png' alt='WIA logo'><p>With more than 60 years of product development under their belt, WIA has been supplying the Australian market with reliable welding equipment and consumables that have stood the test of time. From the Fabricator to the Austarc 16TC, the products they have developed and delivered long ago are still being relied on today.</p><p>Today, WIA has further evolved and take pride in being part of ITW, one of the strongest, most well-regarded manufacturers in the world. For over 100 years ITW's strategy has never changed – to deliver best-in class, innovative solutions that result in higher efficiency and proven performance for customers worldwide.</p><p>For more information, visit <a href='https://welding.com.au/'>welding.com.au</a></p>"},
+
+            {"title": "Air Liquide", "body_text": "<p class='sponsor-tier sponsor-tier--silver'>Silver Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/airliquide.png' alt='Air Liquide logo'><p>A world leader in gases, technologies and services for industry and healthcare, Air Liquide acts as the backbone of numerous economic sectors, serving 4.3 million customers and patients across 59 countries with approximately 65,000 employees. With revenues close to 27 billion euros in 2025, Air Liquide combines strong performance and useful growth.</p><p>Air Liquide aims to deliver innovative gas solutions and technologies to a wide range of customers which drive their performance and help them reduce their environmental impact. No matter where, Air Liquide is committed to providing solutions which are safe, reliable, cost-effective and sustainable.</p><p>For more information visit: <a href='https://www.airliquide.com/'>airliquide.com</a></p>"},
+            {"title": "AWS", "body_text": "<p class='sponsor-tier sponsor-tier--silver'>Silver Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/aws-logo.png' alt='AWS logo'><p>Apex Welding Safety (AWS) is a specialist in controlling welding fumes. Built on the hierarchy of control, AWS offers solutions across all product control categories, including welding helmets with powered air purifying respirators (PAPR), on-gun fume extraction, hooded local exhaust ventilation, push-pull systems, and diluters. Partnering with the world's leading brands – including 3M, Speedglas, Translas, Nederman, and Plymovent – AWS is perfectly positioned to help businesses implement product controls that better protect welders and nearby workers.</p><p>For more information visit <a href='https://www.apexweldingsafety.com.au/'>apexweldingsafety.com.au</a></p>"},
+            {"title": "Diverseco", "body_text": "<p class='sponsor-tier sponsor-tier--silver'>Silver Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/diverseco-log.png' alt='Diverseco logo'><p>For over 30 years, Diverseco has helped Australian businesses operate with greater precision, efficiency and confidence – evolving from its origins in industrial weighing into a leader in weighing and automation.</p><p>Today, Diverseco brings this capability to market through two specialised divisions. Accuweigh, the foundation of Diverseco's heritage, delivers industrial weighing, measurement and service solutions.</p><p>Complementing this is Diverseco R+I (Robotics &amp; Intralogistics), focused on advanced automation. From warehouse optimisation to intelligent robotics and integrated intralogistics systems, Diverseco R+I enables businesses to streamline operations, improve throughput and adapt to the growing demands of modern supply chains.</p><p>Together, these divisions reflect Diverseco's evolution – from weighing specialists to a multi-disciplinary partner delivering end-to-end solutions across measurement, automation and operational performance.</p><p>At Diverseco's core is a simple belief: technology alone is not enough. Real impact comes from understanding customers' challenges and delivering practical, tailored solutions that drive measurable outcomes. This is how Diverseco continues to lead – empowering businesses to operate smarter, compete stronger and grow with confidence into the future.</p><p>For further information, visit: <a href='https://diverseco.com.au/'>diverseco.com.au</a></p>"},
+            {"title": "Lorch", "body_text": "<p class='sponsor-tier sponsor-tier--silver'>Silver Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/Lorch-e1739917105889-300x157.png' alt='Lorch logo'><p>Lorch South Pacific is a subsidiary of Lorch Schweißtechnik GmbH. Lorch Schweißtechnik GmbH is a leading manufacturer of electric arc welding systems for industrial applications, metalworking, partially automated solutions and robot automation systems. For more than 60 years, Lorch's premium quality systems have been manufactured in Germany at one of the world's most cutting-edge manufacturing plants for welding equipment and exported to more than 60 countries. The welding equipment engineered by Lorch merges first-rate suitability for real-world applications with superior ease of use and outstanding efficiency, setting new technological standards in the marketplace.</p><p>For further information, visit: <a href='https://www.lorch.eu/en_AU'>lorch.eu/en_AU</a></p>"},
+            {"title": "Outsource Institute", "body_text": "<p class='sponsor-tier sponsor-tier--silver'>Silver Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/Outsource-Institute-AUS-Logo.png' alt='Outsource Institute logo'><p>Outsource Institute (AUS), founded in 1998, is an Australian Engineering college, delivering qualifications in Engineering, Welding and specialised trade &amp; technical skills to the Mining, Defence, Manufacturing and Engineering sectors both domestically and internationally.</p><p>Having partnered with industry for over 20 years, Outsource Institute is at the forefront of what skills and knowledge is needed in the metals and engineering sector and makes it their business to deliver it both directly and through industry partnerships with Weld Australia, Custom Fluid Power, SMC Corporation (Australia) Pty Ltd, Workforce Success and RPR Trades. To provide their students with educational pathways post their vocational studies, Outsource Institute has recognition for their courses in the form of articulation pathways with several of Australia's top universities: The University of Queensland, Griffith, Southern Cross, the University of Southern Queensland, and James Cook University.</p><p>For more information, visit <a href='https://outsourceinstitute.edu.au/'>outsourceinstitute.edu.au</a> or call 1300 136 904.</p>"},
+            {"title": "Gentronics", "body_text": "<p class='sponsor-tier sponsor-tier--bronze'>Bronze Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/gentronics-logo.png' alt='Gentronics logo'><p>With a rich legacy dating back to 1982, Gentronics has been dedicated to serving industries just like yours, providing unrivalled expertise and a comprehensive range of welding products, consumables, and industrial supplies. Our mission is to empower you to achieve the best results by offering the finest selection of top-quality products at competitive prices, ensuring you have everything you need to successfully complete your next project.</p><p>At Gentronics, we specialise in Welding Automation, Generators, Engine Driven Welders, Turning Rollers, Positioners, Compressors, Benders, Notchers, and Safety Equipment. Whether you require equipment or consumables for TIG, MIG, MMA, CNC, Inverter MIG, Welding Wire, Filler Rods, Aluminium, Stainless Steel, or even gas cylinders and refills such as Oxygen, Acetylene, and Argon, we are your one-stop solution.</p><p>Our commitment extends beyond merely supplying welding products and equipment. With our Welshpool service centre, we offer comprehensive repair and maintenance services for all your equipment. And to minimise downtime, our team of On-Site Service Technicians is readily available to assist you whenever the job requires it.</p><p>For further information, visit: <a href='https://www.gentronics.com.au/'>gentronics.com.au</a></p>"},
+            {"title": "Nederman", "body_text": "<p class='sponsor-tier sponsor-tier--bronze'>Bronze Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/Nederman_cyan.png' alt='Nederman logo'><p>Nederman is an environmental technology company and a global leader in industrial air filtration dedicated to extracting, transporting and cleaning air to make industrial production more efficient, safe and sustainable. Based on industry leading products, solutions and services in combination with innovative IoT technology, Nederman monitors and optimises performance and validates emissions compliance to protect people, planet and production.</p><p>Whether operating a small welding workshop, field welding or a large scale automated factory, Nederman is dedicated to providing fume extraction solutions that meet your specific requirements. Regardless of the welding method employed, be it robotic, cobot, or manual, effective welding fume extraction is imperative to safeguard welders, sustain productivity, and compliance with rules and regulations.</p><p>For further information, visit: <a href='https://www.nederman.com/'>nederman.com</a></p>"},
+            {"title": "One Gas Australia", "body_text": "<p class='sponsor-tier sponsor-tier--bronze'>Bronze Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/one-gas-logo.png' alt='One Gas Australia logo'><p>Introducing One Gas Australia, a trailblazer in the Industrial &amp; Hospitality Gas industry, committed to revolutionising the business landscape with a unique and inclusive approach.</p><p>Our fundamental philosophy centres around empowering our customers through our ground-breaking NO RENT Cylinder purchase program. By granting complete control and ownership of the cylinders, we empower our customers to treat them as indispensable tools and equipment, just like any other essential asset.</p><p>At One Gas Australia, we set the benchmark for unwavering commitment to innovation, service excellence, and unmatched value for all our esteemed customers. We take pride in spearheading the paradigm shift towards Rent-Free ownership in both the industrial &amp; Hospitality Gas markets.</p><p>For further information, visit: <a href='https://onegasaustralia.com.au/'>onegasaustralia.com.au</a></p>"},
+            {"title": "W.E.S.S", "body_text": "<p class='sponsor-tier sponsor-tier--bronze'>Bronze Sponsor</p><img class='sponsor-logo' src='/hubfs/Awards%20Sponsors%20Logos/WESS-e1739916904261-300x114.png' alt='W.E.S.S logo'><p>Welding Equipment Sales &amp; Service (W.E.S.S.) is the largest Independent Welding Distribution Business in South Australia and is 100% Australian owned. We specialise in everything related to Cutting/Welding and Metal Fabrication. It's what we do and we do it all Sales, Service, Hire &amp; Repair for all major industry brands and provide the expertise to back it all up.</p><p>It's our business to provide solutions with expert independent advice and deliver value added products and services to our customers, no job is too big or small. We strive to deliver the best solution for the job, with the best products, quality and price in South Australia with expert advice, back-up and ongoing support.</p><p>For more information, visit <a href='https://www.wess.com.au/'>wess.com.au</a></p>"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 8  CONTACT METHODS GRID — FURTHER INFORMATION (below Sponsors) ─── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/contact-methods-grid"
+          label="Further Information"
+          section_id="info"
+          background="surface"
+          style="feature"
+          section_heading="Further Information"
+          cards=[
+            {"heading": "Michelle Tagliapietra", "body_text": "<p>Executive General Manager, Sales and Marketing. For further information, simply contact Michelle.</p><p><a href='mailto:m.tagliapietra@weldaustralia.com.au'>m.tagliapietra@weldaustralia.com.au</a><br><a href='tel:0437106726'>0437 106 726</a></p>"}
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 9  CTA BANNER ──────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA"
+          background="primary"
+          align="split"
+          headline="Enter the 2026 Welding Excellence Awards"
+          body_text="<p>Entries close midnight Friday 4 September 2026. Showcase your people and your operations against the best in the Australian welding industry.</p>"
+          cta_label="How to enter"
+          cta_link={"url": {"href": "#enter", "type": "EXTERNAL"}}
+          secondary_cta_label="Register for tickets"
+          secondary_cta_link={"url": {"href": "#tickets", "type": "EXTERNAL"}}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+{% end_dnd_area %}
+{% endblock %}

@@ -1,0 +1,126 @@
+<!--
+  templateType: page
+  label: Find a Member
+  isAvailableForNewContent: true
+-->
+﻿{#
+  find-a-member.html - Find a Member directory
+  URL: /find-a-member/
+  § 3.14 of docs/01-sitemap.md
+
+  Sections:
+    1. Hero with search  - title, intro, prominent search input
+    2. Directory grid    - find-a-member React island (tier-prioritised cards)
+    3. Become a member   - CTA banner
+
+  Modules used: hero, find-a-member, cta-banner
+#}
+{% set page_title_exact = page_meta.html_title | default('Find a Weld Australia Member - Member Directory') %}
+{% set page_description = page_meta.meta_description | default('Search the Weld Australia member directory. Connect with Gold, Silver and Bronze certified welding companies and professionals across Australia.') %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<style>
+  body.is-find-a-member-page .dnd-section:has(.wa-hero-search),
+  body.is-find-a-member-page .dnd-section:has(#find-a-member-hero) {
+    display: none;
+  }
+
+  body.is-find-a-member-page .wa-hero-search {
+    display: none;
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}is-find-a-member-page{% endblock %}
+
+{% block body %}
+{% module "find_member_static_hero"
+  path="../../modules/hero"
+  label="Hero - Find a Member"
+  section_id="find-a-member-hero"
+  background="primary"
+  height="medium"
+  spacing="default"
+  alignment="left"
+  accent_bar=true
+  media_type="none"
+  eyebrow="Member directory"
+  headline="Find a Weld Australia Member"
+  subheadline="<p>Search our directory to connect with certified welding companies and industry professionals across Australia.</p>"
+%}
+
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 1  HERO WITH SEARCH
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero - Find a Member"
+          section_id="find-a-member-hero"
+          background="primary"
+          height="medium"
+          spacing="default"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+          eyebrow="Member directory"
+          headline="Find a Weld Australia Member"
+          subheadline="<p>Search our directory to connect with certified welding companies and industry professionals across Australia.</p>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 2  DIRECTORY GRID - find-a-member React island
+          Gold members appear at the top of every filtered view.
+          Tier-prioritised sort is enforced inside the React component.
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/find-a-member"
+          label="Member directory"
+          section_heading="Member directory"
+          intro="<p>Active Weld Australia members sorted by membership tier. Gold members appear first. Use the filters below to narrow by state or tier.</p>"
+          default_sort="tier"
+          show_state_filter=true
+          show_search=true
+          page_size=24
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 3  BECOME A MEMBER - promotional banner
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Become a member promo"
+          headline="Join Weld Australia and appear in our member directory"
+          body_text="<p>Membership gives your business visibility, credibility, and access to Australia's leading welding community.</p>"
+          cta_label="Explore membership tiers"
+          cta_link={"url": {"href": "/membership/", "type": "EXTERNAL"}}
+          secondary_cta_label="Contact us"
+          secondary_cta_link={"url": {"href": "/contact-us/", "type": "EXTERNAL"}}
+          background="primary"
+          align="split"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

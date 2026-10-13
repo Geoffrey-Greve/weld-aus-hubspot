@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Weld Australia training session location image</title>
+  <desc id="desc">A modern welding training venue with location markers, used as the default image for session cards.</desc>
+  <defs>
+    <linearGradient id="overlay" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101338" stop-opacity="0.14"/>
+      <stop offset="0.58" stop-color="#1c1e4c" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#0055a4" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="bottomFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.28"/>
+    </linearGradient>
+  </defs>
+
+  <image
+    href="https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1266644220%20(2).jpg"
+    x="0"
+    y="0"
+    width="1200"
+    height="675"
+    preserveAspectRatio="xMidYMid slice"
+  />
+  <rect width="1200" height="675" fill="url(#overlay)"/>
+  <rect width="1200" height="675" fill="url(#bottomFade)"/>
+</svg>

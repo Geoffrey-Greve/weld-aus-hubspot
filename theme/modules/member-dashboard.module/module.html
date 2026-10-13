@@ -1,0 +1,497 @@
+{#
+  member-dashboard.module/module.html
+
+  React island: Member portal Command Centre.
+
+  Data flow:
+    1. Reads the logged-in contact's state (for geo-localised events).
+    2. Queries HubDB `events` table for upcoming events matching the contact's
+       state (or National), limited to 5, ordered by event_date ascending.
+    3. Queries HubDB `resources` table for up to 4 non-locked resources
+       (based on contact tier) to surface in the "Resources for you" tile.
+    4. Serialises module fields + HubDB rows into a single JSON props blob.
+    5. The React member-dashboard bundle reads window.__WELD_MEMBER__ for
+       contact/cert data and the data-props for editor-configured tile settings
+       and HubL-serialized collections.
+
+  Note on registered_events and invoices:
+    HubL on HubSpot Pro cannot directly query a contact's associated Deals
+    in a portal page template. These arrays are passed as empty for Phase 1
+    and will be populated via a mid-weight API call or property sync workflow
+    in a later sprint. Both tiles handle the empty state gracefully.
+
+  Build note:
+    The <script> src hash is updated by scripts/build.ts after pnpm build.
+    Always run `pnpm build` before `hs upload`.
+#}
+
+{% set _portal_preview = is_in_editor or request.query_dict.portal_preview == '1' or request.query_dict.hs_preview %}
+{% if not module.members_only or request_contact.is_logged_in or _portal_preview or module.preview_mode %}
+
+{# ── Contact state for geo-event filtering ────────────────────────────── #}
+{# request_contact.state may be stored as an abbreviation ("NSW") or a full   #}
+{# name ("New South Wales"). HubDB event_state uses abbreviations, so map     #}
+{# full names to the abbreviation before querying - otherwise the state query #}
+{# matches nothing and only National events return.                           #}
+{% set contact_state_raw = request_contact.state | default('') %}
+{% if module.preview_mode and not contact_state_raw %}
+  {% set contact_state_raw = 'NSW' %}
+{% endif %}
+{% set state_abbr_map = {
+  'new south wales':    'NSW',
+  'victoria':           'VIC',
+  'queensland':         'QLD',
+  'western australia':  'WA',
+  'south australia':    'SA',
+  'tasmania':           'TAS',
+  'northern territory': 'NT',
+  'australian capital territory': 'ACT'
+} %}
+{% set contact_state_lower = contact_state_raw | lower | trim %}
+{% if state_abbr_map[contact_state_lower] %}
+  {% set contact_state = state_abbr_map[contact_state_lower] %}
+{% else %}
+  {% set contact_state = contact_state_raw | upper | trim %}
+{% endif %}
+
+{# ── Geo-localised events (HubDB) ─────────────────────────────────────── #}
+{# Fetch upcoming events for the contact's state OR National events.         #}
+{# HubDB SELECT filter can't do OR conditions, so we query National events  #}
+{# separately and merge client-side (both arrays passed as props).           #}
+{% set geo_events_state = [] %}
+{% set geo_events_national = [] %}
+{% if contact_state and contact_state != 'NATIONAL' %}
+  {% set geo_events_state = hubdb_table_rows(
+    'events',
+    'event_state__eq=' ~ contact_state ~ '&orderBy=event_date'
+  ) | default([]) %}
+{% endif %}
+{% set geo_events_national = hubdb_table_rows(
+  'events',
+  'event_state__eq=National&orderBy=event_date'
+) | default([]) %}
+
+{# Build unified geo_events array (state-specific first, then national) #}
+{% set ns = namespace(geo_events=[]) %}
+{% for ev in geo_events_state %}
+  {% set ns.geo_events = ns.geo_events + [{
+    'id':              ev.hs_id,
+    'event_name':      ev.event_name      | default(''),
+    'event_type':      ev.event_type.name | default(''),
+    'event_date':      ev.event_date      | default(null),
+    'event_end_date':  ev.event_end_date  | default(null),
+    'event_state':     ev.event_state.name | default(''),
+    'event_location':  ev.event_location  | default(''),
+    'registration_url': ev.registration_url | default(''),
+    'is_members_only': ev.is_members_only | default(false)
+  }] %}
+{% endfor %}
+{% for ev in geo_events_national %}
+  {% set ns.geo_events = ns.geo_events + [{
+    'id':              ev.hs_id,
+    'event_name':      ev.event_name      | default(''),
+    'event_type':      ev.event_type.name | default(''),
+    'event_date':      ev.event_date      | default(null),
+    'event_end_date':  ev.event_end_date  | default(null),
+    'event_state':     ev.event_state.name | default(''),
+    'event_location':  ev.event_location  | default(''),
+    'registration_url': ev.registration_url | default(''),
+    'is_members_only': ev.is_members_only | default(false)
+  }] %}
+{% endfor %}
+
+{# ── Resources for you (HubDB) ────────────────────────────────────────── #}
+{# Fetch up to 4 non-locked public resources as suggested reading.          #}
+{# More sophisticated tier-aware filtering happens in the resource-library  #}
+{# island; here we just surface a quick "recommended for you" subset.       #}
+{% set resource_rows = hubdb_table_rows(
+  'resources',
+  'is_active__eq=true&orderBy=-published_date'
+) | default([]) %}
+
+{# Tier rank for resource locking (mirrors resource-library.module logic).
+
+   Company-aware, through _member-content-gate.html. Both halves of this used to
+   read the contact's OWN record only, so a corporate employee INSIDE THEIR OWN
+   PORTAL landed at rank 0 and saw every member resource locked: `is_active_member`
+   could not see an employer's active status, and the tier chain below could not
+   see an employer's Gold. Their membership lives on the company record and reaches
+   the contact as the mirrored `wa_company_membership_*` properties. Same cause as
+   Ref 72, one floor up.
+
+   (`is_active_member` was also the same comparison twice, or-ed with itself.) #}
+{% import "../../templates/partials/_member-tier.html" as wa_dash_tier %}
+{% include "../../templates/partials/_member-content-gate.html" %}
+{# The employer's tier stands in when the contact carries none of their own. It is
+   never preferred OVER a real contact tier: that ordering belongs to
+   `wa_tier.prefer_pricing_tier`, which prices a course, and this only unlocks a
+   teaser row. #}
+{% set contact_tier       = request_contact.individual_membership_type_2 | default('') %}
+{% if not (wa_dash_tier.is_real_tier(contact_tier) | trim) %}
+  {% set contact_tier = request_contact.wa_company_membership_tier | default('') %}
+{% endif %}
+{% set is_active_member   = wa_member_gate.is_member %}
+{% if module.preview_mode %}
+  {% set contact_tier_rank = 4 %}
+{% elif contact_tier == 'Corporate Gold' %}
+  {% set contact_tier_rank = 4 %}
+{% elif contact_tier == 'Corporate Silver' %}
+  {% set contact_tier_rank = 3 %}
+{% elif contact_tier == 'Corporate Bronze' %}
+  {% set contact_tier_rank = 2 %}
+{% elif is_active_member %}
+  {% set contact_tier_rank = 1 %}
+{% else %}
+  {% set contact_tier_rank = 0 %}
+{% endif %}
+
+{% set ns2 = namespace(resources=[], count=0) %}
+{% for row in resource_rows %}
+  {% if ns2.count < 4 %}
+    {% set req_tier_name = row.required_tier.name | default('') %}
+    {% if req_tier_name == 'gold' %}
+      {% set req_rank = 4 %}
+    {% elif req_tier_name == 'silver' %}
+      {% set req_rank = 3 %}
+    {% elif req_tier_name == 'bronze' %}
+      {% set req_rank = 2 %}
+    {% elif req_tier_name == 'member' %}
+      {% set req_rank = 1 %}
+    {% else %}
+      {% set req_rank = 0 %}
+    {% endif %}
+    {% set is_locked = req_rank > 0 and contact_tier_rank < req_rank %}
+    {% set ns2.resources = ns2.resources + [{
+      'id':        row.hs_id,
+      'title':     row.title           | default(''),
+      'category':  row.category.name   | default(''),
+      'file_type': row.file_type.name  | default(''),
+      'file_url':  row.file_url        | default(''),
+      'locked':    is_locked
+    }] %}
+    {% set ns2.count = ns2.count + 1 %}
+  {% endif %}
+{% endfor %}
+
+{# ── Tile configs: extract custom_cta URLs from link objects ─────────── #}
+{% set ns3 = namespace(tile_data=[]) %}
+{% for tile in module.tiles %}
+  {% set cta_url = tile.custom_cta_link.url.href | default('') %}
+  {% set ns3.tile_data = ns3.tile_data + [{
+    'tile_type':             tile.tile_type,
+    'tile_heading_override': tile.tile_heading_override | default(''),
+    'tile_visible':          tile.tile_visible,
+    'custom_cta_label':      tile.custom_cta_label | default(''),
+    'custom_cta_url':        cta_url
+  }] %}
+{% endfor %}
+
+{# Mock member profiles for the staging-only /member-preview page. #}
+{% set preview_profiles = [] %}
+{% set preview_registered_events = [] %}
+{% set preview_invoices = [] %}
+{% if module.preview_mode %}
+  {% set preview_profiles = [
+    {
+      'contact': {
+        'id': 'preview-individual',
+        'firstName': 'Maya',
+        'lastName': 'Individual',
+        'email': 'maya.individual@example.com',
+        'membershipTier': 'individual',
+        'membershipStatus': 'active',
+        'membershipExpiry': '2027-06-30',
+        'nextCourse': {
+          'name': 'Welding Supervisor - AS1796 Cert 10',
+          'date': '2026-08-20',
+          'location': 'Online'
+        }
+      },
+      'associations': [],
+      'activeContext': 'personal',
+      'certifications': [
+        {
+          'type': 'AS1796 Certificate 10',
+          'status': 'active',
+          'expiry': '2027-06-30',
+          'certificateUrl': '/resources/',
+          'currentStep': null
+        }
+      ],
+      'entitlements': {
+        'canDownloadResources': true,
+        'isPrimaryAdmin': false
+      }
+    },
+    {
+      'contact': {
+        'id': 'preview-corporate-employee',
+        'firstName': 'Noah',
+        'lastName': 'Corporate',
+        'email': 'noah.corporate@example.com',
+        'membershipTier': 'individual',
+        'membershipStatus': 'active',
+        'membershipExpiry': '2027-05-31',
+        'nextCourse': {
+          'name': 'Welding Inspection Fundamentals',
+          'date': '2026-09-14',
+          'location': 'Sydney'
+        }
+      },
+      'associations': [
+        {
+          'companyId': 'preview-company-southern-fabrication',
+          'companyName': 'Southern Fabrication Group',
+          'roleLabel': 'Employee',
+          'tier': 'corporate_silver'
+        }
+      ],
+      'activeContext': 'preview-company-southern-fabrication',
+      'certifications': [
+        {
+          'type': 'Welding Inspector',
+          'status': 'in_progress',
+          'expiry': null,
+          'certificateUrl': null,
+          'currentStep': 'Submit practical logbook'
+        }
+      ],
+      'entitlements': {
+        'canDownloadResources': true,
+        'isPrimaryAdmin': false
+      }
+    },
+    {
+      'contact': {
+        'id': 'preview-corporate-admin',
+        'firstName': 'Ava',
+        'lastName': 'Admin',
+        'email': 'ava.admin@example.com',
+        'membershipTier': 'corporate_gold',
+        'membershipStatus': 'active',
+        'membershipExpiry': '2027-12-31',
+        'nextCourse': {
+          'name': 'ISO 3834 Implementation Workshop',
+          'date': '2026-10-07',
+          'location': 'Melbourne'
+        }
+      },
+      'associations': [
+        {
+          'companyId': 'preview-company-national-weld',
+          'companyName': 'National Weld Systems',
+          'roleLabel': 'Primary Admin',
+          'tier': 'corporate_gold'
+        }
+      ],
+      'activeContext': 'preview-company-national-weld',
+      'certifications': [
+        {
+          'type': 'IIW International Welding Engineer',
+          'status': 'active',
+          'expiry': '2028-02-28',
+          'certificateUrl': '/resources/',
+          'currentStep': null
+        }
+      ],
+      'entitlements': {
+        'canDownloadResources': true,
+        'isPrimaryAdmin': true
+      }
+    },
+    {
+      'contact': {
+        'id': 'preview-industry-supplier',
+        'firstName': 'Leo',
+        'lastName': 'Supplier',
+        'email': 'leo.supplier@example.com',
+        'membershipTier': 'industry_supplier',
+        'membershipStatus': 'active',
+        'membershipExpiry': '2027-09-30',
+        'nextCourse': {
+          'name': null,
+          'date': null,
+          'location': null
+        }
+      },
+      'associations': [
+        {
+          'companyId': 'preview-company-arctech',
+          'companyName': 'ArcTech Supplies',
+          'roleLabel': 'Supplier Admin',
+          'tier': 'industry_supplier'
+        }
+      ],
+      'activeContext': 'preview-company-arctech',
+      'certifications': [],
+      'entitlements': {
+        'canDownloadResources': true,
+        'isPrimaryAdmin': false
+      }
+    },
+    {
+      'contact': {
+        'id': 'preview-apprentice',
+        'firstName': 'Sienna',
+        'lastName': 'Apprentice',
+        'email': 'sienna.apprentice@example.com',
+        'membershipTier': 'apprentice',
+        'membershipStatus': 'active',
+        'membershipExpiry': '2027-12-31',
+        'nextCourse': {
+          'name': 'Introduction to Welding Safety',
+          'date': '2026-08-05',
+          'location': 'Brisbane'
+        }
+      },
+      'associations': [],
+      'activeContext': 'personal',
+      'certifications': [
+        {
+          'type': 'Apprentice CPD',
+          'status': 'in_progress',
+          'expiry': null,
+          'certificateUrl': null,
+          'currentStep': 'Complete online safety module'
+        }
+      ],
+      'entitlements': {
+        'canDownloadResources': true,
+        'isPrimaryAdmin': false
+      }
+    },
+    {
+      'contact': {
+        'id': 'preview-honorary',
+        'firstName': 'Grace',
+        'lastName': 'Honorary',
+        'email': 'grace.honorary@example.com',
+        'membershipTier': 'honorary',
+        'membershipStatus': 'honorary',
+        'membershipExpiry': null,
+        'nextCourse': {
+          'name': null,
+          'date': null,
+          'location': null
+        }
+      },
+      'associations': [],
+      'activeContext': 'personal',
+      'certifications': [
+        {
+          'type': 'Lifetime Recognition',
+          'status': 'active',
+          'expiry': null,
+          'certificateUrl': null,
+          'currentStep': null
+        }
+      ],
+      'entitlements': {
+        'canDownloadResources': true,
+        'isPrimaryAdmin': false
+      }
+    },
+    {
+      'contact': {
+        'id': 'preview-lapsed',
+        'firstName': 'Oliver',
+        'lastName': 'Lapsed',
+        'email': 'oliver.lapsed@example.com',
+        'membershipTier': 'individual',
+        'membershipStatus': 'lapsed',
+        'membershipExpiry': '2026-05-31',
+        'nextCourse': {
+          'name': null,
+          'date': null,
+          'location': null
+        }
+      },
+      'associations': [],
+      'activeContext': 'personal',
+      'certifications': [
+        {
+          'type': 'Welding Supervisor',
+          'status': 'expired',
+          'expiry': '2026-05-31',
+          'certificateUrl': null,
+          'currentStep': 'Renew membership to access recertification support'
+        }
+      ],
+      'entitlements': {
+        'canDownloadResources': false,
+        'isPrimaryAdmin': false
+      }
+    }
+  ] %}
+  {% set preview_registered_events = [
+    {
+      'deal_id': 'preview-event-webinar',
+      'event_name': 'Member Technical Update Webinar',
+      'event_date': '2026-08-18',
+      'event_location': 'Online',
+      'zoom_url': '#',
+      'ical_url': '#'
+    },
+    {
+      'deal_id': 'preview-event-briefing',
+      'event_name': 'Industry Drinks Night',
+      'event_date': '2026-09-03',
+      'event_location': 'Sydney',
+      'zoom_url': null,
+      'ical_url': '#'
+    }
+  ] %}
+  {% set preview_invoices = [
+    {
+      'deal_id': 'preview-invoice-membership',
+      'deal_name': 'Corporate Gold Membership Renewal',
+      'invoice_date': '2026-07-01',
+      'amount_display': '$3,300.00',
+      'pdf_url': null
+    },
+    {
+      'deal_id': 'preview-invoice-course',
+      'deal_name': 'Welding Supervisor - AS1796 Cert 10',
+      'invoice_date': '2026-06-24',
+      'amount_display': '$6,435.00',
+      'pdf_url': null
+    }
+  ] %}
+{% endif %}
+
+{# ── Compose props blob ───────────────────────────────────────────────── #}
+{# Issue 34: renewal defaults to /membership/join/ (pay), not /membership/
+   (marketing). Do not put HubL comments inside dict literals - HubSpot's
+   validator then misreports the outer members_only if as a missing endif. #}
+{% set island_props = {
+  'welcome_message':    module.welcome_message | default('Welcome back, {firstname}'),
+  'expiry_warning_days': module.expiry_warning_days | int | default(60),
+  'tiles':              ns3.tile_data,
+  'renewal_url':        module.renewal_link.url.href | default('/membership/join/'),
+  'support_email':      module.support_email | default('office@weldaustralia.com.au'),
+  'member_state':       contact_state,
+  'geo_events':         ns.geo_events,
+  'registered_events':  preview_registered_events,
+  'invoices':           preview_invoices,
+  'resources_for_you':  ns2.resources,
+  'preview_profiles':   preview_profiles
+} %}
+
+{# ── Section wrapper + React mount point ─────────────────────────────── #}
+<section
+  class="wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }} wa-dashboard-section"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    <div
+      data-wa-module="member-dashboard"
+      data-props="{{ island_props | tojson | escape }}"
+    ></div>
+  </div>
+</section>
+
+{# Script tag - hash updated by scripts/build.ts after pnpm build. #}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/js/assets/member-dashboard.standalone.css') }}">
+<script type="module" src="{{ get_asset_url('../../assets/js/member-dashboard.standalone.js') }}"></script>
+
+{% endif %}

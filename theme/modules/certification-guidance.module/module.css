@@ -1,0 +1,10 @@
+/*
+ * certification-guidance.module/module.css
+ *
+ * Minimal shell - the React island (CertificationGuidance.css) handles
+ * its own component styles. This file scopes the section wrapper only.
+ */
+
+.wa-cert-guidance-section .container {
+  max-width: 860px;
+}

@@ -1,0 +1,224 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "Surface (default light)"
+      ],
+      [
+        "surface_alt",
+        "Alt surface (subtle grey)"
+      ],
+      [
+        "primary",
+        "Primary (brand colour)"
+      ],
+      [
+        "primary_dark",
+        "Primary dark"
+      ],
+      [
+        "transparent",
+        "Transparent"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact (32px)"
+      ],
+      [
+        "default",
+        "Default (64px)"
+      ],
+      [
+        "spacious",
+        "Spacious (96px)"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text",
+    "default": "What our members say"
+  },
+  {
+    "name": "layout",
+    "label": "Layout",
+    "type": "choice",
+    "choices": [
+      [
+        "spotlight",
+        "Spotlight - sidebar selector"
+      ],
+      [
+        "grid",
+        "Grid - card layout"
+      ]
+    ],
+    "default": "spotlight"
+  },
+  {
+    "name": "moving_items",
+    "label": "Moving company items",
+    "type": "group",
+    "help_text": "Company names shown in the moving row above the testimonials. Add, remove, or reorder items here.",
+    "occurrence": {
+      "min": 0,
+      "max": 30,
+      "default": 10
+    },
+    "default": [
+      { "company_name": "BlueScope Steel" },
+      { "company_name": "BHP" },
+      { "company_name": "Monadelphous" },
+      { "company_name": "CPB Contractors" },
+      { "company_name": "Civmec" },
+      { "company_name": "Clough" },
+      { "company_name": "UGL" },
+      { "company_name": "GHD" },
+      { "company_name": "Thiess" },
+      { "company_name": "Lendlease" }
+    ],
+    "children": [
+      {
+        "name": "company_name",
+        "label": "Company name",
+        "type": "text",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "name": "testimonials",
+    "label": "Testimonials",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 20,
+      "default": 1
+    },
+    "children": [
+      {
+        "name": "quote",
+        "label": "Quote",
+        "type": "richtext",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "name_text",
+        "label": "Name",
+        "type": "text"
+      },
+      {
+        "name": "role",
+        "label": "Role",
+        "type": "text"
+      },
+      {
+        "name": "company",
+        "label": "Company",
+        "type": "text"
+      },
+      {
+        "name": "photo",
+        "label": "Photo",
+        "type": "image"
+      },
+      {
+        "name": "initials",
+        "label": "Initials",
+        "type": "text",
+        "help_text": "2-letter fallback if no photo, e.g. JO"
+      },
+      {
+        "name": "tier",
+        "label": "Member tier badge",
+        "type": "choice",
+        "choices": [
+          [
+            "",
+            "None"
+          ],
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "silver",
+            "Silver"
+          ],
+          [
+            "bronze",
+            "Bronze"
+          ]
+        ],
+        "default": ""
+      }
+    ]
+  },
+  {
+    "name": "autoplay",
+    "label": "Autoplay",
+    "type": "boolean",
+    "default": true
+  }
+]

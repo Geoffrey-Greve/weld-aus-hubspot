@@ -1,0 +1,93 @@
+{#
+  events-feature-links.module/module.html
+
+  Permanent feature links for the Events page. Server-rendered (no React island).
+
+  Each item in the `features` group renders as a card ONLY when it has a link href.
+  This is how "coming soon" features (e.g. the National Manufacturing Summit) stay
+  hidden until a URL is entered, while live features (e.g. the Welding Excellence
+  Awards, defaulting to /awards/) are shown. If no feature has a link, the whole
+  section is omitted so the page never shows an empty block.
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{# Collect only the features that have both a title and a resolvable link href. #}
+{% set _features = namespace(items=[]) %}
+{% for feature in module.features %}
+  {% set _href = feature.link.url.href | default('', true) | trim %}
+  {% if _href and (feature.title | default('', true) | trim) %}
+    {% set _features.items = _features.items + [feature] %}
+  {% endif %}
+{% endfor %}
+
+{% if _features.items | length > 0 %}
+{% set _bg  = module.background | default('surface_alt') %}
+{% set _sp  = module.spacing | default('spacious') %}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _section_classes = 'wa-events-features wa-section wa-section--bg-' ~ _bg ~ ' wa-section--spacing-' ~ _sp %}
+{% if 'mobile' not in _vis %}{% set _section_classes = _section_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _section_classes = _section_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _section_classes = _section_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+<section
+  class="{{ _section_classes }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+    {% if module.eyebrow or module.heading or module.intro %}
+    <div class="wa-events-features__head">
+      {% if module.eyebrow %}
+        <p class="wa-events-features__eyebrow">{{ module.eyebrow }}</p>
+      {% endif %}
+      {% if module.heading %}
+        <h2 class="wa-events-features__heading">{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+        <div class="wa-events-features__intro wa-richtext">{{ module.intro }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <ul class="wa-events-features__grid" role="list">
+      {% for feature in _features.items %}
+        {% set _href = feature.link.url.href | default('', true) | trim %}
+        {% set _new_tab = feature.link.open_in_new_tab | default(false) %}
+        {% set _cta = feature.cta_label | default('Learn more', true) %}
+        <li class="wa-events-features__item">
+          <article class="wa-events-features__card">
+            {% if feature.image and feature.image.src %}
+            <div class="wa-events-features__media">
+              <img
+                class="wa-events-features__img"
+                src="{{ feature.image.src|escape_url }}"
+                alt="{{ feature.image.alt | default(feature.title, true)|escape_attr }}"
+                loading="lazy"
+              >
+            </div>
+            {% endif %}
+            <div class="wa-events-features__body">
+              {% if feature.badge %}
+                <span class="wa-events-features__badge">{{ feature.badge }}</span>
+              {% endif %}
+              <h3 class="wa-events-features__title">{{ feature.title }}</h3>
+              {% if feature.description %}
+                <div class="wa-events-features__desc wa-richtext">{{ feature.description }}</div>
+              {% endif %}
+              <div class="wa-events-features__actions">
+                <a
+                  class="btn btn-primary wa-events-features__cta"
+                  href="{{ _href }}"
+                  {% if _new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                >{{ _cta }}</a>
+              </div>
+            </div>
+          </article>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% endif %}

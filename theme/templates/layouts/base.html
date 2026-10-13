@@ -1,0 +1,165 @@
+<!--
+  templateType: none
+-->
+{#
+  base.html - Root layout for all Weld Australia public pages.
+
+  Child templates extend this with:
+    {% extends "./layouts/base.html" %}
+    {% block body %}…{% endblock %}
+
+  Optional child blocks:
+    extra_head       - additional <head> content (styles, meta)
+    body_class       - extra classes on <body>
+    site_header      - override entire header region
+    portal_nav       - secondary portal sub-nav (empty here; portal.html fills it)
+    body             - page body content
+    pre_footer_accent - brand accent line before the global footer
+    site_footer      - override entire footer region
+#}
+<!doctype html>
+<html lang="en-AU">
+<head>
+  {% include "../partials/_head.html" %}
+  {{ standard_header_includes }}
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="wa-body{% if request_contact.is_logged_in %} is-logged-in{% endif %} {% block body_class %}{% endblock %}">
+
+  {# ── Skip to content - must be first focusable element ─────────────────── #}
+  <a class="skip-to-content" href="#main-content">Skip to main content</a>
+
+  {# ── GTM noscript - only rendered if GTM container is configured ────────── #}
+  {% if theme.analytics and theme.analytics.gtm_container_id %}
+  <noscript>
+    <iframe
+      src="https://www.googletagmanager.com/ns.html?id={{ theme.analytics.gtm_container_id }}"
+      height="0"
+      width="0"
+      style="display:none;visibility:hidden"
+      title="Google Tag Manager"
+      aria-hidden="true"
+    ></iframe>
+  </noscript>
+  {% endif %}
+
+  {# ── Site header ─────────────────────────────────────────────────────────── #}
+  {% block site_header %}
+    {# Header refresh marker: resources-news-link. #}
+    {% include "../partials/header.html" %}
+  {% endblock %}
+
+  {# ── Portal sub-nav (empty slot - filled by portal.html) ────────────────── #}
+  {% block portal_nav %}{% endblock %}
+
+  {# ── Main content ────────────────────────────────────────────────────────── #}
+  <main id="main-content" tabindex="-1">
+    {% block body %}{% endblock %}
+  </main>
+
+  {# ── Site footer ─────────────────────────────────────────────────────────── #}
+  {% block pre_footer_accent %}
+    {% set _brand_line_context = 'footer' %}
+    {% set _brand_line_class = '' %}
+    {% include "../partials/brand-line.html" %}
+  {% endblock %}
+
+  {% block site_footer %}
+    {% include "../partials/footer.html" %}
+  {% endblock %}
+
+  {#
+    Auth-page native HubSpot form cleanup.
+    HubSpot Private Content widgets can render global status/error placeholders
+    as empty <label> elements. They are not field labels, so normalize only
+    those auth status placeholders into status/alert containers before tools
+    such as WAVE scan the page.
+  #}
+  <script>
+    (function () {
+      if (!document.body || !document.body.classList.contains('is-auth-page')) return;
+
+      var selector = 'label.hs-membership-global-error, label.hs-membership-global-message';
+
+      function normalizeStatusLabel(label) {
+        if (!label || label.tagName !== 'LABEL' || label.getAttribute('for') || !label.parentNode) return;
+
+        var replacement = document.createElement('div');
+        for (var i = 0; i < label.attributes.length; i++) {
+          var attr = label.attributes[i];
+          if (attr.name !== 'for') {
+            replacement.setAttribute(attr.name, attr.value);
+          }
+        }
+
+        var isError = label.classList.contains('hs-membership-global-error') || label.classList.contains('hs-error-msg');
+        replacement.setAttribute('role', isError ? 'alert' : 'status');
+        replacement.setAttribute('aria-live', isError ? 'assertive' : 'polite');
+
+        while (label.firstChild) {
+          replacement.appendChild(label.firstChild);
+        }
+
+        if (!replacement.textContent.trim()) {
+          replacement.hidden = true;
+          replacement.setAttribute('aria-hidden', 'true');
+        }
+
+        label.parentNode.replaceChild(replacement, label);
+      }
+
+      function scanStatusLabels() {
+        var labels = document.querySelectorAll(selector);
+        for (var i = 0; i < labels.length; i++) {
+          normalizeStatusLabel(labels[i]);
+        }
+      }
+
+      scanStatusLabels();
+
+      if ('MutationObserver' in window) {
+        var observer = new MutationObserver(scanStatusLabels);
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+      }
+    }());
+  </script>
+
+  {#
+    ── Inline-SVG icon repaint nudge ────────────────────────────────────────
+    Works around a Blink (Chrome/Android) paint-invalidation bug where inline
+    <svg> icons that fill/stroke with `currentColor` render blank after the page
+    is restored from the back-forward cache or brought back to the foreground
+    (i.e. after tapping a link/icon and returning). We force a single-frame
+    repaint of every inline icon so the SVG subtree is re-painted with its fill.
+    Cheap, self-clearing, no dependencies. See bugs/qa-log.md (icons-blank-on-click).
+  #}
+  <script>
+    (function () {
+      function repaintIcons() {
+        var svgs = document.querySelectorAll('a svg, button svg');
+        for (var i = 0; i < svgs.length; i++) {
+          var s = svgs[i];
+          var prev = s.style.transform;
+          s.style.transform = (prev ? prev + ' ' : '') + 'translateZ(0)';
+          // Force a reflow so the transform is applied, then restore next frame.
+          void s.getBoundingClientRect();
+          (function (el, original) {
+            requestAnimationFrame(function () { el.style.transform = original; });
+          })(s, prev);
+        }
+      }
+      window.addEventListener('pageshow', function (e) { if (e.persisted) repaintIcons(); });
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') repaintIcons();
+      });
+    }());
+  </script>
+
+  {# ── HubSpot required footer includes (tracking, preview bar) ───────────── #}
+  {{ standard_footer_includes }}
+
+</body>
+</html>

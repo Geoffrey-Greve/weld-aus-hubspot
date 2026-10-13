@@ -1,0 +1,729 @@
+/* course-timetable-filter.module/module.css
+   Section-level layout styles that complement the React island's own CSS.
+   Token-aware - uses --wa-* custom properties from the theme. */
+
+.wa-section__heading {
+  margin-bottom: var(--wa-space-6, 24px);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Training page course-card fallback. Mirrors featured-courses.module styles because the saved /training page instance still uses this module wrapper. */
+/* ============================================================
+   featured-courses - mockup-aligned course cards
+   Image-led cards based on Training.zip / Weld Australia - Training Page.html.
+   CSS class prefix: wa-fc
+   ============================================================ */
+
+.wa-fc__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.wa-fc__header-copy {
+  max-width: 52rem;
+}
+
+.wa-fc__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  color: var(--wa-color-magenta, #ed128d);
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.wa-fc__eyebrow::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  flex: 0 0 24px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.wa-fc__heading {
+  font-family: var(--wa-font-heading, 'Poppins', system-ui, sans-serif);
+  color: var(--wa-color-primary, #1c1e4c);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-align: left;
+  margin: 0;
+}
+
+.wa-fc__count {
+  margin: 0 0 0.25rem;
+  color: #5b6770;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.wa-fc__controls {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 36px;
+}
+
+.wa-fc__search {
+  position: relative;
+  display: block;
+  max-width: 340px;
+}
+
+.wa-fc__search > .wa-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.wa-fc__search svg {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  color: #6f757e;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.wa-fc__search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px 0 42px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 999px;
+  background: #fff;
+  color: #1a1a1a;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.wa-fc__search input:focus-visible,
+.wa-fc__filter:focus-visible {
+  outline: 3px solid color-mix(in srgb, #1c1e4c 32%, transparent);
+  outline-offset: 2px;
+}
+
+.wa-fc__search input::placeholder {
+  color: #6f757e;
+}
+
+.wa-fc__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.wa-fc__filter {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 18px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 9999px;
+  background: #fff;
+  color: #1a1a1a;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.wa-fc__filter span {
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+.wa-fc__filter-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.wa-fc__filter-dot--inspector {
+  color: #1a5c9e;
+}
+
+.wa-fc__filter-dot--supervision {
+  color: #1c1e4c;
+}
+
+.wa-fc__filter-dot--certification {
+  color: #1f8a4d;
+}
+
+.wa-fc__filter-dot--appreciation {
+  color: #ed128d;
+}
+
+.wa-fc__filter:hover {
+  transform: translateY(-1px);
+  border-color: rgba(28, 30, 76, 0.35);
+  box-shadow: 0 3px 10px rgba(28, 30, 76, 0.08);
+}
+
+.wa-fc__filter.is-active {
+  border-color: #1c1e4c;
+  background: #1c1e4c;
+  color: #fff;
+}
+
+.wa-fc__filter.is-active .wa-fc__filter-dot {
+  color: #fff;
+}
+
+@media (max-width: 720px) {
+  .wa-fc__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .wa-fc__search {
+    max-width: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .wa-fc__controls {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    align-items: start;
+  }
+
+  .wa-fc__filters {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .wa-fc__search {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: none;
+  }
+}
+
+.wa-fc__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 700px) {
+  .wa-fc__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .wa-fc__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wa-fc__grid-item {
+  display: flex;
+  min-width: 0;
+}
+
+.wa-fc__grid-item[hidden] {
+  display: none !important;
+}
+
+.wa-fc__card {
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #dde0e5;
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  transition:
+    box-shadow 200ms ease,
+    transform 200ms ease,
+    border-color 200ms ease;
+}
+
+.wa-fc__card:hover {
+  border-color: rgba(28, 30, 76, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+}
+
+.wa-fc__card--sold-out,
+.wa-fc__card--cancelled,
+.wa-fc__card--closed {
+  opacity: 0.78;
+}
+
+.wa-fc__media {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, #1c1e4c, #0055a4);
+}
+
+.wa-fc__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 400ms ease;
+}
+
+.wa-fc__card:hover .wa-fc__image {
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-fc__card,
+  .wa-fc__image {
+    transition: none;
+  }
+
+  .wa-fc__card:hover {
+    transform: none;
+  }
+
+  .wa-fc__card:hover .wa-fc__image {
+    transform: none;
+  }
+}
+
+.wa-fc__image--placeholder {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(237, 18, 141, 0.22), transparent 30%),
+    linear-gradient(135deg, #1c1e4c, #0055a4);
+}
+
+.wa-fc__media-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 55%);
+}
+
+.wa-fc__badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  z-index: 1;
+}
+
+.wa-fc__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.wa-fc__badge--inspection,
+.wa-fc__badge--engineering {
+  background: #dbeafe;
+  color: #1a5c9e;
+}
+
+.wa-fc__badge--supervision,
+.wa-fc__badge--general {
+  background: #edf0f4;
+  color: #1c1e4c;
+}
+
+.wa-fc__badge--appreciation {
+  background: #fff7ed;
+  color: #c97e10;
+}
+
+.wa-fc__badge--certification {
+  background: #dcfce7;
+  color: #1f8a4d;
+}
+
+.wa-fc__badge--free {
+  background: #1f8a4d;
+  color: #fff;
+}
+
+.wa-fc__badge--status {
+  color: #fff;
+}
+
+.wa-fc__status-badge--sold-out {
+  background: var(--wa-color-danger, #dc2626);
+}
+
+.wa-fc__status-badge--cancelled {
+  background: #5b6770;
+}
+
+/* Ref 74c - registrations shut by hand on an upcoming session. */
+.wa-fc__status-badge--closed {
+  background: #b45309;
+}
+
+.wa-fc__location,
+.wa-fc__date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: -2px 0 0;
+  color: #5b6770;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.wa-fc__date-icon {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.75;
+  flex: 0 0 auto;
+}
+
+.wa-fc__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px 0;
+}
+
+.wa-fc__delivery {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 21px;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+.wa-fc__delivery--online {
+  background: #dbeafe;
+  color: #0055a4;
+}
+
+.wa-fc__delivery--face-to-face {
+  background: #dcfce7;
+  color: #1f8a4d;
+}
+
+.wa-fc__delivery--blended {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.wa-fc__delivery--in-house {
+  background: #fff7ed;
+  color: #c97e10;
+}
+
+.wa-fc__delivery--other {
+  background: #f1f5f9;
+  color: #5b6770;
+}
+
+.wa-fc__card-title {
+  margin: 0;
+  color: #1c1e4c;
+  font-family: var(--wa-font-heading, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.38;
+}
+
+.wa-fc__card-title-link {
+  color: inherit;
+  text-decoration: none !important;
+}
+
+.wa-fc__card-title-link:hover {
+  color: #0055a4;
+  text-decoration: underline;
+}
+
+.wa-fc__summary {
+  margin: 0;
+  color: #5b6770;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 12px;
+  line-height: 1.68;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wa-fc__standards {
+  margin: 0;
+  color: #98a2ae;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+.wa-fc__seats {
+  margin: 0;
+  color: #c97e10;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.wa-fc__pricing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.25rem;
+}
+
+.wa-fc__price {
+  color: #1c1e4c;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.wa-fc__price--member,
+.wa-fc__price-note {
+  color: #1f8a4d;
+}
+
+.wa-fc__price--struck {
+  color: #7a8591;
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+.wa-fc__price-label,
+.wa-fc__price-note {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.wa-fc__actions {
+  display: flex;
+  gap: 8px;
+  padding: 14px 18px 16px;
+}
+
+.wa-fc__action {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.wa-fc__action:hover {
+  transform: translateY(-1px);
+}
+
+.wa-fc__action--outline {
+  background: transparent;
+  color: #1c1e4c;
+  border: 1.5px solid #1c1e4c;
+}
+
+.wa-fc__action--outline:hover {
+  background: rgba(28, 30, 76, 0.06);
+}
+
+.wa-fc__action--primary {
+  background: #1c1e4c;
+  color: #fff !important;
+  border: 1.5px solid #1c1e4c;
+}
+
+.wa-fc__action--primary:hover {
+  background: #101338;
+  color: #fff !important;
+  border-color: #101338;
+}
+
+.wa-fc__action--primary:focus,
+.wa-fc__action--primary:focus-visible,
+.wa-fc__action--primary:active,
+.wa-fc__action--primary:visited {
+  color: #fff !important;
+}
+
+.wa-fc__action--disabled {
+  color: #7a8591;
+  background: #eef1f4;
+  border: 1.5px solid #d8dde3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.wa-fc__action-icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wa-btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.wa-fc__empty {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2rem;
+  border: 1px solid #dde0e5;
+  border-radius: 16px;
+  color: #5b6770;
+  text-align: center;
+  background: #fff;
+}
+
+.wa-fc__empty[hidden] {
+  display: none !important;
+}
+
+.wa-fc__pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-block-start: 32px;
+}
+
+.wa-fc__pagination[hidden] {
+  display: none !important;
+}
+
+.wa-fc__pagination-btn {
+  min-width: 42px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1.5px solid #dde0e5;
+  border-radius: 999px;
+  background: #fff;
+  color: #1c1e4c;
+  cursor: pointer;
+  font-family: var(--wa-font-body, 'Poppins', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.wa-fc__pagination-btn:hover:not(:disabled),
+.wa-fc__pagination-btn:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #1c1e4c;
+}
+
+.wa-fc__pagination-btn.is-active {
+  border-color: #1c1e4c;
+  background: #1c1e4c;
+  color: #fff;
+}
+
+.wa-fc__pagination-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.wa-fc__view-all {
+  display: flex;
+  justify-content: center;
+  margin-block-start: 2rem;
+}
+
+@media (max-width: 390px) {
+  .wa-fc__actions {
+    flex-direction: column;
+  }
+}

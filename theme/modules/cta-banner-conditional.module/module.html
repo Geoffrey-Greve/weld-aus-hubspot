@@ -1,0 +1,117 @@
+{#
+  cta-banner-conditional.module/module.html
+
+  Same layout as cta-banner.module but wraps the entire section in a
+  visitor-state gate driven by contact.individual_membership_status
+  (from Ollie's CRM properties - CLAUDE.md § 8.2).
+
+  Visitor states:
+    all             - always render
+    non_members     - render when NOT an active/grace member
+    lapsed_members  - render when status is "Lapsed"
+    active_members  - render when status is "Active" or "Grace Period"
+
+  Defensive: if the property doesn't exist yet in sandbox,
+  individual_membership_status defaults to '' which is treated as non_member.
+
+  Fields (extends cta-banner fields):
+    module.visitor_state         - "all" | "non_members" | "lapsed_members" | "active_members"
+    ... all cta-banner fields
+#}
+
+{# ── Resolve membership state ───────────────────────────────────────────────── #}
+{% set _status = request_contact.individual_membership_status | default('') %}
+{% set _is_logged_in = request_contact.is_logged_in | default(false) %}
+
+{# Classify visitor into one of three buckets #}
+{% set _is_active  = _status in ['Current'] %}
+{% set _is_lapsed  = _status == 'Lapsed' %}
+{% set _is_non_mem = not _is_active and not _is_lapsed %}
+{% set _is_resources_page = request.path == '/resources' or request.path == '/resources/' %}
+{% set _visitor_state = module.visitor_state | default('non_members') %}
+{% if _is_resources_page %}
+  {% set _visitor_state = 'logged_out' %}
+{% endif %}
+
+{# ── Visitor-state gate ─────────────────────────────────────────────────────── #}
+{% set _show = false %}
+{% if _visitor_state == 'all' %}
+  {% set _show = true %}
+{% elif _visitor_state == 'logged_out' and not _is_logged_in %}
+  {% set _show = true %}
+{% elif _visitor_state == 'active_members' and _is_active %}
+  {% set _show = true %}
+{% elif _visitor_state == 'lapsed_members' and _is_lapsed %}
+  {% set _show = true %}
+{% elif _visitor_state == 'non_members' and _is_non_mem %}
+  {% set _show = true %}
+{% endif %}
+
+{# ── Members-only field also gates (secondary guard) ───────────────────────── #}
+{% if module.members_only and not _is_active %}
+  {% set _show = false %}
+{% endif %}
+
+{% if _show %}
+
+{# ── Visibility classes ─────────────────────────────────────────────────────── #}
+{% set _vis = module.visibility | default(['mobile', 'tablet', 'desktop']) %}
+{% set _vis_classes = '' %}
+{% if 'mobile' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-mobile' %}{% endif %}
+{% if 'tablet' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-tablet' %}{% endif %}
+{% if 'desktop' not in _vis %}{% set _vis_classes = _vis_classes ~ ' wa-hide-desktop' %}{% endif %}
+
+{# ── Image modifier ─────────────────────────────────────────────────────────── #}
+{% set _align = module.align | default('centered') %}
+{% if _is_resources_page %}{% set _align = 'split' %}{% endif %}
+{% set _bg = module.background | default('primary') %}
+{% set _dark = _bg in ['primary', 'primary_dark'] %}
+{% set _btn_primary = 'btn-gold' if _dark else 'btn-primary' %}
+{% set _btn_secondary = 'btn-white-outline' if _dark else 'btn-navy-outline' %}
+{% set _section_id = module.section_id | default('') %}
+{% if _is_resources_page and not _section_id %}{% set _section_id = 'resources-membership-cta' %}{% endif %}
+{% set _eyebrow = module.eyebrow | default('') %}
+{% if _is_resources_page and not _eyebrow %}{% set _eyebrow = 'Member resources' %}{% endif %}
+
+{% set _img_mod = '' %}
+{% if module.image and module.image.src and module.image_position != 'none' %}
+  {% set _img_mod = ' wa-cta-banner--has-image wa-cta-banner--image-' ~ module.image_position %}
+{% endif %}
+
+{% set _primary_cta_href = module.cta_link.url.href | default('#') | trim %}
+{% set _secondary_cta_href = module.secondary_cta_link.url.href | default('#') | trim %}
+{% set _primary_cta_is_direct = _primary_cta_href[0:4] | lower == 'tel:' or _primary_cta_href[0:7] | lower == 'mailto:' %}
+{% set _secondary_cta_is_direct = _secondary_cta_href[0:4] | lower == 'tel:' or _secondary_cta_href[0:7] | lower == 'mailto:' %}
+
+{# Shared CTA banner renderer. Conditional/gating logic stays in this module. #}
+{% set _cta_banner_align = _align %}
+{% set _cta_banner_bg = _bg %}
+{% set _cta_banner_spacing = module.spacing | default('default') %}
+{% set _cta_banner_vis_classes = _vis_classes %}
+{% set _cta_banner_img_mod = _img_mod %}
+{% set _cta_banner_extra_classes = 'wa-cta-banner--conditional' %}
+{% set _cta_banner_section_id = _section_id %}
+{% set _cta_banner_visitor_state = _visitor_state %}
+{% set _cta_banner_eyebrow = _eyebrow %}
+{% set _cta_banner_headline = module.headline %}
+{% set _cta_banner_body = module.body_text %}
+{% set _cta_banner_image = module.image %}
+{% set _cta_banner_image_position = module.image_position | default('right') %}
+{% set _cta_banner_primary_label = module.cta_label %}
+{% set _cta_banner_primary_href = _primary_cta_href %}
+{% set _cta_banner_primary_is_direct = _primary_cta_is_direct %}
+{% set _cta_banner_primary_open_in_new_tab = module.cta_link.open_in_new_tab %}
+{% set _cta_banner_primary_class = _btn_primary %}
+{% set _cta_banner_secondary_label = module.secondary_cta_label %}
+{% set _cta_banner_secondary_href = _secondary_cta_href %}
+{% set _cta_banner_secondary_is_direct = _secondary_cta_is_direct %}
+{% set _cta_banner_secondary_open_in_new_tab = module.secondary_cta_link.open_in_new_tab %}
+{% set _cta_banner_secondary_class = _btn_secondary %}
+{% set _cta_banner_tertiary_label = '' %}
+{% set _cta_banner_tertiary_href = '#' %}
+{% set _cta_banner_tertiary_is_direct = false %}
+{% set _cta_banner_tertiary_open_in_new_tab = false %}
+
+{% include "../../templates/partials/cta-banner.html" %}
+
+{% endif %}{# end visitor-state gate #}

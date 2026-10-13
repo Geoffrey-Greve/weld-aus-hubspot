@@ -1,0 +1,14 @@
+{
+  "label": "News Mention List",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Curated list of media mentions showing publication logo, headline, date and external link.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["news", "media", "press", "mentions"]
+}

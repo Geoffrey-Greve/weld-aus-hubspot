@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Header primary nav - width fixture</title>
+  <!--
+    Issue 54 fixture.
+
+    a11y/header.html deliberately uses simplified `wa-nav` markup for the
+    landmark/axe checks. That is why it never caught this defect: the real
+    header is header.module, whose desktop nav is a nowrap flex list sitting
+    between a fixed-width logo and a non-shrinking actions group, and none of
+    that geometry existed in the fixture.
+
+    This fixture mirrors the REAL class names and the real module.css so
+    header-nav.spec.ts can measure the actual layout. The item labels match the
+    fallback menu in header.module/module.html - the seven top-level entries
+    rendered when no HubSpot menu is attached. Keep them in step: the 1120px
+    desktop breakpoint was measured against exactly this menu.
+  -->
+  <link rel="stylesheet" href="/theme/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/theme/assets/css/base.css" />
+  <link rel="stylesheet" href="/theme/modules/header.module/module.css" />
+  <style>
+    /*
+      Poppins has to be declared here. In production the @font-face rules live in
+      theme/templates/partials/_fonts.html and use HubL get_asset_url(), which a
+      static fixture cannot evaluate - so without this the nav renders in the
+      container's default sans-serif and every width measurement is a measurement
+      of the wrong font. The .ttf files are in-repo, so loading them directly
+      makes this fixture both production-accurate and identical on every machine,
+      which is what lets the breakpoint assertions be stable in CI.
+
+      Only the two weights the nav actually uses: 500 for the links, 700 for the
+      member CTA.
+    */
+    @font-face {
+      font-family: 'Poppins';
+      src: url('/theme/assets/fonts/Poppins-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Poppins';
+      src: url('/theme/assets/fonts/Poppins-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: block;
+    }
+    body { margin: 0; }
+    /* Stands in for the inline SVG logo, which is a fixed-size flex item. */
+    .wa-nav-bar__logo { width: 150px; height: 44px; background: #333; flex: 0 0 auto; }
+  </style>
+</head>
+<body>
+  <header class="wa-site-header">
+    <div class="wa-nav-bar">
+      <div class="wa-nav-bar__inner">
+        <a class="wa-nav-bar__logo" href="/" aria-label="Weld Australia - home"></a>
+
+        <nav class="wa-primary-nav" id="wa-primary-nav" aria-label="Primary navigation">
+          <ul class="wa-primary-nav__list" role="list">
+            <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+              <button class="wa-primary-nav__link wa-primary-nav__link--parent" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="d1">Membership<svg class="wa-primary-nav__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <ul class="wa-nav-dropdown" id="d1" role="list" aria-label="Membership submenu">
+                <li class="wa-nav-dropdown__item"><a href="/membership" class="wa-nav-dropdown__link">Membership overview</a></li>
+              </ul>
+            </li>
+            <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+              <button class="wa-primary-nav__link wa-primary-nav__link--parent" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="d2">Training<svg class="wa-primary-nav__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <ul class="wa-nav-dropdown" id="d2" role="list" aria-label="Training submenu">
+                <li class="wa-nav-dropdown__item"><a href="/training" class="wa-nav-dropdown__link">Training overview</a></li>
+              </ul>
+            </li>
+            <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+              <button class="wa-primary-nav__link wa-primary-nav__link--parent" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="d3">Certification<svg class="wa-primary-nav__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <ul class="wa-nav-dropdown" id="d3" role="list" aria-label="Certification submenu">
+                <li class="wa-nav-dropdown__item"><a href="/certification" class="wa-nav-dropdown__link">Certification overview</a></li>
+              </ul>
+            </li>
+            <li class="wa-primary-nav__item">
+              <a href="/engineering" class="wa-primary-nav__link">Engineering</a>
+            </li>
+            <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+              <button class="wa-primary-nav__link wa-primary-nav__link--parent" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="d4">Events<svg class="wa-primary-nav__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <ul class="wa-nav-dropdown" id="d4" role="list" aria-label="Events submenu">
+                <li class="wa-nav-dropdown__item"><a href="/events" class="wa-nav-dropdown__link">All Events</a></li>
+              </ul>
+            </li>
+            <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+              <button class="wa-primary-nav__link wa-primary-nav__link--parent" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="d5">Resources<svg class="wa-primary-nav__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <ul class="wa-nav-dropdown" id="d5" role="list" aria-label="Resources submenu">
+                <li class="wa-nav-dropdown__item"><a href="/resources" class="wa-nav-dropdown__link">Resources hub</a></li>
+              </ul>
+            </li>
+            <li class="wa-primary-nav__item wa-primary-nav__item--has-dropdown">
+              <button class="wa-primary-nav__link wa-primary-nav__link--parent" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="d6">About<svg class="wa-primary-nav__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <ul class="wa-nav-dropdown" id="d6" role="list" aria-label="About submenu">
+                <li class="wa-nav-dropdown__item"><a href="/about" class="wa-nav-dropdown__link">About us</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="wa-nav-bar__actions">
+          <button class="wa-nav-bar__action-btn wa-nav-bar__search-toggle" type="button" aria-label="Open site search"></button>
+          <div class="wa-nav-bar__member-menu">
+            <button class="btn btn-gold wa-nav-bar__cta wa-nav-bar__cta--profile" type="button" aria-haspopup="true" aria-expanded="false">
+              <!-- A deliberately long first name - this is the reported trigger. -->
+              <span class="wa-nav-bar__profile-name" id="wa-profile-name">Christopher</span>
+              <span class="wa-nav-bar__cta-chevron" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <button class="wa-hamburger" type="button" aria-label="Open menu" aria-expanded="false"></button>
+      </div>
+    </div>
+  </header>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "label": "My Events",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "React island: Member portal My Events page. Displays a tab-switched Upcoming / Past list of the member's registered events (Event Ticket Deals). Data is populated via workflow-synced contact properties. Upcoming events show Zoom join link and calendar download; past events show an empty state. Place on my-events.html (portal layout).",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["portal", "react-island", "my-events", "members-only"]
+}

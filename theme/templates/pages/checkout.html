@@ -1,0 +1,89 @@
+<!--
+  templateType: page
+  label: Checkout
+  isAvailableForNewContent: true
+-->
+{#
+  checkout.html - Course/event registration checkout page.
+  URL: /checkout/ (receives ?session_id=<hubdb_row_id>)
+
+  ── Layout ───────────────────────────────────────────────────────────────────
+  Extends the distraction-free checkout.html LAYOUT (not the base layout).
+  The layout provides:
+    • Minimal header: logo + #wa-checkout-steps (React portal target) + secure badge
+    • No site nav, no portal nav, no widgets - pure tunnel
+    • Minimal footer: copyright + privacy/terms links only
+
+  ── Module ───────────────────────────────────────────────────────────────────
+  A single checkout-tunnel module fills the checkout_content block.
+  The module handles all 4 steps: session confirm → identify → pricing → payment.
+
+  ── HubSpot configuration ────────────────────────────────────────────────────
+  • Assign this template to a page at /checkout/
+  • Private Content: NONE - intentionally public so guests can register.
+    Logged-in members automatically get member pricing via request_contact.
+  • Page title + meta are suppressed (noindex) - this is a transactional page.
+
+  ── Query param ──────────────────────────────────────────────────────────────
+  The course-filter module (on each course page) links registrations like:
+    /checkout/?session_id=<hubdb_courses_row_id>
+  The checkout-tunnel module reads this param in HubL to pre-fetch the session.
+#}
+{% set page_title_exact = 'Register - Weld Australia' %}
+{% set page_description = 'Complete your course or event registration with Weld Australia.' %}
+{% extends "../layouts/checkout-layout.html" %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/checkout.css') }}">
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+
+{% block checkout_content %}
+
+  {# Page-level h1 - visually hidden so the distraction-free checkout keeps its
+     minimal look while satisfying WCAG 1.3.1 (the tunnel's step headings are h2). #}
+  <h1 class="sr-only">Course registration</h1>
+
+  {#
+    The checkout-tunnel module is placed here with all editor defaults.
+    Editors can adjust step labels, guest checkout, payment provider, and
+    the confirmation redirect URL from the HubSpot page editor.
+    payment_provider="event_engine" routes registration through the Event Engine
+    worker (reserve → HubSpot invoice).
+    Resolve worker_base_url in a {% set %} first - HubSpot module tags do not
+    reliably evaluate piped theme-field expressions and can store the HubL
+    source as a literal (which then POSTs as a relative URL and 403s).
+    Do not put HubL comments inside the module tag - HubSpot's validator
+    misreports that as a missing endblock.
+  #}
+  {# `event-engine` IS the live Worker. It launched as `event-engine-staging`
+   and was RENAMED, so that hostname no longer resolves: anything still pointing
+   at it takes checkout down. See theme/fields.json -> integrations. #}
+  {% set _checkout_worker_base_url = theme.integrations.event_engine_worker_base_url | default('https://event-engine.refuel-creative.workers.dev', true) %}
+  {# Use the portal serving this theme. This keeps a Dev checkout from sending
+     the Dev portal identity to the live Worker, while production continues to
+     identify itself correctly. #}
+  {% set _checkout_worker_portal_id = hub_id | string %}
+  {% module "checkout_tunnel"
+    path="../../modules/checkout-tunnel"
+    step_labels={
+      "step_1": "Confirm session",
+      "step_2": "Your details",
+      "step_3": "Pricing",
+      "step_4": "Payment"
+    }
+    guest_checkout_allowed=true
+    membership_offer_post_purchase=true
+    membership_offer_message="<p>Save on future registrations by joining Weld Australia. <a href='/membership/'>Learn about membership</a>.</p>"
+    payment_provider="event_engine"
+    worker_base_url=_checkout_worker_base_url
+    worker_portal_id=_checkout_worker_portal_id
+    stripe_publishable_key=""
+    confirmation_redirect={ "url": { "type": "CONTENT", "href": "/checkout/confirmation/" } }
+    support_email="training@weldaustralia.com.au"
+    background="surface"
+    spacing="default"
+    members_only=false
+  %}
+
+{% endblock %}

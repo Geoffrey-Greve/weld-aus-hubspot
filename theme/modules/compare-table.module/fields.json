@@ -1,0 +1,177 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White/Light"
+      ],
+      [
+        "surface_alt",
+        "Alt grey"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "overline",
+    "label": "Overline",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text"
+  },
+  {
+    "name": "tier_columns",
+    "label": "Tier columns",
+    "type": "group",
+    "occurrence": {
+      "min": 2,
+      "max": 6,
+      "default": 2
+    },
+    "children": [
+      {
+        "name": "label_text",
+        "label": "Tier label",
+        "type": "text"
+      },
+      {
+        "name": "accent_color",
+        "label": "Accent colour",
+        "type": "choice",
+        "choices": [
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "silver",
+            "Silver"
+          ],
+          [
+            "bronze",
+            "Bronze"
+          ],
+          [
+            "navy",
+            "Navy"
+          ],
+          [
+            "green",
+            "Green"
+          ]
+        ],
+        "default": "navy"
+      },
+      {
+        "name": "is_highlighted",
+        "label": "Highlighted",
+        "type": "boolean",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "row_groups",
+    "label": "Feature row groups",
+    "type": "group",
+    "occurrence": {
+      "min": 1,
+      "max": 10,
+      "default": 1
+    },
+    "children": [
+      {
+        "name": "group_label",
+        "label": "Group heading",
+        "type": "text"
+      },
+      {
+        "name": "rows",
+        "label": "Feature rows",
+        "type": "group",
+        "occurrence": {
+          "min": 1,
+          "max": 20,
+          "default": 1
+        },
+        "children": [
+          {
+            "name": "feature_label",
+            "label": "Feature",
+            "type": "text"
+          },
+          {
+            "name": "values",
+            "label": "Values per tier",
+            "type": "group",
+            "occurrence": {
+              "min": 2,
+              "max": 6,
+              "default": 2
+            },
+            "children": [
+              {
+                "name": "text",
+                "label": "Value (text or leave blank for ✓/✗)",
+                "type": "text"
+              },
+              {
+                "name": "included",
+                "label": "Included (tick)",
+                "type": "boolean",
+                "default": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "collapsible",
+    "label": "Row groups collapsible",
+    "type": "boolean",
+    "default": true
+  }
+]

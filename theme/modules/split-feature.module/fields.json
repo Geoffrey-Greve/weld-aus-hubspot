@@ -1,0 +1,706 @@
+[
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "help_text": "Lower-case, hyphenated. Used for in-page anchor links.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      [
+        "surface",
+        "White / Light (default)"
+      ],
+      [
+        "surface_alt",
+        "Surface alt (subtle grey)"
+      ],
+      [
+        "primary",
+        "Navy"
+      ],
+      [
+        "primary_dark",
+        "Deep navy"
+      ]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "background_image",
+    "label": "Section background image",
+    "type": "image",
+    "help_text": "Optional. Used for image-backed sections such as In-House Training. If left empty, that section keeps its default background image.",
+    "responsive": false
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      [
+        "compact",
+        "Compact"
+      ],
+      [
+        "default",
+        "Default"
+      ],
+      [
+        "spacious",
+        "Spacious"
+      ]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      [
+        "mobile",
+        "Mobile"
+      ],
+      [
+        "tablet",
+        "Tablet"
+      ],
+      [
+        "desktop",
+        "Desktop"
+      ]
+    ],
+    "default": [
+      "mobile",
+      "tablet",
+      "desktop"
+    ]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  },
+  {
+    "name": "overline",
+    "label": "Overline / eyebrow",
+    "type": "text",
+    "help_text": "Small uppercase label above the heading.",
+    "default": ""
+  },
+  {
+    "name": "heading",
+    "label": "Heading",
+    "type": "text"
+  },
+  {
+    "name": "body_text",
+    "label": "Body copy",
+    "type": "richtext"
+  },
+  {
+    "name": "media_side",
+    "label": "Media position",
+    "type": "choice",
+    "choices": [
+      [
+        "right",
+        "Right (default)"
+      ],
+      [
+        "left",
+        "Left"
+      ]
+    ],
+    "default": "right"
+  },
+  {
+    "name": "media_type",
+    "label": "Media type",
+    "type": "choice",
+    "choices": [
+      [
+        "image",
+        "Image"
+      ],
+      [
+        "image_callout",
+        "Image with callout card"
+      ],
+      [
+        "image_panels",
+        "Image with feature panels"
+      ],
+      [
+        "document_list",
+        "Document / download list"
+      ],
+      [
+        "feature_panel",
+        "Feature panels (2-column grid)"
+      ],
+      [
+        "info_cards",
+        "Info cards (stacked)"
+      ],
+      [
+        "video",
+        "Video"
+      ],
+      [
+        "checklist",
+        "Checklist"
+      ],
+      [
+        "stat_panel",
+        "Stat tiles"
+      ],
+      [
+        "quote",
+        "Pull quote"
+      ]
+    ],
+    "default": "image"
+  },
+  {
+    "name": "items_source",
+    "label": "Info cards source",
+    "type": "choice",
+    "choices": [
+      [
+        "manual",
+        "Manual module items"
+      ],
+      [
+        "hubdb_certification_pathways",
+        "HubDB certification pathways"
+      ]
+    ],
+    "default": "manual",
+    "help_text": "Used for info cards. HubDB mode reads public certification pathway rows and falls back to manual items if none are found.",
+    "visibility": {
+      "controlling_field_path": "media_type",
+      "operator": "EQUAL",
+      "controlling_value_regex": "info_cards"
+    }
+  },
+  {
+    "name": "items_hubdb_table",
+    "label": "Info cards HubDB table",
+    "type": "text",
+    "default": "certification_pathways",
+    "visibility": {
+      "controlling_field_path": "items_source",
+      "operator": "EQUAL",
+      "controlling_value_regex": "hubdb_certification_pathways"
+    }
+  },
+  {
+    "name": "items_hubdb_audience",
+    "label": "Info cards HubDB audience",
+    "type": "choice",
+    "choices": [
+      [
+        "company",
+        "Company"
+      ],
+      [
+        "individual",
+        "Individual"
+      ],
+      [
+        "all",
+        "All"
+      ]
+    ],
+    "default": "company",
+    "visibility": {
+      "controlling_field_path": "items_source",
+      "operator": "EQUAL",
+      "controlling_value_regex": "hubdb_certification_pathways"
+    }
+  },
+  {
+    "name": "image",
+    "label": "Image",
+    "type": "image",
+    "help_text": "Used for media types: Image, Image with callout card, Image with feature panels, and optional Feature panels images."
+  },
+  {
+    "name": "callout_title",
+    "label": "Image callout - title",
+    "type": "text",
+    "help_text": "Card overlaid on the image (image_callout type).",
+    "visibility": {
+      "controlling_field_path": "media_type",
+      "operator": "EQUAL",
+      "controlling_value_regex": "image_callout"
+    }
+  },
+  {
+    "name": "callout_sub",
+    "label": "Image callout - sub-text",
+    "type": "text",
+    "visibility": {
+      "controlling_field_path": "media_type",
+      "operator": "EQUAL",
+      "controlling_value_regex": "image_callout"
+    }
+  },
+  {
+    "name": "panels_label",
+    "label": "Feature panels label",
+    "type": "text",
+    "default": "What we're calling for",
+    "help_text": "Shown above the feature panel cards when the media type uses feature panels."
+  },
+  {
+    "name": "panels",
+    "label": "Feature panels",
+    "type": "group",
+    "help_text": "Used for Feature panels and Image with feature panels media types. 2-column grid of mini-panels.",
+    "occurrence": {
+      "min": 0,
+      "max": 8
+    },
+    "children": [
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text"
+      },
+      {
+        "name": "desc",
+        "label": "Description",
+        "type": "text"
+      },
+      {
+        "name": "accent_color",
+        "label": "Accent colour",
+        "type": "choice",
+        "choices": [
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "magenta",
+            "Magenta"
+          ],
+          [
+            "navy",
+            "Navy"
+          ],
+          [
+            "green",
+            "Green"
+          ]
+        ],
+        "default": "gold"
+      }
+    ]
+  },
+  {
+    "name": "video_source",
+    "label": "Video source",
+    "type": "choice",
+    "display": "radio",
+    "choices": [
+      [
+        "embed",
+        "Embed URL (YouTube / Vimeo)"
+      ],
+      [
+        "hubspot",
+        "HubSpot-hosted video"
+      ]
+    ],
+    "default": "embed",
+    "help_text": "Choose a video hosted in HubSpot, or paste a YouTube/Vimeo embed URL.",
+    "visibility": {
+      "controlling_field_path": "media_type",
+      "operator": "EQUAL",
+      "controlling_value_regex": "video"
+    }
+  },
+  {
+    "name": "hubspot_video",
+    "label": "HubSpot video",
+    "type": "videoplayer",
+    "help_text": "Pick a video hosted in HubSpot (Marketing > Files and Templates > Files). Uses HubSpot's own player, so plays are tracked against the contact record. Poster image and play-button label below only apply to the embed URL source - the HubSpot player uses its own thumbnail.",
+    "default": {
+      "player_id": null,
+      "size_type": "auto_full_width",
+      "width": 1280,
+      "height": 720,
+      "loop_video": false,
+      "mute_by_default": false,
+      "autoplay": false,
+      "hide_controls": false
+    },
+    "advanced_visibility": {
+      "boolean_operator": "AND",
+      "criteria": [
+        {
+          "controlling_field_path": "media_type",
+          "operator": "EQUAL",
+          "controlling_value_regex": "video"
+        },
+        {
+          "controlling_field_path": "video_source",
+          "operator": "EQUAL",
+          "controlling_value_regex": "hubspot"
+        }
+      ]
+    }
+  },
+  {
+    "name": "video_url",
+    "label": "Video embed URL",
+    "type": "text",
+    "help_text": "YouTube/Vimeo embed URL (e.g. https://www.youtube.com/embed/ID).",
+    "advanced_visibility": {
+      "boolean_operator": "AND",
+      "criteria": [
+        {
+          "controlling_field_path": "media_type",
+          "operator": "EQUAL",
+          "controlling_value_regex": "video"
+        },
+        {
+          "controlling_field_path": "video_source",
+          "operator": "EQUAL",
+          "controlling_value_regex": "embed"
+        }
+      ]
+    }
+  },
+  {
+    "name": "video_poster_image",
+    "label": "Video poster image (optional)",
+    "type": "image",
+    "help_text": "Used for the embed URL video source. Shows this image with a play button before the video loads, matching the hero module poster behavior.",
+    "responsive": false,
+    "advanced_visibility": {
+      "boolean_operator": "AND",
+      "criteria": [
+        {
+          "controlling_field_path": "media_type",
+          "operator": "EQUAL",
+          "controlling_value_regex": "video"
+        },
+        {
+          "controlling_field_path": "video_source",
+          "operator": "EQUAL",
+          "controlling_value_regex": "embed"
+        }
+      ]
+    }
+  },
+  {
+    "name": "video_label",
+    "label": "Video link label",
+    "type": "text",
+    "default": "Watch our video",
+    "advanced_visibility": {
+      "boolean_operator": "AND",
+      "criteria": [
+        {
+          "controlling_field_path": "media_type",
+          "operator": "EQUAL",
+          "controlling_value_regex": "video"
+        },
+        {
+          "controlling_field_path": "video_source",
+          "operator": "EQUAL",
+          "controlling_value_regex": "embed"
+        }
+      ]
+    }
+  },
+  {
+    "name": "items",
+    "label": "Document / info items",
+    "type": "group",
+    "help_text": "Used for document_list and info_cards media types.",
+    "visibility": {
+      "controlling_field_path": "media_type",
+      "operator": "MATCHES_REGEX",
+      "controlling_value_regex": "^(document_list|info_cards)$"
+    },
+    "occurrence": {
+      "min": 0,
+      "max": 12
+    },
+    "children": [
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text"
+      },
+      {
+        "name": "desc",
+        "label": "Description / detail",
+        "type": "text"
+      },
+      {
+        "name": "link_url",
+        "label": "Link URL",
+        "type": "link"
+      }
+    ]
+  },
+  {
+    "name": "checklist_items",
+    "label": "Checklist items",
+    "type": "group",
+    "help_text": "Used for the checklist media type.",
+    "visibility": {
+      "controlling_field_path": "media_type",
+      "operator": "MATCHES_REGEX",
+      "controlling_value_regex": "^(checklist|image_callout)$"
+    },
+    "occurrence": {
+      "min": 0,
+      "max": 20
+    },
+    "children": [
+      {
+        "name": "text",
+        "label": "Item text",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "stat_panel_items",
+    "label": "Stat panel items",
+    "type": "group",
+    "help_text": "Used for the stat_panel media type.",
+    "visibility": {
+      "controlling_field_path": "media_type",
+      "operator": "EQUAL",
+      "controlling_value_regex": "stat_panel"
+    },
+    "occurrence": {
+      "min": 0,
+      "max": 6
+    },
+    "children": [
+      {
+        "name": "value_text",
+        "label": "Value (e.g. 10,000+)",
+        "type": "text"
+      },
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text"
+      },
+      {
+        "name": "accent_color",
+        "label": "Accent colour",
+        "type": "choice",
+        "choices": [
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "magenta",
+            "Magenta"
+          ],
+          [
+            "navy",
+            "Navy"
+          ]
+        ],
+        "default": "gold"
+      }
+    ]
+  },
+  {
+    "name": "quote_text",
+    "label": "Quote text",
+    "type": "text",
+    "help_text": "Used for the quote media type.",
+    "visibility": {
+      "controlling_field_path": "media_type",
+      "operator": "EQUAL",
+      "controlling_value_regex": "quote"
+    }
+  },
+  {
+    "name": "quote_author",
+    "label": "Quote author",
+    "type": "text",
+    "visibility": {
+      "controlling_field_path": "media_type",
+      "operator": "EQUAL",
+      "controlling_value_regex": "quote"
+    }
+  },
+  {
+    "name": "highlight",
+    "label": "Highlight callout (inline)",
+    "type": "group",
+    "help_text": "Optional inline callout shown below the body copy.",
+    "children": [
+      {
+        "name": "text",
+        "label": "Highlight text",
+        "type": "text"
+      },
+      {
+        "name": "logo_image",
+        "label": "Highlight logo image",
+        "type": "image",
+        "help_text": "Optional. Used for the homepage IIW highlight badge. If left empty, the module keeps the text badge fallback.",
+        "responsive": false
+      }
+    ]
+  },
+  {
+    "name": "alert",
+    "label": "Alert / notice",
+    "type": "group",
+    "help_text": "Optional alert box shown below the body copy.",
+    "children": [
+      {
+        "name": "tone",
+        "label": "Tone",
+        "type": "choice",
+        "choices": [
+          [
+            "amber",
+            "Amber / warning"
+          ],
+          [
+            "green",
+            "Green / success"
+          ],
+          [
+            "blue",
+            "Blue / info"
+          ],
+          [
+            "navy",
+            "Navy"
+          ]
+        ],
+        "default": "amber"
+      },
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text"
+      },
+      {
+        "name": "body_text",
+        "label": "Body text",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "figure_block",
+    "label": "Figure callout",
+    "type": "group",
+    "help_text": "Large-number callout shown between heading and body.",
+    "children": [
+      {
+        "name": "number",
+        "label": "Number / stat",
+        "type": "text"
+      },
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text"
+      },
+      {
+        "name": "accent_color",
+        "label": "Accent colour",
+        "type": "choice",
+        "choices": [
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "magenta",
+            "Magenta"
+          ],
+          [
+            "navy",
+            "Navy"
+          ]
+        ],
+        "default": "gold"
+      }
+    ]
+  },
+  {
+    "name": "buttons",
+    "label": "Buttons",
+    "type": "group",
+    "occurrence": {
+      "min": 0,
+      "max": 3
+    },
+    "children": [
+      {
+        "name": "label_text",
+        "label": "Label",
+        "type": "text"
+      },
+      {
+        "name": "url",
+        "label": "URL",
+        "type": "link"
+      },
+      {
+        "name": "style",
+        "label": "Style",
+        "type": "choice",
+        "choices": [
+          [
+            "primary",
+            "Navy (primary)"
+          ],
+          [
+            "gold",
+            "Gold"
+          ],
+          [
+            "navy-outline",
+            "Navy outline"
+          ],
+          [
+            "white-outline",
+            "White outline"
+          ],
+          [
+            "outline",
+            "Outline"
+          ]
+        ],
+        "default": "primary"
+      },
+      {
+        "name": "open_in_new_tab",
+        "label": "Open in new tab",
+        "type": "boolean",
+        "default": false
+      }
+    ]
+  }
+]

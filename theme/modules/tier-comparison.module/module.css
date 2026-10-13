@@ -1,0 +1,384 @@
+/*
+ * tier-comparison.module/module.css
+ * Membership tier comparison.
+ * Desktop (≥1024px): full HTML table.
+ * Mobile (<1024px):  stacked cards per tier.
+ * CSS-only responsive. No JavaScript.
+ */
+
+/* ── Screen-reader utility ───────────────────────────────────────────────── */
+
+.wa-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+
+.wa-tier-comparison__heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-3xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0 0 var(--wa-space-10);
+  text-align: center;
+}
+
+.wa-section--primary .wa-tier-comparison__heading,
+.wa-section--primary-dark .wa-tier-comparison__heading {
+  color: var(--wa-color-on-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESKTOP TABLE (shown ≥1024px)
+═══════════════════════════════════════════════════════════════════════════ */
+
+.wa-tier-comparison__mobile-cards {
+  display: none; /* mobile cards hidden on desktop */
+}
+
+.wa-tier-comparison__table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wa-tier-comparison__table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* ── Table header ────────────────────────────────────────────────────────── */
+
+.wa-tier-comparison__th {
+  padding: var(--wa-space-5) var(--wa-space-4);
+  vertical-align: bottom;
+  border-bottom: 2px solid var(--wa-color-border);
+}
+
+.wa-tier-comparison__th--feature {
+  text-align: left;
+  width: 240px;
+  min-width: 180px;
+}
+
+.wa-tier-comparison__th--tier {
+  text-align: center;
+  min-width: 150px;
+  background-color: var(--wa-color-surface-2);
+}
+
+/* Featured tier: elevated, primary border */
+.wa-tier-comparison__th--featured {
+  background-color: var(--wa-color-surface);
+  border-top: 3px solid var(--wa-color-primary);
+  box-shadow: var(--wa-shadow-md);
+  position: relative;
+  z-index: 1;
+}
+
+/* Tier accent colours for the header */
+.wa-tier-comparison__th--gold    { border-top-color: var(--wa-color-tier-gold); }
+.wa-tier-comparison__th--silver  { border-top-color: var(--wa-color-tier-silver); }
+.wa-tier-comparison__th--bronze  { border-top-color: var(--wa-color-tier-bronze); }
+.wa-tier-comparison__th--primary { border-top-color: var(--wa-color-primary); }
+.wa-tier-comparison__th--neutral { border-top-color: var(--wa-color-border); }
+
+/* ── Tier header content ─────────────────────────────────────────────────── */
+
+.wa-tier-comparison__tier-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wa-space-2);
+}
+
+.wa-tier-comparison__tier-name {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-lg);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+}
+
+.wa-tier-comparison__tier-price {
+  display: flex;
+  align-items: baseline;
+  gap: var(--wa-space-1);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.wa-tier-comparison__price-intro {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+}
+
+.wa-tier-comparison__price {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+}
+
+.wa-tier-comparison__price-period {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+}
+
+.wa-tier-comparison__tier-summary {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+  margin: 0;
+  text-align: center;
+}
+
+.wa-tier-comparison__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-2) var(--wa-space-5);
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  text-decoration: none;
+  border-radius: var(--wa-radius-md);
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.wa-tier-comparison__cta:hover {
+  opacity: 0.88;
+}
+
+.wa-tier-comparison__cta:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 3px;
+}
+
+/* ── Table body rows ─────────────────────────────────────────────────────── */
+
+.wa-tier-comparison__row--alt .wa-tier-comparison__td {
+  background-color: var(--wa-color-surface-2);
+}
+
+.wa-tier-comparison__td {
+  padding: var(--wa-space-4);
+  border-bottom: 1px solid var(--wa-color-border);
+  vertical-align: middle;
+  background-color: var(--wa-color-surface);
+}
+
+.wa-tier-comparison__td--feature {
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  color: var(--wa-color-text);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-2);
+}
+
+.wa-tier-comparison__td--value {
+  text-align: center;
+}
+
+.wa-tier-comparison__td--featured {
+  box-shadow: inset 2px 0 0 var(--wa-color-primary), inset -2px 0 0 var(--wa-color-primary);
+}
+
+/* ── Cell value states ───────────────────────────────────────────────────── */
+
+.wa-tier-comparison__cell-check,
+.wa-tier-comparison__cell-cross {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-tier-comparison__cell-text {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+}
+
+/* ── Tooltip trigger ─────────────────────────────────────────────────────── */
+
+.wa-tier-comparison__tooltip-trigger {
+  background: none;
+  border: none;
+  cursor: help;
+  color: var(--wa-color-text-muted);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  min-width: 20px;
+  min-height: 20px;
+}
+
+.wa-tier-comparison__tooltip-trigger:hover {
+  color: var(--wa-color-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE CARDS (shown <1024px)
+═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1023px) {
+  .wa-tier-comparison__table-wrap {
+    display: none; /* hide table on mobile */
+  }
+
+  .wa-tier-comparison__mobile-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-6);
+  }
+}
+
+/* ── Mobile card ─────────────────────────────────────────────────────────── */
+
+.wa-tier-comparison__mobile-card {
+  background-color: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--wa-shadow-card);
+}
+
+.wa-tier-comparison__mobile-card--featured {
+  border-width: 2px;
+  border-color: var(--wa-color-primary);
+  box-shadow: var(--wa-shadow-md);
+}
+
+/* Tier accent top stripe on mobile cards */
+.wa-tier-comparison__mobile-card--gold   { border-top: 4px solid var(--wa-color-tier-gold); }
+.wa-tier-comparison__mobile-card--silver { border-top: 4px solid var(--wa-color-tier-silver); }
+.wa-tier-comparison__mobile-card--bronze { border-top: 4px solid var(--wa-color-tier-bronze); }
+.wa-tier-comparison__mobile-card--primary { border-top: 4px solid var(--wa-color-primary); }
+.wa-tier-comparison__mobile-card--neutral { border-top: 4px solid var(--wa-color-border); }
+
+/* ── Mobile card header ──────────────────────────────────────────────────── */
+
+.wa-tier-comparison__mobile-card-header {
+  padding: var(--wa-space-6);
+  border-bottom: 1px solid var(--wa-color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-2);
+}
+
+.wa-tier-comparison__mobile-tier-name {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-xl);
+  font-weight: var(--wa-weight-bold);
+  color: var(--wa-color-text);
+  margin: 0;
+}
+
+.wa-tier-comparison__mobile-price {
+  display: flex;
+  align-items: baseline;
+  gap: var(--wa-space-1);
+  flex-wrap: wrap;
+}
+
+.wa-tier-comparison__mobile-summary {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+  margin: 0;
+}
+
+/* ── Mobile feature list ─────────────────────────────────────────────────── */
+
+.wa-tier-comparison__mobile-features {
+  list-style: none;
+  margin: 0;
+  padding: var(--wa-space-4) var(--wa-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.wa-tier-comparison__mobile-feature {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wa-space-4);
+  padding: var(--wa-space-3) 0;
+  border-bottom: 1px solid var(--wa-color-border);
+  min-height: var(--wa-touch-min);
+}
+
+.wa-tier-comparison__mobile-feature:last-child {
+  border-bottom: none;
+}
+
+.wa-tier-comparison__mobile-feature-label {
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text);
+  flex: 1;
+}
+
+.wa-tier-comparison__mobile-feature-value {
+  font-size: var(--wa-text-sm);
+  font-weight: var(--wa-weight-semibold);
+  color: var(--wa-color-text-muted);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ── Mobile CTA ──────────────────────────────────────────────────────────── */
+
+.wa-tier-comparison__mobile-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wa-touch-min);
+  padding: var(--wa-space-4) var(--wa-space-6);
+  background-color: var(--wa-color-primary);
+  color: var(--wa-color-on-primary);
+  font-size: var(--wa-text-base);
+  font-weight: var(--wa-weight-semibold);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.wa-tier-comparison__mobile-cta:hover {
+  opacity: 0.9;
+}
+
+.wa-tier-comparison__mobile-cta:focus-visible {
+  outline: 2px solid var(--wa-color-on-primary);
+  outline-offset: -4px;
+}
+
+/* ── Downgrade guard (QA ref 44) ──────────────────────────────────────────
+   Same treatment as membership-options: a tier below the member's own keeps
+   its price and features and loses only its join link. The note takes the
+   button's place so the header row does not jump. */
+.wa-tier-comparison__cta-note {
+  margin: var(--wa-space-3, 12px) 0 0;
+  min-height: var(--wa-touch-min, 44px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wa-color-text-subtle, #6f757e);
+  font-size: var(--wa-text-sm, 0.875rem);
+  font-weight: 600;
+  text-align: center;
+}
+
+.wa-tier-comparison__cta-note--current {
+  color: var(--wa-color-success, #1f8a4d);
+  font-weight: 800;
+}

@@ -1,0 +1,211 @@
+{
+  "name": "jobs",
+  "label": "Jobs - Job Board",
+  "useForPages": true,
+  "allowChildTables": false,
+  "enableChildTablePages": false,
+  "allowPublicApiAccess": false,
+  "dynamicPageUrlPattern": "/job-board/{slug}",
+  "dynamicMetaTags": {
+    "DESCRIPTION": "job_description"
+  },
+  "columns": [
+    {
+      "name": "slug",
+      "label": "URL slug",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "job_title",
+      "label": "Job title",
+      "type": "TEXT",
+      "required": true
+    },
+    {
+      "name": "company_name",
+      "label": "Company / employer name",
+      "type": "TEXT"
+    },
+    {
+      "name": "job_type",
+      "label": "Employment type",
+      "type": "SELECT",
+      "options": [
+        { "name": "Full-time", "label": "Full-time", "type": "option" },
+        { "name": "Part-time", "label": "Part-time", "type": "option" },
+        { "name": "Contract", "label": "Contract", "type": "option" },
+        { "name": "Apprenticeship", "label": "Apprenticeship", "type": "option" }
+      ]
+    },
+    {
+      "name": "job_state",
+      "label": "State",
+      "type": "SELECT",
+      "options": [
+        { "name": "NSW", "label": "NSW", "type": "option" },
+        { "name": "VIC", "label": "VIC", "type": "option" },
+        { "name": "QLD", "label": "QLD", "type": "option" },
+        { "name": "WA", "label": "WA", "type": "option" },
+        { "name": "SA", "label": "SA", "type": "option" },
+        { "name": "TAS", "label": "TAS", "type": "option" },
+        { "name": "NT", "label": "NT", "type": "option" },
+        { "name": "ACT", "label": "ACT", "type": "option" }
+      ]
+    },
+    {
+      "name": "job_location",
+      "label": "City / locality",
+      "type": "TEXT"
+    },
+    {
+      "name": "job_description",
+      "label": "Job description",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "application_url",
+      "label": "Apply link (URL)",
+      "type": "URL"
+    },
+    {
+      "name": "application_email",
+      "label": "Apply by email - employer address (never shown publicly)",
+      "type": "TEXT"
+    },
+    {
+      "name": "closing_date",
+      "label": "Applications close",
+      "type": "DATE"
+    },
+    {
+      "name": "date_posted",
+      "label": "Date posted",
+      "type": "DATE"
+    },
+    {
+      "name": "is_active",
+      "label": "Active (visible on site)",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "is_featured",
+      "label": "Featured (pinned to top)",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "sector",
+      "label": "Industry sector",
+      "type": "SELECT",
+      "options": [
+        { "name": "Mining & Resources", "type": "option" },
+        { "name": "Defence", "type": "option" },
+        { "name": "Infrastructure", "type": "option" },
+        { "name": "Energy", "type": "option" },
+        { "name": "Maritime", "type": "option" },
+        { "name": "General Fabrication", "type": "option" },
+        { "name": "Other", "type": "option" }
+      ]
+    },
+    {
+      "name": "category",
+      "label": "Job category",
+      "type": "SELECT",
+      "options": [
+        { "name": "Welder", "type": "option" },
+        { "name": "Inspector", "type": "option" },
+        { "name": "Supervisor", "type": "option" },
+        { "name": "Engineer", "type": "option" },
+        { "name": "Technologist", "type": "option" },
+        { "name": "Management", "type": "option" },
+        { "name": "Apprentice", "type": "option" },
+        { "name": "Other", "type": "option" }
+      ]
+    },
+    {
+      "name": "arrangement",
+      "label": "Work arrangement",
+      "type": "SELECT",
+      "options": [
+        { "name": "On-Site", "type": "option" },
+        { "name": "Remote", "type": "option" },
+        { "name": "Hybrid", "type": "option" },
+        { "name": "Fly-In Fly-Out", "type": "option" }
+      ]
+    },
+    {
+      "name": "salary",
+      "label": "Salary / rate (display text, e.g. $120k-$140k)",
+      "type": "TEXT"
+    },
+    {
+      "name": "salary_note",
+      "label": "Salary note (e.g. + super + benefits)",
+      "type": "TEXT"
+    },
+    {
+      "name": "ref",
+      "label": "Job reference number",
+      "type": "TEXT"
+    },
+    {
+      "name": "excerpt",
+      "label": "Short excerpt for listing cards",
+      "type": "TEXT"
+    },
+    {
+      "name": "responsibilities",
+      "label": "Key responsibilities",
+      "type": "RICHTEXT"
+    },
+    {
+      "name": "requirements",
+      "label": "Requirements / qualifications",
+      "type": "RICHTEXT"
+    }
+  ],
+  "rows": [
+    {
+      "slug": "senior-welding-inspector-austal-henderson",
+      "job_title": "Senior Welding Inspector",
+      "company_name": "Austal Ships",
+      "job_type": "Full-time",
+      "job_state": "WA",
+      "job_location": "Henderson",
+      "job_description": "<p>Austal Ships is seeking an experienced Senior Welding Inspector to join our aluminium vessel fabrication team at our Henderson facility. The successful candidate will hold current IIW Inspector certification and have a minimum of 5 years' inspection experience in marine or structural fabrication environments.</p>",
+      "application_url": "https://careers.austal.com/welding-inspector",
+      "closing_date": "2026-06-30",
+      "date_posted": "2026-05-10",
+      "is_active": true,
+      "is_featured": true
+    },
+    {
+      "slug": "welding-supervisor-civmec-brisbane",
+      "job_title": "Welding Supervisor - Structural Steel",
+      "company_name": "Civmec Construction & Engineering",
+      "job_type": "Contract",
+      "job_state": "QLD",
+      "job_location": "Brisbane",
+      "job_description": "<p>Civmec is seeking a qualified Welding Supervisor for a 12-month contract on a major structural steel project in the Brisbane CBD. Applicants must hold current AS 2980 Welding Supervisor credentials and have demonstrated experience supervising multi-trade welding teams.</p>",
+      "application_url": "https://civmec.com.au/careers/welding-supervisor-brisbane",
+      "closing_date": "2026-06-15",
+      "date_posted": "2026-05-08",
+      "is_active": true,
+      "is_featured": false
+    },
+    {
+      "slug": "boilermaker-welder-apprenticeship-vic",
+      "job_title": "Boilermaker / Welder Apprenticeship",
+      "company_name": "Weld Australia Training Partners",
+      "job_type": "Apprenticeship",
+      "job_state": "VIC",
+      "job_location": "Dandenong",
+      "job_description": "<p>An exciting apprenticeship opportunity for a motivated individual to train as a Boilermaker/Welder with an industry-leading employer in Melbourne's south-east. Training delivered in partnership with Weld Australia, combining on-the-job learning with formal AS 1796 certification pathways.</p>",
+      "application_url": "https://weldaustralia.com.au/apprenticeships/boilermaker-vic",
+      "closing_date": "2026-07-31",
+      "date_posted": "2026-05-15",
+      "is_active": true,
+      "is_featured": false
+    }
+  ]
+}

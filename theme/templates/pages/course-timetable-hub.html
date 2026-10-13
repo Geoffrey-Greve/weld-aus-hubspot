@@ -1,0 +1,324 @@
+<!--
+  templateType: page
+  label: Course Timetable / Listing
+  isAvailableForNewContent: true
+-->
+{#
+  course-timetable-hub.html - Course timetable + dynamic course detail router
+  URL: /courses/ and /courses/{course_slug}
+
+  When this page is configured as a HubDB dynamic page for the `courses` table:
+  - /courses/ renders the timetable/listing
+  - /courses/{hs_path} renders the selected course detail page
+#}
+{% set _course_row = dynamic_page_hubdb_row %}
+{# Title and description are resolved ABOVE the extends. layouts/base.html
+   includes partials/_head.html, which emits the document's ONLY <title> and
+   meta description; an assignment made after the extends lands too late for
+   it, and a second <title> emitted from extra_head is ignored by crawlers,
+   which take the first. #}
+{% if _course_row %}
+  {% set page_title_exact = _course_row.page_title | default(_course_row.course_name ~ ' - Weld Australia') %}
+  {% set page_description = _course_row.meta_description | default('') %}
+{% else %}
+  {% set page_title_exact = page_meta.html_title | default('Course Timetable - Weld Australia') %}
+  {% set page_description = page_meta.meta_description | default('Browse all upcoming Weld Australia training sessions. Filter by course, location, and date to find the right course for you. Register online.') %}
+{% endif %}
+{% extends "../layouts/base.html" %}
+{% block extra_head %}
+{% if _course_row %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/course-detail.css') }}">
+<link rel="stylesheet" href="{{ get_asset_url('../../modules/hero.module/module.css') }}">
+<style>
+  .wa-hero-video,
+  .wa-stat-tiles,
+  #why,
+  #outcomes,
+  #syllabus,
+  #audience,
+  #trainer,
+  .wa-team,
+  .wa-testimonials,
+  .wa-logo-strip,
+  #faq,
+  .wa-cta-banner {
+    display: none !important;
+  }
+</style>
+{% if _course_row.og_image and _course_row.og_image.url %}
+<meta property="og:image" content="{{ _course_row.og_image.url }}">
+<meta property="og:image:alt" content="{{ _course_row.course_name | default('') }}">
+{% endif %}
+{% else %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/courses-landing.css') }}">
+<style>
+  /* Hide the older saved HubSpot courses-membership CTA so the listing uses
+     the shared reusable CTA banner added below the saved DnD area. */
+  .wa-courses-membership--cta {
+    display: none !important;
+  }
+</style>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+{% if _course_row %}
+{% set _template_type = _course_row.parent_template.name | default('standard') | lower %}
+
+{% if _template_type == 'sales' %}
+  {% include "./course-sales.html" %}
+{% else %}
+  {% include "./course.html" %}
+{% endif %}
+
+{# Dynamic pages can retain a saved DnD module snapshot with an older split
+   bundle URL. Load the HubSpot-safe standalone bundle only if the session
+   selector has not hydrated. #}
+{% set _course_engine_ns = namespace(rows=[]) %}
+{% for _course_engine_row in hubdb_table_rows('courses', 'course_id__eq=' ~ _course_row.course_id ~ '&orderBy=start_date') %}
+  {% if _course_engine_row.use_event_engine %}
+    {% set _course_engine_member_price = _course_engine_row.price_member | default(_course_engine_row.price_individual, true) %}
+    {% set _course_engine_price_individual = _course_engine_row.price_individual | float | default(0) %}
+    {% set _course_engine_price_student = _course_engine_row.price_student_aud_ex_gst | float | default(0) %}
+    {% set _course_engine_price_bronze = _course_engine_row.price_bronze_aud_ex_gst | float | default(0) %}
+    {% set _course_engine_price_silver = _course_engine_row.price_silver_aud_ex_gst | float | default(0) %}
+    {% set _course_engine_price_gold = _course_engine_row.price_gold_aud_ex_gst | float | default(0) %}
+    {% set _course_engine_ns.rows = _course_engine_ns.rows + [{
+      'id': _course_engine_row.hs_id | string,
+      'use_event_engine': true,
+      'price_member': _course_engine_member_price | float | default(0),
+      'price_individual': _course_engine_price_individual,
+      'price_student': _course_engine_price_student,
+      'price_bronze': _course_engine_price_bronze,
+      'price_silver': _course_engine_price_silver,
+      'price_gold': _course_engine_price_gold,
+      'price_non_member': _course_engine_row.price_non_member | float | default(0)
+    }] %}
+  {% endif %}
+{% endfor %}
+<script type="module">
+function hideStaleCourseSections() {
+  [
+    '.wa-hero-video',
+    '.wa-stat-tiles',
+    '#why',
+    '#outcomes',
+    '#syllabus',
+    '#audience',
+    '#trainer',
+    '.wa-team',
+    '.wa-testimonials',
+    '.wa-logo-strip',
+    '#faq',
+    '.wa-cta-banner'
+  ].forEach(function (selector) {
+    document.querySelectorAll(selector).forEach(function (el) {
+      el.setAttribute('hidden', 'hidden');
+      el.style.display = 'none';
+    });
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', hideStaleCourseSections);
+} else {
+  hideStaleCourseSections();
+}
+
+window.setTimeout(hideStaleCourseSections, 250);
+window.setTimeout(hideStaleCourseSections, 1000);
+
+window.setTimeout(function () {
+  var mount = document.querySelector('[data-wa-module="course-filter"]');
+  if (mount) {
+    try {
+      var props = JSON.parse(mount.getAttribute('data-props') || '{}');
+      var engineRows = {{ _course_engine_ns.rows | tojson }};
+      var engineById = {};
+      engineRows.forEach(function (row) { engineById[String(row.id)] = row; });
+      props.rows = (props.rows || []).map(function (row) {
+        var engineRow = engineById[String(row.id)];
+        return engineRow ? Object.assign({}, row, engineRow) : row;
+      });
+      var replacement = mount.cloneNode(false);
+      replacement.setAttribute('data-props', JSON.stringify(props));
+      mount.replaceWith(replacement);
+    } catch (error) {
+      console.error('[wa-course-detail] Could not refresh Event Engine rows.', error);
+    }
+    import("{{ get_asset_url('../../assets/js/course-filter.standalone.js') }}?fallback=1");
+  }
+}, 0);
+</script>
+{% else %}
+{# The listing is a dnd_area so editors can reorder, add and remove sections,
+   the same as /home, /about and /membership.
+
+   The area name is deliberately "courses_listing_v2" and MUST NOT be renamed
+   back. HubSpot only overlays a page's saved layout_sections onto a dnd_area of
+   the same name, so:
+   - "main_content" / "courses_listing" may still carry stale snapshots from the
+     earlier hero-consolidation attempt (38a05ab) - never reuse them here;
+   - the detail branch above contributes "standard_course_hero" /
+     "sales_course_hero" via course.html / course-sales.html, and two areas in
+     one template must not collide.
+   dnd_module derives its instance id from its position rather than an
+   author-supplied id, so none of the pre-consolidation widget data
+   (courses_landing_hero, keyed to the retired courses-landing-hero module) can
+   attach to these modules.
+
+   Caveat, per DEPLOYMENT.md § 8: once this page is saved in the page editor,
+   HubSpot owns the layout and edits to the defaults below no longer reach it. #}
+{% dnd_area "courses_listing_v2" label="Courses listing" %}
+
+  {# ── § 1  HERO ────────────────────────────────────────────────────────── #}
+  {# media_type="image" exposes the right-hand Image field (defect 100). The
+     hero image is the second column, never a full-bleed background. #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero"
+          background="primary"
+          height="medium"
+          spacing="default"
+          alignment="left"
+          accent_bar=true
+          media_type="image"
+          background_image={
+            "src": "https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1266644220%20(2).jpg",
+            "alt": "Weld Australia trainer delivering practical welding training",
+            "width": 1200,
+            "height": 900
+          }
+          eyebrow="Training & certification"
+          headline="Welding courses & timetable"
+          subheadline="<p>Browse every Weld Australia course and upcoming session in one place. Filter by training division, city and date - member pricing is applied automatically when you're logged in.</p>"
+          primary_cta={"label_text": "Find a course", "link": {"url": {"href": "#all-courses", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "gold"}
+          secondary_cta={"label_text": "Become a member", "link": {"url": {"href": "/membership/", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 2  PROOF CARDS ─────────────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/courses-proof-cards"
+          label="Courses proof cards"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 3  VIEW BY CATEGORY ────────────────────────────────────────────── #}
+  {# Links out to the four training division pages. The course directory below
+     filters in-page via its own chips; this row exists so the division pages
+     are reachable (and internally linked) from /courses too. #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/card-grid"
+          label="View by category"
+          section_id="by-category"
+          background="surface_alt"
+          spacing="default"
+          overline="View by category"
+          heading="Browse courses by training division"
+          section_align="left"
+          card_style="bordered"
+          columns="4"
+          cards=[
+            {
+              "title": "Welding Inspection",
+              "body_text": "Assess and assure weld quality to Australian and international standards.",
+              "link_label": "View courses",
+              "link_style": "arrow",
+              "link_url": {"url": {"href": "/courses?category=welding-inspection#all-courses", "type": "EXTERNAL"}}
+            },
+            {
+              "title": "Welding Supervision",
+              "body_text": "Lead welding operations, including AS1796 Certificate 10.",
+              "link_label": "View courses",
+              "link_style": "arrow",
+              "link_url": {"url": {"href": "/courses?category=welding-supervision#all-courses", "type": "EXTERNAL"}}
+            },
+            {
+              "title": "Welding Coordination",
+              "body_text": "IIW coordination credentials - IWS, IWP, IWT and IWE.",
+              "link_label": "View courses",
+              "link_style": "arrow",
+              "link_url": {"url": {"href": "/courses?category=welding-coordination#all-courses", "type": "EXTERNAL"}}
+            },
+            {
+              "title": "Short Courses",
+              "body_text": "Focused training in welding processes, NDT and robotic welding.",
+              "link_label": "View courses",
+              "link_style": "arrow",
+              "link_url": {"url": {"href": "/courses?category=short-courses#all-courses", "type": "EXTERNAL"}}
+            }
+          ]
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 4  COURSE DIRECTORY ────────────────────────────────────────────── #}
+  {# Defect 102: course directory under the proof/category strip, with upcoming
+     sessions beneath it. section_id="all-courses" is the /courses#all-courses
+     anchor used by the hero CTA, courses-landing.css and the ?category deep
+     links - do not change it. #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/featured-courses"
+          label="All course cards"
+          section_eyebrow="Course directory"
+          section_heading="Browse all welding training courses"
+          section_id="all-courses"
+          selection_mode="all_courses"
+          max_count="48"
+          show_member_pricing=true
+          show_filters=true
+          show_view_all_cta=false
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ── § 5  UPCOMING SESSIONS ───────────────────────────────────────────── #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/courses-upcoming-sessions"
+          label="Courses upcoming sessions"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+
+{# Defect 101/230 + reusable CTA rollout:
+   keep this outside the DnD area so saved page layouts cannot accidentally
+   suppress the courses listing CTA. #}
+{% module "courses_membership_cta_fixed" path="../../modules/cta-banner"
+  label="Courses membership CTA"
+  section_id="membership"
+  background="primary"
+  align="split"
+  headline="Join Weld Australia"
+  body_text="<p>Access member pricing, exclusive resources, and connect with Australia's welding industry.</p>"
+  cta_label="Join now"
+  cta_link={"url": {"href": "/membership/", "type": "EXTERNAL"}}
+%}
+{% endif %}
+{% endblock %}

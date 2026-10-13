@@ -1,0 +1,142 @@
+.wa-engineering-services {
+  padding: clamp(60px, 7vw, 88px) 0;
+  background: #f5f7f9;
+}
+
+.wa-engineering-services__header {
+  max-width: 580px;
+  margin-bottom: clamp(36px, 5vw, 52px);
+}
+
+.wa-engineering-services h2 {
+  margin: 0 0 14px;
+  color: #1c1e4c;
+  font-size: clamp(1.55rem, 3vw, 2.06rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.wa-engineering-services__intro {
+  color: #5b6770;
+  font-size: 0.95rem;
+  line-height: 1.72;
+}
+
+.wa-engineering-services__intro > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-engineering-services__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.wa-engineering-service-card {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  border: 1px solid #dde0e5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.wa-engineering-service-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.13);
+}
+
+.wa-engineering-service-card__media {
+  position: relative;
+  overflow: hidden;
+  height: 210px;
+  flex: 0 0 auto;
+  background: #1c1e4c;
+}
+
+.wa-engineering-service-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+  transition: opacity 180ms ease;
+}
+
+.wa-engineering-service-card:hover .wa-engineering-service-card__media img {
+  opacity: 0.9;
+}
+
+.wa-engineering-service-card__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(28, 30, 76, 0.62) 0%, transparent 52%);
+}
+
+.wa-engineering-service-card__icon {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(28, 30, 76, 0.78);
+  color: #fecf05;
+  backdrop-filter: blur(6px);
+}
+
+.wa-engineering-service-card__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 24px 26px;
+}
+
+.wa-engineering-service-card__body h3 {
+  margin: 0;
+  color: #1c1e4c;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.wa-engineering-service-card__desc {
+  flex: 1 1 auto;
+  color: #5b6770;
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+
+.wa-engineering-service-card__desc > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-engineering-service-card__body a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 6px;
+  color: #1a5c9e;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 1024px) {
+  .wa-engineering-services__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .wa-engineering-services__grid {
+    grid-template-columns: 1fr;
+  }
+}

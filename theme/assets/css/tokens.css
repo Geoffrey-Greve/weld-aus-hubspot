@@ -1,0 +1,234 @@
+/*
+ * Weld Australia - Design Tokens
+ * CSS custom properties consumed by HubL templates and React islands alike.
+ * See CLAUDE.md § 5.3 for the full token specification.
+ *
+ * BRAND - palette + type confirmed via the approved Home Page design handoff
+ * (Claude Design, 2026-06-01). Supersedes the earlier weldaustralia.com.au
+ * visual-inspection placeholders. Matches the Weld Australia logo flame
+ * gradient (magenta → orange → gold).
+ */
+
+:root {
+
+  /* ── Colour - Brand ─────────────────────────────────────────────────────── */
+
+  --wa-color-primary:        #1c1e4c;  /* navy/indigo - headers, headings, primary surfaces */
+  --wa-color-primary-light:  #2d3070;
+  --wa-color-primary-dark:   #0f1030;  /* deepest navy - footer, membership band */
+
+  --wa-color-secondary:      #1a5c9e;  /* industrial blue - "Training" accents, links */
+  --wa-color-secondary-light: #3575b8;
+  --wa-color-secondary-dark:  #0a2d5e;
+
+  /* Brand gold - bright, used for primary CTAs and active states */
+  --wa-color-accent:         #fecf05;
+  --wa-color-accent-dark:    #e8bc00;  /* CTA hover */
+
+  /* Brand magenta - overline accents + the flame gradient start */
+  --wa-color-magenta:        #ed128d;
+  --wa-color-accent-magenta: #ed128d;   /* alias - matches design-canonical token name */
+  --wa-color-accent-orange:  #f04828;   /* logo flame mid-point */
+
+  /* Accessible TEXT tones (WCAG 1.4.3) - use ONLY where magenta/gold is text on
+     a light surface. The vibrant tokens above stay for bars, CTAs, gradients. */
+  --wa-color-magenta-text:   #c00d74;   /* magenta text on white ≈ 5.9:1 */
+  --wa-color-magenta-on-dark:#ff7eb8;   /* magenta text on navy/dark ≈ 7:1 */
+  --wa-color-gold-text:      #7a5c00;   /* gold text on white   ≈ 6.3:1 */
+  /* Logo flame gradient - magenta → orange → gold (accent bars, section rules) */
+  --wa-gradient-flame:       linear-gradient(90deg, #ed128d 0%, #f04828 40%, #fecf05 100%);
+
+  --wa-color-on-primary:     #ffffff;
+  --wa-color-on-secondary:   #ffffff;
+  --wa-color-on-accent:      #1a1a1a;
+
+  /* Header row of a table an editor builds in rich text. A pair, so the text is
+     always the on-colour of the background it sits on. See base.css. */
+  --wa-table-head-bg:        var(--wa-color-primary);
+  --wa-table-head-text:      var(--wa-color-on-primary);
+
+  /* ── Colour - Surface ───────────────────────────────────────────────────── */
+
+  --wa-color-surface:        #ffffff;
+  --wa-color-surface-2:      #f5f7f9;  /* card backgrounds, alternating sections */
+  --wa-color-surface-3:      #edf0f4;  /* deeper alternate row / sidebar tint */
+  --wa-color-surface-inverse: #0f1030; /* inverse surface - deep navy */
+
+  /* ── Colour - Text ──────────────────────────────────────────────────────── */
+
+  --wa-color-text:           #1a1a1a;
+  --wa-color-text-muted:     #5b6770;
+  --wa-color-text-subtle:    #6f757e;  /* was #767c84 (4.21:1) - AA small text ≥4.5:1 on white */
+  --wa-color-text-inverse:   #ffffff;
+  /* Muted body/meta text on navy/dark surfaces (footer, dark bands).
+     #c5cadf on #101132 ≈ 11.2:1; on primary-light #2d3070 ≈ 7.3:1. Was
+     rgba(184,190,219,0.52) on footer acknowledgement (~3.5:1 - failed AA). */
+  --wa-color-text-muted-on-dark: #c5cadf;
+  --wa-color-text-disabled:  #b0b7c1;
+
+  /* ── Colour - Border ────────────────────────────────────────────────────── */
+
+  --wa-color-border:         #dde0e5;
+  --wa-color-border-strong:  #b0b7c1;
+  --wa-color-border-focus:   var(--wa-color-primary);
+
+  /* ── Colour - Member Tiers ──────────────────────────────────────────────── */
+
+  --wa-color-tier-gold:      #fecf05;  /* matches brand accent gold */
+  --wa-color-tier-gold-bg:   #fdf6e3;
+  --wa-color-tier-silver:    #a0a0a0;
+  --wa-color-tier-silver-bg: #f5f5f5;
+  --wa-color-tier-bronze:    #b27330;
+  --wa-color-tier-bronze-bg: #faf0e6;
+
+  /* ── Colour - Semantic ──────────────────────────────────────────────────── */
+
+  /* Member discount green - per CLAUDE.md § 5.4 rule 4.
+     Keep the vibrant --wa-color-success for large/bold highlights & fills;
+     use --wa-color-success-text for small badge/alert text (AA on light). */
+  --wa-color-success:        #1f8a4d;
+  --wa-color-success-surface: #e8f7ef;
+  --wa-color-success-border: #a8dfc0;
+  --wa-color-success-text:   #146c39;  /* ≈5.9:1 on success-surface / 6.5:1 on white */
+  --wa-color-success-on-dark:#5fd08a;  /* green text on navy/dark ≈ 8:1 */
+
+  --wa-color-warning:        #c97e10;
+  --wa-color-warning-surface: #fef4e5;
+  --wa-color-warning-border: #f3cc83;
+
+  --wa-color-danger:         #b3261e;
+  --wa-color-danger-surface: #fdecea;
+  --wa-color-danger-border:  #f0a9a6;
+
+  --wa-color-info:           #0077cc;
+  --wa-color-info-surface:   #e6f2ff;
+  --wa-color-info-border:    #99ccf3;
+  --wa-color-info-text:      #0a5c9e;  /* ≈6:1 on info-surface / 6.9:1 on white */
+
+  /* ── Typography - Font families ─────────────────────────────────────────── */
+
+  /* Brand typeface - Poppins (confirmed via design handoff 2026-06-01). */
+  --wa-font-heading: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --wa-font-body:    'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --wa-font-mono:    ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ── Typography - Size scale (rem, base 16px) ───────────────────────────── */
+
+  --wa-text-xs:   0.75rem;    /* 12px */
+  --wa-text-sm:   0.875rem;   /* 14px */
+  --wa-text-base: 1rem;       /* 16px */
+  --wa-text-md:   1.125rem;   /* 18px */
+  --wa-text-lg:   1.25rem;    /* 20px */
+  --wa-text-xl:   1.5rem;     /* 24px */
+  --wa-text-2xl:  1.875rem;   /* 30px */
+  --wa-text-3xl:  2.25rem;    /* 36px */
+  --wa-text-4xl:  3rem;       /* 48px */
+  --wa-text-5xl:  3.75rem;    /* 60px */
+
+  /* ── Typography - Line heights ──────────────────────────────────────────── */
+
+  --wa-leading-none:     1;
+  --wa-leading-tight:    1.25;
+  --wa-leading-snug:     1.375;
+  --wa-leading-normal:   1.5;
+  --wa-leading-relaxed:  1.625;
+  --wa-leading-loose:    2;
+
+  /* ── Typography - Font weights ──────────────────────────────────────────── */
+
+  --wa-weight-normal:    400;
+  --wa-weight-medium:    500;
+  --wa-weight-semibold:  600;
+  --wa-weight-bold:      700;
+  --wa-weight-extrabold: 800;
+  --wa-weight-black:     900;
+
+  /* ── Semantic heading size roles ──────────────────────────────────────────── */
+
+  --wa-h1-size:    var(--wa-text-4xl);   /* 48px - standard h1 */
+  --wa-h2-size:    var(--wa-text-3xl);   /* 36px */
+  --wa-h3-size:    var(--wa-text-2xl);   /* 30px */
+  --wa-h4-size:    var(--wa-text-xl);    /* 24px */
+  --wa-h5-size:    var(--wa-text-lg);    /* 20px */
+  --wa-h6-size:    var(--wa-text-md);    /* 18px */
+  --wa-body-size:  var(--wa-text-base);  /* 16px */
+  --wa-small-size: var(--wa-text-sm);    /* 14px */
+
+  /* ── Spacing scale (4px base per CLAUDE.md § 5.2) ──────────────────────── */
+
+  --wa-space-1:  4px;
+  --wa-space-2:  8px;
+  --wa-space-3:  12px;
+  --wa-space-4:  16px;
+  --wa-space-5:  20px;
+  --wa-space-6:  24px;
+  --wa-space-8:  32px;
+  --wa-space-10: 40px;
+  --wa-space-12: 48px;
+  --wa-space-16: 64px;
+  --wa-space-20: 80px;
+  --wa-space-24: 96px;
+  --wa-space-32: 128px;
+
+  /* ── Container widths ───────────────────────────────────────────────────── */
+
+  --wa-container-narrow:  680px;
+  --wa-container-default: 1260px;
+  --wa-container-wide:    1260px;
+
+  /* ── Breakpoints (reference only - use in @media queries, not var()) ─────── */
+  /* Matching theme.json responsive_breakpoints:
+     mobile  < 768px
+     tablet  768px - 1023px
+     desktop ≥ 1024px
+  */
+  --wa-bp-sm:  640px;
+  --wa-bp-md:  768px;
+  --wa-bp-lg:  1024px;
+  --wa-bp-xl:  1280px;
+  --wa-bp-2xl: 1536px;
+
+  /* ── Border radius ──────────────────────────────────────────────────────── */
+
+  --wa-radius-none: 0;
+  --wa-radius-sm:   4px;
+  --wa-radius-md:   8px;
+  --wa-radius-lg:   16px;
+  --wa-radius-xl:   24px;
+  --wa-radius-full: 9999px;
+
+  /* ── Shadows ────────────────────────────────────────────────────────────── */
+
+  --wa-shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.04);
+  --wa-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --wa-shadow-md:   0 4px 16px rgba(0, 0, 0, 0.10);
+  --wa-shadow-lg:   0 8px 32px rgba(0, 0, 0, 0.14);
+  --wa-shadow-xl:   0 16px 48px rgba(0, 0, 0, 0.18);
+
+  /* ── Touch target ───────────────────────────────────────────────────────── */
+
+  /* WCAG 2.5.5 - mandatory minimum 44×44px for interactive elements (CLAUDE.md § 5.4 rule 2) */
+  --wa-touch-min: 44px;
+
+  /* ── Z-index scale ──────────────────────────────────────────────────────── */
+
+  --wa-z-below:    -1;
+  --wa-z-base:      0;
+  --wa-z-raised:   10;
+  --wa-z-dropdown: 100;
+  --wa-z-sticky:   200;
+  --wa-z-overlay:  300;
+  --wa-z-modal:    400;
+  --wa-z-toast:    500;
+  --wa-z-tooltip:  600;
+
+  /* ── Transitions ────────────────────────────────────────────────────────── */
+
+  --wa-duration-fast:   100ms;
+  --wa-duration-normal: 200ms;
+  --wa-duration-slow:   400ms;
+  --wa-ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
+  --wa-ease-in:         cubic-bezier(0.4, 0, 1, 1);
+  --wa-ease-out:        cubic-bezier(0, 0, 0.2, 1);
+
+}

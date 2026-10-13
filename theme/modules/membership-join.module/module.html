@@ -1,0 +1,390 @@
+{#
+  membership-join.module/module.html
+  Tier-aware handoff for new membership applications.
+
+  Paid tiers → HubSpot/Stripe payment link (module settings).
+  Free / by-agreement tiers (issue 251) → theme-styled application form posted
+  to the HubSpot Forms API (new-editor embeds are cross-origin iframes and
+  cannot be themed from the parent page).
+  This module does not write CRM state itself; payment/workflows and form
+  workflows activate membership after review.
+#}
+
+{%- set selected_slug = request.query_dict.tier|default('individual')|lower|replace('_', '-') -%}
+{%- if selected_slug == 'apprentice' or selected_slug == 'student' -%}
+  {%- set selected_slug = 'student-apprentice' -%}
+{%- elif selected_slug == 'corporate' -%}
+  {%- set selected_slug = 'corporate-bronze' -%}
+{%- elif selected_slug == 'supplier' -%}
+  {%- set selected_slug = 'supplier-bronze' -%}
+{%- endif -%}
+
+{# Picker values win. These fallbacks keep legacy page instances portal-local. #}
+{%- set _is_dev_portal = hub_id|string == '443253065' -%}
+{%- set STUDENT_APPRENTICE_FORM_ID = 'fd96b682-ba21-4dc8-aed0-3a3a49ae8489' if _is_dev_portal else '842ea403-aeec-4cea-b2f6-d0a22ce8db35' -%}
+{%- set RECIPROCAL_FORM_ID = '65639239-b23c-4a0c-91ca-641913e44c87' if _is_dev_portal else '1c03846a-c399-4750-a58d-fb735a1b18d2' -%}
+{%- set TAFE_RTO_FORM_ID = 'c3eb6c28-0461-4e64-bcf6-424e58dcbd76' if _is_dev_portal else '93662621-fb14-4fc1-ad52-79dd463c4c7e' -%}
+
+{%- set tiers = [
+  {
+    'slug': 'individual',
+    'label': 'Individual membership',
+    'category': 'Individual',
+    'price': module.individual_price_label|default('Price to be confirmed', true),
+    'description': 'For welding professionals who want member pricing, resources and Weld Australia portal access.',
+    'payment_href': module.individual_payment_link.url.href|default('', true),
+    'application_form_id': '',
+    'is_free_application': false
+  },
+  {
+    'slug': 'student-apprentice',
+    'label': 'Student / Apprentice membership',
+    'category': 'Individual',
+    'price': module.student_apprentice_price_label|default('Free', true),
+    'description': 'For students and apprentices beginning their welding career.',
+    'payment_href': '',
+    'application_form_id': module.student_apprentice_application_form.form_id|default(STUDENT_APPRENTICE_FORM_ID, true)|string|trim,
+    'is_free_application': true
+  },
+  {
+    'slug': 'reciprocal',
+    'label': 'Reciprocal membership',
+    'category': 'Individual',
+    'price': module.reciprocal_price_label|default('By agreement', true),
+    'description': 'For eligible members joining through a reciprocal membership arrangement.',
+    'payment_href': '',
+    'application_form_id': module.reciprocal_application_form.form_id|default(RECIPROCAL_FORM_ID, true)|string|trim,
+    'is_free_application': true
+  },
+  {
+    'slug': 'tafe-rto',
+    'label': 'TAFE / Government RTO membership',
+    'category': 'Organisation',
+    'price': module.tafe_rto_price_label|default('By agreement', true),
+    'description': 'For TAFEs and government registered training organisations.',
+    'payment_href': '',
+    'application_form_id': module.tafe_rto_application_form.form_id|default(TAFE_RTO_FORM_ID, true)|string|trim,
+    'is_free_application': true
+  },
+  {
+    'slug': 'corporate-gold',
+    'label': 'Corporate Gold membership',
+    'category': 'Corporate',
+    'price': module.corporate_gold_price_label|default('Price to be confirmed', true),
+    'description': 'For organisations that need the highest level of Weld Australia membership benefits.',
+    'payment_href': module.corporate_gold_payment_link.url.href|default('', true),
+    'application_form_id': '',
+    'is_free_application': false
+  },
+  {
+    'slug': 'corporate-silver',
+    'label': 'Corporate Silver membership',
+    'category': 'Corporate',
+    'price': module.corporate_silver_price_label|default('Price to be confirmed', true),
+    'description': 'For organisations that need strong training, visibility and member support.',
+    'payment_href': module.corporate_silver_payment_link.url.href|default('', true),
+    'application_form_id': '',
+    'is_free_application': false
+  },
+  {
+    'slug': 'corporate-bronze',
+    'label': 'Corporate Bronze membership',
+    'category': 'Corporate',
+    'price': module.corporate_bronze_price_label|default('Price to be confirmed', true),
+    'description': 'For organisations starting their Weld Australia membership journey.',
+    'payment_href': module.corporate_bronze_payment_link.url.href|default('', true),
+    'application_form_id': '',
+    'is_free_application': false
+  },
+  {
+    'slug': 'supplier-gold',
+    'label': 'Supplier Gold membership',
+    'category': 'Supplier',
+    'price': module.supplier_gold_price_label|default('Price to be confirmed', true),
+    'description': 'For suppliers seeking maximum industry visibility and Weld Australia member benefits.',
+    'payment_href': module.supplier_gold_payment_link.url.href|default('', true),
+    'application_form_id': '',
+    'is_free_application': false
+  },
+  {
+    'slug': 'supplier-silver',
+    'label': 'Supplier Silver membership',
+    'category': 'Supplier',
+    'price': module.supplier_silver_price_label|default('Price to be confirmed', true),
+    'description': 'For suppliers seeking industry visibility and member benefits.',
+    'payment_href': module.supplier_silver_payment_link.url.href|default('', true),
+    'application_form_id': '',
+    'is_free_application': false
+  },
+  {
+    'slug': 'supplier-bronze',
+    'label': 'Supplier Bronze membership',
+    'category': 'Supplier',
+    'price': module.supplier_bronze_price_label|default('Price to be confirmed', true),
+    'description': 'For suppliers starting their Weld Australia membership journey.',
+    'payment_href': module.supplier_bronze_payment_link.url.href|default('', true),
+    'application_form_id': '',
+    'is_free_application': false
+  }
+] -%}
+
+{%- set selected = namespace(tier=tiers[0]) -%}
+{%- for tier in tiers -%}
+  {%- if tier.slug == selected_slug -%}
+    {%- set selected.tier = tier -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- set is_free = selected.tier.is_free_application -%}
+{%- if selected.tier.slug == 'student-apprentice' -%}
+  {%- set hero_subheadline = 'Start your free Weld Australia membership and access support, resources and industry connection while you study or complete your apprenticeship.' -%}
+{%- elif is_free -%}
+  {%- set hero_subheadline = selected.tier.description ~ ' Complete the application form and the membership team will review your eligibility.' -%}
+{%- else -%}
+  {%- set hero_subheadline = selected.tier.description ~ ' Review your selected tier and continue to the secure payment or application step.' -%}
+{%- endif -%}
+{%- set application_form_id = selected.tier.application_form_id|default('', true)|string|trim -%}
+{%- set support_email = module.support_email|default('membership@weldaustralia.com.au', true) -%}
+{%- set mail_subject = 'Membership application: ' ~ selected.tier.label -%}
+{%- if is_free -%}
+  {%- set mail_body = 'Hi Weld Australia team,%0D%0A%0D%0AI would like to apply for ' ~ selected.tier.label ~ '.%0D%0A%0D%0APlease send me the application form / next steps.%0D%0A' -%}
+{%- else -%}
+  {%- set mail_body = 'Hi Weld Australia team,%0D%0A%0D%0AI would like to apply for ' ~ selected.tier.label ~ '.%0D%0A%0D%0APlease send me the correct payment/application link.%0D%0A' -%}
+{%- endif -%}
+{%- set selected_price_label = request.query_dict.price_label|default('', true) -%}
+{%- set selected_price_value = request.query_dict.price_value|default('', true) -%}
+{%- set selected_price_sub = request.query_dict.price_sub|default('', true) -%}
+{%- if not selected_price_value -%}
+  {%- set selected_price_value = selected.tier.price -%}
+{%- endif -%}
+{#- QA ref 36: membership fees are ex GST and the payment step adds the tax.
+    A card on /membership already says so in the price_sub it hands over; a
+    price typed into this module's own fields, or an old link, gets the same
+    words here. "Free", "By agreement" and "$0" are not a fee. -#}
+{%- set _join_fee_amount = selected_price_value|string|replace('$', '')|replace(',', '')|trim|float -%}
+{%- if _join_fee_amount > 0 and 'gst' not in (selected_price_label ~ ' ' ~ selected_price_value ~ ' ' ~ selected_price_sub)|lower -%}
+  {%- set selected_price_sub = (selected_price_sub ~ ', ex GST') if selected_price_sub else 'ex GST' -%}
+{%- endif -%}
+
+<div class="wa-membership-join__hero">
+  {% set _shared_hero_id = 'membership-join-hero' %}
+  {% set _shared_hero_section_id = 'membership-join-hero' %}
+  {% set _shared_hero_background = 'primary' %}
+  {% set _shared_hero_height = 'compact' %}
+  {% set _shared_hero_spacing = 'spacious' %}
+  {% set _shared_hero_alignment = 'left' %}
+  {% set _shared_hero_accent_bar = true %}
+  {% set _shared_hero_media_type = 'none' %}
+  {% set _shared_hero_show_breadcrumb = true %}
+  {% set _shared_hero_breadcrumb_items = [
+    {"label": "Membership", "href": "/membership/"},
+    {"label": "Join", "href": "/membership/join/"},
+    {"label": selected.tier.label, "current": true}
+  ] %}
+  {% set _shared_hero_eyebrow = 'Membership application' %}
+  {% set _shared_hero_headline = selected.tier.label %}
+  {% set _shared_hero_subheadline = '<p>' ~ hero_subheadline ~ '</p>' %}
+  {% include "../../templates/partials/shared-hero.html" %}
+</div>
+
+<section
+  class="wa-membership-join wa-section wa-section--bg-surface_alt wa-section--spacing-spacious{% if is_free %} wa-membership-join--free{% endif %}"
+  aria-labelledby="{{ name }}-heading"
+  data-membership-join-tier="{{ selected.tier.slug }}"
+  data-membership-join-mode="{% if is_free %}application{% else %}payment{% endif %}"
+>
+  <div class="container">
+    <div class="wa-membership-join__grid">
+      <div class="wa-membership-join__copy">
+        {% if module.overline %}
+        <p class="wa-overline">
+          <span class="wa-overline__text">{{ module.overline }}</span>
+        </p>
+        {% endif %}
+
+        <h2 id="{{ name }}-heading">{{ module.heading|default('Complete your membership application') }}</h2>
+
+        {% if module.intro %}
+        <div class="wa-richtext wa-membership-join__intro">{{ module.intro }}</div>
+        {% endif %}
+
+        <ol class="wa-membership-join__steps" role="list">
+          <li>
+            <span>1</span>
+            <strong>Choose your tier</strong>
+            <small>You have selected {{ selected.tier.label }}.</small>
+          </li>
+          {% if is_free %}
+          <li>
+            <span>2</span>
+            <strong>Complete the application</strong>
+            <small>Free and by-agreement memberships use an eligibility form — not a payment checkout.</small>
+          </li>
+          <li>
+            <span>3</span>
+            <strong>Eligibility review</strong>
+            <small>Portal access is granted after the membership team confirms you are eligible.</small>
+          </li>
+          {% else %}
+          <li>
+            <span>2</span>
+            <strong>Complete payment</strong>
+            <small>Use the secure payment link when configured for this tier.</small>
+          </li>
+          <li>
+            <span>3</span>
+            <strong>Activate portal access</strong>
+            <small>You are granted member portal access after the membership is approved.</small>
+          </li>
+          {% endif %}
+        </ol>
+
+        {% if is_free %}
+        <div class="wa-membership-join__application" id="{{ name }}-application">
+          {% if application_form_id %}
+          {# Theme-owned form UI → Forms API (same pattern as contact-form).
+             New HubSpot editor forms render in a cross-origin iframe, so parent
+             CSS / --hsf-* vars cannot style the embed. #}
+          <h2 class="wa-membership-join__application-heading">Apply for {{ selected.tier.label }}</h2>
+          <div
+            class="wa-membership-join__form-mount"
+            id="{{ name }}-form-mount"
+            data-wa-membership-application
+            data-portal-id="{{ hub_id | default('441838610', true) }}"
+            data-form-id="{{ application_form_id }}"
+            data-tier-slug="{{ selected.tier.slug }}"
+            data-tier-label="{{ selected.tier.label|escape }}"
+            data-success-message={{ module.application_success_message|default('<p>Thanks — your membership application has been received. The Weld Australia membership team will review it and be in touch within 2 business days.</p>', true)|tojson }}
+            data-error-message={{ ('Something went wrong. Please try again, or email ' ~ support_email ~ '.')|tojson }}
+            data-submit-label="Submit application"
+          >
+            <div class="wa-membership-join__success" hidden role="status" aria-live="polite" tabindex="-1"></div>
+            <form class="wa-membership-join__form" novalidate>
+              <div class="wa-mj-row">
+                <div class="wa-mj-field">
+                  <label class="wa-mj-label" for="{{ name }}-firstname">First name <span class="wa-mj-required" aria-hidden="true">*</span></label>
+                  <input class="wa-mj-input" id="{{ name }}-firstname" name="firstname" type="text" autocomplete="given-name" required>
+                </div>
+                <div class="wa-mj-field">
+                  <label class="wa-mj-label" for="{{ name }}-lastname">Last name <span class="wa-mj-required" aria-hidden="true">*</span></label>
+                  <input class="wa-mj-input" id="{{ name }}-lastname" name="lastname" type="text" autocomplete="family-name" required>
+                </div>
+              </div>
+              <div class="wa-mj-field">
+                <label class="wa-mj-label" for="{{ name }}-email">Email <span class="wa-mj-required" aria-hidden="true">*</span></label>
+                <input class="wa-mj-input" id="{{ name }}-email" name="email" type="email" autocomplete="email" required>
+              </div>
+              <div class="wa-mj-field">
+                <label class="wa-mj-label" for="{{ name }}-company">Company name</label>
+                <input class="wa-mj-input" id="{{ name }}-company" name="company" type="text" autocomplete="organization">
+              </div>
+              {% if selected.tier.slug == 'student-apprentice' %}
+              <fieldset class="wa-mj-fieldset">
+                <legend class="wa-mj-fieldset__legend">Training details</legend>
+                <div class="wa-mj-field">
+                  <label class="wa-mj-label" for="{{ name }}-school">Name of Training Organisation <span class="wa-mj-required" aria-hidden="true">*</span></label>
+                  <input class="wa-mj-input" id="{{ name }}-school" name="school" type="text" autocomplete="organization" required>
+                </div>
+                <div class="wa-mj-row">
+                  <div class="wa-mj-field">
+                    <label class="wa-mj-label" for="{{ name }}-student-course-completion-date">Expected Apprenticeship Completion Date <span class="wa-mj-required" aria-hidden="true">*</span></label>
+                    <input class="wa-mj-input" id="{{ name }}-student-course-completion-date" name="student_course_completion_date" type="date" required>
+                  </div>
+                  <div class="wa-mj-field">
+                    <label class="wa-mj-label" for="{{ name }}-student-id-number">Student Identification Number <span class="wa-mj-required" aria-hidden="true">*</span></label>
+                    <input class="wa-mj-input" id="{{ name }}-student-id-number" name="student_id_number" type="text" autocomplete="off" required>
+                  </div>
+                </div>
+              </fieldset>
+              {% endif %}
+              <div class="wa-mj-row">
+                <div class="wa-mj-field">
+                  <label class="wa-mj-label" for="{{ name }}-phone">Phone number</label>
+                  <input class="wa-mj-input" id="{{ name }}-phone" name="phone" type="tel" autocomplete="tel">
+                </div>
+                <div class="wa-mj-field">
+                  <label class="wa-mj-label" for="{{ name }}-mobilephone">Mobile phone number</label>
+                  <input class="wa-mj-input" id="{{ name }}-mobilephone" name="mobilephone" type="tel" autocomplete="tel-national">
+                </div>
+              </div>
+              <p class="wa-mj-error" role="alert" hidden></p>
+              <button class="btn btn-primary wa-membership-join__form-submit" type="submit">
+                Submit application
+              </button>
+            </form>
+          </div>
+          {% else %}
+          <div class="wa-membership-join__notice wa-richtext">
+            {{ module.application_unavailable_message }}
+          </div>
+          <a
+            class="btn btn-primary wa-membership-join__cta"
+            href="mailto:{{ support_email }}?subject={{ mail_subject|urlencode }}&body={{ mail_body }}"
+          >
+            Request application form
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+
+      <aside class="wa-membership-join__card" aria-label="Selected membership">
+        <p class="wa-membership-join__category">{{ selected.tier.category }}</p>
+        <h2>{{ selected.tier.label }}</h2>
+        <div class="wa-membership-join__price-block">
+          {% if selected_price_label %}
+          <span class="wa-membership-join__price-label">{{ selected_price_label }}</span>
+          {% endif %}
+          <p class="wa-membership-join__price">{{ selected_price_value }}</p>
+          {% if selected_price_sub %}
+          <p class="wa-membership-join__price-sub">{{ selected_price_sub }}</p>
+          {% endif %}
+        </div>
+        <p class="wa-membership-join__description">{{ selected.tier.description }}</p>
+
+        {% if is_free %}
+          {% if application_form_id %}
+          <a class="btn btn-primary wa-membership-join__cta" href="#{{ name }}-application">
+            Complete application form
+          </a>
+          {% else %}
+          <div class="wa-membership-join__notice wa-richtext">
+            {{ module.application_unavailable_message }}
+          </div>
+          <a
+            class="btn btn-primary wa-membership-join__cta"
+            href="mailto:{{ support_email }}?subject={{ mail_subject|urlencode }}&body={{ mail_body }}"
+          >
+            Request application form
+          </a>
+          {% endif %}
+        {% elif selected.tier.payment_href %}
+        {#
+          When the per-tier payment link points at the Event Engine membership
+          checkout, append the logged-in member's tier so the engine can resolve
+          pricing/entitlements - same wa_member_tier handoff as course checkout
+          (src/shared/utils/registration.ts). No-op for a new (non-member) applicant.
+        #}
+        {%- set _member_tier_raw = request_contact.individual_membership_type_2 | default(request_contact.contact_membership_tier, true) | default('', true) | string | trim -%}
+        {#- Normalise a display value ("Corporate Gold") to the engine slug ("corporate_gold"),
+            matching checkout-tunnel's tier key, then URL-encode before appending. -#}
+        {%- set _member_tier = _member_tier_raw | lower | replace(' ', '_') | replace('-', '_') -%}
+        {%- set _pay_sep = '?' if '?' not in selected.tier.payment_href else '&' -%}
+        {%- set _pay_href = (selected.tier.payment_href ~ _pay_sep ~ 'wa_member_tier=' ~ (_member_tier | urlencode)) if _member_tier else selected.tier.payment_href -%}
+        <a class="btn btn-primary wa-membership-join__cta" href="{{ _pay_href }}">
+          Continue to secure payment
+        </a>
+        {% else %}
+        <div class="wa-membership-join__notice wa-richtext">
+          {{ module.payment_unavailable_message }}
+        </div>
+        <a class="btn btn-primary wa-membership-join__cta" href="mailto:{{ support_email }}?subject={{ mail_subject|urlencode }}&body={{ mail_body }}">
+          Request payment link
+        </a>
+        {% endif %}
+
+        <a class="wa-membership-join__back" href="/membership/#membership-options">Compare all membership options</a>
+      </aside>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,63 @@
+{#
+  timeline.module/module.html
+  Vertical timeline. Desktop: alternating left/right with a centre spine.
+  Mobile: single-column stacked.
+
+  Fields:
+    module.section_id    - optional anchor id
+    module.background    - background variant
+    module.spacing       - vertical spacing variant
+    module.members_only  - gating flag
+    module.section_heading - optional heading
+    module.milestones    - repeater group (year, heading, body, image)
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section
+  class="wa-timeline wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-timeline__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    <div class="wa-timeline__track">
+      {% for milestone in module.milestones %}
+      <div class="wa-timeline__item wa-timeline__item--{% if loop.index is odd %}left{% else %}right{% endif %}">
+
+        {# Centre spine node #}
+        <div class="wa-timeline__node" aria-hidden="true">
+          <span class="wa-timeline__year-badge">{{ milestone.year }}</span>
+        </div>
+
+        {# Content card #}
+        <div class="wa-timeline__card">
+          {% if milestone.image and milestone.image.src %}
+          <div class="wa-timeline__image-wrap">
+            <img
+              src="{{ milestone.image.src }}"
+              alt="{{ milestone.image.alt | default(milestone.heading | default('')) }}"
+              class="wa-timeline__image"
+              loading="lazy"
+            >
+          </div>
+          {% endif %}
+
+          {% if milestone.heading %}
+          <h3 class="wa-timeline__card-heading">{{ milestone.heading }}</h3>
+          {% endif %}
+
+          {% if milestone.body_text %}
+          <div class="wa-timeline__card-body">{{ milestone.body_text }}</div>
+          {% endif %}
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endif %}

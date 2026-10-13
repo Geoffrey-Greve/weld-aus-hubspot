@@ -1,0 +1,154 @@
+[
+  {
+    "name": "variant",
+    "label": "Section type",
+    "type": "choice",
+    "choices": [
+      ["proof_points", "Course proof points"],
+      ["trainers", "Trainer / course delivery"],
+      ["workplace", "In-house workplace training"],
+      ["pathway", "Certification pathway"]
+    ],
+    "default": "proof_points"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface"],
+      ["surface_alt", "Alt grey"],
+      ["primary", "Navy"],
+      ["primary_dark", "Deep navy"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact"],
+      ["default", "Default"],
+      ["spacious", "Spacious"]
+    ],
+    "default": "spacious"
+  },
+  {
+    "name": "eyebrow",
+    "label": "Eyebrow override",
+    "type": "text",
+    "help_text": "Leave blank to use the dynamic default for this section."
+  },
+  {
+    "name": "heading",
+    "label": "Heading override",
+    "type": "text",
+    "help_text": "Leave blank to use the dynamic default for this section."
+  },
+  {
+    "name": "body_text",
+    "label": "Body override",
+    "type": "richtext",
+    "help_text": "Leave blank to use dynamic copy based on the current course row."
+  },
+  {
+    "name": "image",
+    "label": "Image override",
+    "type": "image",
+    "help_text": "Leave blank to use the HubDB course photo or fallback image."
+  },
+  {
+    "name": "media_side",
+    "label": "Media side",
+    "type": "choice",
+    "choices": [
+      ["right", "Right"],
+      ["left", "Left"]
+    ],
+    "default": "right"
+  },
+  {
+    "name": "cards",
+    "label": "Card overrides",
+    "type": "group",
+    "help_text": "Optional. If populated, these replace the dynamic cards for this section.",
+    "occurrence": {
+      "min": 0,
+      "max": 8
+    },
+    "children": [
+      {
+        "name": "title",
+        "label": "Title",
+        "type": "text"
+      },
+      {
+        "name": "body_text",
+        "label": "Body",
+        "type": "text"
+      },
+      {
+        "name": "accent_color",
+        "label": "Accent colour",
+        "type": "choice",
+        "choices": [
+          ["gold", "Gold"],
+          ["magenta", "Magenta"],
+          ["navy", "Navy"],
+          ["green", "Green"]
+        ],
+        "default": "gold"
+      }
+    ]
+  },
+  {
+    "name": "steps",
+    "label": "Pathway step overrides",
+    "type": "group",
+    "help_text": "Optional. Used by the certification pathway section.",
+    "occurrence": {
+      "min": 0,
+      "max": 6
+    },
+    "children": [
+      {
+        "name": "title",
+        "label": "Step title",
+        "type": "text"
+      },
+      {
+        "name": "body_text",
+        "label": "Step body",
+        "type": "text"
+      },
+      {
+        "name": "meta",
+        "label": "Step meta / duration",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "cta_label",
+    "label": "CTA label",
+    "type": "text"
+  },
+  {
+    "name": "cta_link",
+    "label": "CTA link",
+    "type": "link"
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false
+  }
+]

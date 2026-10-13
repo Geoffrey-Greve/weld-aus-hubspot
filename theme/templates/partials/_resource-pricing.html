@@ -1,0 +1,53 @@
+{#
+  ─────────────────────────────────────────────────────────────────────────────
+  _resource-pricing.html - resource price-label helpers (QA #220)
+  ─────────────────────────────────────────────────────────────────────────────
+
+  HubDB Table 5 (`resources`) stores `member_label` / `non_member_label` as free
+  text. In practice those columns hold a mix of:
+
+    • real prices          "$450", "$450.00 ex GST", "295"
+    • price on application "$--"
+    • plain CTA copy       "Download PDF", "Join to download"
+    • free markers         "Free", "Included", "" (blank)
+
+  So "not free" is NOT the same as "costs money". A resource is only treated as
+  paid when its label actually reads like a price: it carries a currency marker
+  ($ / AUD) or is purely numeric, and any amount in it is greater than zero.
+
+  This mirrors isPaidLabel() in src/modules/resource-library/ResourceLibrary.tsx
+  so the listing island and the dynamic resource page agree on what is free.
+
+  Usage:
+    {% import "../partials/_resource-pricing.html" as rp %}
+    {% set is_paid = (rp.is_paid_label(row.non_member_label) | trim) == 'true' %}
+#}
+{% macro is_paid_label(raw) %}
+  {%- set label = raw | default('', true) | string | trim -%}
+  {%- set lowered = label | lower -%}
+  {%- if not label -%}
+    {{- 'false' -}}
+  {%- elif 'free' in lowered or 'included' in lowered or 'no charge' in lowered or 'complimentary' in lowered -%}
+    {{- 'false' -}}
+  {%- else -%}
+    {#- "aud" must be a standalone token, or "Download fraud guidance" reads as
+        a currency marker. Punctuation → spaces, padded, so ' aud ' only matches
+        the whole word - mirrors the word-bounded /\bAUD\b/i test in the island. -#}
+    {%- set tokens = ' ' ~ (lowered | regex_replace('[^a-z0-9]', ' ')) ~ ' ' -%}
+    {%- set has_currency = '$' in label or ' aud ' in tokens -%}
+    {%- set numeric_only = (label | regex_replace('[0-9., ]', '')) == '' -%}
+    {%- set digits = label | regex_replace('[^0-9]', '') -%}
+    {%- if not has_currency and not numeric_only -%}
+      {#- plain CTA copy such as "Download PDF" -#}
+      {{- 'false' -}}
+    {%- elif not digits -%}
+      {#- "$--" / "$POA": a currency marker with no amount is still paid. -#}
+      {{- 'true' if has_currency else 'false' -}}
+    {%- elif (digits | int) > 0 -%}
+      {{- 'true' -}}
+    {%- else -%}
+      {#- "$0" / "0.00" -#}
+      {{- 'false' -}}
+    {%- endif -%}
+  {%- endif -%}
+{% endmacro %}

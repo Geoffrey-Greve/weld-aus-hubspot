@@ -1,0 +1,7 @@
+/* checkout-tunnel.module/module.css
+   Shell styles managed at the HubL layer.
+   Most visual styles live in CheckoutTunnel.css (compiled into the JS bundle).
+   This file handles layout integration with the checkout.html layout. */
+
+/* The checkout layout provides no padding around checkout_content,
+   so the React island's .wa-checkout-tunnel sets its own spacing. */

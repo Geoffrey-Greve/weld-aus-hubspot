@@ -1,0 +1,87 @@
+{#
+  cert-pathway-cards.module/module.html
+  Grid of certification pathway cards. 1-col mobile → 2-col tablet → 3-col desktop.
+  Each card: icon, title, summary, "Who it's for" badge, duration badge, CTA button.
+
+  Fields:
+    module.section_id    - optional anchor id
+    module.background    - background variant
+    module.spacing       - vertical spacing variant
+    module.members_only  - gating flag
+    module.section_heading - optional heading
+    module.pathways      - repeater group (title, summary, audience, duration, icon, cta_label, cta_link)
+#}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+<section
+  class="wa-cert-pathway-cards wa-section wa-section--{{ module.background }} wa-section--{{ module.spacing }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+>
+  <div class="container">
+
+    {% if module.section_heading %}
+    <h2 class="wa-cert-pathway-cards__heading">{{ module.section_heading }}</h2>
+    {% endif %}
+
+    <div class="wa-cert-pathway-cards__grid">
+      {% for pathway in module.pathways %}
+      <div class="wa-cert-pathway-cards__card">
+
+        {% if pathway.icon and pathway.icon.src %}
+        <div class="wa-cert-pathway-cards__icon-wrap" aria-hidden="true">
+          <img
+            src="{{ pathway.icon.src }}"
+            alt="{{ pathway.icon.alt | default('') }}"
+            class="wa-cert-pathway-cards__icon"
+            width="48"
+            height="48"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        {% endif %}
+
+        <h3 class="wa-cert-pathway-cards__title">{{ pathway.title }}</h3>
+
+        {% if pathway.summary %}
+        <div class="wa-cert-pathway-cards__summary">{{ pathway.summary }}</div>
+        {% endif %}
+
+        {# Badges row #}
+        {% if pathway.audience or pathway.duration %}
+        <div class="wa-cert-pathway-cards__badges">
+          {% if pathway.audience %}
+          <span class="wa-cert-pathway-cards__badge wa-cert-pathway-cards__badge--audience">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-5.33 0-8 2.67-8 4v1h16v-1c0-1.33-2.67-4-8-4Z" fill="currentColor"/>
+            </svg>
+            {{ pathway.audience }}
+          </span>
+          {% endif %}
+          {% if pathway.duration %}
+          <span class="wa-cert-pathway-cards__badge wa-cert-pathway-cards__badge--duration">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2Zm1 9H9V5h2v4.5l3 1.8-1 1.7-2-1.2V11Z" fill="currentColor"/>
+            </svg>
+            {{ pathway.duration }}
+          </span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {# CTA button at bottom of card #}
+        {% if pathway.cta_label and pathway.cta_link %}
+        <a
+          href="{{ pathway.cta_link.url.href }}"
+          class="wa-cert-pathway-cards__cta"
+          {% if pathway.cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ pathway.cta_label }}</a>
+        {% endif %}
+
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endif %}

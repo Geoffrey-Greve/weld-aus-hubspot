@@ -1,0 +1,14 @@
+{
+  "label": "FAQ Accordion",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "FAQ accordion with optional FAQPage JSON-LD structured data for SEO. Uses native HTML details/summary.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_POST", "BLOG_LISTING"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["content", "accordion", "faq", "seo"]
+}

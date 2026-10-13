@@ -1,0 +1,168 @@
+<!--
+  templateType: page
+  label: Membership - Apprentice
+  isAvailableForNewContent: true
+-->
+﻿{#
+  membership-apprentice.html - Weld Australia Apprentice Membership Page
+  URL: /membership/apprentice/
+  Template type: drag-and-drop page
+
+  Sections (§ 3.5 variant - apprentice focus):
+    1. Hero - apprentice-focused, affordable entry-point messaging
+    2. What you get - three-up benefits (study resources, discounted courses, career pathways)
+    3. Apprentice vs Individual tier comparison - two-column focused comparison
+    4. How to join as an apprentice - three-step
+    5. Member testimonials - apprentice voices
+    6. FAQ accordion (apprentice-specific)
+    7. Final CTA - Join as an Apprentice
+
+  Modules used:
+    hero, value-props-3up, tier-comparison, step-process,
+    testimonial-slider, faq-accordion, cta-banner
+#}
+{% set page_title_exact = page_meta.html_title | default('Apprentice Membership - Weld Australia') %}
+{% set page_description = page_meta.meta_description | default('Weld Australia Apprentice Membership gives you access to study resources, discounted training courses, and certification support at an affordable rate.') %}
+{% extends "../layouts/base.html" %}
+
+
+{% block body %}
+{% dnd_area "main_content" label="Main content" %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 1  HERO - Apprentice-focused entry point
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/hero"
+          label="Hero - Apprentice Membership"
+          background="primary_dark"
+          height="medium"
+          alignment="left"
+          accent_bar=true
+          media_type="none"
+          headline="Start your welding career with the right support"
+          subheadline="<p>Apprentice membership with Weld Australia gives you access to study resources, discounted courses, and a community of experienced professionals.</p>"
+          primary_cta={"label_text": "Join as an apprentice", "link": {"url": {"href": "/membership/join/?tier=student-apprentice", "type": "EXTERNAL"}}, "style": "gold"}
+          secondary_cta={"label_text": "See what's included", "link": {"url": {"href": "#apprentice-benefits", "type": "EXTERNAL"}}, "style": "white-outline"}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 2  WHAT YOU GET - Three-up benefits for apprentices
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/value-props-3up"
+          label="Apprentice membership benefits"
+          section_heading="What you get as an apprentice member"
+          section_id="apprentice-benefits"
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 3  TIER COMPARISON - Apprentice + Individual side by side
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/tier-comparison"
+          label="Apprentice vs Individual membership"
+          section_heading="Apprentice membership vs Individual membership"
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 4  HOW TO JOIN - Three-step process for apprentices
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/step-process"
+          label="How to join as an apprentice"
+          section_heading="Joining takes just a few minutes"
+          step_count=3
+          background="surface"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 5  TESTIMONIALS - Apprentice member voices
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/testimonial-slider"
+          label="Apprentice testimonials"
+          section_heading="From apprentices who've been where you are"
+          autoplay=true
+          interval_seconds=6
+          background="primary"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 6  FAQ - Apprentice-specific questions
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/faq-accordion"
+          label="Apprentice membership FAQ"
+          section_heading="Your questions answered"
+          background="surface_alt"
+          spacing="spacious"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+  {# ═══════════════════════════════════════════════════════════════════════
+     § 7  FINAL CTA - Join as an Apprentice
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% dnd_section %}
+    {% dnd_column offset=0 width=12 %}
+      {% dnd_row %}
+        {% dnd_module
+          path="../../modules/cta-banner"
+          label="Final CTA - Apprentice join"
+          headline="Start your Weld Australia membership today"
+          body_text="<p>Join as an apprentice member and get the tools and community to build a rewarding welding career.</p>"
+          cta_label="Join as an apprentice"
+          cta_link={"url": {"href": "/membership/join/?tier=student-apprentice", "type": "EXTERNAL"}}
+          secondary_cta_label="See all membership tiers"
+          secondary_cta_link={"url": {"href": "/membership/", "type": "EXTERNAL"}}
+          background="primary"
+          spacing="default"
+          align="split"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+
+{% end_dnd_area %}
+{% endblock %}

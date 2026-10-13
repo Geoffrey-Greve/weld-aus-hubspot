@@ -1,0 +1,208 @@
+[
+  {
+    "name": "section_heading",
+    "label": "Section heading",
+    "type": "text",
+    "default": "Featured courses"
+  },
+  {
+    "name": "section_eyebrow",
+    "label": "Section eyebrow",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "name": "selection_mode",
+    "label": "Selection mode",
+    "type": "choice",
+    "choices": [
+      ["all_courses", "All courses"],
+      ["manual", "Manually pick"],
+      ["next_upcoming", "Next upcoming sessions"],
+      ["category", "Filter by category"]
+    ],
+    "default": "next_upcoming"
+  },
+  {
+    "name": "manual_course_ids",
+    "label": "Course IDs (comma separated)",
+    "type": "text",
+    "visibility": {
+      "controlling_field_path": "selection_mode",
+      "operator": "EQUAL",
+      "controlling_value_regex": "manual"
+    }
+  },
+  {
+    "name": "category_filter",
+    "label": "Training division",
+    "type": "choice",
+    "help_text": "Divisions are defined in config/course-categories.json and map onto the HubDB courses 'category' column - see theme/templates/partials/course-taxonomy.html.",
+    "choices": [
+      ["welding-inspection", "Welding Inspection"],
+      ["welding-supervision", "Welding Supervision"],
+      ["welding-coordination", "Welding Coordination"],
+      ["short-courses", "Short Courses"]
+    ],
+    "visibility": {
+      "controlling_field_path": "selection_mode",
+      "operator": "EQUAL",
+      "controlling_value_regex": "category"
+    }
+  },
+  {
+    "name": "max_count",
+    "label": "How many to show",
+    "type": "number",
+    "default": 3,
+    "min": 1,
+    "max": 48
+  },
+  {
+    "name": "show_member_pricing",
+    "label": "Show member pricing",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "show_filters",
+    "label": "Show category filters",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "promo_banner",
+    "label": "Promotional callout",
+    "type": "group",
+    "help_text": "Optional highlighted callout shown above the course grid.",
+    "children": [
+      {
+        "name": "enabled",
+        "label": "Show promotional callout",
+        "type": "boolean",
+        "default": false
+      },
+      {
+        "name": "eyebrow",
+        "label": "Eyebrow",
+        "type": "text",
+        "default": "Featured"
+      },
+      {
+        "name": "text",
+        "label": "Callout text",
+        "type": "richtext",
+        "default": "<p>Looking for a tailored or in-house program? Talk to our training team about a course built around your workforce.</p>"
+      },
+      {
+        "name": "link_label",
+        "label": "Link label",
+        "type": "text",
+        "default": "Enquire about training"
+      },
+      {
+        "name": "link",
+        "label": "Link",
+        "type": "link",
+        "default": {
+          "url": { "type": "EXTERNAL", "href": "/contact/" },
+          "open_in_new_tab": false,
+          "no_follow": false
+        }
+      }
+    ]
+  },
+  {
+    "name": "use_type_thumbnails",
+    "label": "Use one thumbnail per course type",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When on, each card uses the representative image for its course type (below) instead of the per-session photo (defect 102)."
+  },
+  {
+    "name": "type_thumbnails",
+    "label": "Course-type thumbnails",
+    "type": "group",
+    "visibility": {
+      "controlling_field_path": "use_type_thumbnails",
+      "operator": "EQUAL",
+      "controlling_value_regex": "true"
+    },
+    "children": [
+      { "name": "inspector", "label": "Inspector", "type": "image", "default": { "src": "", "alt": "Inspector courses" } },
+      { "name": "supervisor", "label": "Supervisor", "type": "image", "default": { "src": "", "alt": "Supervisor courses" } },
+      { "name": "welding_processes", "label": "Welding Processes", "type": "image", "default": { "src": "", "alt": "Welding processes courses" } },
+      { "name": "engineering", "label": "Engineering", "type": "image", "default": { "src": "", "alt": "Engineering courses" } },
+      { "name": "welding_fundamentals", "label": "Welding Fundamentals", "type": "image", "default": { "src": "", "alt": "Welding fundamentals courses" } },
+      { "name": "other", "label": "Other", "type": "image", "default": { "src": "", "alt": "Welding courses" } }
+    ]
+  },
+  {
+    "name": "show_view_all_cta",
+    "label": "Show 'View all courses' CTA",
+    "type": "boolean",
+    "default": true
+  },
+  {
+    "name": "view_all_label",
+    "label": "View all label",
+    "type": "text",
+    "default": "View all courses"
+  },
+  {
+    "name": "view_all_link",
+    "label": "View all link",
+    "type": "link"
+  },
+  {
+    "name": "section_id",
+    "label": "Section anchor ID (optional)",
+    "type": "text",
+    "help_text": "Used for in-page anchor links. Lower-case, hyphenated. Leave blank if not needed.",
+    "default": ""
+  },
+  {
+    "name": "background",
+    "label": "Background style",
+    "type": "choice",
+    "choices": [
+      ["surface", "Surface (default light)"],
+      ["surface_alt", "Alt surface (subtle grey)"],
+      ["primary", "Primary (brand colour)"],
+      ["primary_dark", "Primary dark"],
+      ["transparent", "Transparent"]
+    ],
+    "default": "surface"
+  },
+  {
+    "name": "spacing",
+    "label": "Vertical spacing",
+    "type": "choice",
+    "choices": [
+      ["compact", "Compact (32px)"],
+      ["default", "Default (64px)"],
+      ["spacious", "Spacious (96px)"]
+    ],
+    "default": "default"
+  },
+  {
+    "name": "visibility",
+    "label": "Show on devices",
+    "type": "choice",
+    "display": "checkbox",
+    "multiple": true,
+    "choices": [
+      ["mobile", "Mobile"],
+      ["tablet", "Tablet"],
+      ["desktop", "Desktop"]
+    ],
+    "default": ["mobile", "tablet", "desktop"]
+  },
+  {
+    "name": "members_only",
+    "label": "Members only",
+    "type": "boolean",
+    "default": false,
+    "help_text": "When true, this section is only rendered for logged-in active members."
+  }
+]

@@ -1,0 +1,371 @@
+/*
+ * team-grid.module/module.css  (server-rendered)
+ * Header (intro + magenta-bordered highlight cards), then people cards.
+ */
+
+/* ── Header: intro left, highlight cards right ───────────────────────────── */
+
+.wa-team__head {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-8, 2rem);
+  margin-bottom: var(--wa-space-10, 2.5rem);
+}
+
+@media (min-width: 900px) {
+  .wa-team__head {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: start;
+    gap: var(--wa-space-12, 3rem);
+  }
+}
+
+.wa-team__heading {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--wa-color-primary);
+  margin: 0 0 var(--wa-space-4, 1rem);
+}
+
+.wa-team__intro {
+  font-size: var(--wa-text-base);
+  line-height: var(--wa-leading-relaxed, 1.7);
+  color: var(--wa-color-text-muted);
+  max-width: 46ch;
+}
+
+/* Highlight cards (magenta left border) */
+.wa-team__highlights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-4, 1rem);
+}
+
+.wa-team__highlight {
+  background: #fff;
+  border: 1px solid var(--wa-color-border, #e5e7eb);
+  border-left: 4px solid var(--wa-color-accent-magenta, #ed128d);
+  border-radius: var(--wa-radius-md, 10px);
+  box-shadow: var(--wa-shadow-card, 0 8px 24px rgba(28, 30, 76, 0.05));
+  padding: var(--wa-space-4, 1rem) var(--wa-space-5, 1.25rem);
+}
+
+.wa-team__highlight-title {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-base, 1rem);
+  font-weight: 700;
+  color: var(--wa-color-primary);
+  margin: 0 0 2px;
+}
+
+.wa-team__highlight-desc {
+  font-size: var(--wa-text-sm, 0.9rem);
+  line-height: 1.5;
+  color: var(--wa-color-text-muted);
+  margin: 0;
+}
+
+/* Feature grid variant for longer highlight lists. This keeps 5-6 points from
+   becoming a tall right-hand rail with awkward empty space beside the intro. */
+.wa-team--feature-highlights .wa-team__head {
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-7, 1.75rem);
+}
+
+.wa-team--feature-highlights .wa-team__head-intro {
+  max-width: 760px;
+}
+
+.wa-team--feature-highlights .wa-team__intro {
+  max-width: 62ch;
+}
+
+.wa-team--feature-highlights .wa-team__highlights {
+  counter-reset: wa-team-feature;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-4, 1rem);
+}
+
+.wa-team--feature-highlights .wa-team__highlight {
+  counter-increment: wa-team-feature;
+  position: relative;
+  min-height: 100%;
+  border: 1px solid rgba(28, 30, 76, 0.1);
+  border-top: 4px solid var(--wa-color-accent-magenta, #ed128d);
+  border-left: 1px solid rgba(28, 30, 76, 0.1);
+  border-radius: var(--wa-radius-lg, 16px);
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(28, 30, 76, 0.06);
+  padding: var(--wa-space-5, 1.25rem) var(--wa-space-5, 1.25rem) var(--wa-space-5, 1.25rem) 4.25rem;
+}
+
+.wa-team--feature-highlights .wa-team__highlight::before {
+  content: counter(wa-team-feature, decimal-leading-zero);
+  position: absolute;
+  top: var(--wa-space-5, 1.25rem);
+  left: var(--wa-space-5, 1.25rem);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wa-color-primary, #1c1e4c);
+  color: #fff;
+  font-family: var(--wa-font-heading, inherit);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.wa-team--feature-highlights .wa-team__highlight-title {
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  margin-bottom: 0.35rem;
+}
+
+@media (min-width: 680px) {
+  .wa-team--feature-highlights .wa-team__highlights {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1040px) {
+  .wa-team--feature-highlights .wa-team__highlights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Checklist variant used by the public Team & Board page. */
+.wa-team--highlights-checklist .wa-team__highlights {
+  gap: 0.75rem;
+  padding-top: 0.15rem;
+}
+
+.wa-team--highlights-checklist .wa-team__highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.wa-team--highlights-checklist .wa-team__highlight::before {
+  content: "✓";
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wa-color-surface-alt, #f1f3f8);
+  color: var(--wa-color-primary, #1c1e4c);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  margin-top: 0.05rem;
+}
+
+.wa-team--highlights-checklist .wa-team__highlight-title {
+  font-family: var(--wa-font-body, inherit);
+  font-size: var(--wa-text-sm, 0.9rem);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--wa-color-text, #111827);
+  margin: 0;
+}
+
+.wa-team--highlights-checklist .wa-team__highlight-desc {
+  margin-top: 0.15rem;
+}
+
+/* ── Category groups (group_by_category) ─────────────────────────────────── */
+
+.wa-team__group + .wa-team__group {
+  margin-top: var(--wa-space-10, 2.5rem);
+}
+
+.wa-team__group-title {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(20px, 1.8vw, 26px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--wa-color-primary);
+  margin: 0 0 var(--wa-space-5, 1.25rem);
+  padding-bottom: var(--wa-space-3, 0.75rem);
+  border-bottom: 2px solid var(--wa-color-border, #e5e7eb);
+}
+
+.wa-team--dark .wa-team__group-title {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── People grid ─────────────────────────────────────────────────────────── */
+
+.wa-team__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-6, 1.5rem);
+  justify-items: center;
+}
+
+@media (min-width: 600px) {
+  .wa-team__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 900px) {
+  .wa-team--cols-2 .wa-team__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wa-team--cols-3 .wa-team__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .wa-team--cols-4 .wa-team__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.wa-team__actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--wa-space-10, 2.5rem);
+}
+
+.wa-team__view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wa-team--board-preview .wa-team__grid {
+  align-items: stretch;
+}
+
+.wa-team__card {
+  width: min(100%, 340px);
+  justify-self: center;
+  background: #fff;
+  border: 2px solid var(--wa-color-border, #e5e7eb);
+  border-radius: var(--wa-radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: var(--wa-shadow-card, 0 12px 30px rgba(28, 30, 76, 0.06));
+  display: flex;
+  flex-direction: column;
+}
+
+/* Linked cards (HubDB rows with a profile page). The <a> wraps the whole card
+   interior, so the hit area is the card itself - comfortably over the 44x44px
+   minimum. Colour is inherited so the name/role keep their own styling. */
+.wa-team__card--linked {
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.wa-team__card-link {
+  color: inherit;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.wa-team__card--linked:hover,
+.wa-team__card--linked:focus-within {
+  border-color: var(--wa-color-accent, #fecf05);
+  box-shadow: 0 1rem 2.5rem rgba(28, 30, 76, 0.14);
+  transform: translateY(-2px);
+}
+
+.wa-team__card--linked:hover .wa-team__name,
+.wa-team__card--linked:focus-within .wa-team__name {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.wa-team__card-link:focus-visible {
+  outline: 3px solid var(--wa-color-accent-magenta, #ed128d);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-team__card--linked {
+    transition: none;
+  }
+
+  .wa-team__card--linked:hover,
+  .wa-team__card--linked:focus-within {
+    transform: none;
+  }
+}
+
+.wa-team__photo-wrap {
+  position: relative;
+  aspect-ratio: 5 / 6;
+  background: var(--wa-color-surface-alt, #eef0f4);
+  overflow: hidden;
+}
+
+.wa-team__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.wa-team__photo-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--wa-font-heading);
+  font-size: 44px;
+  font-weight: 800;
+  color: rgba(28, 30, 76, 0.25);
+}
+
+.wa-team__body {
+  flex: 1;
+  padding: clamp(1.35rem, 2vw, 1.75rem);
+}
+
+.wa-team__name {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-lg, 1.125rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--wa-color-primary);
+  margin: 0 0 0.45rem;
+}
+
+.wa-team__role {
+  font-size: var(--wa-text-sm, 0.9rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--wa-color-magenta-text, #c00d74);
+  margin: 0 0 var(--wa-space-3, 0.75rem);
+}
+
+/* Outlined qualification pill (e.g. "IWE", "IWE, PhD") */
+.wa-team__quals {
+  display: inline-block;
+  padding: 3px 12px;
+  border: 1px solid var(--wa-color-primary, #1c1e4c);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--wa-color-primary, #1c1e4c);
+  background: rgba(28, 30, 76, 0.03);
+}
+
+/* ── Dark background variant ─────────────────────────────────────────────── */
+
+.wa-team--dark .wa-team__heading { color: #fff; }
+.wa-team--dark .wa-team__intro { color: rgba(255, 255, 255, 0.7); }

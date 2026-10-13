@@ -1,0 +1,14 @@
+{
+  "label": "News Subscribe Banner",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Weld Connect subscribe block for news pages. Submits to the HubSpot form chosen in the Subscription form dropdown - no GUID is entered by hand. Use an email-only form. Pick the full-width banner or the article sidebar card in Layout.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE", "BLOG_LISTING", "BLOG_POST"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["newsletter", "subscribe", "blog"]
+}

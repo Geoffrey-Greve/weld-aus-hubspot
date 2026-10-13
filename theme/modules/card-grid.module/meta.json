@@ -1,0 +1,14 @@
+{
+  "label": "Card Grid",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Configurable grid of cards with multiple layout styles. Replaces category-cards-3up, case-study-cards, and service-cards.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["cards", "grid", "content"]
+}

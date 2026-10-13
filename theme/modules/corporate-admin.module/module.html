@@ -1,0 +1,315 @@
+{#
+  corporate-admin.module/module.html
+
+  React island: Manage My Team panel for Primary Admin contacts.
+
+  Visibility guard: only renders for contacts with Primary Admin association.
+  The client-side component additionally treats the props as read-only - it
+  never re-derives access from JS; the HubL guard is the source of truth.
+
+  Data flow:
+    1. Resolve the logged-in contact's primary company via crm_associations.
+    2. Read company-level voucher properties (vouchers_total, vouchers_used).
+    3. Fetch all Employee-associated contacts of that company.
+    4. Fetch available course sessions from HubDB Table 1 (courses).
+    5. Serialise everything as a props blob for the React island.
+
+  Dependencies:
+    - request_contact.is_logged_in
+    - request_contact.associations (Primary Admin label)
+    - Company properties: company_name, vouchers_total, vouchers_used
+    - HubDB table: courses (Table 1 per CLAUDE.md §7.1)
+
+  Build note:
+    The script tag below is updated by scripts/build.ts after pnpm build.
+    Always run pnpm build before hs upload to resolve the hashed filename.
+#}
+
+{# ── 1. Guard: logged-in Primary Admin only ── #}
+{#
+  We iterate ALL company associations (up to 50 - the max crm_associations
+  returns in HubL) and pick the first company whose association label set
+  includes 'Primary Admin'.  Taking [0] before verifying the label would
+  silently use the wrong company for contacts associated with multiple
+  companies under different roles.
+#}
+
+{% set admin_lookup_ns = namespace(found=false, company=none, actor_contact_id='', seen=[]) %}
+{% if request_contact.is_logged_in %}
+  {% set admin_contact_id_candidates = [
+    request_contact.id | default('', true) | string | trim,
+    request_contact.hs_object_id | default('', true) | string | trim,
+    request_contact.vid | default('', true) | string | trim,
+    contact.id | default('', true) | string | trim,
+    contact.hs_object_id | default('', true) | string | trim,
+    contact.vid | default('', true) | string | trim
+  ] %}
+  {% for admin_contact_id in admin_contact_id_candidates %}
+    {% set admin_candidate_id = admin_contact_id | string | trim %}
+    {% if admin_candidate_id and admin_candidate_id != '[object Object]' and admin_candidate_id != '[object object]' and admin_candidate_id not in admin_lookup_ns.seen and not admin_lookup_ns.found %}
+      {% set admin_lookup_ns.seen = admin_lookup_ns.seen + [admin_candidate_id] %}
+      {#
+        The active HubSpot portal stores the corporate admin role as a custom
+        Contact → Company association label: USER_DEFINED / typeId 7 / "Admin".
+        The generic CONTACT_TO_COMPANY helper can omit labels in private-content
+        renders, so this typed lookup is the authoritative access check.
+      #}
+      {% set admin_typed_company_assocs_raw = crm_associations(admin_candidate_id, 'USER_DEFINED', 7, 'limit=50', 'name,vouchers_total,vouchers_used,hs_object_id', false) %}
+      {% set admin_typed_company_assocs = admin_typed_company_assocs_raw.results if admin_typed_company_assocs_raw.results else admin_typed_company_assocs_raw %}
+      {% if admin_typed_company_assocs|length > 0 %}
+        {% set admin_lookup_ns.company = admin_typed_company_assocs[0] %}
+        {% set admin_lookup_ns.actor_contact_id = admin_candidate_id %}
+        {% set admin_lookup_ns.found = true %}
+      {% endif %}
+      {% set company_assocs_raw = crm_associations(admin_candidate_id, 'CONTACT_TO_COMPANY', 50) %}
+      {% set company_assocs = company_assocs_raw.results if company_assocs_raw.results else company_assocs_raw %}
+      {% for company in company_assocs %}
+        {% if not admin_lookup_ns.found %}
+          {#
+            crm_associations returns the labels for each association on the
+            association object itself as `association_labels`.  We check that
+            list for 'Primary Admin' before accepting this company.
+          #}
+          {% set labels = company.association_labels | default(company.labels | default([], true), true) %}
+          {% for label in labels %}
+            {% if label | string | lower | trim in ['primary admin', 'admin'] and not admin_lookup_ns.found %}
+              {% set admin_lookup_ns.company = company %}
+              {% set admin_lookup_ns.actor_contact_id = admin_candidate_id %}
+              {% set admin_lookup_ns.found = true %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+
+  {#
+    Fallback for portals where the Primary Admin association has been workflow-
+    synced to contact properties but HubL does not expose labels in the current
+    render context. This still only reads CRM data.
+  #}
+  {% set admin_role_label = request_contact.wa_company_role_label | default('', true) | string | lower | trim %}
+  {% set admin_flag = request_contact.is_corporate_admin | default(false, true) | string | lower | trim %}
+  {% if not admin_lookup_ns.found and (admin_role_label in ['primary admin', 'admin'] or admin_flag in ['true', '1', 'yes']) and request_contact.associatedcompanyid %}
+    {% set fallback_company = crm_object('company', request_contact.associatedcompanyid, 'name,vouchers_total,vouchers_used,hs_object_id') %}
+    {% if fallback_company %}
+      {# Same scalar ID filter as the primary candidate loop — object-valued
+         request_contact.id must not win over hs_object_id / vid. #}
+      {% set fallback_actor_ns = namespace(id='') %}
+      {% for admin_contact_id in admin_contact_id_candidates %}
+        {% set admin_candidate_id = admin_contact_id | string | trim %}
+        {% if not fallback_actor_ns.id and admin_candidate_id and admin_candidate_id != '[object Object]' and admin_candidate_id != '[object object]' %}
+          {% set fallback_actor_ns.id = admin_candidate_id %}
+        {% endif %}
+      {% endfor %}
+      {% if fallback_actor_ns.id %}
+        {% set admin_lookup_ns.company = fallback_company %}
+        {% set admin_lookup_ns.actor_contact_id = fallback_actor_ns.id %}
+        {% set admin_lookup_ns.found = true %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+{% set is_primary_admin = admin_lookup_ns.found %}
+{% set primary_company = admin_lookup_ns.company %}
+{% set actor_contact_id = admin_lookup_ns.actor_contact_id | string | trim %}
+{% set primary_company_id = primary_company.hs_object_id | default(primary_company.toObjectId | default(primary_company.id | default('', true), true), true) | string | trim %}
+{% set primary_company_name = primary_company.name | default(primary_company.company_name | default(primary_company.properties.name | default(primary_company.properties.company_name | default('Your Company', true), true), true), true) %}
+
+{% if is_primary_admin and primary_company and primary_company_id %}
+
+{# ── 2. Read company voucher properties ── #}
+
+{% set vouchers_total = primary_company.vouchers_total | default(primary_company.properties.vouchers_total | default(0, true), true) | int | default(0) %}
+{% set vouchers_used  = primary_company.vouchers_used | default(primary_company.properties.vouchers_used | default(0, true), true) | int | default(0) %}
+
+{# ── 3. Fetch employee contacts associated to this company ── #}
+{#
+  HubL's crm_associations cap is 250.  We request the maximum and expose a
+  `employees_capped` flag in props so the React component can warn admins of
+  large teams that some members may not be shown (rather than silently
+  truncating the list at 50).
+#}
+
+{% set _employee_limit = 250 %}
+{% set employee_assocs_raw = crm_associations(primary_company_id, 'HUBSPOT_DEFINED', 2, 'limit=' ~ _employee_limit, 'firstname,lastname,email,individual_membership_type_2,hs_object_id', false) %}
+{% set employee_assocs = employee_assocs_raw.results if employee_assocs_raw.results else employee_assocs_raw %}
+{#
+  Mark admins in the team list so the UI can hide destructive remove actions.
+  The inverse of the Contact → Company USER_DEFINED / typeId 7 / "Admin"
+  label is Company → Contact USER_DEFINED / typeId 6 / "Admin".
+#}
+{% set admin_employee_assocs_raw = crm_associations(primary_company_id, 'USER_DEFINED', 6, 'limit=' ~ _employee_limit, 'hs_object_id', false) %}
+{% set admin_employee_assocs = admin_employee_assocs_raw.results if admin_employee_assocs_raw.results else admin_employee_assocs_raw %}
+{% set admin_ids_ns = namespace(ids=[]) %}
+{% for admin_emp in admin_employee_assocs %}
+  {% set admin_emp_id = admin_emp.hs_object_id | default(admin_emp.toObjectId | default(admin_emp.id | default('', true), true), true) | string %}
+  {% if admin_emp_id %}
+    {% set admin_ids_ns.ids = admin_ids_ns.ids + [admin_emp_id] %}
+  {% endif %}
+{% endfor %}
+{% set ns = namespace(employees=[]) %}
+{% for emp in employee_assocs %}
+  {% set emp_id = emp.hs_object_id | default(emp.toObjectId | default(emp.id | default('', true), true), true) | string %}
+  {% set emp_firstname = emp.firstname | default(emp.properties.firstname | default('', true), true) %}
+  {% set emp_lastname = emp.lastname | default(emp.properties.lastname | default('', true), true) %}
+  {% set emp_email = emp.email | default(emp.properties.email | default('', true), true) %}
+  {% set emp_membership_tier = emp.individual_membership_type_2 | default(emp.properties.individual_membership_type_2 | default('', true), true) %}
+  {% set emp_is_admin = emp_id in admin_ids_ns.ids %}
+  {% set emp_data = {
+    'id':               emp_id,
+    'name':             (emp_firstname | default('') ~ ' ' ~ emp_lastname | default('')) | trim,
+    'email':            emp_email,
+    'membership_tier':  emp_membership_tier,
+    'is_admin':         emp_is_admin
+  } %}
+  {% set ns.employees = ns.employees + [emp_data] %}
+{% endfor %}
+{% set employees_capped = (employee_assocs | length) >= _employee_limit %}
+
+{# ── 4. Fetch available course sessions from HubDB ── #}
+
+{% set course_rows = hubdb_table_rows(module.courses_table, 'status__neq=Cancelled&orderBy=start_date&limit=250') %}
+{% set today_key = local_dt | datetimeformat('%Y%m%d') %}
+{% set ns2 = namespace(sessions=[]) %}
+{% for row in course_rows %}
+  {% set course_start_key = row.start_date | datetimeformat('%Y%m%d') if row.start_date else '' %}
+  {% if not course_start_key or course_start_key >= today_key %}
+    {#
+      Read the real HubDB status rather than asserting 'available'. The query
+      already excludes Cancelled, but Sold Out rows still come back and must not
+      be offered for bulk booking.
+    #}
+    {% set session_status = row.status.name | lower | replace(' ', '_') if row.status else 'available' %}
+    {#
+      Event Engine identifiers, serialised exactly as checkout-tunnel.module does
+      (see that module.html §3). Their presence is what makes a session
+      bulk-bookable: with a worker_event_id and a member ticket type we can POST
+      the whole team to /api/v1/events/{id}/reserve as one group order. Without
+      them the React panel keeps the mailto-the-office fallback.
+    #}
+    {% set session_data = {
+      'id':          row.hs_id | string,
+      'course_name': row.course_name | default(''),
+      'city':        row.city.name | default(''),
+      'start_date':  row.start_date | datetimeformat('%d %b %Y') | default(''),
+      'status':      session_status,
+      'use_event_engine':           row.use_event_engine | default(false),
+      'worker_event_id':            row.worker_event_id          | default(''),
+      'member_ticket_type_id':      row.member_ticket_type_id     | default(''),
+      'non_member_ticket_type_id':  row.non_member_ticket_type_id | default('')
+    } %}
+    {% set ns2.sessions = ns2.sessions + [session_data] %}
+  {% endif %}
+{% endfor %}
+
+{# ── 4b. Resolve the admin's own identity (the bulk-booking buyer) ── #}
+{#
+  The Event Engine reserve call needs a buyer name + email. The admin is the
+  buyer; the selected employees are the attendees. Same candidate-list pattern
+  as checkout-tunnel.module (§ "contact identity"), because request_contact does
+  not expose these consistently across private-content render contexts.
+#}
+
+{% set admin_email_candidates = [
+  request_contact.email | default('', true) | string | lower | trim,
+  request_contact.hs_content_membership_email | default('', true) | string | lower | trim,
+  request_contact.member_email | default('', true) | string | lower | trim,
+  contact.email | default('', true) | string | lower | trim,
+  contact.hs_content_membership_email | default('', true) | string | lower | trim,
+  contact.member_email | default('', true) | string | lower | trim
+] %}
+{% set admin_email_ns = namespace(value='') %}
+{% for email_candidate in admin_email_candidates %}
+  {% set normalized_admin_email = email_candidate | default('', true) | string | lower | trim %}
+  {% if not admin_email_ns.value and normalized_admin_email and normalized_admin_email != '[object object]' and normalized_admin_email != '[object Object]' and '@' in normalized_admin_email %}
+    {% set admin_email_ns.value = normalized_admin_email %}
+  {% endif %}
+{% endfor %}
+{% set actor_email = admin_email_ns.value %}
+
+{% set actor_first_name = request_contact.firstname | default('', true) | string | trim %}
+{% if not actor_first_name or actor_first_name == '[object Object]' or actor_first_name == '[object object]' %}
+  {% set actor_first_name = contact.firstname | default('', true) | string | trim %}
+{% endif %}
+{% set actor_last_name = request_contact.lastname | default('', true) | string | trim %}
+{% if not actor_last_name or actor_last_name == '[object Object]' or actor_last_name == '[object object]' %}
+  {% set actor_last_name = contact.lastname | default('', true) | string | trim %}
+{% endif %}
+{% set actor_name = (actor_first_name ~ ' ' ~ actor_last_name) | trim %}
+{% if not actor_name or actor_name == '[object Object]' or actor_name == '[object object]' %}
+  {% set actor_name = request_contact.fullname | default(contact.fullname, true) | default('', true) | string | trim %}
+{% endif %}
+{% if not actor_name and actor_email %}
+  {% set actor_name = actor_email %}
+{% endif %}
+
+{# ── 5. Compose props ── #}
+
+{% set add_url = module.add_employee_form_url.url.href | default('/portal/team/add-employee') %}
+{% set office_email = module.office_email | default('office@weldaustralia.com.au') %}
+{# `event-engine` IS the live Worker. It launched as `event-engine-staging`
+   and was RENAMED, so that hostname no longer resolves: anything still pointing
+   at it takes checkout down. See theme/fields.json -> integrations. #}
+{% set worker_base_url = module.worker_base_url | default(theme.integrations.event_engine_worker_base_url, true) | default('https://event-engine.refuel-creative.workers.dev', true) %}
+{# corporate_action_token: optional short-lived Worker-verifiable token. Leave
+   blank to use the same-origin /_hcms/api/corporate/* serverless handlers.
+   Never treat actor_contact_id as authentication. #}
+{% set corporate_action_token = '' %}
+
+{% set full_props = {
+  'portal_id':             hub_id | string,
+  'actor_contact_id':      actor_contact_id,
+  'actor_name':            actor_name,
+  'actor_email':           actor_email,
+  'company_id':            primary_company_id,
+  'company_name':          primary_company_name,
+  'vouchers_total':        vouchers_total,
+  'vouchers_used':         vouchers_used,
+  'employees':             ns.employees,
+  'employees_capped':      employees_capped,
+  'course_sessions':       ns2.sessions,
+  'add_employee_form_url': add_url,
+  'team_page_url':         '/portal#portal-team',
+  'office_email':          office_email,
+  'worker_base_url':       worker_base_url,
+  'corporate_action_token': corporate_action_token,
+  'corporate_writes_via_proxy': true
+} %}
+
+{# ── 6. Render mount point ── #}
+
+<section class="wa-section wa-section--{{ module.background }} wa-corporate-admin-section">
+  <div class="container">
+    <div
+      data-wa-module="corporate-admin"
+      data-props="{{ full_props | tojson | escape }}"
+    ></div>
+  </div>
+</section>
+
+{# Script tag injected by pnpm build - do not edit this line manually. #}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/js/assets/corporate-admin.standalone.css') }}">
+<script type="module" src="{{ get_asset_url('../../assets/js/corporate-admin.standalone.js') }}"></script>
+
+{% else %}
+  {#
+    Non-admins: as a dashboard tile this renders nothing (the tile is hidden for
+    non-admins). On the standalone team page, `show_access_notice` opts into a
+    friendly "not an admin" message - derived from the SAME Primary Admin
+    association guard above, so the page can never contradict the module.
+  #}
+  {% if module.show_access_notice and request_contact.is_logged_in %}
+  <section class="wa-section wa-section--surface wa-section--default">
+    <div class="container">
+      <div class="wa-portal-empty">
+        <h2>Team management is for corporate admins</h2>
+        <p>
+          Your account isn’t set up as a Primary Admin for a corporate membership. If you believe
+          this is a mistake, <a href="/contact-us">contact the Weld Australia office</a> and we’ll help.
+        </p>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+{% endif %}

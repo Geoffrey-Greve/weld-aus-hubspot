@@ -1,0 +1,411 @@
+/* Member portal invoice list page. Mirrors the Financials card pattern from
+   the dashboard, but gives members a full-page filterable receipt history. */
+
+.wa-my-invoices-section .container {
+  --wa-my-invoices-success-action: var(--wa-color-success-text, #146c39);
+  --wa-my-invoices-success-action-hover: #0f5c2f;
+  max-width: 980px;
+}
+
+.wa-my-invoices-section .wa-section__heading {
+  color: var(--mcc-navy, #070b3f);
+  letter-spacing: -0.045em;
+}
+
+.wa-my-invoices-section .wa-section__intro {
+  color: var(--mcc-muted, #5f687a);
+  max-width: 680px;
+}
+
+.wa-my-invoices__auth-gate {
+  background: #fff;
+  border: 1px solid #e1e6f0;
+  border-radius: 24px;
+  box-shadow: 0 18px 50px rgba(7, 11, 63, 0.08);
+  margin: 0 auto;
+  max-width: 760px;
+  padding: clamp(28px, 5vw, 44px);
+}
+
+.wa-my-invoices__auth-eyebrow {
+  color: var(--mcc-muted, #5f687a);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.wa-my-invoices__auth-button {
+  align-items: center;
+  background: var(--mcc-navy, #070b3f);
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-weight: 900;
+  justify-content: center;
+  margin-top: 20px;
+  min-height: 46px;
+  padding: 0 22px;
+  text-decoration: none;
+}
+
+.wa-my-invoices__auth-button:hover,
+.wa-my-invoices__auth-button:focus-visible {
+  background: var(--mcc-navy-2, #191d57);
+  color: #fff;
+  outline: none;
+}
+
+.wa-my-invoices__summary {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  margin: 0 0 18px;
+}
+
+.wa-my-invoices__summary > div {
+  background: var(--mcc-surface-2, #f5f7fb);
+  border: 1px solid #e1e6f0;
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.wa-my-invoices__summary span {
+  color: var(--mcc-muted, #5f687a);
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.wa-my-invoices__summary strong {
+  color: var(--mcc-navy, #070b3f);
+  display: block;
+  font-size: clamp(22px, 4vw, 34px);
+  font-weight: 950;
+  letter-spacing: -0.05em;
+  margin-top: 4px;
+}
+
+.wa-my-invoices__filters {
+  align-items: flex-end;
+  background: #fff;
+  border: 1px solid #e1e6f0;
+  border-radius: 20px;
+  box-shadow: 0 14px 34px rgba(7, 11, 63, 0.06);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 16px;
+}
+
+.wa-my-invoices__filter-group {
+  display: flex;
+  flex: 1 1 160px;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.wa-my-invoices__filter-label {
+  color: var(--mcc-muted, #5f687a);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.wa-my-invoices__select,
+.wa-my-invoices__date-input {
+  background: var(--mcc-surface-2, #f5f7fb);
+  border: 1px solid #dce3ef;
+  border-radius: 14px;
+  color: var(--mcc-navy, #070b3f);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  min-height: 48px;
+  padding: 0 14px;
+  width: 100%;
+}
+
+.wa-my-invoices__select:focus,
+.wa-my-invoices__date-input:focus {
+  border-color: var(--wa-color-primary, #f9c400);
+  box-shadow: 0 0 0 3px rgba(249, 196, 0, 0.25);
+  outline: none;
+}
+
+.wa-my-invoices__clear {
+  align-items: center;
+  background: transparent;
+  border: 1px solid #dce3ef;
+  border-radius: 999px;
+  color: var(--mcc-navy, #070b3f);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+}
+
+.wa-my-invoices__clear:hover,
+.wa-my-invoices__clear:focus-visible {
+  background: var(--mcc-navy, #070b3f);
+  border-color: var(--mcc-navy, #070b3f);
+  color: #fff;
+  outline: none;
+}
+
+.wa-my-invoices__cards {
+  display: grid;
+  gap: 12px;
+}
+
+.wa-my-invoices__card {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e1e6f0;
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(7, 11, 63, 0.05);
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+}
+
+.wa-my-invoices__card-icon {
+  align-items: center;
+  background: var(--mcc-surface-2, #f5f7fb);
+  border-radius: 14px;
+  color: var(--mcc-navy, #070b3f);
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+/* Issue 209: when the icon links to a PDF it must read and behave as a control. */
+.wa-my-invoices__card-icon--link {
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.wa-my-invoices__card-icon--link:hover,
+.wa-my-invoices__card-icon--link:focus-visible {
+  background: var(--mcc-navy, #070b3f);
+  color: #fff;
+  outline: none;
+}
+
+.wa-my-invoices__icon-svg {
+  display: block;
+}
+
+.wa-my-invoices__card-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.wa-my-invoices__card-topline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.wa-my-invoices__type-badge,
+.wa-my-invoices__source {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  min-height: 22px;
+  padding: 3px 8px;
+}
+
+.wa-my-invoices__type-badge {
+  background: rgba(249, 196, 0, 0.16);
+  color: var(--mcc-navy, #070b3f);
+}
+
+.wa-my-invoices__source {
+  background: var(--mcc-surface-2, #f5f7fb);
+  color: var(--mcc-muted, #5f687a);
+}
+
+.wa-my-invoices__card-name {
+  color: var(--mcc-navy, #070b3f);
+  font-size: clamp(16px, 2vw, 18px);
+  font-weight: 950;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.wa-my-invoices__card-meta {
+  color: var(--mcc-muted, #5f687a);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 5px 0 0;
+}
+
+.wa-my-invoices__amount {
+  color: var(--mcc-navy, #070b3f);
+  font-weight: 950;
+}
+
+.wa-my-invoices__card-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.wa-my-invoices__action,
+.wa-my-invoices__paid-pill {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 950;
+  gap: 6px;
+  /* CLAUDE.md 5.4 rule 2 - 44x44 minimum touch target, matching the portal
+     course/event CTAs. This row previously sat at 34px. */
+  min-height: var(--wa-touch-min, 44px);
+  padding: 8px 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.wa-my-invoices__action {
+  background: var(--mcc-navy, #070b3f);
+  border: 1.5px solid var(--mcc-navy, #070b3f);
+  color: #fff;
+}
+
+.wa-my-invoices__action:hover,
+.wa-my-invoices__action:focus-visible {
+  background: var(--mcc-navy-2, #191d57);
+  border-color: var(--mcc-navy-2, #191d57);
+  color: #fff;
+  outline: none;
+}
+
+/*
+  Issue 34 - "Pay now" is the money action, so it takes the filled accent and
+  Download steps back to an outline. Uses the same success green the checkout
+  uses for member savings (CLAUDE.md 5.4 rule 4) so "there is money to act on"
+  reads consistently across the portal and the checkout.
+*/
+.wa-my-invoices__action--pay {
+  background: var(--wa-my-invoices-success-action);
+  border-color: var(--wa-my-invoices-success-action);
+  color: #fff;
+}
+
+.wa-my-invoices__action--pay:hover,
+.wa-my-invoices__action--pay:focus-visible {
+  background: var(--wa-my-invoices-success-action-hover);
+  border-color: var(--wa-my-invoices-success-action-hover);
+  color: #fff;
+  outline: none;
+}
+
+.wa-my-invoices__action--secondary {
+  background: transparent;
+  border-color: #c6cede;
+  color: var(--mcc-navy, #070b3f);
+}
+
+.wa-my-invoices__action--secondary:hover,
+.wa-my-invoices__action--secondary:focus-visible {
+  background: #eef2f9;
+  border-color: var(--mcc-navy, #070b3f);
+  color: var(--mcc-navy, #070b3f);
+}
+
+.wa-my-invoices__balance {
+  color: var(--wa-my-invoices-success-action);
+  font-weight: 800;
+}
+
+.wa-my-invoices__paid-pill {
+  background: #e5f5ec;
+  color: #087a3d;
+}
+
+.wa-my-invoices__empty {
+  background: #fff;
+  border: 1px dashed #dce3ef;
+  border-radius: 18px;
+  padding: 34px 22px;
+  text-align: center;
+}
+
+.wa-my-invoices__empty-message {
+  color: var(--mcc-muted, #5f687a);
+  font-size: 16px;
+  margin: 0;
+}
+
+.wa-my-invoices__help {
+  background: linear-gradient(135deg, rgba(249, 196, 0, 0.14), rgba(255, 255, 255, 0.92));
+  border: 1px solid rgba(249, 196, 0, 0.36);
+  border-radius: 18px;
+  color: var(--mcc-muted, #5f687a);
+  margin-top: 22px;
+  padding: 16px 18px;
+}
+
+.wa-my-invoices__help p {
+  margin: 0;
+}
+
+.wa-my-invoices__help a {
+  color: var(--mcc-navy, #070b3f);
+  font-weight: 900;
+}
+
+@media (max-width: 700px) {
+  .wa-my-invoices__card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .wa-my-invoices__card-actions {
+    flex: 1 0 100%;
+    justify-content: flex-start;
+    padding-left: 58px;
+  }
+}
+
+@media (max-width: 520px) {
+  .wa-my-invoices__filters {
+    border-radius: 18px;
+  }
+
+  .wa-my-invoices__filter-group {
+    flex-basis: 100%;
+  }
+
+  .wa-my-invoices__card {
+    padding: 12px;
+  }
+
+  .wa-my-invoices__card-actions {
+    padding-left: 0;
+  }
+}

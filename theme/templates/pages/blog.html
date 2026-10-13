@@ -1,0 +1,250 @@
+<!--
+  templateType: blog_listing
+  isAvailableForNewContent: true
+  label: Weld Australia - News & Publications Listing
+-->
+{#
+  blog.html - News & Publications blog listing
+  URL: /news/
+
+  This template intentionally keeps HubSpot's native blog data as the source of
+  truth while matching the supplied V2 "News & Publications" design-system page.
+  The editable latest-articles browser module filters in-page with HubSpot topic archive links as fallback.
+  Filter refresh marker: instant-topic-tabs.
+  Hero visual refresh marker: no-radial-flare.
+#}
+{% set page_title = 'News, Publications & Industry Insights' %}
+{% set page_description = 'Read the latest welding industry news, technical articles, publications and member updates from Weld Australia.' %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+{% if content.rss_feed_url %}
+<link rel="alternate" type="application/rss+xml" title="Weld Australia - News &amp; Publications" href="{{ content.rss_feed_url }}">
+{% endif %}
+<link rel="stylesheet" href="{{ get_asset_url('../../assets/css/blog.css') }}">
+{% endblock %}
+
+{% block body_class %}wa-blog-page{% endblock %}
+
+{% block body %}
+{% set _request_path = request.path | default('', true) %}
+
+<div class="wa-blog-shell">
+  {% module
+    "blog_listing_hero"
+    path="../../modules/hero"
+    label="News listing hero"
+    background="primary"
+    height="large"
+    spacing="default"
+    alignment="left"
+    accent_bar=true
+    media_type="none"
+    eyebrow="Welding industry news Australia"
+    headline="News, Publications &amp; Industry Insights"
+    subheadline="<p><strong>Stay up to date with the latest in welding, fabrication, standards, training and manufacturing.</strong></p><p>Weld Australia publications bring together technical guidance, industry analysis, advocacy updates and stories from across the welding community.</p>"
+    primary_cta={"label_text": "Read the latest articles", "link": {"url": {"href": "#latest-articles", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "gold"}
+    secondary_cta={"label_text": "Subscribe to Weld Connect", "link": {"url": {"href": "#news-updates", "type": "EXTERNAL"}, "open_in_new_tab": false}, "style": "white-outline"}
+    show_stats=true
+    stats_placement="side"
+    stats=[
+      {"value": "Bi-annual", "stat_label": "Australian Welding magazine", "dynamic_value": "none"},
+      {"value": "Monthly", "stat_label": "Weld Connect e-newsletter", "dynamic_value": "none"},
+      {"value": "10,000+", "stat_label": "Industry subscribers", "dynamic_value": "none"},
+      {"value": "Extensive", "stat_label": "Topic categories covered", "dynamic_value": "none"}
+    ]
+  %}
+
+  {% module "news_publications" path="../../modules/news-publications" %}
+
+  {% module "news_articles_browser" path="../../modules/news-articles-browser" %}
+  {# Legacy hardcoded featured/latest articles section replaced by editable module above.
+  <section class="wa-blog-section wa-blog-section--surface" id="latest-articles" aria-labelledby="wa-latest-articles-heading">
+    <div class="wa-blog-container">
+      {% set blog_ns = namespace(featured=null, posts=[]) %}
+      {% for post in contents %}
+        {% if loop.first %}
+          {% set blog_ns.featured = post %}
+        {% else %}
+          {% set blog_ns.posts = blog_ns.posts + [post] %}
+        {% endif %}
+      {% endfor %}
+
+      {% if blog_ns.featured %}
+      <div class="wa-blog-featured-block" aria-labelledby="wa-featured-article-heading">
+        <div class="wa-blog-section-head wa-blog-featured-block__head">
+          <p class="wa-blog-overline">Featured</p>
+          <h2 class="wa-blog-section-head__title" id="wa-featured-article-heading">This week&apos;s read</h2>
+        </div>
+
+        <a class="wa-featured-post" href="{{ blog_ns.featured.absolute_url }}">
+          <div class="wa-featured-post__media">
+            {% if blog_ns.featured.featured_image %}
+            <img
+              src="{{ blog_ns.featured.featured_image | escape_url }}"
+              alt="{{ blog_ns.featured.featured_image_alt_text | default(blog_ns.featured.name) | escape }}"
+              loading="lazy"
+            >
+            {% endif %}
+            <span class="wa-featured-post__pick">
+              <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m12 3 2.7 5.48 6.05.88-4.38 4.27 1.03 6.02L12 16.81l-5.4 2.84 1.03-6.02-4.38-4.27 6.05-.88L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+              Editor&apos;s pick
+            </span>
+          </div>
+          <div class="wa-featured-post__body">
+            {% if blog_ns.featured.tag_list %}
+              {% for tag in blog_ns.featured.tag_list %}
+                {% if loop.first %}
+                <span class="wa-topic-tag wa-topic-tag--{{ tag.slug }}">{{ tag.name }}</span>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+            <h3 class="wa-featured-post__title">{{ blog_ns.featured.name }}</h3>
+            <p class="wa-featured-post__excerpt">
+              {{ blog_ns.featured.meta_description | default(blog_ns.featured.post_summary | striptags | truncate(170)) }}
+            </p>
+            <div class="wa-blog-meta-row">
+              <span class="wa-blog-byline">
+                {% if blog_ns.featured.blog_author and blog_ns.featured.blog_author.avatar %}
+                <img class="wa-blog-byline__avatar" src="{{ blog_ns.featured.blog_author.avatar | escape_url }}" alt="" loading="lazy">
+                {% endif %}
+                <span>
+                  <span class="wa-blog-byline__name">
+                    {{ blog_ns.featured.blog_author.display_name | default('Weld Australia') }}
+                  </span>
+                  <span class="wa-blog-byline__meta">
+                    {{ blog_ns.featured.publish_date | datetimeformat('%d %B %Y') }}
+                  </span>
+                </span>
+              </span>
+              <span class="wa-featured-post__read">
+                Read article
+                <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </a>
+      </div>
+      {% endif %}
+
+      <div class="wa-blog-browser" aria-labelledby="wa-latest-articles-heading">
+        <div class="wa-blog-browser__head">
+          <div class="wa-blog-section-head">
+            <p class="wa-blog-overline">Latest articles</p>
+            <h2 class="wa-blog-section-head__title" id="wa-latest-articles-heading">News &amp; insights</h2>
+          </div>
+          <p class="wa-blog-browser__count">
+            {{ blog_ns.posts|length }} article{% if blog_ns.posts|length != 1 %}s{% endif %}
+          </p>
+        </div>
+
+        <div class="wa-blog-controls" aria-label="Filter and search news">
+          <nav class="wa-blog-topic-nav" aria-label="Browse by topic">
+            <a class="wa-topic-chip{% if '/tag/' not in _request_path %} wa-topic-chip--active{% endif %}" href="/news/">All</a>
+            <a class="wa-topic-chip wa-topic--industry-news{% if '/tag/industry-news' in _request_path %} wa-topic-chip--active{% endif %}" href="/news/tag/industry-news/">Industry News</a>
+            <a class="wa-topic-chip wa-topic--technical{% if '/tag/technical' in _request_path %} wa-topic-chip--active{% endif %}" href="/news/tag/technical/">Technical</a>
+            <a class="wa-topic-chip wa-topic--standards{% if '/tag/standards' in _request_path %} wa-topic-chip--active{% endif %}" href="/news/tag/standards/">Standards</a>
+            <a class="wa-topic-chip wa-topic--technology{% if '/tag/technology' in _request_path %} wa-topic-chip--active{% endif %}" href="/news/tag/technology/">Technology</a>
+            <a class="wa-topic-chip wa-topic--training{% if '/tag/training' in _request_path %} wa-topic-chip--active{% endif %}" href="/news/tag/training/">Training</a>
+            <a class="wa-topic-chip wa-topic--advocacy{% if '/tag/advocacy' in _request_path %} wa-topic-chip--active{% endif %}" href="/news/tag/advocacy/">Advocacy</a>
+            <a class="wa-topic-chip wa-topic--member-news{% if '/tag/member-news' in _request_path %} wa-topic-chip--active{% endif %}" href="/news/tag/member-news/">Member News</a>
+          </nav>
+
+          <form class="wa-blog-search" action="/hs-search-results" method="get" role="search">
+            <label class="sr-only" for="wa-news-search">Search news and publications</label>
+            <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m21 21-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input id="wa-news-search" type="search" name="term" placeholder="Search articles">
+          </form>
+        </div>
+
+        {% if blog_ns.posts|length %}
+        <div class="wa-blog-grid">
+          {% for post in blog_ns.posts %}
+          <a class="wa-blog-card" href="{{ post.absolute_url }}">
+            <div class="wa-blog-card__media">
+              {% if post.featured_image %}
+              <img
+                src="{{ post.featured_image | escape_url }}"
+                alt="{{ post.featured_image_alt_text | default(post.name) | escape }}"
+                loading="lazy"
+              >
+              {% endif %}
+              {% if post.tag_list %}
+              <span class="wa-blog-card__tag-wrap">
+                {% for tag in post.tag_list %}
+                  {% if loop.first %}
+                  <span class="wa-topic-tag wa-topic-tag--{{ tag.slug }}">{{ tag.name }}</span>
+                  {% endif %}
+                {% endfor %}
+              </span>
+              {% endif %}
+            </div>
+            <div class="wa-blog-card__body">
+              <h3 class="wa-blog-card__title">{{ post.name }}</h3>
+              <p class="wa-blog-card__excerpt">
+                {{ post.meta_description | default(post.post_summary | striptags | truncate(135)) }}
+              </p>
+            </div>
+            <div class="wa-blog-card__footer">
+              <span class="wa-blog-card__byline">
+                {% if post.blog_author and post.blog_author.avatar %}
+                <img class="wa-blog-card__avatar" src="{{ post.blog_author.avatar | escape_url }}" alt="" loading="lazy">
+                {% endif %}
+                <span>
+                  <span class="wa-blog-card__author">{{ post.blog_author.display_name | default('Weld Australia') }}</span>
+                  <span class="wa-blog-card__date">{{ post.publish_date | datetimeformat('%d %b %Y') }}</span>
+                </span>
+              </span>
+              <span class="wa-blog-card__arrow" aria-hidden="true">
+                <svg width="17" height="17" viewBox="0 0 24 24">
+                  <path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        {% elif not blog_ns.featured %}
+        <div class="wa-blog-empty">
+          <h3>No articles found</h3>
+          <p>There are no posts available for this topic yet. Please check back soon.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if content.previous_page_url or content.next_page_url %}
+      <nav class="wa-blog-pagination" aria-label="News pagination">
+        {% if content.previous_page_url %}
+        <a class="btn btn-navy-outline" href="{{ content.previous_page_url }}" rel="prev">Previous page</a>
+        {% endif %}
+        {% if content.next_page_url %}
+        <a class="btn btn-navy" href="{{ content.next_page_url }}" rel="next">Next page</a>
+        {% endif %}
+      </nav>
+      {% endif %}
+    </div>
+  </section>
+  #}
+
+  {#- Weld Connect subscribe CTA. Uses the same compact subscription card
+      pattern as /events while keeping the existing Weld Connect form ID. -#}
+  {%- set _news_subscribe_form_id = '2cab6935-46eb-4e93-a7c9-458038f758f1' if hub_id|string == '443253065' else 'de2473b6-2afa-4799-80f2-36ff9ad026ec' -%}
+  {% module "news_subscribe_cta"
+    path="../../modules/subscription-form"
+    label="News subscribe CTA"
+    heading="Industry news, delivered monthly"
+    intro="<p>Subscribe to Weld Connect for practical updates on welding standards, technical resources, training, events and industry policy.</p>"
+    section_id="news-updates"
+    form={"form_id": _news_subscribe_form_id, "response_type": "inline", "message": "Thanks - you're subscribed to Weld Connect."}
+    subscription_options=["newsletter"]
+    background="primary"
+    spacing="default"
+  %}
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{
+  "label": "Checkout Tunnel",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Multi-step checkout tunnel for course/event registration. Place on the checkout.html page template. Reads the ?session_id= query param to load the session from HubDB Table 1 (courses). Integrates with event.hapily, Stripe, or a generic redirect payment provider.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["checkout", "react-island", "hubdb", "interactive", "portal"]
+}

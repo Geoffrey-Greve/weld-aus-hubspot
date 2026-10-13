@@ -1,0 +1,401 @@
+{#
+  contact-form.module/module.html
+
+  Routing enquiry form with optional info sidebar.
+  Submits to the HubSpot Forms API via module.js (no page reload).
+
+  Layout:
+    - Overline + heading + intro above the form grid.
+    - 2-col grid at ≥768px: form card (1fr) + sidebar (360px fixed).
+    - Sidebar collapses below the form at tablet/mobile.
+    - Conditional follow-up block revealed by JS when the nominated
+      enquiry type is selected.
+
+  Fields:
+    module.overline, module.heading, module.intro
+    module.form                   — HubSpot form picker; module.form.form_id for submission
+                                    (falls back to legacy module.form_id on existing instances)
+    module.enquiry_types[]        — options for the routing dropdown
+    module.show_phone / show_company
+    module.submit_label, success_title, success_body
+    module.enable_conditional     — gates the conditional block
+    module.conditional            — group: trigger_type, question_heading,
+                                    options[], reveal_on, extra_field_*,
+                                    cond_success_body, cond_sidebar_*
+    module.show_sidebar
+    module.sidebar_phone_number, sidebar_phone_sub
+    module.sidebar_list_heading, sidebar_list_items[]
+    module.response_time
+    Standard: section_id, background, spacing, visibility, members_only
+#}
+
+{#- QA: member-only content is company-aware. See _member-content-gate.html -
+    a corporate employee's membership lives on their employer's record, and
+    `individual_membership_status == 'Current'` cannot see it. -#}
+{%- include "../../templates/partials/_member-content-gate.html" -%}
+{%- set _is_active_member = wa_member_gate.is_member -%}
+{%- if not module.members_only or _is_active_member -%}
+
+{%- set _bg = module.background | default('surface') -%}
+{%- set _sp = module.spacing | default('default') -%}
+{%- set _vis = module.visibility | default(['mobile','tablet','desktop']) -%}
+
+{%- set _vis_cls = '' -%}
+{%- if 'mobile'  not in _vis -%}{%- set _vis_cls = _vis_cls ~ ' wa-hide-mobile' -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _vis_cls = _vis_cls ~ ' wa-hide-tablet' -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _vis_cls = _vis_cls ~ ' wa-hide-desktop' -%}{%- endif -%}
+
+{%- set _cond = module.conditional[0] if module.enable_conditional and module.conditional else false -%}
+{%- set _sold_enabled = module.enable_soldamatic_selector | default(true) -%}
+
+{%- if _sold_enabled -%}
+  {%- set _sold_cfg = {
+    'generalLabel': module.general_form_label | default('General enquiry'),
+    'soldamaticLabel': module.soldamatic_form_label | default('Soldamatic support'),
+    'submitLabel': module.soldamatic_submit_label | default('Submit support request'),
+    'successTitle': module.soldamatic_success_title | default('Support request received'),
+    'successBody': module.soldamatic_success_body | default(''),
+    'resetLabel': module.soldamatic_reset_label | default('Submit another request'),
+    'machineLabel': module.soldamatic_machine_label | default('Soldamatic machine number'),
+    'machineHint': module.soldamatic_machine_hint | default(''),
+    'machinePlaceholder': module.soldamatic_machine_placeholder | default(''),
+    'messageLabel': module.soldamatic_message_label | default('Brief description of the issue'),
+    'messagePlaceholder': module.soldamatic_message_placeholder | default('Describe the issue with your Soldamatic simulator…'),
+    'showCompanyOnGeneral': module.show_company_on_general | default(false)
+  } -%}
+{%- endif -%}
+
+{# Serialise conditional config for JS consumption #}
+{%- if _cond -%}
+  {%- set _cond_opts = [] -%}
+  {%- for opt in _cond.options -%}
+    {%- set _cond_opts = _cond_opts + [{'value': opt.value_text, 'title': opt.title, 'sub': opt.sub | default('')}] -%}
+  {%- endfor -%}
+  {%- set _cond_cfg = {
+    'triggerType': _cond.trigger_type   | default(''),
+    'heading':     _cond.question_heading | default(''),
+    'options':     _cond_opts,
+    'revealOn':    _cond.reveal_on      | default(''),
+    'extraLabel':  _cond.extra_field_label | default(''),
+    'extraHint':   _cond.extra_field_hint  | default(''),
+    'extraPlaceholder': _cond.extra_field_placeholder | default(''),
+    'condSuccessBody': _cond.cond_success_body | default(''),
+    'condSidebarHeading': _cond.cond_sidebar_heading | default(''),
+    'condSidebarBody': _cond.cond_sidebar_body | default('')
+  } -%}
+{%- endif -%}
+
+<section
+  class="wa-contact-form wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}{{ _vis_cls }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  data-portal-id="{{ hub_id }}"
+  data-form-id="{{ module.form.form_id | default(module.form_id, true) | default('', true) }}"
+  data-soldamatic-form-id="{{ module.soldamatic_form.form_id | default('', true) }}"
+  data-show-phone="{{ module.show_phone | lower }}"
+  data-show-company="{{ module.show_company | lower }}"
+  data-success-title="{{ module.success_title | default('Enquiry received') | escape }}"
+  data-success-body="{{ module.success_body | default('') | striptags | escape }}"
+  {% if _cond %}data-conditional="{{ _cond_cfg | tojson | escape }}"{% endif %}
+  {% if _sold_enabled %}data-soldamatic="{{ _sold_cfg | tojson | escape }}"{% endif %}
+>
+  <div class="container">
+
+    {# ── Section head ──────────────────────────────────────────────────────── #}
+    {% if module.overline or module.heading %}
+    <div class="wa-section-head wa-section-head--narrow">
+      {% if module.overline %}
+      <div class="wa-overline">
+        <span class="wa-overline__text">{{ module.overline }}</span>
+      </div>
+      {% endif %}
+      {% if module.heading %}
+      <h2 class="wa-contact-form__heading">{{ module.heading }}</h2>
+      {% endif %}
+      {% if module.intro %}
+      <div class="wa-contact-form__intro">{{ module.intro }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# ── Form + sidebar grid ───────────────────────────────────────────────── #}
+    <div class="wa-contact-form__grid{% if not module.show_sidebar %} wa-contact-form__grid--no-sidebar{% endif %}">
+
+      {# Form card #}
+      <div class="wa-contact-form__card">
+
+        {# Success panel — hidden until JS shows it #}
+        <div class="wa-contact-form__success" aria-hidden="true" aria-live="polite">
+          <div class="wa-contact-form__success-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <h3 class="wa-contact-form__success-title">{{ module.success_title | default('Enquiry received') }}</h3>
+          <div class="wa-contact-form__success-body"></div>
+          <button class="wa-contact-form__reset" type="button">Send another enquiry</button>
+        </div>
+
+        {#
+          HubSpot's hosted renderer is required here because both selected forms
+          have HubSpot CAPTCHA enabled. Direct Forms API submissions are rejected
+          when CAPTCHA is on, whereas the official embed handles that challenge.
+        #}
+        <div class="wa-contact-form__hubspot" data-wa-hubspot-contact>
+          {% if _sold_enabled %}
+          <div class="wa-cf-mode-tabs" role="tablist" aria-label="Select enquiry form">
+            <button type="button" class="wa-cf-mode-tab is-active" data-wa-hs-form-mode="general" role="tab" aria-selected="true">
+              {{ module.general_form_label | default('General enquiry') }}
+            </button>
+            <button type="button" class="wa-cf-mode-tab" data-wa-hs-form-mode="soldamatic" role="tab" aria-selected="false">
+              {{ module.soldamatic_form_label | default('Soldamatic support') }}
+            </button>
+          </div>
+          {% endif %}
+          <div id="wa-hs-contact-general-{{ name }}" data-wa-hs-form-panel="general"></div>
+          {% if _sold_enabled %}
+          <div id="wa-hs-contact-soldamatic-{{ name }}" data-wa-hs-form-panel="soldamatic" hidden></div>
+          {% endif %}
+          <p class="wa-cf-error-msg" data-wa-hs-form-error role="alert" aria-live="polite" hidden></p>
+        </div>
+
+        {# Legacy custom markup remains as source fallback only. Submission is
+           handled by the HubSpot renderer above so CAPTCHA can remain enabled. #}
+        <form class="wa-contact-form__form" novalidate hidden aria-hidden="true">
+
+          {% if _sold_enabled %}
+          <div class="wa-cf-mode-tabs" role="tablist" aria-label="Select enquiry form">
+            <button type="button" class="wa-cf-mode-tab is-active" data-wa-form-mode="general" role="tab" aria-selected="true">
+              {{ module.general_form_label | default('General enquiry') }}
+            </button>
+            <button type="button" class="wa-cf-mode-tab" data-wa-form-mode="soldamatic" role="tab" aria-selected="false">
+              {{ module.soldamatic_form_label | default('Soldamatic support') }}
+            </button>
+          </div>
+          <input type="hidden" name="form_mode" value="general">
+          {% endif %}
+
+          {# Ticket category — rendered as dropdown; submitted as hs_ticket_category #}
+          <div class="wa-cf-field" {% if _sold_enabled %}data-wa-general-only{% endif %}>
+            <label class="wa-cf-label" for="wa-cf-type">
+              What is your enquiry about?<span class="wa-cf-required" aria-hidden="true">*</span>
+            </label>
+            <div class="wa-cf-select-wrap">
+              <select id="wa-cf-type" name="hs_ticket_category" class="wa-cf-select" required aria-required="true">
+                <option value="">Select a topic…</option>
+                {% if module.enquiry_types %}
+                  {% for t in module.enquiry_types %}
+                  {% set _type_label = t.type | default('') %}
+                  {% if not (_sold_enabled and 'Soldamatic' in _type_label) %}
+                  <option value="{{ t.type | escape }}">{{ t.type }}</option>
+                  {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </select>
+              <svg class="wa-cf-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          {# Conditional block — rendered from module fields, shown/hidden by JS #}
+          {% if _cond %}
+          <div class="wa-cf-conditional" aria-hidden="true" data-wa-conditional>
+            <div class="wa-cf-field">
+              <fieldset class="wa-cf-fieldset">
+                <legend class="wa-cf-label">{{ _cond.question_heading | default('') }}<span class="wa-cf-required" aria-hidden="true">*</span></legend>
+                <div class="wa-cf-choice-cards">
+                  {% for opt in _cond.options %}
+                  <label class="wa-cf-choice-card">
+                    <input type="radio" name="wa_conditional_mode" value="{{ opt.value_text | escape }}" class="wa-cf-choice-radio">
+                    <span class="wa-cf-choice-dot"></span>
+                    <span class="wa-cf-choice-body">
+                      <span class="wa-cf-choice-title">{{ opt.title }}</span>
+                      {% if opt.sub %}<span class="wa-cf-choice-sub">{{ opt.sub }}</span>{% endif %}
+                    </span>
+                  </label>
+                  {% endfor %}
+                </div>
+              </fieldset>
+            </div>
+
+            {# Extra field — shown when revealOn option selected #}
+            <div class="wa-cf-extra-field" aria-hidden="true" data-wa-extra-field>
+              <div class="wa-cf-field">
+                <label class="wa-cf-label" for="wa-cf-extra">
+                  {{ _cond.extra_field_label | default('') }}<span class="wa-cf-required" aria-hidden="true">*</span>
+                </label>
+                {% if _cond.extra_field_hint %}
+                <span class="wa-cf-hint">{{ _cond.extra_field_hint }}</span>
+                {% endif %}
+                <input
+                  type="text"
+                  id="wa-cf-extra"
+                  name="conditional_extra"
+                  class="wa-cf-input"
+                  placeholder="{{ _cond.extra_field_placeholder | default('') | escape }}"
+                >
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          {# Name row #}
+          <div class="wa-cf-row">
+            <div class="wa-cf-field">
+              <label class="wa-cf-label" for="wa-cf-firstname">First name<span class="wa-cf-required" aria-hidden="true">*</span></label>
+              <input type="text" id="wa-cf-firstname" name="firstname" class="wa-cf-input" placeholder="Jane" required aria-required="true" autocomplete="given-name">
+            </div>
+            <div class="wa-cf-field">
+              <label class="wa-cf-label" for="wa-cf-lastname">Last name<span class="wa-cf-required" aria-hidden="true">*</span></label>
+              <input type="text" id="wa-cf-lastname" name="lastname" class="wa-cf-input" placeholder="Smith" required aria-required="true" autocomplete="family-name">
+            </div>
+          </div>
+
+          {# Email #}
+          <div class="wa-cf-field">
+            <label class="wa-cf-label" for="wa-cf-email">Email address<span class="wa-cf-required" aria-hidden="true">*</span></label>
+            <input type="email" id="wa-cf-email" name="email" class="wa-cf-input" placeholder="jane@example.com.au" required aria-required="true" autocomplete="email">
+          </div>
+
+          {# Phone + company row (conditional on module fields) #}
+          {% if module.show_phone or module.show_company %}
+          <div class="wa-cf-row{% if not (module.show_phone and module.show_company) %} wa-cf-row--single{% endif %}" {% if _sold_enabled %}data-wa-contact-row{% endif %}>
+            {% if module.show_phone %}
+            <div class="wa-cf-field">
+              <label class="wa-cf-label" for="wa-cf-phone">Phone number</label>
+              <input type="tel" id="wa-cf-phone" name="phone" class="wa-cf-input" placeholder="0400 000 000" autocomplete="tel">
+            </div>
+            {% endif %}
+            {% if module.show_company %}
+            <div class="wa-cf-field" {% if _sold_enabled %}data-wa-company-field{% endif %}>
+              <label class="wa-cf-label" for="wa-cf-company">Company / organisation</label>
+              <input type="text" id="wa-cf-company" name="company" class="wa-cf-input" placeholder="Optional" autocomplete="organization">
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          {% if _sold_enabled %}
+          <div class="wa-cf-field" data-wa-soldamatic-only hidden>
+            <label class="wa-cf-label" for="wa-cf-soldamatic-machine">
+              {{ module.soldamatic_machine_label | default('Soldamatic machine number') }}<span class="wa-cf-required" aria-hidden="true">*</span>
+            </label>
+            {% if module.soldamatic_machine_hint %}
+            <span class="wa-cf-hint">{{ module.soldamatic_machine_hint }}</span>
+            {% endif %}
+            <input
+              type="text"
+              id="wa-cf-soldamatic-machine"
+              name="soldamatic_machine_number"
+              class="wa-cf-input"
+              placeholder="{{ module.soldamatic_machine_placeholder | default('e.g. SM-2024-XXXX') | escape }}"
+              data-wa-soldamatic-required
+            >
+          </div>
+          {% endif %}
+
+          {# Message #}
+          <div class="wa-cf-field">
+            <label class="wa-cf-label" for="wa-cf-message">
+              <span data-wa-message-label>Message</span><span class="wa-cf-required" aria-hidden="true">*</span>
+            </label>
+            <textarea
+              id="wa-cf-message"
+              name="message"
+              class="wa-cf-textarea"
+              placeholder="How can we help you?"
+              rows="5"
+              required
+              aria-required="true"
+              data-wa-general-placeholder="How can we help you?"
+            ></textarea>
+          </div>
+
+          {# Submit #}
+          <div class="wa-cf-submit-wrap">
+            <button type="submit" class="wa-cf-submit">
+              <span class="wa-cf-submit-label">{{ module.submit_label | default('Send enquiry') }}</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+            <div class="wa-cf-error-msg" role="alert" aria-live="polite"></div>
+          </div>
+
+        </form>
+      </div>{# end form card #}
+
+      {# ── Sidebar ─────────────────────────────────────────────────────────── #}
+      {% if module.show_sidebar %}
+      <aside class="wa-contact-form__sidebar" aria-label="Contact information">
+
+        {# Conditional sidebar — shown by JS when trigger type is selected #}
+        {% if _cond and _cond.cond_sidebar_heading %}
+        <div class="wa-cf-sidebar-card wa-cf-sidebar-card--conditional" aria-hidden="true" data-wa-cond-sidebar>
+          <p class="wa-cf-sidebar-overline">{{ _cond.cond_sidebar_heading }}</p>
+          {% if _cond.cond_sidebar_body %}
+          <div class="wa-cf-sidebar-body">{{ _cond.cond_sidebar_body }}</div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {# Default sidebar — phone + list #}
+        {% if _sold_enabled %}
+        <div class="wa-cf-sidebar-card wa-cf-sidebar-card--soldamatic" aria-hidden="true" hidden data-wa-soldamatic-sidebar>
+          <p class="wa-cf-sidebar-overline">{{ module.soldamatic_sidebar_heading | default('About Soldamatic support') }}</p>
+          {% if module.soldamatic_sidebar_body %}
+          <div class="wa-cf-sidebar-body">{{ module.soldamatic_sidebar_body }}</div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="wa-cf-sidebar-card" data-wa-default-sidebar>
+          {% if module.sidebar_phone_number %}
+          <p class="wa-cf-sidebar-overline">Prefer to call?</p>
+          <a href="tel:{{ module.sidebar_phone_number | replace(' ', '') }}" class="wa-cf-phone-link">
+            <span class="wa-cf-phone-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.9-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </span>
+            <span>
+              <span class="wa-cf-phone-number">{{ module.sidebar_phone_number }}</span>
+              {% if module.sidebar_phone_sub %}<span class="wa-cf-phone-sub">{{ module.sidebar_phone_sub }}</span>{% endif %}
+            </span>
+          </a>
+          {% endif %}
+
+          {% if module.sidebar_list_items %}
+          <div class="wa-cf-sidebar-list{% if module.sidebar_phone_number %} wa-cf-sidebar-list--ruled{% endif %}">
+            {% if module.sidebar_list_heading %}
+            <p class="wa-cf-sidebar-overline">{{ module.sidebar_list_heading }}</p>
+            {% endif %}
+            <ul class="wa-cf-sidebar-items" role="list">
+              {% for it in module.sidebar_list_items %}
+              <li class="wa-cf-sidebar-item">
+                <svg class="wa-cf-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                {{ it.item }}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+
+        {# Response time card #}
+        {% if module.response_time %}
+        <div class="wa-cf-sidebar-card wa-cf-sidebar-card--response">
+          <span class="wa-cf-response-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <div>
+            <p class="wa-cf-response-label">Response times</p>
+            <p class="wa-cf-response-text">{{ module.response_time }}</p>
+          </div>
+        </div>
+        {% endif %}
+
+      </aside>
+      {% endif %}{# end sidebar #}
+
+    </div>{# end grid #}
+
+  </div>
+</section>
+
+{%- endif -%}{# end members_only gate #}

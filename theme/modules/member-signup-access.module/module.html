@@ -1,0 +1,90 @@
+{#
+  member-signup-access.module/module.html
+  Editable signup/access guidance for HubSpot Private Content.
+
+  This page does not create CRM records or passwords. HubSpot's reset/setup
+  widget must be submitted from the Private Content system route, so this module
+  links users there instead of embedding the widget on a normal CMS page.
+#}
+
+{%- set _setup_url = '/_hcms/mem/reset/request?redirect_url=/portal' -%}
+
+<section class="auth-signup" aria-labelledby="{{ name }}-heading">
+  {% if module.overline %}
+  <p class="wa-overline auth-signup__eyebrow">
+    <span class="wa-overline__text">{{ module.overline }}</span>
+  </p>
+  {% endif %}
+
+  {% if module.heading %}
+  <h2 id="{{ name }}-heading" class="auth-signup__heading">{{ module.heading }}</h2>
+  {% endif %}
+
+  {% if module.intro %}
+  <div class="auth-signup__intro">{{ module.intro }}</div>
+  {% endif %}
+
+  {% if module.steps %}
+  <div class="auth-signup__steps">
+    {% for step in module.steps %}
+    <div class="auth-signup__step">
+      <span class="auth-signup__step-number" aria-hidden="true">{{ loop.index }}</span>
+      <div>
+        {% if step.heading %}
+        <h3>{{ step.heading }}</h3>
+        {% endif %}
+        {% if step.step_text %}
+        <div class="auth-signup__step-body">{{ step.step_text }}</div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if module.show_setup_form | default(true) %}
+  <div class="auth-signup__setup">
+    {% if module.setup_form_heading %}
+    <h3 class="auth-signup__setup-heading">{{ module.setup_form_heading }}</h3>
+    {% endif %}
+
+    {% if module.setup_form_intro %}
+    <div class="auth-signup__setup-intro">{{ module.setup_form_intro }}</div>
+    {% endif %}
+
+    <div class="auth-signup__setup-action">
+      <a class="btn btn-primary auth-signup__setup-button" href="{{ _setup_url }}">
+        {{ module.setup_submit_label | default('Open setup/reset page') }}
+      </a>
+    </div>
+
+    {% if module.setup_microcopy %}
+    <div class="auth-signup__setup-note">{{ module.setup_microcopy }}</div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if module.primary_cta_label or module.secondary_cta_label %}
+  <div class="auth-signup__actions">
+    {% if module.primary_cta_label %}
+    <a
+      class="btn btn-primary auth-signup__primary"
+      href="{{ module.primary_cta_link.url.href | default('/membership/') }}"
+      {% if module.primary_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >
+      {{ module.primary_cta_label }}
+    </a>
+    {% endif %}
+
+    {% if module.secondary_cta_label %}
+    <a
+      class="btn btn-secondary auth-signup__secondary"
+      href="{{ module.secondary_cta_link.url.href | default('/login/') }}"
+      {% if module.secondary_cta_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >
+      {{ module.secondary_cta_label }}
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>

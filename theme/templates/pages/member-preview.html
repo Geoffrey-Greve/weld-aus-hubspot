@@ -1,0 +1,108 @@
+<!--
+  templateType: page
+  label: Member Preview (Staging)
+  isAvailableForNewContent: true
+-->
+{#
+  member-preview.html - staging-only membership system preview.
+
+  Intended URL: /member-preview
+
+  Safety model:
+    - Uses mock member dashboard profiles only; no HubSpot CRM contacts are read.
+    - Shows the public Find a Member directory from HubDB `members`.
+    - No CRM writes, workflow writes, deal writes, or contact writes.
+
+  The published /membership page remains the public marketing page until the
+  real private-content login/email flow is ready.
+#}
+{% set page_title_exact = 'Member Preview - Weld Australia' %}
+{% set page_description = 'A staging-only preview of the Weld Australia member portal and Find a Member directory experience.' %}
+{% extends "../layouts/base.html" %}
+
+{% block extra_head %}
+<meta name="robots" content="noindex, nofollow">
+<style>
+  body.is-member-preview-page .wa-hero__headline {
+    max-width: 780px;
+  }
+
+  @media (min-width: 1024px) {
+    body.is-member-preview-page .wa-hero__headline {
+      font-size: 54px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}is-member-preview-page is-membership-page{% endblock %}
+
+{% block body %}
+{% module "member_preview_hero" path="../../modules/hero"
+  label="Member preview hero"
+  background="primary"
+  height="medium"
+  alignment="left"
+  accent_bar=true
+  eyebrow="Staging member system preview"
+  headline="Preview the Weld Australia member portal"
+  subheadline="<p>Use this staging-only page to test member dashboard layouts with safe mock profiles and confirm the public Find a Member directory is reading from HubDB.</p>"
+  primary_cta={"label_text": "Test member profiles", "link": {"url": {"href": "#portal-preview", "type": "EXTERNAL"}}, "style": "gold"}
+  secondary_cta={"label_text": "Check directory", "link": {"url": {"href": "#directory-preview", "type": "EXTERNAL"}}, "style": "white-outline"}
+%}
+
+{% module "member_preview_dashboard" path="../../modules/member-dashboard"
+  label="Mock member dashboard preview"
+  section_id="portal-preview"
+  background="surface_alt"
+  spacing="spacious"
+  members_only=false
+  preview_mode=true
+  welcome_message="Welcome back, {firstname}"
+  expiry_warning_days=60
+  renewal_link={"url": {"href": "/contact-us?enquiry=Membership#enquiry", "type": "EXTERNAL"}}
+  support_email="membership@weldaustralia.com.au"
+  tiles=[
+    {"tile_type": "welcome_banner", "tile_heading_override": "", "tile_visible": true},
+    {"tile_type": "smart_alerts", "tile_heading_override": "", "tile_visible": true},
+    {"tile_type": "membership_status", "tile_heading_override": "Membership status", "tile_visible": true},
+    {"tile_type": "certifications", "tile_heading_override": "Certifications", "tile_visible": true},
+    {"tile_type": "upcoming_courses", "tile_heading_override": "Courses", "tile_visible": true},
+    {"tile_type": "registered_events", "tile_heading_override": "Registered events", "tile_visible": true},
+    {"tile_type": "invoices", "tile_heading_override": "Invoices and receipts", "tile_visible": true},
+    {"tile_type": "geo_events", "tile_heading_override": "Events near you", "tile_visible": true},
+    {"tile_type": "corporate_admin", "tile_heading_override": "Corporate admin", "tile_visible": true},
+    {"tile_type": "resources_for_you", "tile_heading_override": "Resources for you", "tile_visible": true},
+    {"tile_type": "custom_cta", "tile_heading_override": "", "tile_visible": true, "custom_cta_label": "Back to membership overview", "custom_cta_link": {"url": {"href": "/membership", "type": "EXTERNAL"}}}
+  ]
+%}
+
+{% module "member_preview_directory" path="../../modules/find-a-member"
+  label="Find a Member directory preview"
+  section_id="directory-preview"
+  background="surface"
+  spacing="spacious"
+  members_only=false
+  section_heading="Find a Member directory preview"
+  intro="<p>Browse active Weld Australia members, sorted by membership tier. Use the search and filters below to find members by company name, tier or state.</p>"
+  default_sort="tier"
+  tiers_visible=["gold", "silver", "bronze", "reciprocal", "industry_supplier"]
+  page_size=12
+  show_state_filter=true
+  show_search=true
+%}
+
+{% module "member_preview_cta" path="../../modules/cta-banner"
+  label="Member preview CTA"
+  background="primary_dark"
+  align="split"
+  headline="Next step: connect the real member portal safely"
+  body_text="<p>Once the login/email flow and member data mapping are confirmed, this preview can be folded into the real /membership logged-in experience while keeping the public membership page visible to anonymous visitors.</p>"
+  cta_label="View membership page"
+  cta_link={"url": {"href": "/membership", "type": "EXTERNAL"}}
+  secondary_cta_label="Open Find a Member"
+  secondary_cta_link={"url": {"href": "/find-a-member/", "type": "EXTERNAL"}}
+  tertiary_cta_label="Browse courses"
+  tertiary_cta_link={"url": {"href": "/courses", "type": "EXTERNAL"}}
+%}
+{% endblock %}

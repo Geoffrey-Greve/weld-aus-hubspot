@@ -1,0 +1,14 @@
+{
+  "label": "Event registration (Event Engine)",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Live event booking via the Event Engine (Cloudflare Worker). Reads availability and reserves seats from the worker; never reads HubDB for counts. Place on an `events` HubDB dynamic page so it can read the current event row. Set ticket type ids to match the Event Engine provisioning for the event.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["events", "booking", "event-engine", "hubdb", "interactive", "forms"]
+}

@@ -1,0 +1,42 @@
+{%- set _bg = module.background | default('surface') -%}
+{%- set _sp = module.spacing | default('default') -%}
+{%- set _dark = _bg in ['primary', 'primary_dark'] -%}
+
+{% if module.tabs %}
+<section class="wa-tabs wa-section wa-section--bg-{{ _bg }} wa-section--spacing-{{ _sp }}" {% if module.section_id %}id="{{ module.section_id }}"{% endif %}>
+  <div class="container">
+    {% if module.overline or module.heading %}
+    <div class="wa-section-head">
+      {% if module.overline %}<div class="wa-overline{% if _dark %} wa-overline--light{% endif %}"><span class="wa-overline__text">{{ module.overline }}</span></div>{% endif %}
+      {% if module.heading %}<h2 class="wa-tabs__heading">{{ module.heading }}</h2>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="wa-tabs__widget" data-tabs>
+      <div class="wa-tabs__tablist" role="tablist">
+        {% for tab in module.tabs %}
+        <button
+          class="wa-tabs__tab"
+          role="tab"
+          id="wa-tab-{{ loop.index }}"
+          aria-controls="wa-panel-{{ loop.index }}"
+          aria-selected="{{ 'true' if loop.first else 'false' }}"
+          tabindex="{{ '0' if loop.first else '-1' }}"
+        >{{ tab.label_text }}</button>
+        {% endfor %}
+      </div>
+      {% for tab in module.tabs %}
+      <div
+        class="wa-tabs__panel"
+        role="tabpanel"
+        id="wa-panel-{{ loop.index }}"
+        aria-labelledby="wa-tab-{{ loop.index }}"
+        {% if not loop.first %}hidden{% endif %}
+      >
+        <div class="wa-richtext">{{ tab.content }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

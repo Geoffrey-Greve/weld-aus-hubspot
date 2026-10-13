@@ -1,0 +1,14 @@
+{
+  "label": "Course Dynamic Section",
+  "css_assets": [],
+  "external_js": [],
+  "global": false,
+  "help_text": "Course detail section that derives copy/cards from the current HubDB course row, with editor overrides for text, image, cards and CTA.",
+  "content_types": ["SITE_PAGE", "LANDING_PAGE"],
+  "icon": "",
+  "is_available_for_new_content": true,
+  "js_assets": [],
+  "other_assets": [],
+  "smart_objects": [],
+  "tags": ["courses", "hubdb", "dynamic", "training"]
+}

@@ -1,0 +1,486 @@
+{#
+  hero.module/module.html
+  Full-width hero: headline, sub-headline, optional right-side image/video/text, CTA pair.
+
+  Standard fields: section_id, background, spacing, visibility, members_only
+  Module fields:   headline, subheadline, media_type, background_image (side image),
+                   video_embed_url, video_poster, media_text (side text panel),
+                   alignment, primary_cta, secondary_cta, height,
+                   show_breadcrumb + breadcrumb_*, show_stats + stats_placement + stats
+
+  Absorbed the courses/events/resources/job-board landing heroes: breadcrumbs and
+  stat tiles are optional here rather than living in four near-identical modules.
+#}
+
+{%- set _request_path = request.path | default('', true) | lower | split('?') | first | split('#') | first -%}
+{%- set _is_about_page = _request_path == '/about' or _request_path == '/about/' -%}
+{%- set _is_membership_page = _request_path == '/membership' or _request_path == '/membership/' -%}
+{%- set _is_advocacy_page = _request_path == '/advocacy' or _request_path == '/advocacy/' -%}
+{%- set _is_certification_page = _request_path == '/certification' or _request_path == '/certification/' -%}
+{%- set _is_engineering_page = _request_path == '/engineering' or _request_path == '/engineering/' -%}
+{%- set _is_training_page = _request_path == '/training' or _request_path == '/training/' -%}
+{%- set _is_find_a_member_page = _request_path == '/find-a-member' or _request_path == '/find-a-member/' -%}
+{%- set _is_awards_page = _request_path == '/2026-welding-excellence-awards' or _request_path == '/2026-welding-excellence-awards/' -%}
+{%- set _headline_key = module.headline | default('', true) | striptags | lower | trim -%}
+{%- set _is_awards_hero = _is_awards_page or ('excellence awards' in _headline_key and 'weld' in _headline_key) -%}
+{%- set _is_certification_landing_hero = _is_certification_page and (_headline_key == '' or 'welding certification australia' in _headline_key) -%}
+{%- set _eyebrow = module.eyebrow | default('', true) | trim -%}
+{%- if not _eyebrow and _is_about_page -%}
+  {%- set _eyebrow = 'Peak industry body' -%}
+{%- elif _is_awards_hero and (not _eyebrow or (_eyebrow | lower | trim) == '2026 welding excellence awards') -%}
+  {%- set _eyebrow = 'Industry recognition' -%}
+{%- endif -%}
+
+{%- set _media_type = module.media_type | default('none', true) -%}
+{%- set _media_text = module.media_text | default('', true) -%}
+{%- set _media_text_key = _media_text | striptags | lower | trim -%}
+{%- set _side_img_src = module.background_image.src | default('', true) -%}
+{%- set _side_img_alt = module.background_image.alt | default('', true) -%}
+{%- set _side_img_width = module.background_image.width | default('', true) -%}
+{%- set _side_img_height = module.background_image.height | default('', true) -%}
+{%- if _is_membership_page and (_media_type == 'text' and 'member value from day one' in _media_text_key or _media_type == 'none' or (_media_type == 'image' and not _side_img_src)) -%}
+  {%- set _media_type = 'image' -%}
+  {%- set _side_img_src = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/Imported_Blog_Media/reciprocal-membership.jpg' -%}
+  {%- set _side_img_alt = 'reciprocal-membership' -%}
+  {%- set _side_img_width = 980 -%}
+  {%- set _side_img_height = 653 -%}
+{%- elif _is_advocacy_page and (_media_type == 'text' and 'advocacy priorities' in _media_text_key or _media_type == 'none' or (_media_type == 'image' and not _side_img_src)) -%}
+  {%- set _media_type = 'image' -%}
+  {%- set _side_img_src = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/Screenshot%202026-07-31%20182528.jpg' -%}
+  {%- set _side_img_alt = 'Geoff Crittenden' -%}
+  {%- set _side_img_width = 1851 -%}
+  {%- set _side_img_height = 1012 -%}
+{%- elif _is_certification_landing_hero and (_media_type == 'text' and 'certification pathways' in _media_text_key or _media_type == 'none' or (_media_type == 'image' and not _side_img_src)) -%}
+  {%- set _media_type = 'image' -%}
+  {%- set _side_img_src = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1290244385%20(1).jpg' -%}
+  {%- set _side_img_alt = 'Welding Certification Australia' -%}
+  {%- set _side_img_width = 5120 -%}
+  {%- set _side_img_height = 2880 -%}
+{%- elif _is_training_page and (_media_type == 'none' or (_media_type == 'image' and not _side_img_src)) -%}
+  {%- set _media_type = 'image' -%}
+  {%- set _side_img_src = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/placeholders/Stocked%20Images/iStock-1266644220%20(2).jpg' -%}
+  {%- set _side_img_alt = 'Weld Australia trainer delivering practical welding training' -%}
+  {%- set _side_img_width = 1200 -%}
+  {%- set _side_img_height = 900 -%}
+{%- endif -%}
+{%- set _has_side_img = _media_type == 'image' and _side_img_src -%}
+{%- set _has_video    = _media_type == 'video' and module.video_embed_url -%}
+{%- set _has_side_text = _media_type == 'text' and _media_text -%}
+{%- set _has_poster   = module.video_poster and module.video_poster.src -%}
+{%- set _vis          = module.visibility | default(['mobile','tablet','desktop']) -%}
+
+{#- ── Stat tiles ───────────────────────────────────────────────────────────
+     Collect the rows the editor actually filled in, and note whether any of
+     them asks for a live Job Board count. The HubDB read below is guarded on
+     that flag so heroes without live counts never pay for the query. -#}
+{%- set _stats_ns = namespace(rows=[], needs_jobs=false) -%}
+{%- if module.show_stats -%}
+  {%- for stat in module.stats -%}
+    {%- set _stat_dynamic = stat.dynamic_value | default('none', true) -%}
+    {%- if stat.value or stat.stat_label or stat.label_text or stat.label or _stat_dynamic != 'none' -%}
+      {%- set _stats_ns.rows = _stats_ns.rows + [stat] -%}
+      {%- if _stat_dynamic != 'none' -%}{%- set _stats_ns.needs_jobs = true -%}{%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- set _jobs = namespace(
+  total=0,
+  state_keys='|', state_count=0,
+  employer_keys='|', employer_count=0,
+  category_keys='|', category_count=0,
+  remote_count=0, featured_count=0
+) -%}
+{%- if _stats_ns.needs_jobs -%}
+  {# Job Board stats should count public active roles only. #}
+  {%- set _jobs_rows = hubdb_table_rows('jobs', 'is_active__eq=true&orderBy=-date_posted&limit=200') -%}
+  {%- set _jobs.total = _jobs_rows|length -%}
+  {%- for _job in _jobs_rows -%}
+    {%- set _job_state = _job.job_state.name|default(_job.job_state, true)|trim -%}
+    {%- if _job_state -%}
+      {%- if ('|' ~ (_job_state|lower) ~ '|') not in _jobs.state_keys -%}
+        {%- set _jobs.state_keys = _jobs.state_keys ~ (_job_state|lower) ~ '|' -%}
+        {%- set _jobs.state_count = _jobs.state_count + 1 -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- set _company = _job.company_name|default('', true)|striptags|trim -%}
+    {%- if _company -%}
+      {%- if ('|' ~ (_company|lower) ~ '|') not in _jobs.employer_keys -%}
+        {%- set _jobs.employer_keys = _jobs.employer_keys ~ (_company|lower) ~ '|' -%}
+        {%- set _jobs.employer_count = _jobs.employer_count + 1 -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- set _category = _job.category.name|default(_job.category, true)|trim -%}
+    {%- if _category -%}
+      {%- if ('|' ~ (_category|lower) ~ '|') not in _jobs.category_keys -%}
+        {%- set _jobs.category_keys = _jobs.category_keys ~ (_category|lower) ~ '|' -%}
+        {%- set _jobs.category_count = _jobs.category_count + 1 -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- set _arrangement = _job.arrangement.name|default(_job.arrangement, true)|lower -%}
+    {%- if 'remote' in _arrangement or 'fly-in' in _arrangement or 'fifo' in _arrangement -%}
+      {%- set _jobs.remote_count = _jobs.remote_count + 1 -%}
+    {%- endif -%}
+
+    {%- if _job.is_featured -%}{%- set _jobs.featured_count = _jobs.featured_count + 1 -%}{%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{#- Flatten to {value, label} pairs. Values are stringified so a live count of
+    zero still renders instead of being dropped as falsy. -#}
+{%- set _stats_out = namespace(items=[]) -%}
+{%- for stat in _stats_ns.rows -%}
+  {%- set _stat_dynamic = stat.dynamic_value | default('none', true) -%}
+  {%- set _stat_value = stat.value | default('', true) -%}
+  {%- if     _stat_dynamic == 'open_roles_count' -%}{%- set _stat_value = _jobs.total -%}
+  {%- elif   _stat_dynamic == 'states_count'     -%}{%- set _stat_value = _jobs.state_count -%}
+  {%- elif   _stat_dynamic == 'employers_count'  -%}{%- set _stat_value = _jobs.employer_count -%}
+  {%- elif   _stat_dynamic == 'categories_count' -%}{%- set _stat_value = _jobs.category_count -%}
+  {%- elif   _stat_dynamic == 'remote_count'     -%}{%- set _stat_value = _jobs.remote_count -%}
+  {%- elif   _stat_dynamic == 'featured_count'   -%}{%- set _stat_value = _jobs.featured_count -%}
+  {%- endif -%}
+  {#- stat_label is the current field name; label_text/label are read so data
+      pasted from the retired landing-hero modules still renders. -#}
+  {%- set _stat_label = stat.stat_label | default(stat.label_text, true) | default(stat.label, true) | default('', true) -%}
+  {%- set _stats_out.items = _stats_out.items + [{'value': _stat_value | string | trim, 'label': _stat_label}] -%}
+{%- endfor -%}
+
+{%- set _has_stats = _stats_out.items | length > 0 -%}
+{#- The side column can only hold one thing: an image, video or text block wins,
+    stats fall back below. -#}
+{%- set _stats_placement = module.stats_placement | default('below', true) -%}
+{%- if _stats_placement == 'side' and (_has_side_img or _has_video or _has_side_text) -%}
+  {%- set _stats_placement = 'below' -%}
+{%- endif -%}
+{%- set _has_side_stats = _has_stats and _stats_placement == 'side' -%}
+{%- set _has_media      = _has_side_img or _has_video or _has_side_text or _has_side_stats -%}
+
+{%- macro wa_hero_stat_list(items, variant) -%}
+<dl class="wa-hero__stats wa-hero__stats--{{ variant }}">
+  {%- for stat in items %}
+  <div class="wa-hero__stat">
+    {% if stat.value %}<dt class="wa-hero__stat-value">{{ stat.value }}</dt>{% endif %}
+    {% if stat.label %}<dd class="wa-hero__stat-label">{{ stat.label }}</dd>{% endif %}
+  </div>
+  {%- endfor %}
+</dl>
+{%- endmacro -%}
+{%- set _bg           = module.background | default('primary') -%}
+{%- set _dark         = _bg in ['primary', 'primary_dark'] -%}
+{%- set _primary_cta_href = module.primary_cta.link.url.href | default('#') | trim -%}
+{%- set _primary_cta_open_in_new_tab = module.primary_cta.link.open_in_new_tab -%}
+{%- set _primary_cta_label = module.primary_cta.label_text | default('', true) | lower | trim -%}
+{%- set _secondary_cta_href = module.secondary_cta.link.url.href | default('#') | trim -%}
+{%- set _secondary_cta_open_in_new_tab = module.secondary_cta.link.open_in_new_tab -%}
+{%- set _secondary_cta_label = module.secondary_cta.label_text | default('', true) | lower | trim -%}
+{%- set _show_search = module.show_search | default(false) -%}
+{%- if _is_find_a_member_page -%}{%- set _show_search = false -%}{%- endif -%}
+{%- set _search_placeholder = module.search_placeholder | default('Search...', true) -%}
+{%- if module.search_target == 'find_a_member' -%}
+  {%- set _search_action = '/find-a-member/' -%}
+  {%- set _search_label  = 'Search for a member' -%}
+{%- elif module.search_target == 'course_timetable' -%}
+  {%- set _search_action = '/courses/' -%}
+  {%- set _search_label  = 'Search courses' -%}
+{%- else -%}
+  {%- set _search_action = '/resources/' -%}
+  {%- set _search_label  = 'Search resources' -%}
+{%- endif -%}
+{%- set _engineering_prospectus_url = 'https://441838610.fs1.hubspotusercontent-ap1.net/hubfs/441838610/weld-australia/engineering/prospectus/Weld-Australia-Engineering-Services-Prospectus.pdf' -%}
+{%- set _training_brochure_url = 'https://weldingtech.sharepoint.com/sites/WeldsPublicDocuments/_layouts/15/download.aspx?share=EepC0EpcRT1OjptEQzolHsQBbBn2MyGah-VoxHDyiznQPg' -%}
+{%- set _resources_placeholder_hrefs = ['', '#', '#download', '/resources', '/resources/', '/resources?hslang=en', '/resources/?hslang=en'] -%}
+{%- if _secondary_cta_label == 'find a course' -%}
+  {%- set _secondary_cta_href = '/courses' -%}
+  {%- set _secondary_cta_open_in_new_tab = false -%}
+{%- endif -%}
+{# QA 106: /training/ no longer carries a course list, so its old #courses
+   anchor is dead. Any "Find a course" CTA still pointing at it goes to /courses. #}
+{%- if _primary_cta_label == 'find a course' and _primary_cta_href | lower in ['#courses', '', '#'] -%}
+  {%- set _primary_cta_href = '/courses' -%}
+  {%- set _primary_cta_open_in_new_tab = false -%}
+{%- endif -%}
+{# QA 225: brochure CTAs pointed at the Resources hub instead of the brochure
+   itself. Same asset and same treatment as the split-feature "Download
+   brochure" button (QA #46) - only fires on a placeholder href, so a hero that
+   already names a real brochure file is left alone. #}
+{%- if 'brochure' in _secondary_cta_label and _secondary_cta_href | lower in _resources_placeholder_hrefs -%}
+  {%- set _secondary_cta_href = _training_brochure_url -%}
+  {%- set _secondary_cta_open_in_new_tab = true -%}
+{%- endif -%}
+{%- if _is_engineering_page and _primary_cta_label == 'download prospectus' and (_primary_cta_href == '' or _primary_cta_href == '#' or _primary_cta_href == '#download') -%}
+  {%- set _primary_cta_href = _engineering_prospectus_url -%}
+  {%- set _primary_cta_open_in_new_tab = true -%}
+{%- endif -%}
+{%- set _secondary_cta_href_key = _secondary_cta_href | lower -%}
+{%- if _is_membership_page and (_secondary_cta_label == 'download prospectus' or _secondary_cta_label == 'membership prospectus') and (_secondary_cta_href_key == '' or _secondary_cta_href_key == '#' or _secondary_cta_href_key == '#download' or _secondary_cta_href_key == '/resources' or _secondary_cta_href_key == '/resources/' or _secondary_cta_href_key == '/resources?hslang=en' or _secondary_cta_href_key == '/resources/?hslang=en') -%}
+  {%- set _secondary_cta_href = 'https://weldaustralia.com.au/wp-content/uploads/2025/10/Weld-Australia-Membership-Prospectus-2025-FINAL.pdf' -%}
+  {%- set _secondary_cta_open_in_new_tab = true -%}
+{%- endif -%}
+
+{# tel:/mailto: must bypass escape_url (drops tel:). HubSpot link fields also empty
+   tel: on save — rebuild when href is blank/# and the CTA is a phone call.
+   Exact Weld Aus number is forced for the known Contact Us label so a dead link cannot ship. #}
+{%- if _primary_cta_label == 'call 1800 189 900' -%}
+  {%- set _primary_cta_href = 'tel:1800189900' -%}
+{%- elif (_primary_cta_href == '' or _primary_cta_href == '#') -%}
+  {%- set _primary_digits = module.primary_cta.label_text | default('') | regex_replace('[^0-9]', '') -%}
+  {%- if _primary_digits|length >= 8 and ('call' in _primary_cta_label or _primary_digits[0:4] == '1800' or _primary_digits[0:4] == '1300') -%}
+    {%- set _primary_cta_href = 'tel:' ~ _primary_digits -%}
+  {%- endif -%}
+{%- endif -%}
+{%- if _secondary_cta_label == 'call 1800 189 900' -%}
+  {%- set _secondary_cta_href = 'tel:1800189900' -%}
+{%- elif (_secondary_cta_href == '' or _secondary_cta_href == '#') -%}
+  {%- set _secondary_digits = module.secondary_cta.label_text | default('') | regex_replace('[^0-9]', '') -%}
+  {%- if _secondary_digits|length >= 8 and ('call' in _secondary_cta_label or _secondary_digits[0:4] == '1800' or _secondary_digits[0:4] == '1300') -%}
+    {%- set _secondary_cta_href = 'tel:' ~ _secondary_digits -%}
+  {%- endif -%}
+{%- endif -%}
+{# Re-evaluate AFTER href mutations so escape_url never strips a reconstructed tel:. #}
+{%- set _primary_cta_is_direct   = _primary_cta_href[0:4]   | lower == 'tel:' or _primary_cta_href[0:7]   | lower == 'mailto:' -%}
+{%- set _secondary_cta_is_direct = _secondary_cta_href[0:4] | lower == 'tel:' or _secondary_cta_href[0:7] | lower == 'mailto:' -%}
+
+{% if not module.members_only or request_contact.is_logged_in %}
+
+{%- set _section_classes = [
+  'wa-hero',
+  'wa-hero--bg-'   ~ _bg,
+  'wa-hero--sp-'   ~ (module.spacing     | default('default')),
+  'wa-hero--h-'    ~ (module.height      | default('medium')),
+  'wa-hero--align-'~ (module.alignment   | default('left'))
+] -%}
+{%- if _has_media       -%}{%- set _section_classes = _section_classes + ['wa-hero--has-media'] -%}{%- endif -%}
+{%- if _has_side_img    -%}{%- set _section_classes = _section_classes + ['wa-hero--has-image'] -%}{%- endif -%}
+{%- if _has_video       -%}{%- set _section_classes = _section_classes + ['wa-hero--has-video'] -%}{%- endif -%}
+{%- if _has_side_text   -%}{%- set _section_classes = _section_classes + ['wa-hero--has-text']  -%}{%- endif -%}
+{%- if _has_side_stats  -%}{%- set _section_classes = _section_classes + ['wa-hero--has-side-stats'] -%}{%- endif -%}
+{%- if _show_search     -%}{%- set _section_classes = _section_classes + ['wa-hero--has-search'] -%}{%- endif -%}
+{%- if module.accent_bar != false -%}{%- set _section_classes = _section_classes + ['wa-hero--accent-bar'] -%}{%- endif -%}
+{%- if 'mobile'  not in _vis -%}{%- set _section_classes = _section_classes + ['wa-hidden-mobile']  -%}{%- endif -%}
+{%- if 'tablet'  not in _vis -%}{%- set _section_classes = _section_classes + ['wa-hidden-tablet']  -%}{%- endif -%}
+{%- if 'desktop' not in _vis -%}{%- set _section_classes = _section_classes + ['wa-hidden-desktop'] -%}{%- endif -%}
+
+<section
+  class="{{ _section_classes | join(' ') }}"
+  {% if module.section_id %}id="{{ module.section_id }}"{% endif %}
+  aria-labelledby="{% if module.section_id %}{{ module.section_id }}-heading{% else %}wa-hero-heading{% endif %}"
+>
+
+  <div class="container wa-hero__inner">
+    <div class="wa-hero__content">
+
+      {% if module.show_breadcrumb and (module.show_breadcrumb_home or module.breadcrumb_parent_label or module.breadcrumb_current_label) %}
+      <nav class="wa-hero__breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          {% if module.show_breadcrumb_home %}
+          <li>
+            <a
+              href="{{ module.breadcrumb_home_link.url.href | default('/', true) | escape_url }}"
+              {% if module.breadcrumb_home_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ module.breadcrumb_home_label | default('Home', true) }}</a>
+          </li>
+          {% if module.breadcrumb_parent_label or module.breadcrumb_current_label %}
+          <li aria-hidden="true">/</li>
+          {% endif %}
+          {% endif %}
+          {% if module.breadcrumb_parent_label %}
+          <li>
+            <a
+              href="{{ module.breadcrumb_parent_link.url.href | default('/', true) | escape_url }}"
+              {% if module.breadcrumb_parent_link.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+            >{{ module.breadcrumb_parent_label }}</a>
+          </li>
+          <li aria-hidden="true">/</li>
+          {% endif %}
+          {% if module.breadcrumb_current_label %}
+          <li aria-current="page">{{ module.breadcrumb_current_label }}</li>
+          {% endif %}
+        </ol>
+      </nav>
+      {% endif %}
+
+      {% if _eyebrow %}
+      <div class="wa-overline{% if _dark %} wa-overline--light{% endif %}">
+        <span class="wa-overline__text">{{ _eyebrow }}</span>
+      </div>
+      {% endif %}
+
+      <h1
+        class="wa-hero__headline"
+        id="{% if module.section_id %}{{ module.section_id }}-heading{% else %}wa-hero-heading{% endif %}"
+      >
+        {{ module.headline }}
+      </h1>
+
+      {% if module.subheadline %}
+      <div class="wa-hero__subheadline">{{ module.subheadline }}</div>
+      {% endif %}
+
+      {% if module.extra_content %}
+      <div class="wa-hero__extra">{{ module.extra_content }}</div>
+      {% endif %}
+
+      {% if module.primary_cta.label_text or module.secondary_cta.label_text %}
+      <div class="wa-hero__ctas">
+
+        {% if module.primary_cta.label_text %}
+        <a
+          href="{% if _primary_cta_is_direct %}{{ _primary_cta_href | escape }}{% else %}{{ _primary_cta_href | escape_url }}{% endif %}"
+          class="btn btn-{{ module.primary_cta.style | default('gold') }} wa-hero__cta"
+          {% if _primary_cta_open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >
+          <span>{{ module.primary_cta.label_text }}</span>
+          <svg class="wa-btn__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{% if _is_membership_page and module.primary_cta.style|default('gold') == 'gold' %}#1a1a1a{% else %}currentColor{% endif %}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"{% if _is_membership_page and module.primary_cta.style|default('gold') == 'gold' %} style="color:#1a1a1a;stroke:#1a1a1a;"{% endif %}>
+            <line x1="5" y1="12" x2="19" y2="12"{% if _is_membership_page and module.primary_cta.style|default('gold') == 'gold' %} stroke="#1a1a1a" style="stroke:#1a1a1a;"{% endif %}></line>
+            <polyline points="12 5 19 12 12 19"{% if _is_membership_page and module.primary_cta.style|default('gold') == 'gold' %} stroke="#1a1a1a" style="stroke:#1a1a1a;"{% endif %}></polyline>
+          </svg>
+        </a>
+        {% endif %}
+
+        {% if module.secondary_cta.label_text %}
+        <a
+          href="{% if _secondary_cta_is_direct %}{{ _secondary_cta_href | escape }}{% else %}{{ _secondary_cta_href | escape_url }}{% endif %}"
+          class="btn btn-{{ module.secondary_cta.style | default('white-outline') }} wa-hero__cta"
+          {% if _secondary_cta_open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ module.secondary_cta.label_text }}</a>
+        {% endif %}
+
+      </div>
+      {% endif %}
+
+      {% if _show_search %}
+      <form
+        class="wa-hero__search"
+        action="{{ _search_action | escape_url }}"
+        method="get"
+        role="search"
+        aria-label="{{ _search_label | escape_attr }}"
+      >
+        <div class="wa-hero__search-wrap">
+          <label
+            for="{% if module.section_id %}{{ module.section_id }}-search{% else %}wa-hero-search-input{% endif %}"
+            class="sr-only"
+          >{{ _search_label }}</label>
+          <svg
+            class="wa-hero__search-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="search"
+            id="{% if module.section_id %}{{ module.section_id }}-search{% else %}wa-hero-search-input{% endif %}"
+            name="q"
+            class="wa-hero__search-input"
+            placeholder="{{ _search_placeholder | escape_attr }}"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+          >
+          <button
+            type="submit"
+            class="wa-hero__search-submit btn btn-primary"
+            aria-label="Submit search"
+          >
+            Search
+          </button>
+        </div>
+      </form>
+      {% endif %}
+
+      {% if _has_stats and _stats_placement == 'below' %}
+      {{ wa_hero_stat_list(_stats_out.items, 'below') }}
+      {% endif %}
+
+      {% if _has_video %}
+      {# Tablet/mobile: lightweight link to the video (the embed only renders on desktop) #}
+      <a class="wa-hero__video-link" href="{{ module.video_embed_url | replace('/embed/', '/watch?v=') }}"
+         target="_blank" rel="noopener noreferrer">
+        <span class="wa-hero__video-play" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </span>
+        Watch our video
+      </a>
+      {% endif %}
+
+    </div>
+
+    {% if _has_media %}
+    <div class="wa-hero__media">
+      {% if _has_side_img %}
+      <img
+        src="{{ _side_img_src }}"
+        alt="{{ _side_img_alt | default('') }}"
+        class="wa-hero__img"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        {% if _side_img_width  %}width="{{ _side_img_width }}"{% endif %}
+        {% if _side_img_height %}height="{{ _side_img_height }}"{% endif %}
+      >
+      {% elif _has_video %}
+      <div class="wa-hero__media-frame">
+        {% if _has_poster %}
+        {# Click-to-play facade: the poster shows first; the iframe is injected on
+           click (see module.js). Defers the heavy embed until the visitor opts in. #}
+        <button
+          type="button"
+          class="wa-hero__video-facade"
+          data-video-src="{{ module.video_embed_url }}"
+          aria-label="Play video{% if module.headline %}: {{ module.headline }}{% endif %}"
+        >
+          <img
+            src="{{ module.video_poster.src }}"
+            alt="{{ module.video_poster.alt | default('') }}"
+            class="wa-hero__poster"
+            loading="lazy"
+            decoding="async"
+            {% if module.video_poster.width  %}width="{{ module.video_poster.width }}"{% endif %}
+            {% if module.video_poster.height %}height="{{ module.video_poster.height }}"{% endif %}
+          >
+          <span class="wa-hero__poster-play" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" focusable="false"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+          </span>
+        </button>
+        {% else %}
+        <iframe
+          src="{{ module.video_embed_url }}"
+          title="{{ module.headline }}"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+        {% endif %}
+      </div>
+      {% elif _has_side_text %}
+      <div class="wa-hero__media-text">{{ _media_text }}</div>
+      {% elif _has_side_stats %}
+      {{ wa_hero_stat_list(_stats_out.items, 'side') }}
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  {% if module.accent_bar %}
+    {% set _brand_line_context = 'hero' %}
+    {% set _brand_line_class = 'wa-hero__accent-bar' %}
+    {% include "../../templates/partials/brand-line.html" %}
+  {% endif %}
+
+</section>
+
+{% endif %}

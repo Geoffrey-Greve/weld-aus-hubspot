@@ -1,0 +1,164 @@
+/*
+ * faq-accordion.module/module.css
+ * FAQ accordion - identical visual style to accordion.module.
+ * BEM prefix: wa-faq-accordion.
+ */
+
+/* ── Header (overline + heading) ─────────────────────────────────────────── */
+
+.wa-faq-accordion__head {
+  margin: 0 0 var(--wa-space-10, 2.5rem);
+}
+
+.wa-faq-accordion__heading {
+  font-family: var(--wa-font-heading);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: var(--wa-weight-extrabold, 800);
+  color: var(--wa-color-primary);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.wa-section--bg-primary .wa-faq-accordion__heading,
+.wa-section--bg-primary_dark .wa-faq-accordion__heading {
+  color: var(--wa-color-on-primary, #fff);
+}
+
+/* ── List ────────────────────────────────────────────────────────────────── */
+
+.wa-faq-accordion__list {
+  width: 100%;
+  margin: 0;
+  border-top: 1px solid var(--wa-color-border);
+}
+
+/* ── Item ────────────────────────────────────────────────────────────────── */
+
+.wa-faq-accordion__item {
+  border-bottom: 1px solid var(--wa-color-border);
+}
+
+.wa-faq-accordion__item > summary {
+  list-style: none;
+}
+.wa-faq-accordion__item > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* ── Summary ─────────────────────────────────────────────────────────────── */
+
+.wa-faq-accordion__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wa-space-4);
+  padding: var(--wa-space-5) 0;
+  cursor: pointer;
+  min-height: var(--wa-touch-min);
+  user-select: none;
+}
+
+.wa-faq-accordion__summary:focus-visible {
+  outline: 2px solid var(--wa-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--wa-radius-sm);
+}
+
+/* ── Title ───────────────────────────────────────────────────────────────── */
+
+.wa-faq-accordion__title {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-lg);
+  font-weight: var(--wa-weight-bold, 700);
+  color: var(--wa-color-primary);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.wa-section--bg-primary .wa-faq-accordion__title,
+.wa-section--bg-primary_dark .wa-faq-accordion__title {
+  color: var(--wa-color-on-primary, #fff);
+}
+
+/* ── Chevron ─────────────────────────────────────────────────────────────── */
+
+.wa-faq-accordion__chevron {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wa-color-text-muted);
+  transition: transform 0.2s ease;
+}
+
+.wa-faq-accordion__item[open] .wa-faq-accordion__chevron {
+  transform: rotate(180deg);
+}
+
+.wa-section--primary .wa-faq-accordion__chevron,
+.wa-section--primary-dark .wa-faq-accordion__chevron {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+
+.wa-faq-accordion__body {
+  padding: 0 0 var(--wa-space-5);
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text-muted);
+  line-height: 1.7;
+}
+
+.wa-faq-accordion__body > *:first-child {
+  margin-top: 0;
+}
+
+.wa-faq-accordion__body > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-section--primary .wa-faq-accordion__body,
+.wa-section--primary-dark .wa-faq-accordion__body {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Contact CTA (spaced below the question list) ────────────────────────── */
+
+.wa-faq-accordion__cta {
+  margin-top: var(--wa-space-10, 2.5rem);
+}
+
+/* ── Two-column layout at desktop ────────────────────────────────────────── */
+
+.wa-faq__layout { display: block; }
+
+@media (min-width: 1024px) {
+  .wa-faq__layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--wa-space-16);
+    align-items: start;
+  }
+  .wa-faq__aside {
+    position: sticky;
+    top: calc(72px + var(--wa-space-8));
+  }
+}
+
+.wa-faq__aside-heading {
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-2xl);
+  font-weight: 800;
+  color: inherit;
+  margin: 0 0 var(--wa-space-6) 0;
+}
+
+.wa-faq__contact-cta {
+  margin-top: var(--wa-space-6);
+}
+
+/* Remove centered max-width constraint when inside the two-column layout */
+.wa-faq__main .wa-faq-accordion__list {
+  max-width: none;
+  margin: 0;
+}

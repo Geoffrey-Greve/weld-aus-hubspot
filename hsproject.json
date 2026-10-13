@@ -1,0 +1,15 @@
+{
+  "name": "weld-australia-theme",
+  "srcDir": "theme",
+  "platformVersion": "2026.03",
+  "accounts": {
+    "staging": {
+      "name": "weld-australia-staging",
+      "portalId": 443253065
+    },
+    "production": {
+      "name": "weld-australia",
+      "portalId": 441838610
+    }
+  }
+}

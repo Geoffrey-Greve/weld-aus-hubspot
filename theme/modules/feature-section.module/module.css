@@ -1,0 +1,97 @@
+/* feature-section.module/module.css */
+
+.wa-feature-section__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-spacing-8, 2rem);
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .wa-feature-section--has-media .wa-feature-section__inner {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--wa-spacing-12, 3rem);
+  }
+
+  /* Media right (default): content | media */
+  .wa-feature-section--media-right .wa-feature-section__inner {
+    flex-direction: row;
+  }
+
+  /* Media left: media | content */
+  .wa-feature-section--media-left .wa-feature-section__inner {
+    flex-direction: row-reverse;
+  }
+
+  .wa-feature-section--has-media .wa-feature-section__content {
+    flex: 1 1 0;
+  }
+
+  .wa-feature-section--has-media .wa-feature-section__media {
+    flex: 0 0 48%;
+    max-width: 48%;
+  }
+}
+
+.wa-feature-section__eyebrow {
+  font-size: var(--wa-text-sm, 0.875rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wa-color-primary, #00529b);
+  margin-bottom: var(--wa-spacing-2, 0.5rem);
+}
+
+.wa-feature-section__heading {
+  font-size: var(--wa-text-3xl, 1.875rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--wa-spacing-4, 1rem);
+  color: var(--wa-color-text, #111827);
+}
+
+.wa-feature-section__body {
+  color: var(--wa-color-text, #111827);
+  line-height: 1.7;
+  margin-bottom: var(--wa-spacing-6, 1.5rem);
+}
+
+.wa-feature-section__body > *:last-child {
+  margin-bottom: 0;
+}
+
+.wa-feature-section__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--wa-radius-lg, 16px);
+  object-fit: cover;
+}
+
+/* 16:9 video wrapper */
+.wa-feature-section__video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  border-radius: var(--wa-radius-lg, 16px);
+  overflow: hidden;
+  background: #000;
+}
+
+.wa-feature-section__iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.wa-feature-section__cta {
+  margin-top: var(--wa-spacing-2, 0.5rem);
+}
+
+/* Alternate backgrounds for visual rhythm on multi-section pages */
+.wa-feature-section:nth-of-type(even).wa-section--bg-surface {
+  background-color: var(--wa-color-surface-alt, #f9fafb);
+}

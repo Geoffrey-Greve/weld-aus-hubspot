@@ -1,0 +1,188 @@
+/*
+ * certifications-list.module/module.css
+ *
+ * Styles for the server-rendered certifications list.
+ * Token-aware - uses --wa-* CSS custom properties from tokens.css.
+ *
+ * Layout:
+ *   Desktop (≥768px): 2- or 3-column CSS grid of cert cards
+ *   Mobile (<768px):  Single column stacked cards
+ *
+ * Status badge colours:
+ *   active/current → green (--wa-color-success)
+ *   pending/in_progress → amber (--wa-color-warning)
+ *   expired/lapsed → red (--wa-color-danger)
+ */
+
+/* ── Section heading ───────────────────────────────────────────────────── */
+
+.wa-certifications-section__heading {
+  margin-bottom: var(--wa-space-8);
+  font-family: var(--wa-font-heading);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: var(--wa-weight-bold);
+  line-height: var(--wa-leading-tight);
+  color: var(--wa-color-text);
+}
+
+/* ── Grid layout ───────────────────────────────────────────────────────── */
+
+.wa-certifications-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wa-space-6);
+}
+
+@media (min-width: 768px) {
+  .wa-certifications-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wa-certifications-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Cert card ─────────────────────────────────────────────────────────── */
+
+.wa-cert-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-lg);
+  box-shadow: var(--wa-shadow-card);
+  padding: var(--wa-space-6);
+  gap: var(--wa-space-4);
+  transition: box-shadow var(--wa-duration-normal) var(--wa-ease-default);
+}
+
+.wa-cert-card:hover {
+  box-shadow: var(--wa-shadow-md);
+}
+
+/* Status-tinted left border */
+
+.wa-cert-card--active {
+  border-left: 4px solid var(--wa-color-success);
+}
+
+.wa-cert-card--pending {
+  border-left: 4px solid var(--wa-color-warning);
+}
+
+.wa-cert-card--expired {
+  border-left: 4px solid var(--wa-color-danger);
+  opacity: 0.85;
+}
+
+/* ── Card header ───────────────────────────────────────────────────────── */
+
+.wa-cert-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--wa-space-3);
+  flex-wrap: wrap;
+}
+
+.wa-cert-card__name {
+  margin: 0;
+  font-family: var(--wa-font-heading);
+  font-size: var(--wa-text-md);
+  font-weight: var(--wa-weight-semibold);
+  line-height: var(--wa-leading-snug);
+  color: var(--wa-color-text);
+  flex: 1;
+}
+
+/* ── Status badge ──────────────────────────────────────────────────────── */
+
+.wa-cert-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--wa-space-1) var(--wa-space-3);
+  border-radius: var(--wa-radius-full);
+  font-size: var(--wa-text-xs);
+  font-weight: var(--wa-weight-semibold);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.wa-cert-status-badge--active {
+  background: var(--wa-color-success-surface);
+  color: var(--wa-color-success);
+  border: 1px solid var(--wa-color-success-border);
+}
+
+.wa-cert-status-badge--pending {
+  background: var(--wa-color-warning-surface);
+  color: var(--wa-color-warning);
+  border: 1px solid var(--wa-color-warning-border);
+}
+
+.wa-cert-status-badge--expired {
+  background: var(--wa-color-danger-surface);
+  color: var(--wa-color-danger);
+  border: 1px solid var(--wa-color-danger-border);
+}
+
+/* ── Expiry and step text ──────────────────────────────────────────────── */
+
+.wa-cert-card__expiry,
+.wa-cert-card__step {
+  margin: 0;
+  font-size: var(--wa-text-sm);
+  color: var(--wa-color-text-muted);
+  line-height: var(--wa-leading-normal);
+}
+
+.wa-cert-card__expiry-label,
+.wa-cert-card__step-label {
+  font-weight: var(--wa-weight-medium);
+  color: var(--wa-color-text);
+}
+
+/* ── Card actions ──────────────────────────────────────────────────────── */
+
+.wa-cert-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-3);
+  margin-top: auto;
+  padding-top: var(--wa-space-2);
+}
+
+/* Ensure touch target minimum (CLAUDE.md § 5.4 rule 2) */
+.wa-cert-card__actions .wa-btn {
+  min-height: var(--wa-touch-min);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ── Empty state ───────────────────────────────────────────────────────── */
+
+.wa-certifications-empty {
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+  padding: var(--wa-space-16) var(--wa-space-4);
+}
+
+.wa-certifications-empty__message {
+  font-size: var(--wa-text-base);
+  color: var(--wa-color-text-muted);
+  line-height: var(--wa-leading-relaxed);
+  margin-bottom: var(--wa-space-6);
+}
+
+.wa-certifications-empty__message p {
+  margin: 0;
+}
+
+.wa-certifications-empty .wa-btn {
+  min-height: var(--wa-touch-min);
+}

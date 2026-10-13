@@ -1,0 +1,92 @@
+name: Deploy theme
+
+# Manual, one-button deploy of the theme to the Weld Australia HubSpot portal.
+#
+# Why manual (workflow_dispatch) rather than auto-on-merge: every deploy to the
+# LIVE portal should be a deliberate human action. Flipping this to run on
+# `push: [main]` later is a one-line change once the team is confident.
+#
+# Staging (portal 443253065) has its own workflow, deploy-staging.yml, which runs
+# automatically on merge to main. That is what makes "we tested it on staging" mean
+# the same artifact: before it existed, staging was pushed from a laptop and only
+# production went through CI.
+#
+# What it guarantees, and why that kills a whole class of regressions:
+#   - a FULL `pnpm build` runs first (no "forgot to build" / stale critical.css),
+#   - the asset-reference gate + bundle-size budget must pass (no dangling refs),
+#   - the FULL theme is uploaded by scripts/upload.ts (no "uploaded one module"),
+#   - upload.ts aborts on a failed batch (no half-deployed broken islands).
+#
+# Setup (once): add a repository secret HUBSPOT_PERSONAL_ACCESS_KEY
+#   (HubSpot → Settings → Integrations → Private Apps / `hs auth`) for portal
+#   441838610. No other config is needed - this workflow writes hubspot.config.yml
+#   from the secret at run time (it is gitignored and never persisted).
+#
+#   The generated config names the account `weld-australia`, matching
+#   ACCOUNT_MAP.production in scripts/lib/hubspot-auth.ts. It used to write
+#   `weld-australia-staging` against portal 441838610 - the exact name/id pairing
+#   hubspot-portals.test.ts exists to forbid, because it is how `upload:staging`
+#   came to deploy to the live site. upload.ts matches on portalId first so the
+#   deploy worked anyway, but anyone copying that config to a laptop inherited the
+#   original defect.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "deploy" to confirm deploying to the LIVE portal (441838610).'
+        required: true
+        default: ''
+
+concurrency:
+  group: deploy-theme
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Live deploys are restricted to main: workflow_dispatch can target any branch,
+    # so without this an unmerged feature branch (never through PR/main CI) could be
+    # uploaded straight to the live portal. Require both the confirmation text AND
+    # the main ref.
+    if: ${{ github.event.inputs.confirm == 'deploy' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable corepack (pnpm)
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Write HubSpot CLI config from secret
+        env:
+          PAK: ${{ secrets.HUBSPOT_PERSONAL_ACCESS_KEY }}
+        run: |
+          if [ -z "$PAK" ]; then
+            echo "::error::Secret HUBSPOT_PERSONAL_ACCESS_KEY is not set. Add it in repo Settings → Secrets → Actions."
+            exit 1
+          fi
+          cat > hubspot.config.yml <<YAML
+          defaultPortal: weld-australia
+          portals:
+            - name: weld-australia
+              portalId: 441838610
+              authType: personalaccesskey
+              personalAccessKey: $PAK
+          YAML
+
+      - name: Build theme
+        run: pnpm build
+
+      - name: Upload full theme to the live portal (441838610)
+        run: node_modules/.bin/tsx scripts/upload.ts --env=production
+
+      - name: Remove CLI config
+        if: always()
+        run: rm -f hubspot.config.yml
